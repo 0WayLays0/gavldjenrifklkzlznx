@@ -38,22 +38,22 @@ Sons : tintements métalliques, carillons, impacts lourds, résonances
                            l'impact.
  2. Gilded Chains      [~] Des chaînes d'or sortent du sol et clouent la cible
                            sur place.
- 3. Goldfall           [ ] Des lingots massifs tombent du ciel sur la zone
+ 3. Goldfall           [~] Des lingots massifs tombent du ciel sur la zone
                            visée, comme une pluie de météores en or.
- 4. Golden Spikes      [ ] Une ligne de pics de cristal d'or jaillit du sol
+ 4. Golden Spikes      [~] Une ligne de pics de cristal d'or jaillit du sol
                            devant le lanceur, en vague.
- 5. Midas Curse        [ ] La cible se recouvre d'or petit à petit, ralentit
+ 5. Midas Curse        [~] La cible se recouvre d'or petit à petit, ralentit
                            jusqu'à se figer en statue dorée, puis vole en
                            éclats.
- 6. Aurum Blade        [ ] Une énorme épée d'or spectrale apparaît au-dessus
+ 6. Aurum Blade        [~] Une énorme épée d'or spectrale apparaît au-dessus
                            du lanceur et s'abat sur l'ennemi.
- 7. Molten Torrent     [ ] Un fleuve d'or fondu brûlant qui laisse des flaques
+ 7. Molten Torrent     [~] Un fleuve d'or fondu brûlant qui laisse des flaques
                            incandescentes au sol.
- 8. Gilded Armor       [ ] Le lanceur se couvre d'une armure d'or liquide qui
+ 8. Gilded Armor       [~] Le lanceur se couvre d'une armure d'or liquide qui
                            renvoie une partie des dégâts reçus.
- 9. Golden Sentinels   [ ] Invoque 2 ou 3 chevaliers d'or qui combattent pour
+ 9. Golden Sentinels   [~] Invoque 2 ou 3 chevaliers d'or qui combattent pour
                            le lanceur.
-10. Sun of Eldorado    [ ] ULTIME - Un soleil d'or apparaît au-dessus du
+10. Sun of Eldorado    [~] ULTIME - Un soleil d'or apparaît au-dessus du
                            lanceur, tire des rayons dorés sur tous les
                            ennemis autour, puis s'effondre en explosion d'or.
 

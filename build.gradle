@@ -36,6 +36,10 @@ minecraft {
         }
 
         client {
+            // Automated client smoke test (debug/ClientSmokeTest), only with -Parcanes.autotest=true
+            if (project.hasProperty('arcanes.autotest')) {
+                property 'arcanes.autotest', project.property('arcanes.autotest')
+            }
         }
 
         server {

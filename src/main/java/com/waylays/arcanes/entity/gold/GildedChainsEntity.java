@@ -3,7 +3,6 @@ package com.waylays.arcanes.entity.gold;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.entity.mobs.AntiMagicSusceptible;
 import io.redspace.ironsspellbooks.entity.spells.root.PreventDismount;
 import net.minecraft.nbt.CompoundTag;
@@ -122,9 +121,9 @@ public class GildedChainsEntity extends Entity implements PreventDismount, AntiM
         float width = boundWidth();
         for (int i = 0; i < CHAIN_COUNT; i++) {
             Vec3 anchor = position().add(anchorOffset(i, width));
-            MagicManager.spawnParticles(level, GoldFx.nuggetShards(), anchor.x, anchor.y + .1, anchor.z, 6, .1, .05, .1, .15, false);
-            MagicManager.spawnParticles(level, GoldFx.sparks(), anchor.x, anchor.y + .1, anchor.z, 5, .05, .05, .05, .35, false);
-            MagicManager.spawnParticles(level, GoldFx.DEEP_DUST, anchor.x, anchor.y + .2, anchor.z, 8, .2, .1, .2, .02, false);
+            GoldFx.particles(level, GoldFx.nuggetShards(), anchor.x, anchor.y + .1, anchor.z, 6, .1, .05, .1, .15);
+            GoldFx.particles(level, GoldFx.sparks(), anchor.x, anchor.y + .1, anchor.z, 5, .05, .05, .05, .35);
+            GoldFx.particles(level, GoldFx.DEEP_DUST, anchor.x, anchor.y + .2, anchor.z, 8, .2, .1, .2, .02);
         }
     }
 
@@ -154,7 +153,7 @@ public class GildedChainsEntity extends Entity implements PreventDismount, AntiM
         if (!level.isClientSide) {
             double y = getY() + boundHeight() * .5;
             GoldFx.shatterBurst(level, getX(), y, getZ(), .8f);
-            MagicManager.spawnParticles(level, GoldFx.chainShards(), getX(), y, getZ(), 16, boundWidth() * .5, boundHeight() * .3, boundWidth() * .5, .2, false);
+            GoldFx.particles(level, GoldFx.chainShards(), getX(), y, getZ(), 16, boundWidth() * .5, boundHeight() * .3, boundWidth() * .5, .2);
             level.playSound(null, getX(), getY(), getZ(), SoundEvents.CHAIN_BREAK, SoundSource.NEUTRAL, 2f, .7f);
             level.playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.NEUTRAL, 1.5f, .9f);
         }

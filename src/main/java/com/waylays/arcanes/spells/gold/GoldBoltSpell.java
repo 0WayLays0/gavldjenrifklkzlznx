@@ -11,7 +11,6 @@ import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.Utils;
-import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -91,8 +90,8 @@ public class GoldBoltSpell extends AbstractSpell {
         level.addFreshEntity(bolt);
 
         Vec3 hand = entity.getEyePosition().add(look.scale(.8)).subtract(0, .2, 0);
-        MagicManager.spawnParticles(level, GoldFx.sparks(), hand.x, hand.y, hand.z, 6, .05, .05, .05, .2, false);
-        MagicManager.spawnParticles(level, GoldFx.PALE_DUST, hand.x, hand.y, hand.z, 8, .15, .15, .15, .02, false);
+        GoldFx.particles(level, GoldFx.sparks(), hand.x, hand.y, hand.z, 6, .05, .05, .05, .2);
+        GoldFx.particles(level, GoldFx.PALE_DUST, hand.x, hand.y, hand.z, 8, .15, .15, .15, .02);
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.2f, 1.4f + Utils.random.nextFloat() * .2f);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }

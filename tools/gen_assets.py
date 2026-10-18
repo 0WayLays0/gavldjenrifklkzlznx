@@ -246,40 +246,78 @@ def golden_grimoire_icon():
 
 
 def golden_grimoire_model_texture():
-    """32x32 texture for the 3D book: cover, cover edge, spine, pages and clasp gem (2 px per model unit)."""
-    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    """64x64 texture of the 3D book, 4 px per model unit. Regions (in model units):
+    cover [0,0,12,9], cover edge [12,0,13,9], pages side [13,0,16,8], spine [0,9,12,12], pages edge [0,12,12,15],
+    gold fittings [12,9,14,11], gem [14,9,16,11], strap [12,11,16,12]."""
+    s = 4
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    # Cover: uv [0,0,11,8] -> px 22x16
-    d.rectangle((0, 0, 21, 15), fill=BASE + (255,))
-    d.rectangle((0, 0, 21, 15), outline=OUTLINE + (255,))
-    d.rectangle((1, 1, 20, 14), outline=LIGHT + (255,))
-    d.rectangle((3, 3, 18, 12), outline=SHADOW + (255,))
-    for (x, y) in ((1, 1), (20, 1), (1, 14), (20, 14)):
-        d.rectangle((x - (0 if x < 10 else 1), y - (0 if y < 8 else 1), x + (1 if x < 10 else 0), y + (1 if y < 8 else 0)), fill=HIGH + (255,))
-    # Sun sigil in the middle of the cover
-    cx, cy = 10.5, 7.5
-    for a in range(8):
-        ang = a * math.pi / 4
-        d.line((cx + math.cos(ang) * 2, cy + math.sin(ang) * 2, cx + math.cos(ang) * 4, cy + math.sin(ang) * 4), fill=HIGH + (255,))
-    d.ellipse((cx - 2, cy - 2, cx + 2, cy + 2), fill=TOPAZ + (255,), outline=TOPAZ_DARK + (255,))
-    img.putpixel((10, 6), TOPAZ_LIGHT + (255,))
-    # Cover edge: uv [11,0,12,8] -> px 22..23 x 0..15
-    d.rectangle((22, 0, 23, 15), fill=LIGHT + (255,))
-    d.line((23, 0, 23, 15), fill=SHADOW + (255,))
-    # Spine: uv [12,0,15,11] -> px 24..29 x 0..21
-    d.rectangle((24, 0, 29, 21), fill=SHADOW + (255,))
-    d.line((25, 0, 25, 21), fill=BASE + (255,))
-    for y in (3, 10, 17):
-        d.line((24, y, 29, y), fill=LIGHT + (255,))
-        d.line((24, y + 1, 29, y + 1), fill=OUTLINE + (255,))
-    # Pages: uv [0,8,11,16] -> px 0..21 x 16..31
-    d.rectangle((0, 16, 21, 31), fill=CREAM + (255,))
-    for y in range(17, 32, 2):
-        d.line((0, y, 21, y), fill=CREAM_SHADE + (255,))
-    # Clasp gem: uv [15,0,16,2] -> px 30..31 x 0..3
-    d.rectangle((30, 0, 31, 3), fill=TOPAZ + (255,))
-    img.putpixel((30, 0), TOPAZ_LIGHT + (255,))
-    img.putpixel((31, 3), TOPAZ_DARK + (255,))
+
+    def box(u0, v0, u1, v1, fill, outline=None):
+        d.rectangle((u0 * s, v0 * s, u1 * s - 1, v1 * s - 1), fill=fill + (255,), outline=None if outline is None else outline + (255,))
+
+    # Cover: deep amber leather framed by gold
+    W, H = 12 * s, 9 * s
+    for y in range(H):
+        for x in range(W):
+            t = math.hypot(x - W / 2, y - H / 2) / (W / 2)
+            c = lerp((176, 98, 18), (108, 52, 8), t)
+            # leather grain
+            if (x * 7 + y * 13) % 11 == 0:
+                c = lerp(c, (90, 40, 6), .5)
+            img.putpixel((x, y), c + (255,))
+    d.rectangle((0, 0, W - 1, H - 1), outline=OUTLINE + (255,))
+    d.rectangle((1, 1, W - 2, H - 2), outline=LIGHT + (255,))
+    d.rectangle((2, 2, W - 3, H - 3), outline=BASE + (255,))
+    d.rectangle((4, 4, W - 5, H - 5), outline=SHADOW + (255,))
+    # Filigree in the corners
+    for (cx, cy, sx, sy) in ((5, 5, 1, 1), (W - 6, 5, -1, 1), (5, H - 6, 1, -1), (W - 6, H - 6, -1, -1)):
+        for i in range(5):
+            img.putpixel((cx + sx * i, cy), HIGH + (255,))
+            img.putpixel((cx, cy + sy * i), HIGH + (255,))
+        img.putpixel((cx + sx * 2, cy + sy * 2), LIGHT + (255,))
+        img.putpixel((cx + sx * 3, cy + sy * 3), BASE + (255,))
+    # Sun sigil around the gem
+    cx, cy = W / 2 - .5, H / 2 - .5
+    for k in range(12):
+        ang = k * math.pi / 6
+        r1 = 9 if k % 2 == 0 else 7
+        d.line((cx + math.cos(ang) * 6, cy + math.sin(ang) * 6, cx + math.cos(ang) * r1, cy + math.sin(ang) * r1), fill=HIGH + (255,))
+    d.ellipse((cx - 5.5, cy - 5.5, cx + 5.5, cy + 5.5), outline=LIGHT + (255,))
+    # Cover edge
+    box(12, 0, 13, 9, BASE)
+    d.line((12 * s, 0, 12 * s, H - 1), fill=HIGH + (255,))
+    # Pages side (north/south faces of the page block)
+    box(13, 0, 16, 8, CREAM)
+    for y in range(1, 8 * s, 2):
+        d.line((13 * s, y, 16 * s - 1, y), fill=CREAM_SHADE + (255,))
+    # Spine: gold-tooled leather
+    for y in range(9 * s, 12 * s):
+        for x in range(0, 12 * s):
+            t = abs(y - 10.5 * s) / (1.5 * s)
+            img.putpixel((x, y), lerp((150, 80, 12), (96, 44, 6), t) + (255,))
+    d.line((0, 9 * s, 12 * s - 1, 9 * s), fill=LIGHT + (255,))
+    d.line((0, 12 * s - 1, 12 * s - 1, 12 * s - 1), fill=OUTLINE + (255,))
+    for x in range(2, 12 * s, 6):
+        img.putpixel((x, 10 * s + 2), HIGH + (255,))
+    # Page edges (bottom of the book)
+    box(0, 12, 12, 15, CREAM)
+    for x in range(0, 12 * s, 2):
+        d.line((x, 12 * s, x, 15 * s - 1), fill=CREAM_SHADE + (255,))
+    # Gold fittings: corner guards, spine bands, gem bezel
+    box(12, 9, 14, 11, LIGHT)
+    d.rectangle((12 * s, 9 * s, 14 * s - 1, 11 * s - 1), outline=SHADOW + (255,))
+    d.line((12 * s + 1, 9 * s + 1, 14 * s - 2, 9 * s + 1), fill=HIGH + (255,))
+    # Topaz
+    for y in range(9 * s, 11 * s):
+        for x in range(14 * s, 16 * s):
+            t = math.hypot(x - 14.6 * s, y - 9.6 * s) / (1.6 * s)
+            img.putpixel((x, y), lerp(TOPAZ_LIGHT, TOPAZ_DARK, t) + (255,))
+    # Strap: dark leather with gold stitching
+    box(12, 11, 16, 12, (92, 46, 18))
+    for x in range(12 * s + 1, 16 * s, 3):
+        img.putpixel((x, 11 * s + 1), BASE + (255,))
+        img.putpixel((x, 12 * s - 2), BASE + (255,))
     return img
 
 
@@ -384,6 +422,287 @@ def gold_circle():
     return out.convert("RGBA")
 
 
+# ---------------------------------------------------------------- painted icons (drawn large, scaled down)
+
+def painted(size, draw, background=None, final=16):
+    """Draws at {size}x{size} with draw(d, img), then scales down to final x final (soft, painterly like Iron's icons)."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    if background is not None:
+        cx, cy, inner, outer = background
+        bg = Image.new("RGBA", (size, size))
+        for y in range(size):
+            for x in range(size):
+                t = math.hypot(x - cx * size, y - cy * size) / (size * .75)
+                bg.putpixel((x, y), lerp(inner, outer, t) + (255,))
+        img = bg
+    d = ImageDraw.Draw(img)
+    draw(d, img, size)
+    small = img.resize((final, final), Image.LANCZOS)
+    # Bring back crisp edges lost in the downscale
+    return small.filter(ImageFilter.UnsharpMask(radius=1, percent=90, threshold=0))
+
+
+def glow_spot(img, cx, cy, radius, color, strength=1.0):
+    """Adds light around (cx, cy) (additive)."""
+    w, h = img.size
+    px = img.load()
+    for y in range(max(0, int(cy - radius)), min(h, int(cy + radius) + 1)):
+        for x in range(max(0, int(cx - radius)), min(w, int(cx + radius) + 1)):
+            t = math.hypot(x - cx, y - cy) / radius
+            if t < 1:
+                k = (1 - t) ** 2 * strength
+                r, g, b, a = px[x, y]
+                px[x, y] = (min(255, int(r + color[0] * k)), min(255, int(g + color[1] * k)), min(255, int(b + color[2] * k)), max(a, int(255 * min(1, k * 2))))
+
+
+def ingot_poly(cx, cy, length, width, angle):
+    """Top face of an ingot as a parallelogram-ish trapezoid, rotated."""
+    ca, sa = math.cos(angle), math.sin(angle)
+    pts = [(-length / 2, -width / 2), (length / 2, -width / 2), (length / 2 + width * .3, width / 2), (-length / 2 - width * .3, width / 2)]
+    return [(cx + x * ca - y * sa, cy + x * sa + y * ca) for x, y in pts]
+
+
+def goldfall_icon():
+    def draw(d, img, S):
+        for i, (x, y, l) in enumerate(((.3, .3, .2), (.62, .2, .16), (.5, .58, .24))):
+            # falling streak
+            d.line((x * S + S * .15, y * S - S * .25, x * S, y * S), fill=(255, 200, 80, 140), width=int(S * .08))
+            poly = ingot_poly(x * S, y * S, l * S, l * S * .45, math.radians(-20))
+            d.polygon(poly, fill=BASE + (255,), outline=OUTLINE + (255,))
+            d.line(poly[0:2], fill=HIGH + (255,), width=max(1, S // 40))
+        glow_spot(img, .5 * S, .9 * S, .45 * S, (255, 170, 40), 1.2)
+        d.line((0, .93 * S, S, .93 * S), fill=(60, 30, 8, 255), width=int(S * .1))
+    return painted(64, draw, (.5, .9, (90, 54, 14), (14, 10, 26)))
+
+
+def golden_spikes_icon():
+    def draw(d, img, S):
+        glow_spot(img, .5 * S, .85 * S, .6 * S, (255, 180, 50), .9)
+        for x, h, w in ((.18, .35, .14), (.42, .55, .17), (.7, .78, .2)):
+            base = .9 * S
+            tip = (x * S, base - h * S)
+            left = (x * S - w * S / 2, base)
+            right = (x * S + w * S / 2, base)
+            d.polygon([left, tip, (x * S, base)], fill=HIGH + (255,))
+            d.polygon([(x * S, base), tip, right], fill=SHADOW + (255,))
+            d.line([left, tip, right], fill=OUTLINE + (255,), width=max(1, S // 40))
+        d.rectangle((0, .9 * S, S, S), fill=(50, 26, 8, 255))
+    return painted(64, draw, (.5, .8, (80, 46, 10), (16, 10, 8)))
+
+
+def midas_curse_icon():
+    def draw(d, img, S):
+        glow_spot(img, .5 * S, .45 * S, .55 * S, (255, 190, 60), .7)
+        # Golden bust: head and shoulders
+        d.ellipse((.33 * S, .16 * S, .67 * S, .54 * S), fill=BASE + (255,), outline=OUTLINE + (255,), width=max(1, S // 32))
+        d.pieslice((.12 * S, .5 * S, .88 * S, 1.3 * S), 180, 360, fill=SHADOW + (255,), outline=OUTLINE + (255,), width=max(1, S // 32))
+        d.ellipse((.38 * S, .2 * S, .52 * S, .36 * S), fill=HIGH + (255,))
+        # Cracks of the shattering statue
+        crack = (40, 16, 4, 255)
+        w = max(1, S // 40)
+        d.line([(.55 * S, .2 * S), (.5 * S, .32 * S), (.58 * S, .42 * S), (.52 * S, .54 * S)], fill=crack, width=w)
+        d.line([(.5 * S, .62 * S), (.4 * S, .74 * S), (.45 * S, .86 * S)], fill=crack, width=w)
+        d.line([(.6 * S, .66 * S), (.7 * S, .8 * S)], fill=crack, width=w)
+    return painted(64, draw, (.5, .4, (70, 40, 12), (18, 10, 6)))
+
+
+def aurum_blade_icon():
+    def draw(d, img, S):
+        glow_spot(img, .5 * S, .55 * S, .55 * S, (255, 200, 80), .9)
+        w = max(1, S // 40)
+        # Blade pointing down
+        d.polygon([(.43 * S, .3 * S), (.57 * S, .3 * S), (.57 * S, .82 * S), (.5 * S, .97 * S), (.43 * S, .82 * S)], fill=LIGHT + (255,), outline=OUTLINE + (255,))
+        d.line((.5 * S, .32 * S, .5 * S, .92 * S), fill=GLINT + (255,), width=w)
+        # Crossguard, grip and pommel
+        d.rectangle((.24 * S, .22 * S, .76 * S, .3 * S), fill=BASE + (255,), outline=OUTLINE + (255,))
+        d.rectangle((.45 * S, .08 * S, .55 * S, .22 * S), fill=(120, 60, 16, 255), outline=OUTLINE + (255,))
+        d.ellipse((.42 * S, .01 * S, .58 * S, .12 * S), fill=TOPAZ + (255,), outline=OUTLINE + (255,))
+    return painted(64, draw, (.5, .55, (84, 52, 14), (12, 10, 22)))
+
+
+def molten_torrent_icon():
+    def draw(d, img, S):
+        glow_spot(img, .75 * S, .85 * S, .5 * S, (255, 110, 10), 1.2)
+        w = int(S * .16)
+        pts = [(.1 * S, .1 * S), (.35 * S, .3 * S), (.55 * S, .55 * S), (.72 * S, .82 * S)]
+        d.line(pts, fill=(230, 110, 10, 255), width=w, joint="curve")
+        d.line(pts, fill=(255, 190, 40, 255), width=int(w * .55), joint="curve")
+        d.line(pts[:3], fill=(255, 240, 160, 255), width=int(w * .2), joint="curve")
+        d.ellipse((.5 * S, .82 * S, .98 * S, .98 * S), fill=(255, 150, 20, 255))
+        for x, y in ((.25 * S, .5 * S), (.45 * S, .78 * S), (.85 * S, .62 * S)):
+            d.ellipse((x - .04 * S, y - .04 * S, x + .04 * S, y + .04 * S), fill=(255, 200, 60, 255))
+    return painted(64, draw, (.6, .8, (70, 30, 6), (14, 8, 6)))
+
+
+def chestplate_shape(d, S, ox=0.0, oy=0.0, scale=1.0):
+    def p(x, y):
+        return (ox * S + x * S * scale, oy * S + y * S * scale)
+    body = [p(.2, .18), p(.38, .12), p(.5, .2), p(.62, .12), p(.8, .18), p(.92, .4), p(.8, .46), p(.78, .9), p(.22, .9), p(.2, .46), p(.08, .4)]
+    d.polygon(body, fill=BASE + (255,), outline=OUTLINE + (255,))
+    d.polygon([p(.3, .25), p(.5, .3), p(.5, .85), p(.3, .85)], fill=LIGHT + (255,))
+    d.line([p(.5, .22), p(.5, .88)], fill=SHADOW + (255,), width=max(1, int(S * scale) // 40))
+    d.line([p(.25, .55), p(.75, .55)], fill=SHADOW + (255,), width=max(1, int(S * scale) // 50))
+    d.line([p(.32, .27), p(.32, .8)], fill=HIGH + (255,), width=max(1, int(S * scale) // 40))
+
+
+def gilded_armor_icon():
+    def draw(d, img, S):
+        glow_spot(img, .5 * S, .5 * S, .6 * S, (255, 190, 60), .8)
+        chestplate_shape(d, S)
+        for x, y in ((.15 * S, .75 * S), (.85 * S, .7 * S), (.12 * S, .25 * S)):
+            d.line((x - .05 * S, y, x + .05 * S, y), fill=GLINT + (255,), width=max(1, S // 32))
+            d.line((x, y - .05 * S, x, y + .05 * S), fill=GLINT + (255,), width=max(1, S // 32))
+    return painted(64, draw, (.5, .5, (76, 46, 12), (14, 10, 10)))
+
+
+def helmet_shape(d, S):
+    w = max(1, S // 32)
+    d.chord((.18 * S, .1 * S, .82 * S, .8 * S), 180, 360, fill=BASE + (255,), outline=OUTLINE + (255,), width=w)
+    d.rectangle((.18 * S, .44 * S, .82 * S, .86 * S), fill=BASE + (255,), outline=OUTLINE + (255,), width=w)
+    d.rectangle((.26 * S, .2 * S, .4 * S, .8 * S), fill=LIGHT + (255,))
+    d.rectangle((.47 * S, .08 * S, .53 * S, .5 * S), fill=HIGH + (255,))
+    # Glowing visor slit
+    d.rectangle((.24 * S, .5 * S, .76 * S, .58 * S), fill=(30, 14, 4, 255))
+    d.rectangle((.3 * S, .52 * S, .42 * S, .56 * S), fill=GLINT + (255,))
+    d.rectangle((.58 * S, .52 * S, .7 * S, .56 * S), fill=GLINT + (255,))
+
+
+def golden_sentinels_icon():
+    def draw(d, img, S):
+        glow_spot(img, .5 * S, .45 * S, .6 * S, (255, 190, 60), .8)
+        helmet_shape(d, S)
+    return painted(64, draw, (.5, .45, (70, 44, 12), (12, 10, 18)))
+
+
+def sun_of_eldorado_icon():
+    def draw(d, img, S):
+        c = S / 2
+        for k in range(16):
+            ang = k * math.pi / 8
+            r = (.47 if k % 2 == 0 else .34) * S
+            half = math.pi / 22
+            d.polygon([(c + math.cos(ang - half) * .2 * S, c + math.sin(ang - half) * .2 * S),
+                       (c + math.cos(ang) * r, c + math.sin(ang) * r),
+                       (c + math.cos(ang + half) * .2 * S, c + math.sin(ang + half) * .2 * S)], fill=LIGHT + (255,))
+        d.ellipse((c - .22 * S, c - .22 * S, c + .22 * S, c + .22 * S), fill=BASE + (255,), outline=OUTLINE + (255,), width=max(1, S // 40))
+        glow_spot(img, c, c, .5 * S, (255, 220, 120), 1.0)
+        d.ellipse((c - .1 * S, c - .1 * S, c + .1 * S, c + .1 * S), fill=GLINT + (255,))
+    return painted(64, draw, (.5, .5, (110, 60, 10), (20, 10, 30)))
+
+
+def midas_curse_effect_icon():
+    def draw(d, img, S):
+        d.ellipse((.12 * S, .12 * S, .88 * S, .88 * S), fill=BASE + (255,), outline=OUTLINE + (255,), width=max(1, S // 24))
+        d.ellipse((.22 * S, .22 * S, .78 * S, .78 * S), outline=SHADOW + (255,), width=max(1, S // 30))
+        d.ellipse((.3 * S, .26 * S, .5 * S, .44 * S), fill=HIGH + (255,))
+        d.line([(.58 * S, .2 * S), (.5 * S, .45 * S), (.6 * S, .6 * S), (.48 * S, .82 * S)], fill=(40, 16, 4, 255), width=max(1, S // 24))
+    return painted(72, draw, None, 18)
+
+
+def gilded_armor_effect_icon():
+    def draw(d, img, S):
+        chestplate_shape(d, S, .02, 0.0, .96)
+    return painted(72, draw, None, 18)
+
+
+def gold_crystal():
+    img = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            t = y / 15
+            c = lerp(GLINT, BASE, t * 1.2)
+            if (x + y) % 6 == 0 or (x - y) % 7 == 0:
+                c = lerp(c, HIGH, .6)
+            if x in (0, 15):
+                c = lerp(c, SHADOW, .5)
+            img.putpixel((x, y), c + (255,))
+    return img
+
+
+def molten_pool():
+    """Additive (black = invisible): a ragged pool, white-hot centre, orange rim."""
+    size = 64
+    img = Image.new("RGBA", (size, size))
+    c = size / 2
+    for y in range(size):
+        for x in range(size):
+            ang = math.atan2(y - c, x - c)
+            edge = .82 + .1 * math.sin(ang * 5) + .06 * math.sin(ang * 11 + 1.3)
+            t = math.hypot(x - c, y - c) / (c * edge)
+            if t >= 1:
+                img.putpixel((x, y), (0, 0, 0, 255))
+                continue
+            swirl = .5 + .5 * math.sin(t * 9 + ang * 3)
+            col = lerp((255, 245, 190), (255, 140, 15), t ** .8)
+            col = lerp(col, (255, 200, 60), swirl * .3)
+            k = min(1, (1 - t) * 3)
+            img.putpixel((x, y), tuple(int(v * k) for v in col) + (255,))
+    return img
+
+
+def gold_beam():
+    """Additive beam cross-section, constant along the beam."""
+    img = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            t = abs(x + .5 - 8) / 8
+            core = max(0.0, 1 - t * 3)
+            k = (1 - t) ** 1.5
+            img.putpixel((x, y), (min(255, int(255 * k + 40 * core)), min(255, int(190 * k + 60 * core)), min(255, int(50 * k + 150 * core)), 255))
+    return img
+
+
+def eldorado_sun():
+    """Additive crown of rays around an empty centre (the core is drawn with the glow)."""
+    s = 4
+    size = 128 * s
+    c = size / 2
+    img = Image.new("RGB", (size, size), (0, 0, 0))
+    d = ImageDraw.Draw(img)
+    for k in range(24):
+        ang = k * math.pi / 12
+        r = (61 if k % 2 == 0 else 46) * s
+        half = math.pi / (40 if k % 2 == 0 else 52)
+        d.polygon([(c + math.cos(ang - half) * 20 * s, c + math.sin(ang - half) * 20 * s),
+                   (c + math.cos(ang) * r, c + math.sin(ang) * r),
+                   (c + math.cos(ang + half) * 20 * s, c + math.sin(ang + half) * 20 * s)], fill=(255, 190, 60))
+    d.ellipse((c - 24 * s, c - 24 * s, c + 24 * s, c + 24 * s), outline=(255, 235, 150), width=3 * s)
+    img = img.resize((128, 128), Image.LANCZOS)
+    glow = img.filter(ImageFilter.GaussianBlur(4))
+    out = Image.new("RGB", (128, 128))
+    a, b, o = img.load(), glow.load(), out.load()
+    for y in range(128):
+        for x in range(128):
+            o[x, y] = tuple(min(255, int(a[x, y][i] + b[x, y][i] * .8)) for i in range(3))
+    return out.convert("RGBA")
+
+
+def golden_sentinel_skin():
+    """64x64 humanoid skin (zombie layout): dark bronze body under the armor, gold mask with a dark visor."""
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    for y in range(64):
+        for x in range(64):
+            n = ((x * 13 + y * 7) % 9) / 9
+            img.putpixel((x, y), lerp((120, 72, 14), (90, 50, 10), n) + (255,))
+    d = ImageDraw.Draw(img)
+    # Head front (8..16, 8..16): gold mask with a visor slit
+    d.rectangle((8, 8, 15, 15), fill=BASE + (255,))
+    d.rectangle((8, 8, 15, 8), fill=HIGH + (255,))
+    d.rectangle((8, 11, 15, 12), fill=(30, 14, 4, 255))
+    d.line((11, 13, 12, 15), fill=SHADOW + (255,))
+    # Hat layer (40..64, 0..16) left empty
+    d.rectangle((32, 0, 63, 15), fill=(0, 0, 0, 0))
+    return img
+
+
+def golden_sentinel_eyes():
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    for x in (9, 10, 13, 14):
+        img.putpixel((x, 11), (255, 240, 150, 255))
+        img.putpixel((x, 12), (255, 200, 60, 255))
+    return img
+
+
 # ---------------------------------------------------------------- models
 
 def item_models():
@@ -398,37 +717,64 @@ def item_models():
     write_json("models/item/golden_grimoire_gui.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/golden_grimoire"}})
 
     t = "#book"
-    cover = {"uv": [0, 0, 11, 8], "texture": t}
-    cover_flipped = {"uv": [11, 0, 0, 8], "texture": t}
-    edge = {"uv": [11, 0, 12, 8], "texture": t}
-    pages = {"uv": [0, 8, 11, 16], "texture": t}
-    spine_top = {"uv": [12, 0, 15, 11], "texture": t}
-    gem = {"uv": [15, 0, 16, 2], "texture": t}
+
+    def f(u0, v0, u1, v1, rotation=0):
+        face = {"uv": [u0, v0, u1, v1], "texture": t}
+        if rotation:
+            face["rotation"] = rotation
+        return face
+
+    cover = f(0, 0, 12, 9)
+    cover_mirror = f(12, 0, 0, 9)
+    edge = f(12, 0, 13, 9)
+    pages_side = f(13, 0, 16, 8)
+    spine = f(0, 9, 12, 12, 90)
+    pages_edge = f(0, 12, 12, 15, 90)
+    gold = f(12, 9, 14, 11)
+    gem = f(14, 9, 16, 11)
+    strap = f(12, 11, 16, 12)
 
     def box(frm, to, faces):
         return {"from": frm, "to": to, "faces": faces}
 
+    def solid(frm, to, face):
+        return box(frm, to, {k: face for k in ("north", "south", "east", "west", "up", "down")})
+
     edges = {k: edge for k in ("north", "south", "up", "down")}
     elements = [
-        # Left and right covers (thin slabs standing on their edge, spine up)
-        box([5.5, 0, 2.5], [6.5, 8, 13.5], dict(edges, west=cover_flipped, east=edge)),
-        box([9.5, 0, 2.5], [10.5, 8, 13.5], dict(edges, east=cover, west=edge)),
-        # Spine across the top
-        box([6.5, 7, 2.5], [9.5, 8, 13.5], {"up": spine_top, "down": edge, "north": edge, "south": edge}),
-        # Page block
-        box([6.5, 0.5, 3], [9.5, 7, 13], {"north": pages, "south": pages, "down": pages}),
-        # Clasp gem on the front cover
-        box([10.5, 3, 7], [11, 5, 9], {"east": gem, "north": gem, "south": gem, "up": gem, "down": gem}),
+        # Covers (book standing on its open edge, spine up)
+        box([4.5, 0, 2], [5.5, 9, 14], dict(edges, west=cover_mirror, east=edge)),
+        box([10.5, 0, 2], [11.5, 9, 14], dict(edges, east=cover, west=edge)),
+        # Spine and page block
+        box([5.5, 8, 2], [10.5, 9.2, 14], {"up": spine, "down": edge, "north": edge, "south": edge}),
+        box([5.5, .4, 2.6], [10.5, 8, 13.4], {"north": pages_side, "south": pages_side, "down": pages_edge}),
+        # Raised bands across the spine
+        solid([4.3, 9.2, 4.2], [11.7, 9.6, 4.8], gold),
+        solid([4.3, 9.2, 7.7], [11.7, 9.6, 8.3], gold),
+        solid([4.3, 9.2, 11.2], [11.7, 9.6, 11.8], gold),
+    ]
+    # Gold corner guards on both covers
+    for x0, x1 in ((4.1, 4.5), (11.5, 11.9)):
+        for y0, y1 in ((0, 1.6), (7.4, 9)):
+            for z0, z1 in ((1.8, 3.4), (12.6, 14.2)):
+                elements.append(solid([x0, y0, z0], [x1, y1, z1], gold))
+    elements += [
+        # Gem in its bezel on the front cover
+        solid([11.5, 3.1, 6.6], [11.9, 5.9, 9.4], gold),
+        solid([11.9, 3.6, 7.1], [12.3, 5.4, 8.9], gem),
+        # Clasp strap wrapping the open edge
+        solid([4.3, -.3, 7.4], [11.7, 0, 8.6], strap),
+        solid([11.5, 0, 7.4], [11.8, 2.4, 8.6], strap),
     ]
     write_json("models/item/golden_grimoire_3d.json", {
         "textures": {"book": "arcanes_oublies:item/golden_grimoire_3d", "particle": "arcanes_oublies:item/golden_grimoire_3d"},
         "elements": elements,
         "display": {
-            "thirdperson_righthand": {"rotation": [90, 180, 0], "translation": [0, -1.5, 2], "scale": [0.7, 0.7, 0.7]},
-            "thirdperson_lefthand": {"rotation": [90, 180, 0], "translation": [0, -1.5, 2], "scale": [0.7, 0.7, 0.7]},
-            "firstperson_righthand": {"rotation": [-130, 10, 90], "translation": [-4, 2, -3.5]},
-            "firstperson_lefthand": {"rotation": [-130, 10, -90], "translation": [4, 2, -3]},
-            "ground": {"rotation": [-90, 0, 0], "translation": [0, 0, -4], "scale": [0.7, 0.7, 0.7]},
+            "thirdperson_righthand": {"rotation": [90, 180, 0], "translation": [0, -1.5, 2], "scale": [0.65, 0.65, 0.65]},
+            "thirdperson_lefthand": {"rotation": [90, 180, 0], "translation": [0, -1.5, 2], "scale": [0.65, 0.65, 0.65]},
+            "firstperson_righthand": {"rotation": [-130, 10, 90], "translation": [-4, 2, -3.5], "scale": [0.9, 0.9, 0.9]},
+            "firstperson_lefthand": {"rotation": [-130, 10, -90], "translation": [4, 2, -3], "scale": [0.9, 0.9, 0.9]},
+            "ground": {"rotation": [-90, 0, 0], "translation": [0, 0, -4], "scale": [0.65, 0.65, 0.65]},
             "head": {"rotation": [0, 0, -90], "translation": [4, 8, 0]},
         },
     })
@@ -444,6 +790,22 @@ def main():
     save(gilded_chain_tile(), "textures/entity/gilded_chain.png")
     save(gold_glow(), "textures/entity/gold_glow.png")
     save(gold_circle(), "textures/entity/gold_circle.png")
+    save(goldfall_icon(), "textures/gui/spell_icons/goldfall.png")
+    save(golden_spikes_icon(), "textures/gui/spell_icons/golden_spikes.png")
+    save(midas_curse_icon(), "textures/gui/spell_icons/midas_curse.png")
+    save(aurum_blade_icon(), "textures/gui/spell_icons/aurum_blade.png")
+    save(molten_torrent_icon(), "textures/gui/spell_icons/molten_torrent.png")
+    save(gilded_armor_icon(), "textures/gui/spell_icons/gilded_armor.png")
+    save(golden_sentinels_icon(), "textures/gui/spell_icons/golden_sentinels.png")
+    save(sun_of_eldorado_icon(), "textures/gui/spell_icons/sun_of_eldorado.png")
+    save(midas_curse_effect_icon(), "textures/mob_effect/midas_curse.png")
+    save(gilded_armor_effect_icon(), "textures/mob_effect/gilded_armor.png")
+    save(gold_crystal(), "textures/entity/gold_crystal.png")
+    save(molten_pool(), "textures/entity/molten_pool.png")
+    save(gold_beam(), "textures/entity/gold_beam.png")
+    save(eldorado_sun(), "textures/entity/eldorado_sun.png")
+    save(golden_sentinel_skin(), "textures/entity/golden_sentinel.png")
+    save(golden_sentinel_eyes(), "textures/entity/golden_sentinel_eyes.png")
     item_models()
 
 

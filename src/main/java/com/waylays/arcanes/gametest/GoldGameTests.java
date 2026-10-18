@@ -2,6 +2,21 @@ package com.waylays.arcanes.gametest;
 
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.gold.GildedChainsEntity;
+import com.waylays.arcanes.effect.MidasCurseEffect;
+import com.waylays.arcanes.entity.gold.AurumBladeEntity;
+import com.waylays.arcanes.entity.gold.EldoradoSun;
+import com.waylays.arcanes.entity.gold.GoldenSentinel;
+import com.waylays.arcanes.entity.gold.GoldfallIngot;
+import com.waylays.arcanes.entity.gold.MoltenGoldBlob;
+import com.waylays.arcanes.entity.gold.MoltenPool;
+import com.waylays.arcanes.registry.ModEffects;
+import com.waylays.arcanes.spells.gold.GoldenSentinelsSpell;
+import com.waylays.arcanes.spells.gold.GoldfallSpell;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.monster.Husk;
+import java.util.List;
 import com.waylays.arcanes.entity.gold.GoldBoltProjectile;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
@@ -105,6 +120,141 @@ public final class GoldGameTests {
             helper.assertTrue(chains.isRemoved(), "chains did not break after their duration");
             helper.assertTrue(target.getVehicle() == null, "target still bound after the chains broke");
             helper.succeed();
+        });
+    }
+
+    @GameTest(template = "platform", timeoutTicks = 120)
+    public static void goldfallIngotCrushesTheArea(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
+        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
+        GoldfallIngot ingot = new GoldfallIngot(helper.getLevel(), caster);
+        ingot.setPos(helper.absoluteVec(new Vec3(4.5, 8, 4.5)));
+        ingot.setDeltaMovement(0, -.4, 0);
+        ingot.setDamage(5f);
+        helper.getLevel().addFreshEntity(ingot);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(ingot.isRemoved(), "ingot is still falling");
+            helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 4f, "impact did not hurt the target [" + describe(helper, target) + "]");
+            helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the caster was hurt by its own ingot");
+        });
+    }
+
+    @GameTest(template = "platform", timeoutTicks = 40)
+    public static void goldfallDropsOneIngotPerCount(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
+        GoldfallSpell spell = (GoldfallSpell) ModSpells.GOLDFALL.get();
+        spell.onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        List<GoldfallIngot> ingots = helper.getLevel().getEntitiesOfClass(GoldfallIngot.class, caster.getBoundingBox().inflate(40, 60, 40));
+        int count = ingots.size();
+        // They would land 32 blocks away, possibly on another test: clear them
+        ingots.forEach(GoldfallIngot::discard);
+        helper.assertTrue(count == spell.getIngotCount(1), "expected " + spell.getIngotCount(1) + " ingots, got " + count);
+        helper.succeed();
+    }
+
+    @GameTest(template = "platform", timeoutTicks = 80)
+    public static void goldenSpikesHitInFrontOfTheCaster(GameTestHelper helper) {
+        // A witch with no AI looks south (+Z), the spikes run that way
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
+        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.0));
+        Pig behind = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, .5));
+        ModSpells.GOLDEN_SPIKES.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(target.getHealth() < target.getMaxHealth(), "no spike hit the pig in front [" + describe(helper, target) + "]");
+            helper.assertTrue(behind.getHealth() == behind.getMaxHealth(), "a spike hit the pig behind the caster");
+        });
+    }
+
+    @GameTest(template = "platform", timeoutTicks = 100)
+    public static void midasCurseSlowsThenShatters(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
+        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
+        double baseSpeed = target.getAttributeValue(Attributes.MOVEMENT_SPEED);
+        MidasCurseEffect.curse(target, caster, 1, 40, 5f);
+        helper.runAfterDelay(30, () -> helper.assertTrue(target.getAttributeValue(Attributes.MOVEMENT_SPEED) < baseSpeed * .5,
+                "the cursed pig is not slowed (" + target.getAttributeValue(Attributes.MOVEMENT_SPEED) + " / " + baseSpeed + ")"));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(!target.hasEffect(ModEffects.MIDAS_CURSE.get()), "still cursed");
+            helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 4f, "the statue did not shatter [" + describe(helper, target) + "]");
+            helper.assertTrue(target.getAttributeValue(Attributes.MOVEMENT_SPEED) == baseSpeed, "speed not restored after the curse");
+        });
+    }
+
+    @GameTest(template = "platform", timeoutTicks = 100)
+    public static void aurumBladeStrikesItsTarget(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
+        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
+        AurumBladeEntity blade = new AurumBladeEntity(helper.getLevel(), caster, 6f);
+        Vec3 at = helper.absoluteVec(new Vec3(4.5, 2, 4.5));
+        blade.moveTo(at.x, at.y, at.z);
+        helper.getLevel().addFreshEntity(blade);
+        helper.runAfterDelay(AurumBladeEntity.STRIKE_TICK - 4, () ->
+                helper.assertTrue(target.getHealth() == target.getMaxHealth(), "the blade struck before plunging"));
+        helper.succeedWhen(() -> helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 5f, "the blade did not strike [" + describe(helper, target) + "]"));
+    }
+
+    @GameTest(template = "platform", timeoutTicks = 100)
+    public static void moltenGoldBurnsAndPools(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
+        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 5.5));
+        MoltenGoldBlob atPig = new MoltenGoldBlob(helper.getLevel(), caster);
+        atPig.setPos(helper.absoluteVec(new Vec3(4.5, 2.4, 2.5)));
+        atPig.shoot(new Vec3(0, 0, 1), .8f);
+        atPig.setDamage(3f);
+        MoltenGoldBlob atFloor = new MoltenGoldBlob(helper.getLevel(), caster);
+        atFloor.setPos(helper.absoluteVec(new Vec3(7.5, 3, 7.5)));
+        atFloor.shoot(new Vec3(0, -1, 0), .5f);
+        atFloor.setDamage(3f);
+        helper.getLevel().addFreshEntity(atPig);
+        helper.getLevel().addFreshEntity(atFloor);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(target.getHealth() < target.getMaxHealth(), "molten gold did not hurt the pig [" + describe(helper, target) + "]");
+            helper.assertTrue(target.getRemainingFireTicks() > 0 || target.getHealth() <= target.getMaxHealth() - 3f, "the pig was not set on fire");
+            int pools = helper.getLevel().getEntitiesOfClass(MoltenPool.class, caster.getBoundingBox().inflate(12)).size();
+            helper.assertTrue(pools >= 1, "no molten pool on the floor");
+        });
+    }
+
+    @GameTest(template = "platform", timeoutTicks = 60)
+    public static void gildedArmorReflectsDamage(GameTestHelper helper) {
+        Witch attacker = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
+        Pig wearer = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
+        double armorBefore = wearer.getAttributeValue(Attributes.ARMOR);
+        wearer.addEffect(new MobEffectInstance(ModEffects.GILDED_ARMOR.get(), 200, 0));
+        helper.assertTrue(wearer.getAttributeValue(Attributes.ARMOR) >= armorBefore + 3, "Gilded Armor gave no armor");
+        wearer.hurt(helper.getLevel().damageSources().mobAttack(attacker), 6f);
+        helper.assertTrue(attacker.getHealth() < attacker.getMaxHealth(), "no damage was reflected to the attacker");
+        helper.succeed();
+    }
+
+    @GameTest(template = "platform", batch = "summons", timeoutTicks = 300)
+    public static void goldenSentinelsFightForTheirSummoner(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
+        Husk enemy = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(8.0, 2, 8.0));
+        GoldenSentinelsSpell spell = (GoldenSentinelsSpell) ModSpells.GOLDEN_SENTINELS.get();
+        spell.onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        List<GoldenSentinel> sentinels = helper.getLevel().getEntitiesOfClass(GoldenSentinel.class, caster.getBoundingBox().inflate(6));
+        helper.assertTrue(sentinels.size() == spell.getCount(1), "expected " + spell.getCount(1) + " sentinels, got " + sentinels.size());
+        helper.succeedWhen(() -> {
+            helper.assertTrue(enemy.getHealth() < enemy.getMaxHealth(), "the sentinels did not attack the husk [" + describe(helper, enemy) + "]");
+            helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "a sentinel hurt its summoner");
+        });
+    }
+
+    @GameTest(template = "platform", batch = "ultimate", timeoutTicks = 260)
+    public static void sunOfEldoradoBurnsThenExplodes(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
+        IronGolem enemy = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(7.5, 2, 7.5));
+        ModSpells.SUN_OF_ELDORADO.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        List<EldoradoSun> suns = helper.getLevel().getEntitiesOfClass(EldoradoSun.class, caster.getBoundingBox().inflate(10));
+        helper.assertTrue(suns.size() == 1, "expected one sun, got " + suns.size());
+        EldoradoSun sun = suns.get(0);
+        helper.runAfterDelay(EldoradoSun.FIRST_VOLLEY + 15, () ->
+                helper.assertTrue(enemy.getHealth() < enemy.getMaxHealth(), "the sun's beams missed [" + describe(helper, enemy) + "]"));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(sun.isRemoved(), "the sun has not exploded yet");
+            helper.assertTrue(enemy.getHealth() <= enemy.getMaxHealth() - 40, "beams and explosion dealt too little [" + describe(helper, enemy) + "]");
+            helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the explosion hurt the caster");
         });
     }
 }

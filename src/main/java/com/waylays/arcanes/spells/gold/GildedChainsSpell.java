@@ -12,7 +12,6 @@ import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.Utils;
-import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
 import io.redspace.ironsspellbooks.damage.DamageSources;
 import io.redspace.ironsspellbooks.util.ModTags;
@@ -99,8 +98,8 @@ public class GildedChainsSpell extends AbstractSpell {
         double x = entity.getX() + Mth.cos(angle) * radius;
         double z = entity.getZ() + Mth.sin(angle) * radius;
         double y = entity.getY() + 1.1 + Mth.sin(angle * .5f) * .2;
-        MagicManager.spawnParticles(level, GoldFx.GOLD_DUST, x, y, z, 2, .03, .03, .03, 0, false);
-        MagicManager.spawnParticles(level, GoldFx.PALE_DUST, entity.getX() - Mth.cos(angle) * radius, y, entity.getZ() - Mth.sin(angle) * radius, 1, .03, .03, .03, 0, false);
+        GoldFx.particles(level, GoldFx.GOLD_DUST, x, y, z, 2, .03, .03, .03, 0);
+        GoldFx.particles(level, GoldFx.PALE_DUST, entity.getX() - Mth.cos(angle) * radius, y, entity.getZ() - Mth.sin(angle) * radius, 1, .03, .03, .03, 0);
     }
 
     @Override
