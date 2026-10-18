@@ -242,8 +242,6 @@ addons connus. À vérifier avant de se lancer.
                         orchestre fantôme en ultime.
  - Magie des Miroirs  : clones du lanceur, reflets qui renvoient les sorts,
                         téléportation par miroirs.
- - Magie du Temps     : ralentir, accélérer, rembobiner sa position, figer
-                        une zone.
  - Magie de l'Ombre   : se fondre dans les ombres, ombres vivantes, voler
                         l'ombre d'un ennemi pour le contrôler.
  - Magie des Rêves    : endormir, cauchemars, moutons de rêve invoqués,
@@ -257,6 +255,55 @@ addons connus. À vérifier avant de se lancer.
  - Magie des Étoiles / Constellations : dessiner des constellations qui
                         invoquent des créatures stellaires.
 
+ - Magie du Verre     : éclats de vitrail, murs de verre, prisme coloré,
+                        cathédrale de vitraux en ultime.
+ - Magie de la Rouille et des Engrenages (Clockwork) : rouages tranchants,
+                        automates mécaniques, horloge géante.
+ - Magie du Miel et des Abeilles : essaims, miel collant, gelée royale qui
+                        soigne, reine abeille géante.
+ - Magie de la Neige Poudreuse / Blizzard Féerique : boules de neige
+                        magiques, bonshommes de neige gardiens, aurore boréale.
+ - Magie des Masques  : changer de masque pour changer de pouvoir, masques
+                        maudits, carnaval fantôme.
+ - Magie de la Soie et des Fils (Marionnettiste) : fils invisibles,
+                        contrôler les mobs comme des marionnettes.
+ - Magie des Os       : lances d'os, cage thoracique protectrice, dragon
+                        squelette en ultime.
+ - Magie de la Peinture / Couleurs : coups de pinceau, couleurs qui donnent
+                        des effets différents, tableau vivant.
+ - Magie des Lanternes / Feux Follets : lanternes flottantes, feux follets
+                        qui guident ou égarent, festival des lanternes.
+ - Magie du Sel       : cercles de sel protecteurs, purification, cristaux
+                        de sel qui dessèchent.
+ - Magie des Bulles d'Eau / Marées : vagues, geysers, raz-de-marée.
+ - Magie du Champignon (Mycélium) : réseau souterrain, spores lumineuses,
+                        colosse champignon.
+ - Magie de la Foudre Rose / Plasma : boules de plasma, arcs électriques
+                        roses, étoile artificielle.
+ - Magie des Chaînes et Malédictions (Hex) : poupées vaudou, malédictions
+                        cumulables, sceaux.
+ - Magie de la Fumée  : se changer en fumée, dragons de fumée, encens.
+ - Magie des Plumes / Ailes : vol plané, pluie de plumes d'acier, phénix
+                        de plumes.
+ - Magie des Météores / Cosmos : pluie d'étoiles filantes, trou noir,
+                        mini-planètes en orbite.
+ - Magie du Thé / Alchimie Douce : potions instantanées, théières magiques,
+                        vapeur brûlante.
+ - Magie des Runes Nordiques : runes gravées au sol, pièges runiques,
+                        Valkyrie spectrale.
+ - Magie du Chaos / Dés : effets aléatoires, dés géants, sorts imprévisibles.
+ - Magie des Insectes : scarabées, essaims de criquets, carapaces.
+ - Magie de l'Argile / Poterie : golems d'argile, jarres piégées, statues.
+ - Magie des Néons   : lignes de néon, signes lumineux, ville cyberpunk.
+ - Magie du Vent Sacré / Plumes de Kitsune : feux de renard bleus, illusions
+                        à neuf queues.
+ - Magie de l'Écho / Son : ondes, cris qui repoussent, ultrason.
+ - Magie de la Faim / Glouton : dévorer les sorts ennemis, bouche géante.
+ - Magie des Cristaux de Lune : phases de lune qui changent les sorts,
+                        loup lunaire.
+ - Magie du Fromage / Nourriture (fun) : tartes explosives, banquet géant.
+
+ Déjà retirée car un addon existe : Magie du Temps.
 
 ================================================================================
  RÉCAPITULATIF
