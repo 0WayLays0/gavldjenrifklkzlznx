@@ -1,0 +1,211 @@
+================================================================================
+  ADDONS POUR IRON'S SPELLS 'N SPELLBOOKS - LISTE DES ÉCOLES ET DES SORTS
+================================================================================
+
+Version Minecraft / loader : À DÉCIDER (1.20.1 Forge ou 1.21.1 NeoForge)
+Nom du mod / modid       : À DÉCIDER
+
+Contenu prévu pour chaque école :
+  - 10 sorts (le n°10 est l'ultime)
+  - un livre de sorts thématique
+  - les parchemins (générés automatiquement par Iron's Spells pour chaque sort)
+  - VFX (particules), modèles et sons propres à l'école
+Pas de recettes ni de traductions complètes pour l'instant (juste les noms
+des sorts en anglais, sinon le jeu affiche les clés brutes).
+
+Statut : [ ] à faire   [~] en cours   [x] fini et testé en jeu
+
+Ordre de développement :
+  1. Or
+  2. Rotation
+  3. Poudre à Canon
+  4. Livre
+  5. Chewing-Gum
+  6. Mousse et Flore
+
+
+================================================================================
+ 1. MAGIE DE L'OR (Gold)                                         [~] EN COURS
+================================================================================
+Couleur : or / jaune brillant
+Ambiance : lingots, éclats, or fondu, statues, richesse
+Sons : tintements métalliques, carillons, impacts lourds, résonances
+
+ 1. Gold Bolt          [ ] Un lingot-projectile qui explose en éclats dorés à
+                           l'impact.
+ 2. Gilded Chains      [ ] Des chaînes d'or sortent du sol et clouent la cible
+                           sur place.
+ 3. Goldfall           [ ] Des lingots massifs tombent du ciel sur la zone
+                           visée, comme une pluie de météores en or.
+ 4. Golden Spikes      [ ] Une ligne de pics de cristal d'or jaillit du sol
+                           devant le lanceur, en vague.
+ 5. Midas Curse        [ ] La cible se recouvre d'or petit à petit, ralentit
+                           jusqu'à se figer en statue dorée, puis vole en
+                           éclats.
+ 6. Aurum Blade        [ ] Une énorme épée d'or spectrale apparaît au-dessus
+                           du lanceur et s'abat sur l'ennemi.
+ 7. Molten Torrent     [ ] Un fleuve d'or fondu brûlant qui laisse des flaques
+                           incandescentes au sol.
+ 8. Gilded Armor       [ ] Le lanceur se couvre d'une armure d'or liquide qui
+                           renvoie une partie des dégâts reçus.
+ 9. Golden Sentinels   [ ] Invoque 2 ou 3 chevaliers d'or qui combattent pour
+                           le lanceur.
+10. Sun of Eldorado    [ ] ULTIME - Un soleil d'or apparaît au-dessus du
+                           lanceur, tire des rayons dorés sur tous les
+                           ennemis autour, puis s'effondre en explosion d'or.
+
+Livre : Golden Spellbook (livre d'or) [ ]
+
+
+================================================================================
+ 2. MAGIE DE ROTATION (Rotation)                                  [ ] À FAIRE
+================================================================================
+Couleur : cyan / blanc argenté
+Ambiance : tourbillons, disques, vortex, gyroscopes, force centrifuge
+Sons : sifflements de vent, vrombissements, lames qui tournent
+
+ 1. Spinning Blade     [ ] Un disque tranchant tournoyant part comme un
+                           boomerang et revient vers le lanceur.
+ 2. Cyclone            [ ] Une tornade avance, aspire les ennemis puis les
+                           projette en l'air.
+ 3. Centrifuge         [ ] Le lanceur tourne sur lui-même, repousse et blesse
+                           tout ce qui l'entoure.
+ 4. Gyro Shield        [ ] Des anneaux tournent autour du lanceur et dévient
+                           les projectiles.
+ 5. Vertigo            [ ] La cible est prise de vertige : elle tourne sur
+                           elle-même et se déplace au hasard.
+ 6. Orbitals           [ ] Des sphères orbitent autour du lanceur, puis se
+                           lancent une par une sur les ennemis.
+ 7. Drill              [ ] Une foreuse d'énergie en rotation transperce tous
+                           les ennemis en ligne droite.
+ 8. Spin Dash          [ ] Dash en vrille qui blesse les ennemis traversés.
+ 9. Reversal           [ ] Inverse la trajectoire des projectiles proches et
+                           les renvoie vers leur tireur.
+10. Maelstrom          [ ] ULTIME - Un vortex géant aspire tout vers son
+                           centre et broie les ennemis.
+
+Livre : Gyroscopic Spellbook [ ]
+
+
+================================================================================
+ 3. MAGIE DE POUDRE À CANON (Gunpowder)                           [ ] À FAIRE
+================================================================================
+Couleur : noir / orange feu
+Ambiance : barils, boulets, mèches, fumée, artillerie de pirate
+Sons : détonations, mèches qui crépitent, tirs de mousquet, canons
+
+ 1. Musket Shot        [ ] Une balle de mousquet rapide qui transperce la
+                           cible.
+ 2. Powder Keg         [ ] Lance un baril de poudre qui explose à l'impact.
+ 3. Grapeshot          [ ] Tir de mitraille en cône à courte portée.
+ 4. Fuse Trail         [ ] Une traînée de poudre au sol s'enflamme et provoque
+                           une chaîne d'explosions.
+ 5. Sticky Bomb        [ ] Une bombe collante s'accroche à la cible et explose
+                           après quelques secondes.
+ 6. Cannonball         [ ] Un boulet de canon lourd qui rebondit et écrase les
+                           ennemis sur sa route.
+ 7. Smoke Screen       [ ] Un nuage de fumée noire aveugle les ennemis et rend
+                           le lanceur difficile à viser.
+ 8. Blast Jump         [ ] Une explosion sous les pieds propulse le lanceur
+                           dans les airs (sans dégâts pour lui).
+ 9. Minefield          [ ] Pose plusieurs mines cachées qui explosent quand un
+                           ennemi passe dessus.
+10. Artillery Barrage  [ ] ULTIME - Des canons fantômes apparaissent et
+                           bombardent toute la zone.
+
+Livre : Powder Keg Spellbook [ ]
+
+
+================================================================================
+ 4. MAGIE DU LIVRE (Book)                                         [ ] À FAIRE
+================================================================================
+Couleur : violet / parchemin crème
+Ambiance : pages, encre, plumes, runes, bibliothèque vivante
+Sons : pages qui se tournent, froissements, livres qui claquent, chuchotements
+
+ 1. Paper Cut          [ ] Une salve de feuilles tranchantes.
+ 2. Page Storm         [ ] Un tourbillon de pages entoure la cible et la
+                           lacère.
+ 3. Ink Splash         [ ] Un jet d'encre aveugle et ralentit les ennemis.
+ 4. Tome Slam          [ ] Un livre géant tombe du ciel et écrase la zone.
+ 5. Bookmark           [ ] Pose un marque-page à un endroit ; relancer le sort
+                           téléporte le lanceur dessus.
+ 6. Silence            [ ] La cible est réduite au silence : elle ne peut plus
+                           lancer de sorts pendant un moment.
+ 7. Living Library     [ ] Invoque des livres volants qui mordent les ennemis.
+ 8. Quill Barrage      [ ] Une rafale de plumes d'écriture projectiles.
+ 9. Errata             [ ] Efface les effets négatifs du lanceur.
+10. The Final Chapter  [ ] ULTIME - Un grimoire géant s'ouvre ; ses pages
+                           forment un dôme et des runes explosent sur tous les
+                           ennemis.
+
+Livre : Grimoire Vivant [ ]
+
+
+================================================================================
+ 5. MAGIE DU CHEWING-GUM (Bubblegum)                              [ ] À FAIRE
+================================================================================
+Couleur : rose bonbon / bleu clair
+Ambiance : bulles, collant, élastique, rebondissant, cartoon
+Sons : bulles qui éclatent, bruits élastiques, "boing", mastication
+
+ 1. Gum Ball           [ ] Une boule de chewing-gum collante qui ralentit la
+                           cible.
+ 2. Bubble Trap        [ ] Une bulle enferme un ennemi et le fait flotter dans
+                           les airs.
+ 3. Sticky Puddle      [ ] Une flaque collante au sol immobilise les ennemis
+                           qui marchent dedans.
+ 4. Bubble Pop         [ ] Une grosse bulle explose et repousse tout autour.
+ 5. Gum Shield         [ ] Une bulle élastique protège le lanceur et renvoie
+                           les projectiles.
+ 6. Stretch            [ ] Un grappin de chewing-gum attire la cible vers le
+                           lanceur, ou propulse le lanceur vers un bloc.
+ 7. Bounce             [ ] Le lanceur rebondit très haut et ne prend plus de
+                           dégâts de chute pendant un moment.
+ 8. Gum Web            [ ] Une toile de chewing-gum piège les ennemis dans une
+                           zone.
+ 9. Gum Blob           [ ] Invoque un blob rose qui avale et colle les
+                           ennemis.
+10. Mega Bubble        [ ] ULTIME - Une bulle géante enferme tous les ennemis
+                           de la zone, les soulève puis éclate.
+
+Livre : Bubblegum Spellbook [ ]
+
+
+================================================================================
+ 6. MAGIE DE LA MOUSSE ET DE LA FLORE (Moss & Flora)              [ ] À FAIRE
+================================================================================
+Couleur : vert mousse / rose fleur
+Ambiance : mousse, lianes, épines, fleurs, spores, forêt ancienne
+Sons : bruissements de feuilles, craquements de bois, éclosions, pollen
+
+Attention : Iron's Spells a déjà une école Nature (Root, Oakskin, Blight,
+Poison Arrow...). Les sorts ci-dessous sont pensés pour ne pas faire doublon,
+à vérifier au moment du développement.
+
+ 1. Thorn Shot         [ ] Une salve d'épines qui font saigner la cible.
+ 2. Strangling Vines   [ ] Des lianes sortent du sol, enserrent la cible et
+                           lui infligent des dégâts dans la durée.
+ 3. Moss Carpet        [ ] Un tapis de mousse se répand et soigne les alliés
+                           qui se tiennent dessus.
+ 4. Spore Cloud        [ ] Un nuage de spores empoisonne et désoriente.
+ 5. Bloom              [ ] Des fleurs éclosent autour du lanceur et donnent
+                           de la régénération.
+ 6. Vine Whip          [ ] Un fouet de lianes frappe et attire la cible.
+ 7. Mossy Hide         [ ] La peau du lanceur se couvre de mousse : il absorbe
+                           les dégâts et se soigne lentement.
+ 8. Moss Guardian      [ ] Invoque un gardien de mousse et de pierre.
+ 9. Sleeping Pollen    [ ] Un nuage de pollen endort les ennemis touchés.
+10. Overgrowth         [ ] ULTIME - La zone se couvre de végétation ; lianes et
+                           fleurs carnivores attaquent tous les ennemis.
+
+Livre : Mossbound Spellbook [ ]
+
+
+================================================================================
+ RÉCAPITULATIF
+================================================================================
+6 écoles x 10 sorts = 60 sorts, 6 livres de sorts.
+
+La liste peut changer : si un sort ne te plaît pas, on le remplace ici
+avant de le coder.
