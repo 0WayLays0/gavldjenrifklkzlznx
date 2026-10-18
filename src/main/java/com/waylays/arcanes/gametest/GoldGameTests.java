@@ -236,7 +236,14 @@ public final class GoldGameTests {
         List<GoldenSentinel> sentinels = helper.getLevel().getEntitiesOfClass(GoldenSentinel.class, caster.getBoundingBox().inflate(6));
         helper.assertTrue(sentinels.size() == spell.getCount(1), "expected " + spell.getCount(1) + " sentinels, got " + sentinels.size());
         helper.succeedWhen(() -> {
-            helper.assertTrue(enemy.getHealth() < enemy.getMaxHealth(), "the sentinels did not attack the husk [" + describe(helper, enemy) + "]");
+            StringBuilder state = new StringBuilder(" [difficulty " + helper.getLevel().getDifficulty() + ", husk " + describe(helper, enemy)
+                    + (enemy.isRemoved() ? " REMOVED" : "") + ", caster" + (caster.isRemoved() ? " REMOVED" : " ok"));
+            for (GoldenSentinel s : sentinels) {
+                state.append(", sentinel at ").append(helper.relativeVec(s.position())).append(s.isRemoved() ? " REMOVED" : "")
+                        .append(" target ").append(s.getTarget()).append(" onGround ").append(s.onGround());
+            }
+            state.append("]");
+            helper.assertTrue(enemy.getHealth() < enemy.getMaxHealth(), "the sentinels did not attack the husk" + state);
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "a sentinel hurt its summoner");
         });
     }
