@@ -9,6 +9,8 @@ import io.redspace.ironsspellbooks.damage.SpellDamageSource;
 import io.redspace.ironsspellbooks.particle.BlastwaveParticleOptions;
 import io.redspace.ironsspellbooks.particle.FogParticleOptions;
 import io.redspace.ironsspellbooks.particle.SparkParticleOptions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
@@ -21,6 +23,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -85,6 +88,33 @@ public final class GoldFx {
             Vec3 p = from.add(delta.scale(i / (double) steps));
             particles(level, i % 2 == 0 ? GOLD_DUST : PALE_DUST, p.x, p.y, p.z, 1, .03, .03, .03, 0);
         }
+    }
+
+    /**
+     * The walkable surface nearest to {@code pos} (searching {@code range} blocks up and down, nearest first): a block
+     * with a collision shape and {@code clearance} free blocks above it. Falls back to {@code pos}.
+     */
+    public static Vec3 groundAt(Level level, Vec3 pos, int range, int clearance) {
+        BlockPos base = BlockPos.containing(pos.x, pos.y + 1.0E-3, pos.z);
+        for (int k = 0; k <= range; k++) {
+            for (int sign : k == 0 ? new int[]{0} : new int[]{-1, 1}) {
+                BlockPos feet = base.above(k * sign);
+                BlockPos below = feet.below();
+                VoxelShape floor = level.getBlockState(below).getCollisionShape(level, below);
+                if (floor.isEmpty()) {
+                    continue;
+                }
+                boolean free = true;
+                for (int h = 0; h < clearance && free; h++) {
+                    BlockPos p = feet.above(h);
+                    free = level.getBlockState(p).getCollisionShape(level, p).isEmpty();
+                }
+                if (free) {
+                    return new Vec3(pos.x, below.getY() + floor.max(Direction.Axis.Y), pos.z);
+                }
+            }
+        }
+        return pos;
     }
 
     public static void cameraShake(Level level, Vec3 origin, int ticks, float radius) {

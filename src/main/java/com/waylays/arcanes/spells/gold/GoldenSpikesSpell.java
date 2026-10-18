@@ -86,7 +86,7 @@ public class GoldenSpikesSpell extends AbstractSpell {
         int count = getSpikeCount(spellLevel);
         for (int i = 0; i < count; i++) {
             Vec3 at = entity.position().add(forward.scale(1.5 + i * SPACING));
-            Vec3 ground = Utils.moveToRelativeGroundLevel(level, at, 4);
+            Vec3 ground = GoldFx.groundAt(level, at, 4, 1);
             GoldSpikeEntity spike = new GoldSpikeEntity(level, entity, damage, 2 + i * TICKS_BETWEEN_SPIKES);
             spike.moveTo(ground.x, ground.y, ground.z);
             level.addFreshEntity(spike);

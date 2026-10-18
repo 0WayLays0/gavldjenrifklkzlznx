@@ -235,6 +235,9 @@ public final class GoldGameTests {
         spell.onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
         List<GoldenSentinel> sentinels = helper.getLevel().getEntitiesOfClass(GoldenSentinel.class, caster.getBoundingBox().inflate(6));
         helper.assertTrue(sentinels.size() == spell.getCount(1), "expected " + spell.getCount(1) + " sentinels, got " + sentinels.size());
+        for (GoldenSentinel sentinel : sentinels) {
+            helper.assertTrue(Math.abs(helper.relativeVec(sentinel.position()).y - 2) < .01, "a sentinel did not rise on the floor but at " + helper.relativeVec(sentinel.position()));
+        }
         helper.succeedWhen(() -> {
             StringBuilder state = new StringBuilder(" [difficulty " + helper.getLevel().getDifficulty() + ", husk " + describe(helper, enemy)
                     + (enemy.isRemoved() ? " REMOVED" : "") + ", caster" + (caster.isRemoved() ? " REMOVED" : " ok"));

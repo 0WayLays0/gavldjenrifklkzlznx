@@ -98,12 +98,16 @@ public class GoldenSentinelsSpell extends AbstractSpell {
         int count = getCount(spellLevel);
         for (int i = 0; i < count; i++) {
             float a = entity.getYRot() * Mth.DEG_TO_RAD + i * Mth.TWO_PI / count;
-            Vec3 spot = Utils.moveToRelativeGroundLevel(level, entity.position().add(-Mth.sin(a) * 2, 0, Mth.cos(a) * 2), 3);
+            Vec3 spot = GoldFx.groundAt(level, entity.position().add(-Mth.sin(a) * 2, 0, Mth.cos(a) * 2), 3, 2);
             GoldenSentinel sentinel = ModEntities.GOLDEN_SENTINEL.get().create(level);
             if (sentinel == null) {
                 continue;
             }
             sentinel.moveTo(spot.x, spot.y, spot.z, entity.getYRot(), 0);
+            if (!level.noCollision(sentinel)) {
+                // No room there (wall, low ceiling): rise next to the caster instead
+                sentinel.moveTo(entity.getX(), entity.getY(), entity.getZ(), entity.getYRot(), 0);
+            }
             sentinel.setup(entity, getLifetime(spellLevel), getHealth(spellLevel), getAttackDamage(spellLevel, entity));
             if (entity instanceof Mob mob && mob.getTarget() != null) {
                 sentinel.setTarget(mob.getTarget());

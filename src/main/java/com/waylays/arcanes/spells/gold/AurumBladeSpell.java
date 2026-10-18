@@ -93,7 +93,7 @@ public class AurumBladeSpell extends AbstractSpell {
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         HitResult hit = Utils.raycastForEntity(level, entity, 24, true, .35f);
         Vec3 at = hit instanceof EntityHitResult entityHit ? entityHit.getEntity().position() : hit.getLocation();
-        Vec3 ground = Utils.moveToRelativeGroundLevel(level, at, 3);
+        Vec3 ground = GoldFx.groundAt(level, at, 4, 1);
         AurumBladeEntity blade = new AurumBladeEntity(level, entity, getDamage(spellLevel, entity));
         blade.moveTo(ground.x, ground.y, ground.z, entity.getYRot(), 0);
         level.addFreshEntity(blade);
