@@ -29,8 +29,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * An Errethys summoning: while the caster chants, motes of mana spiral around them; then the creatures take shape in
- * a ring around the caster (on the ground, or in the air for flyers and swimmers) and fight for them for a while.
+ * An Errethys summoning: while the caster chants, motes of mana spiral around them; then the creatures take shape
+ * around the caster, starting in front of them (on the ground, or in the air for flyers and swimmers), and fight for
+ * them for a while.
  */
 public abstract class ManaSummonSpell extends AbstractSpell {
     private final ResourceLocation spellId;
@@ -118,7 +119,8 @@ public abstract class ManaSummonSpell extends AbstractSpell {
         int count = getCount(spellLevel);
         Vec3 eye = entity.getEyePosition();
         for (int i = 0; i < count; i++) {
-            float a = entity.getYRot() * Mth.DEG_TO_RAD + (i + .5f) * Mth.TWO_PI / count;
+            // The first one right in front of the caster, the others fanning out around them
+            float a = entity.getYRot() * Mth.DEG_TO_RAD + (i - (count - 1) * .5f) * Mth.TWO_PI / Math.max(3, count);
             Vec3 around = entity.position().add(-Mth.sin(a) * 1.8, 0, Mth.cos(a) * 1.8);
             Vec3 spot;
             if (airborne()) {
