@@ -327,17 +327,31 @@ Livre : Star Atlas (couverture de ciel étoilé animé) [ ]
 Contexte : serveur RP privé, seuls nos joueurs ont le mod.
 À faire après l'école de l'Or.
 
- - Le lancement normal des sorts est bloqué : pour lancer un sort, il faut
-   prononcer son incantation au micro (via Simple Voice Chat).
- - Reconnaissance vocale hors ligne avec Vosk (français / anglais).
- - Chaque sort a sa propre incantation (pseudo-latin, mots distincts et
-   faciles à prononcer). Ex. : Gold Bolt = "Aurum Fulmen".
- - Maîtrise : après un certain nombre de lancers (ou un niveau), le joueur
-   débloque le lancer silencieux de ce sort. Les ultimes demandent toujours
-   la voix (à décider).
- - Option dans la config pour activer / désactiver l'obligation de parler.
- - Comme le serveur est privé, la triche n'est pas un souci : la
-   reconnaissance peut tourner chez chaque joueur.
+Fonctionnement :
+ - Les joueurs ont le grimoire et les sorts comme dans Iron's Spells de base.
+ - Mais la touche de lancement normale est BLOQUÉE : si un joueur essaie,
+   le sort ne part pas et un message RP s'affiche, par exemple :
+   "Le mana n'arrive pas à sortir de vous..."
+ - Pour lancer un sort, il faut prononcer son incantation secrète au micro
+   (Simple Voice Chat + reconnaissance vocale Vosk). Si la phrase est
+   reconnue et que le sort est dans le grimoire, il est lancé.
+ - Les joueurs découvrent les incantations en RP (livres, PNJ, quêtes...).
+   Elles ne sont affichées nulle part en jeu.
+ - Le staff choisit les incantations dans un fichier de config du serveur
+   (modifiable sans recompiler le mod).
+
+Commandes staff uniquement (permission opérateur, les joueurs ne les ont pas) :
+ - /incantation bypass <joueur> on|off
+     -> le joueur n'a plus besoin de parler : il lance ses sorts avec la
+        touche, comme dans Iron's Spells de base.
+ - /incantation global on|off
+     -> active / désactive l'obligation de parler pour tout le serveur.
+ - /incantation reload
+     -> recharge le fichier des incantations.
+
+Points à régler en jeu :
+ - sensibilité de la reconnaissance vocale,
+ - choix de mots faciles à reconnaître pour chaque sort.
 
 
 ================================================================================
