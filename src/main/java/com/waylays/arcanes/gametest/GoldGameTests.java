@@ -19,7 +19,9 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.item.Item;
@@ -70,11 +72,18 @@ public final class GoldGameTests {
         bolt.setDamage(6f);
         helper.getLevel().addFreshEntity(bolt);
         helper.succeedWhen(() -> {
-            helper.assertTrue(bolt.isRemoved(), "bolt is still flying");
-            helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 5f, "direct hit did not deal its damage (health " + target.getHealth() + ")");
-            helper.assertTrue(bystander.getHealth() < bystander.getMaxHealth(), "shards did not hit the bystander");
-            helper.assertTrue(bystander.getHealth() > target.getHealth(), "splash damage is as high as the direct hit");
+            helper.assertTrue(bolt.isRemoved(), "bolt is still flying (at " + helper.relativeVec(bolt.position()) + ")");
+            String state = " [target " + describe(helper, target) + ", bystander " + describe(helper, bystander) + "]";
+            helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 5f, "direct hit did not deal its damage" + state);
+            helper.assertTrue(bystander.getHealth() < bystander.getMaxHealth(), "shards did not hit the bystander" + state);
+            helper.assertTrue(bystander.getHealth() > target.getHealth(), "splash damage is as high as the direct hit" + state);
         });
+    }
+
+    private static String describe(GameTestHelper helper, LivingEntity entity) {
+        DamageSource last = entity.getLastDamageSource();
+        return "health " + entity.getHealth() + " at " + helper.relativeVec(entity.position())
+                + ", last hit " + (last == null ? "none" : last.getMsgId() + " by " + last.getDirectEntity());
     }
 
     @GameTest(template = "platform", timeoutTicks = 200)
