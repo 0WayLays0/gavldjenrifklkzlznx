@@ -22,6 +22,9 @@ Ordre de développement :
   4. Livre
   5. Chewing-Gum
   6. Mousse et Flore
+  7. Néant / Vide
+  8. Miroirs
+  9. Cosmos / Étoiles
 
 
 ================================================================================
@@ -227,6 +230,98 @@ Livre : Mossbound Spellbook (couvert de mousse et de fleurs) [ ]
 
 
 ================================================================================
+ 7. MAGIE DU NÉANT (Void)                                         [ ] À FAIRE
+================================================================================
+Couleur : noir profond / violet sombre avec reflets blancs
+Ambiance : fissures dans la réalité, absence, effacement, ce qui existait
+           avant le monde
+Sons : silence étouffé, grondements graves, distorsions, aspiration
+
+ 1. Void Orb           [ ] Une sphère de néant avance lentement et efface
+                           tout ce qu'elle touche (gros dégâts).
+ 2. Reality Rift       [ ] Une fissure s'ouvre dans l'air et lacère les
+                           ennemis qui la traversent.
+ 3. Null Grasp         [ ] Des mains noires sortent du vide et attirent les
+                           ennemis vers une faille.
+ 4. Erase              [ ] Retire tous les effets positifs de la cible.
+ 5. Void Step          [ ] Le lanceur disparaît dans le néant et réapparaît
+                           plus loin, laissant une faille qui blesse.
+ 6. Hollow Shell       [ ] Le lanceur devient en partie immatériel : une
+                           partie des coups le traverse.
+ 7. Abyssal Gaze       [ ] Un œil géant s'ouvre dans le ciel et tire un rayon
+                           de néant sur la cible.
+ 8. Entropy            [ ] Les ennemis dans la zone perdent de la vie et de
+                           l'armure petit à petit.
+ 9. Void Spawn         [ ] Invoque des créatures du néant sans visage qui
+                           combattent pour le lanceur.
+10. Devourer of Worlds [ ] ULTIME - Un trou de néant géant s'ouvre, aspire
+                           les ennemis, les blocs de lumière et les
+                           projectiles, puis se referme en implosion.
+
+Livre : Codex of Nothing (couverture noire qui absorbe la lumière) [ ]
+
+
+================================================================================
+ 8. MAGIE DES MIROIRS (Mirror)                                    [ ] À FAIRE
+================================================================================
+Couleur : argent / bleu glacé, reflets irisés
+Ambiance : éclats de miroir, reflets, doubles, illusions
+Sons : verre qui tinte, cristal qui se brise, échos réverbérés
+
+ 1. Shard Volley       [ ] Une salve d'éclats de miroir tranchants.
+ 2. Reflection         [ ] Un miroir apparaît devant le lanceur et renvoie le
+                           prochain sort ou projectile reçu.
+ 3. Mirror Image       [ ] Crée 2 ou 3 clones du lanceur qui attirent les
+                           ennemis et éclatent quand ils sont frappés.
+ 4. Mirror Gate        [ ] Pose deux miroirs : passer dans l'un téléporte à
+                           l'autre.
+ 5. Mirror Prison      [ ] Des miroirs entourent la cible et l'enferment ; les
+                           coups qu'elle donne lui reviennent.
+ 6. Shattering         [ ] Tous les miroirs et clones du lanceur explosent en
+                           éclats en même temps.
+ 7. Swap               [ ] Le lanceur échange sa place avec la cible.
+ 8. Dark Reflection    [ ] Fait apparaître le reflet maléfique d'un ennemi qui
+                           se retourne contre lui.
+ 9. Kaleidoscope       [ ] Un rayon de lumière rebondit entre plusieurs
+                           miroirs et frappe tous les ennemis de la zone.
+10. Hall of Mirrors    [ ] ULTIME - Un labyrinthe de miroirs entoure la zone ;
+                           des dizaines de reflets du lanceur attaquent tous
+                           les ennemis en même temps.
+
+Livre : Looking-Glass Tome (couverture en miroir) [ ]
+
+
+================================================================================
+ 9. MAGIE DU COSMOS / DES ÉTOILES (Cosmic)                        [ ] À FAIRE
+================================================================================
+Couleur : bleu nuit / violet nébuleuse / blanc étoilé
+Ambiance : étoiles, constellations, planètes, nébuleuses, galaxies
+Sons : carillons célestes, bourdonnements spatiaux, impacts de météores
+
+ 1. Starfall           [ ] Des étoiles filantes tombent sur la cible.
+ 2. Constellation      [ ] Relie des étoiles autour des ennemis ; les lignes
+                           lumineuses les lient et les blessent.
+ 3. Planet Orbit       [ ] Trois mini-planètes orbitent autour du lanceur et
+                           frappent les ennemis proches.
+ 4. Nebula Cloud       [ ] Un nuage de nébuleuse coloré ralentit et aveugle
+                           les ennemis.
+ 5. Meteor             [ ] Un gros météore enflammé s'écrase sur la zone.
+ 6. Comet Dash         [ ] Le lanceur fonce comme une comète, laissant une
+                           traînée d'étoiles.
+ 7. Gravity Well       [ ] Un puits de gravité attire les ennemis et les
+                           écrase au sol.
+ 8. Star Shield        [ ] Un bouclier d'étoiles absorbe les dégâts puis
+                           explose en lumière.
+ 9. Celestial Beast    [ ] Invoque une créature de constellation (lion ou
+                           ours étoilé) qui combat pour le lanceur.
+10. Supernova          [ ] ULTIME - Une étoile se forme au-dessus du lanceur,
+                           grossit, puis explose en supernova sur toute la
+                           zone.
+
+Livre : Star Atlas (couverture de ciel étoilé animé) [ ]
+
+
+================================================================================
  IDÉES D'AUTRES ÉCOLES (pas encore dans la liste officielle)
 ================================================================================
 Écoles qui, à ma connaissance, n'existent ni dans Iron's Spells ni dans ses
@@ -240,16 +335,12 @@ addons connus. À vérifier avant de se lancer.
                         appel d'une créature abyssale.
  - Magie de la Musique: notes qui blessent, mélodie de soin, onde sonore,
                         orchestre fantôme en ultime.
- - Magie des Miroirs  : clones du lanceur, reflets qui renvoient les sorts,
-                        téléportation par miroirs.
  - Magie de l'Ombre   : se fondre dans les ombres, ombres vivantes, voler
                         l'ombre d'un ennemi.
  - Magie des Os       : lances d'os, cage thoracique protectrice, dragon
                         squelette en ultime.
  - Magie des Malédictions (Hex) : poupées vaudou, malédictions cumulables,
                         sceaux maudits.
- - Magie Cosmique / Météores : étoiles filantes, mini-planètes en orbite,
-                        trou noir en ultime.
  - Magie de la Lune   : les phases de lune changent les sorts, loup lunaire.
  - Magie des Runes Nordiques : pièges runiques, marteau de foudre runique,
                         Valkyrie spectrale.
@@ -275,8 +366,6 @@ addons connus. À vérifier avant de se lancer.
                         de montagne.
  - Magie des Armes Spectrales : épées, haches et lances fantômes qui
                         combattent autour du lanceur.
- - Magie du Vide / Néant : fissures dans la réalité, sphères qui effacent,
-                        dévoreur du néant.
  - Magie des Pierres Précieuses : rubis (feu), saphir (glace), émeraude
                         (soin), diamant (bouclier).
  - Magie de l'Aurore / Lumière Boréale : voiles de lumière colorée, soins,
@@ -296,7 +385,7 @@ addons connus. À vérifier avant de se lancer.
 ================================================================================
  RÉCAPITULATIF
 ================================================================================
-6 écoles x 10 sorts = 60 sorts, 6 livres de sorts.
+9 écoles x 10 sorts = 90 sorts, 9 livres de sorts.
 
 La liste peut changer : si un sort ne te plaît pas, on le remplace ici
 avant de le coder.
