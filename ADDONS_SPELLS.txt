@@ -322,6 +322,25 @@ Livre : Star Atlas (couverture de ciel étoilé animé) [ ]
 
 
 ================================================================================
+ MODULE SPÉCIAL : INCANTATIONS VOCALES (Simple Voice Chat)       [ ] À FAIRE
+================================================================================
+Contexte : serveur RP privé, seuls nos joueurs ont le mod.
+À faire après l'école de l'Or.
+
+ - Le lancement normal des sorts est bloqué : pour lancer un sort, il faut
+   prononcer son incantation au micro (via Simple Voice Chat).
+ - Reconnaissance vocale hors ligne avec Vosk (français / anglais).
+ - Chaque sort a sa propre incantation (pseudo-latin, mots distincts et
+   faciles à prononcer). Ex. : Gold Bolt = "Aurum Fulmen".
+ - Maîtrise : après un certain nombre de lancers (ou un niveau), le joueur
+   débloque le lancer silencieux de ce sort. Les ultimes demandent toujours
+   la voix (à décider).
+ - Option dans la config pour activer / désactiver l'obligation de parler.
+ - Comme le serveur est privé, la triche n'est pas un souci : la
+   reconnaissance peut tourner chez chaque joueur.
+
+
+================================================================================
  IDÉES D'AUTRES ÉCOLES (pas encore dans la liste officielle)
 ================================================================================
 Écoles qui, à ma connaissance, n'existent ni dans Iron's Spells ni dans ses
