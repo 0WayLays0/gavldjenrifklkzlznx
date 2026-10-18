@@ -19,5 +19,9 @@ public final class ModItems {
     public static final RegistryObject<Item> DETONATION_CODEX = ITEMS.register("detonation_codex",
             () -> new SimpleAttributeSpellBook(10, SpellRarity.LEGENDARY, ModAttributes.EXPLOSION_SPELL_POWER.get(), .10, 200));
 
+    /** Book school spellbook: 12 slots, +10% Book Spell Power, +200 max mana. */
+    public static final RegistryObject<Item> LIVING_GRIMOIRE = ITEMS.register("living_grimoire",
+            () -> new SimpleAttributeSpellBook(12, SpellRarity.LEGENDARY, ModAttributes.BOOK_SPELL_POWER.get(), .10, 200));
+
     private ModItems() {}
 }

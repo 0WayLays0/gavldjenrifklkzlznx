@@ -1,9 +1,19 @@
 package com.waylays.arcanes.registry;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.spells.book.BookmarkSpell;
 import com.waylays.arcanes.spells.book.FinalChapterSpell;
+import com.waylays.arcanes.spells.book.ForbiddenLibrarySpell;
 import com.waylays.arcanes.spells.book.LivingInkSpell;
 import com.waylays.arcanes.spells.book.PageStormSpell;
+import com.waylays.arcanes.spells.book.PaperCranesSpell;
+import com.waylays.arcanes.spells.book.ParchmentAegisSpell;
+import com.waylays.arcanes.spells.book.QuillOfFateSpell;
+import com.waylays.arcanes.spells.book.RazorPagesSpell;
+import com.waylays.arcanes.spells.book.RewriteSpell;
+import com.waylays.arcanes.spells.book.SealOfSilenceSpell;
+import com.waylays.arcanes.spells.book.TomeOfJudgmentSpell;
+import com.waylays.arcanes.spells.book.WordOfPowerSpell;
 import com.waylays.arcanes.spells.explosion.BlastLeapSpell;
 import com.waylays.arcanes.spells.explosion.BlastOrbSpell;
 import com.waylays.arcanes.spells.explosion.CataclysmSpell;
@@ -60,10 +70,20 @@ public final class ModSpells {
     public static final RegistryObject<AbstractSpell> REACTIVE_SHIELD = register(new ReactiveShieldSpell());
     public static final RegistryObject<AbstractSpell> CATACLYSM = register(new CataclysmSpell());
 
-    // Book school (3 of 10 so far)
+    // Book school (the 10 planned spells, then 3 extra)
+    public static final RegistryObject<AbstractSpell> RAZOR_PAGES = register(new RazorPagesSpell());
     public static final RegistryObject<AbstractSpell> PAGE_STORM = register(new PageStormSpell());
     public static final RegistryObject<AbstractSpell> LIVING_INK = register(new LivingInkSpell());
+    public static final RegistryObject<AbstractSpell> TOME_OF_JUDGMENT = register(new TomeOfJudgmentSpell());
+    public static final RegistryObject<AbstractSpell> BOOKMARK = register(new BookmarkSpell());
+    public static final RegistryObject<AbstractSpell> SEAL_OF_SILENCE = register(new SealOfSilenceSpell());
+    public static final RegistryObject<AbstractSpell> FORBIDDEN_LIBRARY = register(new ForbiddenLibrarySpell());
+    public static final RegistryObject<AbstractSpell> WORD_OF_POWER = register(new WordOfPowerSpell());
+    public static final RegistryObject<AbstractSpell> REWRITE = register(new RewriteSpell());
     public static final RegistryObject<AbstractSpell> THE_FINAL_CHAPTER = register(new FinalChapterSpell());
+    public static final RegistryObject<AbstractSpell> PAPER_CRANES = register(new PaperCranesSpell());
+    public static final RegistryObject<AbstractSpell> QUILL_OF_FATE = register(new QuillOfFateSpell());
+    public static final RegistryObject<AbstractSpell> PARCHMENT_AEGIS = register(new ParchmentAegisSpell());
 
     private ModSpells() {}
 

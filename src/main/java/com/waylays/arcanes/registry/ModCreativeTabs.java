@@ -23,6 +23,7 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.GOLDEN_GRIMOIRE.get());
                 output.accept(ModItems.DETONATION_CODEX.get());
+                output.accept(ModItems.LIVING_GRIMOIRE.get());
                 for (RegistryObject<AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
                     AbstractSpell spell = entry.get();
                     if (!spell.isEnabled()) {

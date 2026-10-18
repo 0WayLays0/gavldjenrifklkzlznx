@@ -154,30 +154,40 @@ Couleur : violet profond / parchemin doré
 Ambiance : pages volantes, encre vivante, runes, bibliothèque interdite
 Sons : pages qui tournent, chuchotements, livres qui claquent, plume qui gratte
 
- 1. Razor Pages        [ ] Une salve de pages aux bords lumineux, tranchantes
+ 1. Razor Pages        [~] Une salve de pages aux bords lumineux, tranchantes
                            comme des lames.
  2. Page Storm         [~] Un tourbillon de pages runiques entoure la cible et
                            la lacère.
  3. Living Ink         [~] Une vague d'encre vivante forme des mains noires
                            qui agrippent et aveuglent les ennemis.
- 4. Tome of Judgment   [ ] Un livre géant s'ouvre dans le ciel et se referme
+ 4. Tome of Judgment   [~] Un livre géant s'ouvre dans le ciel et se referme
                            sur la zone en écrasant les ennemis.
- 5. Bookmark           [ ] Pose un marque-page lumineux ; relancer le sort
+ 5. Bookmark           [~] Pose un marque-page lumineux ; relancer le sort
                            ramène le lanceur à cet endroit dans une pluie de
                            pages.
- 6. Seal of Silence    [ ] Une rune scellée s'imprime sur la cible : elle ne
+ 6. Seal of Silence    [~] Une rune scellée s'imprime sur la cible : elle ne
                            peut plus lancer de sorts.
- 7. Forbidden Library  [ ] Invoque des grimoires volants qui mordent et
+ 7. Forbidden Library  [~] Invoque des grimoires volants qui mordent et
                            lancent de petits sorts.
- 8. Word of Power      [ ] Le lanceur prononce un mot runique géant qui se
+ 8. Word of Power      [~] Le lanceur prononce un mot runique géant qui se
                            matérialise en lettres de feu et explose devant lui.
- 9. Rewrite            [ ] Le lanceur réécrit sa propre histoire : il efface
+ 9. Rewrite            [~] Le lanceur réécrit sa propre histoire : il efface
                            ses effets négatifs et récupère un peu de vie.
 10. The Final Chapter  [~] ULTIME - Un grimoire colossal s'ouvre au-dessus de
                            la zone ; ses pages forment un dôme et chaque
                            ennemi est marqué d'une rune qui explose.
+11. Paper Cranes       [~] BONUS - Des grues en origami lumineuses s'envolent
+                           autour du lanceur puis piquent sur les ennemis et
+                           éclatent en confettis de papier.
+12. Quill of Fate      [~] BONUS - Une plume spectrale géante trace une ligne
+                           d'encre au sol devant le lanceur ; l'écriture
+                           s'embrase en piliers de runes qui projettent les
+                           ennemis en l'air.
+13. Parchment Aegis    [~] BONUS - Des pages tournent autour du lanceur comme
+                           une armure : chacune intercepte un projectile ou
+                           amortit un coup, puis part lacérer l'attaquant.
 
-Livre : Living Grimoire (les pages bougent toutes seules) [ ]
+Livre : Living Grimoire (les pages bougent toutes seules) [~]
 
 
 ================================================================================

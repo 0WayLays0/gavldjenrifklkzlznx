@@ -1,6 +1,6 @@
 package com.waylays.arcanes.spells;
 
-import com.waylays.arcanes.entity.gold.GoldenSentinel;
+import com.waylays.arcanes.entity.OwnedSummon;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.util.CameraShakeData;
 import io.redspace.ironsspellbooks.api.util.CameraShakeManager;
@@ -85,7 +85,12 @@ public final class SpellUtil {
         if (other == caster) {
             return true;
         }
-        if (other instanceof GoldenSentinel sentinel && caster.getUUID().equals(sentinel.getOwnerUUID())) {
+        if (other instanceof OwnedSummon summon && caster.getUUID().equals(summon.getOwnerUUID())) {
+            return true;
+        }
+        // A summon's own spells spare its master and the master's other summons
+        if (caster instanceof OwnedSummon summon && summon.getOwnerUUID() != null
+                && (summon.getOwnerUUID().equals(other.getUUID()) || other instanceof OwnedSummon sibling && summon.getOwnerUUID().equals(sibling.getOwnerUUID()))) {
             return true;
         }
         return DamageSources.isFriendlyFireBetween(caster, other);

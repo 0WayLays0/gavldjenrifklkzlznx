@@ -47,6 +47,11 @@ public abstract class SpellProjectile extends Projectile implements AntiMagicSus
         return 15 * 20;
     }
 
+    /** A piercing projectile keeps flying after an entity hit unless {@link #onImpact} discards it. */
+    protected boolean piercesEntities() {
+        return false;
+    }
+
     /** Server side: what the projectile does when it hits something. Usually ends with {@link #discard()}. */
     protected abstract void onImpact(HitResult hit);
 
@@ -72,8 +77,11 @@ public abstract class SpellProjectile extends Projectile implements AntiMagicSus
             if (!level().isClientSide) {
                 onImpact(hit);
             }
-            // The client waits for the server to remove the projectile instead of flying through the target
-            return;
+            // The client waits for the server to remove the projectile instead of flying through the target,
+            // unless it pierces: then the server decides in onImpact whether it goes on
+            if (isRemoved() || hit.getType() != HitResult.Type.ENTITY || !piercesEntities()) {
+                return;
+            }
         }
         Vec3 motion = getDeltaMovement();
         setPos(getX() + motion.x, getY() + motion.y, getZ() + motion.z);

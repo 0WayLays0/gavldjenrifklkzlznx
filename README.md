@@ -3,12 +3,12 @@
 Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.20.1, Forge 47.4+), pour notre serveur RP.
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 0.4.0 : écoles de l'Or et de l'Explosion, début de l'école du Livre
+## Contenu de la bêta 0.5.0 : écoles de l'Or, de l'Explosion et du Livre
 
-Trois nouvelles écoles dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et « Résistance » et
-ses parchemins. L'Or et l'Explosion sont complètes, avec leur livre de sorts 3D (10 emplacements, +10 % puissance
-de l'école, +200 mana). Un onglet
-créatif « Arcanes Oubliés » contient les livres et tous les parchemins à tous les niveaux.
+Trois nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
+« Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
+12 pour le Grimoire Vivant). Un onglet créatif « Arcanes Oubliés » contient les livres et tous les parchemins à tous
+les niveaux.
 
 ### Or
 
@@ -51,15 +51,26 @@ Livre : **Codex de Détonation** (couverture noire craquelée, fissures de magma
 `<monde>/serverconfig/arcanes_oublies-server.toml`, mettre `explosionsBreakBlocks = true` (section `[explosion]`).
 Même activée, la roche du fond, l'obsidienne et les blocs résistants aux explosions ne cassent pas.
 
-### Livre (3 sorts sur 10 pour l'instant)
+### Livre (10 sorts + 3 sorts bonus)
 
 | Sort | Effet |
 |---|---|
+| **Pages Tranchantes** (Razor Pages) | Éventail de 3 à 6 pages aux bords dorés brûlants ; chacune traverse un ou deux ennemis puis se déchire. |
 | **Tempête de Pages** (Page Storm) | Un tourbillon de pages runiques entoure la cible, la suit et la lacère toutes les 0,4 s (et la ralentit). |
 | **Encre Vivante** (Living Ink) | Vague d'encre qui s'étend en cône devant le lanceur ; des mains noires saisissent chaque ennemi touché, l'immobilisent, l'aveuglent et le serrent. |
+| **Tome du Jugement** (Tome of Judgment) | Un livre géant pourpre apparaît dans le ciel au-dessus de la zone visée, s'ouvre, descend, puis ses deux moitiés se referment d'un coup sur la zone : gros dégâts, ralentissement, faiblesse. |
+| **Marque-page** (Bookmark) | Pose un ruban lumineux sur un cercle de runes. Relancer le sort (relance d'Iron's, visible sur l'écran) ramène le lanceur au marque-page dans une pluie de pages. Même dimension seulement ; pas utilisable en parchemin (comme le Portail d'Iron's). |
+| **Sceau du Silence** (Seal of Silence) | Un sceau de cire violette s'abat sur la cible : elle ne peut plus lancer de sorts (joueurs, parchemins compris, et mages d'Iron's) pendant 3 à 7 s. Le lait l'enlève. |
+| **Bibliothèque Interdite** (Forbidden Library) | 2 à 4 grimoires volants (yeux violets, crocs le long des pages) qui suivent le lanceur, mordent et crachent de petits sorts runiques, 20 s ou plus. |
+| **Mot de Pouvoir** (Word of Power) | Un mot runique géant s'écrit lettre par lettre en lettres de feu devant le lanceur, puis explose vers l'avant en cône de flammes. |
+| **Réécriture** (Rewrite) | Le lanceur efface tous ses effets négatifs (et le feu) puis récupère un peu de vie ; des bandes d'écriture dorée s'enroulent autour de lui. |
 | **Le Dernier Chapitre** (The Final Chapter, ultime) | Un grimoire colossal s'ouvre au-dessus de la zone, ses 64 pages forment un dôme, chaque ennemi dessous est marqué d'une rune qui explose ; puis le livre se referme. |
+| **Grues de Papier** (Paper Cranes, bonus) | 3 à 5 grues en origami lumineuses s'envolent, puis piquent sur les ennemis devant le lanceur et éclatent en confettis de papier. |
+| **Plume du Destin** (Quill of Fate, bonus) | Une plume spectrale géante trace une ligne d'encre au sol ; l'écriture s'illumine puis s'embrase en piliers de runes qui projettent les ennemis en l'air. |
+| **Égide de Parchemin** (Parchment Aegis, bonus) | 3 à 6 pages tournent autour du lanceur : chacune arrête un projectile ennemi ou absorbe une partie d'un coup et repart lacérer l'attaquant. |
 
-Focus de l'école : livre. Les 7 autres sorts et le livre de sorts (Living Grimoire) viendront plus tard.
+Livre : **Grimoire Vivant** (Living Grimoire) : couverture violette aux veines de runes qui pulsent, un œil qui
+regarde autour de lui et cligne, des pages qui bougent toutes seules. Focus de l'école : livre.
 
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
 (`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre).

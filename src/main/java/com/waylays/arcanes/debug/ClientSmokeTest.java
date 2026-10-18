@@ -169,8 +169,10 @@ public final class ClientSmokeTest {
         }
         try {
             ServerLevel level = player.serverLevel();
-            boolean explosion = spell.getSchoolType().getId().equals(ModSchools.EXPLOSION_RESOURCE);
-            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(explosion ? ModItems.DETONATION_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get()));
+            var school = spell.getSchoolType().getId();
+            var book = school.equals(ModSchools.EXPLOSION_RESOURCE) ? ModItems.DETONATION_CODEX.get()
+                    : school.equals(ModSchools.BOOK_RESOURCE) ? ModItems.LIVING_GRIMOIRE.get() : ModItems.GOLDEN_GRIMOIRE.get();
+            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(book));
             // A sturdy target dummy 6 blocks in front of the player, at eye level of the raycast
             Vec3 forward = Vec3.directionFromRotation(0, player.getYRot());
             Husk dummy = EntityType.HUSK.create(level);

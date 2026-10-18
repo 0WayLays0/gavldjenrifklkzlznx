@@ -36,17 +36,23 @@ public final class RenderHelper {
 
     /** Rectangle {@code width} x {@code height} in the XY plane centred on the origin, facing +Z (and -Z if {@code twoSided}). */
     public static void rect(VertexConsumer consumer, PoseStack.Pose pose, float width, float height, int argb, int light, boolean twoSided) {
+        rectUv(consumer, pose, width, height, 0, 0, 1, 1, argb, light, twoSided);
+    }
+
+    /** Like {@link #rect} with a part of the texture: (u0, v0) top left to (u1, v1) bottom right. */
+    public static void rectUv(VertexConsumer consumer, PoseStack.Pose pose, float width, float height, float u0, float v0, float u1, float v1,
+                              int argb, int light, boolean twoSided) {
         float w = width * .5f;
         float h = height * .5f;
-        vertex(consumer, pose, -w, -h, 0, 0, 1, argb, light, 0, 0, 1);
-        vertex(consumer, pose, w, -h, 0, 1, 1, argb, light, 0, 0, 1);
-        vertex(consumer, pose, w, h, 0, 1, 0, argb, light, 0, 0, 1);
-        vertex(consumer, pose, -w, h, 0, 0, 0, argb, light, 0, 0, 1);
+        vertex(consumer, pose, -w, -h, 0, u0, v1, argb, light, 0, 0, 1);
+        vertex(consumer, pose, w, -h, 0, u1, v1, argb, light, 0, 0, 1);
+        vertex(consumer, pose, w, h, 0, u1, v0, argb, light, 0, 0, 1);
+        vertex(consumer, pose, -w, h, 0, u0, v0, argb, light, 0, 0, 1);
         if (twoSided) {
-            vertex(consumer, pose, -w, h, 0, 0, 0, argb, light, 0, 0, -1);
-            vertex(consumer, pose, w, h, 0, 1, 0, argb, light, 0, 0, -1);
-            vertex(consumer, pose, w, -h, 0, 1, 1, argb, light, 0, 0, -1);
-            vertex(consumer, pose, -w, -h, 0, 0, 1, argb, light, 0, 0, -1);
+            vertex(consumer, pose, -w, h, 0, u0, v0, argb, light, 0, 0, -1);
+            vertex(consumer, pose, w, h, 0, u1, v0, argb, light, 0, 0, -1);
+            vertex(consumer, pose, w, -h, 0, u1, v1, argb, light, 0, 0, -1);
+            vertex(consumer, pose, -w, -h, 0, u0, v1, argb, light, 0, 0, -1);
         }
     }
 

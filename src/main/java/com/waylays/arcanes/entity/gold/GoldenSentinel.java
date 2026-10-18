@@ -1,5 +1,7 @@
 package com.waylays.arcanes.entity.gold;
 
+import com.waylays.arcanes.entity.OwnedSummon;
+import com.waylays.arcanes.entity.OwnerTargetGoal;
 import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import net.minecraft.core.BlockPos;
@@ -25,8 +27,6 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.TargetGoal;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +42,7 @@ import java.util.UUID;
  * A golden knight summoned by Golden Sentinels. Guards its summoner: attacks what the summoner attacks, what attacks
  * the summoner and nearby monsters. Shatters into gold when its time runs out or when it dies.
  */
-public class GoldenSentinel extends PathfinderMob {
+public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
     @Nullable
     private UUID ownerUUID;
     private int lifeTicks = 600;
@@ -85,11 +85,13 @@ public class GoldenSentinel extends PathfinderMob {
         }
     }
 
+    @Override
     @Nullable
     public UUID getOwnerUUID() {
         return ownerUUID;
     }
 
+    @Override
     @Nullable
     public LivingEntity getOwner() {
         if (ownerUUID != null && level() instanceof ServerLevel serverLevel && serverLevel.getEntity(ownerUUID) instanceof LivingEntity living) {
@@ -161,7 +163,7 @@ public class GoldenSentinel extends PathfinderMob {
     @Override
     public boolean isAlliedTo(Entity other) {
         if (ownerUUID != null && (ownerUUID.equals(other.getUUID())
-                || other instanceof GoldenSentinel sentinel && ownerUUID.equals(sentinel.ownerUUID))) {
+                || other instanceof OwnedSummon summon && ownerUUID.equals(summon.getOwnerUUID()))) {
             return true;
         }
         return super.isAlliedTo(other);
@@ -207,44 +209,6 @@ public class GoldenSentinel extends PathfinderMob {
         lifeTicks = tag.getInt("LifeTicks");
         if (tag.hasUUID("Owner")) {
             ownerUUID = tag.getUUID("Owner");
-        }
-    }
-
-    /** Targets what attacked the owner ({@code defend}) or what the owner attacked. */
-    static class OwnerTargetGoal extends TargetGoal {
-        private final GoldenSentinel sentinel;
-        private final boolean defend;
-        @Nullable
-        private LivingEntity candidate;
-        private int lastTimestamp;
-
-        OwnerTargetGoal(GoldenSentinel sentinel, boolean defend) {
-            super(sentinel, false);
-            this.sentinel = sentinel;
-            this.defend = defend;
-            setFlags(EnumSet.of(Goal.Flag.TARGET));
-        }
-
-        @Override
-        public boolean canUse() {
-            LivingEntity owner = sentinel.getOwner();
-            if (owner == null) {
-                return false;
-            }
-            candidate = defend ? owner.getLastHurtByMob() : owner.getLastHurtMob();
-            int timestamp = defend ? owner.getLastHurtByMobTimestamp() : owner.getLastHurtMobTimestamp();
-            return candidate != null && timestamp != lastTimestamp && !SpellUtil.isAlly(owner, candidate)
-                    && canAttack(candidate, TargetingConditions.DEFAULT);
-        }
-
-        @Override
-        public void start() {
-            LivingEntity owner = sentinel.getOwner();
-            if (owner != null) {
-                lastTimestamp = defend ? owner.getLastHurtByMobTimestamp() : owner.getLastHurtMobTimestamp();
-            }
-            mob.setTarget(candidate);
-            super.start();
         }
     }
 

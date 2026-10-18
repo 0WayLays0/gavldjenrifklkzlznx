@@ -1,11 +1,22 @@
 package com.waylays.arcanes.registry;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.entity.book.AegisPages;
+import com.waylays.arcanes.entity.book.BookmarkMarker;
 import com.waylays.arcanes.entity.book.ChapterRune;
 import com.waylays.arcanes.entity.book.FinalChapter;
+import com.waylays.arcanes.entity.book.FlyingGrimoire;
+import com.waylays.arcanes.entity.book.GrimoireBolt;
 import com.waylays.arcanes.entity.book.InkHands;
 import com.waylays.arcanes.entity.book.InkWave;
 import com.waylays.arcanes.entity.book.PageStorm;
+import com.waylays.arcanes.entity.book.PaperCrane;
+import com.waylays.arcanes.entity.book.QuillStroke;
+import com.waylays.arcanes.entity.book.RazorPage;
+import com.waylays.arcanes.entity.book.RewriteAura;
+import com.waylays.arcanes.entity.book.SilenceSeal;
+import com.waylays.arcanes.entity.book.TomeOfJudgment;
+import com.waylays.arcanes.entity.book.WordOfPower;
 import com.waylays.arcanes.entity.explosion.BlastEffect;
 import com.waylays.arcanes.entity.explosion.CataclysmCore;
 import com.waylays.arcanes.entity.explosion.ChainDetonation;
@@ -113,6 +124,39 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<ChapterRune>> CHAPTER_RUNE = register("chapter_rune",
             EntityType.Builder.<ChapterRune>of(ChapterRune::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(96));
 
+    public static final RegistryObject<EntityType<RazorPage>> RAZOR_PAGE = register("razor_page",
+            EntityType.Builder.<RazorPage>of(RazorPage::new, MobCategory.MISC).sized(.4f, .4f).clientTrackingRange(64).updateInterval(1));
+
+    public static final RegistryObject<EntityType<TomeOfJudgment>> TOME_OF_JUDGMENT = register("tome_of_judgment",
+            EntityType.Builder.<TomeOfJudgment>of(TomeOfJudgment::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(128).fireImmune());
+
+    public static final RegistryObject<EntityType<BookmarkMarker>> BOOKMARK_MARKER = register("bookmark_marker",
+            EntityType.Builder.<BookmarkMarker>of(BookmarkMarker::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
+
+    public static final RegistryObject<EntityType<SilenceSeal>> SILENCE_SEAL = register("silence_seal",
+            EntityType.Builder.<SilenceSeal>of(SilenceSeal::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
+
+    public static final RegistryObject<EntityType<FlyingGrimoire>> FLYING_GRIMOIRE = register("flying_grimoire",
+            EntityType.Builder.<FlyingGrimoire>of(FlyingGrimoire::new, MobCategory.MISC).sized(.6f, .5f).clientTrackingRange(64));
+
+    public static final RegistryObject<EntityType<GrimoireBolt>> GRIMOIRE_BOLT = register("grimoire_bolt",
+            EntityType.Builder.<GrimoireBolt>of(GrimoireBolt::new, MobCategory.MISC).sized(.3f, .3f).clientTrackingRange(64).updateInterval(1));
+
+    public static final RegistryObject<EntityType<WordOfPower>> WORD_OF_POWER = register("word_of_power",
+            EntityType.Builder.<WordOfPower>of(WordOfPower::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64).fireImmune());
+
+    public static final RegistryObject<EntityType<RewriteAura>> REWRITE_AURA = register("rewrite_aura",
+            EntityType.Builder.<RewriteAura>of(RewriteAura::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
+
+    public static final RegistryObject<EntityType<PaperCrane>> PAPER_CRANE = register("paper_crane",
+            EntityType.Builder.<PaperCrane>of(PaperCrane::new, MobCategory.MISC).sized(.4f, .4f).clientTrackingRange(64).updateInterval(1));
+
+    public static final RegistryObject<EntityType<QuillStroke>> QUILL_STROKE = register("quill_stroke",
+            EntityType.Builder.<QuillStroke>of(QuillStroke::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(96));
+
+    public static final RegistryObject<EntityType<AegisPages>> AEGIS_PAGES = register("aegis_pages",
+            EntityType.Builder.<AegisPages>of(AegisPages::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
+
     private ModEntities() {}
 
     private static <T extends Entity> RegistryObject<EntityType<T>> register(String name, EntityType.Builder<T> builder) {
@@ -122,5 +166,6 @@ public final class ModEntities {
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(GOLDEN_SENTINEL.get(), GoldenSentinel.createAttributes().build());
+        event.put(FLYING_GRIMOIRE.get(), FlyingGrimoire.createAttributes().build());
     }
 }

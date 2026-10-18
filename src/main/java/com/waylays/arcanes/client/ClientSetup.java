@@ -1,12 +1,15 @@
 package com.waylays.arcanes.client;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.client.render.AegisPagesRenderer;
 import com.waylays.arcanes.client.render.AurumBladeRenderer;
 import com.waylays.arcanes.client.render.BlastEffectRenderer;
+import com.waylays.arcanes.client.render.BookmarkRenderer;
 import com.waylays.arcanes.client.render.CataclysmRenderer;
 import com.waylays.arcanes.client.render.ChapterRuneRenderer;
 import com.waylays.arcanes.client.render.FinalChapterRenderer;
 import com.waylays.arcanes.client.render.EldoradoSunRenderer;
+import com.waylays.arcanes.client.render.FlyingGrimoireRenderer;
 import com.waylays.arcanes.client.render.GildedChainsRenderer;
 import com.waylays.arcanes.client.render.GlowOrbRenderer;
 import com.waylays.arcanes.client.render.GoldItemProjectileRenderer;
@@ -17,8 +20,15 @@ import com.waylays.arcanes.client.render.InkHandsRenderer;
 import com.waylays.arcanes.client.render.InkWaveRenderer;
 import com.waylays.arcanes.client.render.MoltenPoolRenderer;
 import com.waylays.arcanes.client.render.PageStormRenderer;
+import com.waylays.arcanes.client.render.PaperCraneRenderer;
+import com.waylays.arcanes.client.render.QuillStrokeRenderer;
+import com.waylays.arcanes.client.render.RazorPageRenderer;
+import com.waylays.arcanes.client.render.RewriteAuraRenderer;
 import com.waylays.arcanes.client.render.RuinSigilRenderer;
 import com.waylays.arcanes.client.render.ShieldBubbleRenderer;
+import com.waylays.arcanes.client.render.SilenceSealRenderer;
+import com.waylays.arcanes.client.render.TomeOfJudgmentRenderer;
+import com.waylays.arcanes.client.render.WordOfPowerRenderer;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModItems;
 import io.redspace.ironsspellbooks.render.SpellBookCurioRenderer;
@@ -67,6 +77,17 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.INK_HANDS.get(), InkHandsRenderer::new);
         event.registerEntityRenderer(ModEntities.FINAL_CHAPTER.get(), FinalChapterRenderer::new);
         event.registerEntityRenderer(ModEntities.CHAPTER_RUNE.get(), ChapterRuneRenderer::new);
+        event.registerEntityRenderer(ModEntities.RAZOR_PAGE.get(), RazorPageRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOME_OF_JUDGMENT.get(), TomeOfJudgmentRenderer::new);
+        event.registerEntityRenderer(ModEntities.BOOKMARK_MARKER.get(), BookmarkRenderer::new);
+        event.registerEntityRenderer(ModEntities.SILENCE_SEAL.get(), SilenceSealRenderer::new);
+        event.registerEntityRenderer(ModEntities.FLYING_GRIMOIRE.get(), FlyingGrimoireRenderer::new);
+        event.registerEntityRenderer(ModEntities.GRIMOIRE_BOLT.get(), context -> new GlowOrbRenderer<>(context, .4f, 0xA060FF));
+        event.registerEntityRenderer(ModEntities.WORD_OF_POWER.get(), WordOfPowerRenderer::new);
+        event.registerEntityRenderer(ModEntities.REWRITE_AURA.get(), RewriteAuraRenderer::new);
+        event.registerEntityRenderer(ModEntities.PAPER_CRANE.get(), PaperCraneRenderer::new);
+        event.registerEntityRenderer(ModEntities.QUILL_STROKE.get(), QuillStrokeRenderer::new);
+        event.registerEntityRenderer(ModEntities.AEGIS_PAGES.get(), AegisPagesRenderer::new);
     }
 
     @SubscribeEvent
@@ -75,6 +96,7 @@ public final class ClientSetup {
         event.enqueueWork(() -> {
             CuriosRendererRegistry.register(ModItems.GOLDEN_GRIMOIRE.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.DETONATION_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.LIVING_GRIMOIRE.get(), SpellBookCurioRenderer::new);
         });
     }
 }
