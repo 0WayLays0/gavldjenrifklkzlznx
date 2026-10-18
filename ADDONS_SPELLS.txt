@@ -18,7 +18,7 @@ Statut : [ ] à faire   [~] en cours   [x] fini et testé en jeu
 Ordre de développement :
   1. Or
   2. Rotation
-  3. Poudre à Canon
+  3. Explosion
   4. Livre
   5. Chewing-Gum
   6. Mousse et Flore
@@ -97,36 +97,54 @@ Livre : Gyroscopic Spellbook (anneaux qui tournent sur la couverture) [ ]
 
 
 ================================================================================
- 3. MAGIE DE POUDRE À CANON (Gunpowder / Pyrotechnie arcanique)  [ ] À FAIRE
+ 3. MAGIE DE L'EXPLOSION (Explosion / Arcanes détonants)          [ ] À FAIRE
 ================================================================================
-Couleur : noir de suie / orange incandescent
-Ambiance : poudre ensorcelée, fantômes de pirates, mèches runiques, feux
-           d'artifice magiques
-Sons : détonations, mèches qui crépitent, canons spectraux, échos de bataille
+Couleur : cœur blanc-or, flammes orange vif, ondes de choc violet-magenta
+Ambiance : énergie instable qui gonfle puis éclate ; flashs aveuglants, ondes
+           de choc en anneaux, fissures incandescentes, réactions en chaîne,
+           débris lumineux, l'écran qui tremble
+Sons : sifflement aigu qui monte avant chaque explosion, détonations sourdes,
+       craquements, grondement qui résonne, écho lointain
+Note RP : les explosions ne cassent pas les blocs (option staff dans la config
+          pour l'activer si besoin).
 
- 1. Arcane Musket      [ ] Une balle de poudre ensorcelée, entourée de runes
-                           de feu, transperce la cible et explose derrière elle.
- 2. Spectral Keg       [ ] Un baril fantôme apparaît, roule vers les ennemis
-                           et détone en gerbe de flammes orange.
- 3. Hellfire Grapeshot [ ] Un cône de mitraille incandescente qui enflamme
-                           tout devant le lanceur.
- 4. Runic Fuse         [ ] Une mèche runique court au sol jusqu'à la cible et
-                           déclenche une chaîne d'explosions sur son chemin.
- 5. Cursed Bomb        [ ] Une bombe maudite se colle à la cible, compte à
-                           rebours visible au-dessus d'elle, puis explose.
- 6. Ghost Cannonball   [ ] Un canon spectral apparaît derrière le lanceur et
-                           tire un boulet fantôme qui rebondit et écrase tout.
- 7. Black Powder Veil  [ ] Un nuage de poudre noire enveloppe le lanceur : il
-                           devient invisible et le nuage explose s'il est
-                           enflammé.
- 8. Blast Jump         [ ] Une explosion magique sous les pieds propulse le
-                           lanceur très haut, sans dégâts pour lui.
- 9. Firework Volley    [ ] Une salve de fusées magiques colorées qui
-                           poursuivent les ennemis et éclatent en étoiles.
-10. Phantom Armada     [ ] ULTIME - Un navire pirate fantôme apparaît dans le
-                           ciel et bombarde toute la zone de boulets spectraux.
+ 1. Blast Orb          [ ] Un orbe d'énergie instable, parcouru d'éclairs
+                           orange, file vers la cible et éclate en double onde
+                           de choc (un anneau blanc puis un anneau violet).
+ 2. Chain Detonation   [ ] Une explosion frappe la cible puis saute d'ennemi
+                           en ennemi (jusqu'à 5) ; chaque saut est plus gros
+                           et plus lumineux que le précédent.
+ 3. Sigils of Ruin     [ ] Pose 3 à 5 sceaux runiques qui brillent au sol.
+                           Quand un ennemi marche dessus, le sceau explose et
+                           fait exploser les sceaux voisins en cascade.
+ 4. Detonation Wave    [ ] Le lanceur frappe le sol : un anneau d'explosions
+                           successives s'étend en cercle autour de lui, comme
+                           une vague de feu.
+ 5. Implosion          [ ] Un point de lumière noire aspire tous les ennemis
+                           proches vers son centre, se contracte... puis
+                           détone en une sphère blanche aveuglante.
+ 6. Volatile Brand     [ ] Une marque incandescente s'imprime sur la cible.
+                           Chaque coup qu'elle reçoit la charge (elle brille de
+                           plus en plus) ; à 5 charges, elle explose.
+ 7. Blast Leap         [ ] Une explosion sous les pieds propulse le lanceur
+                           dans le ciel (sans dégâts pour lui) ; il retombe en
+                           piqué et l'atterrissage provoque une seconde
+                           explosion.
+ 8. Cluster Barrage    [ ] Une grosse sphère monte dans le ciel, éclate en 8
+                           sous-charges lumineuses qui retombent et explosent
+                           en cascade, comme un feu d'artifice destructeur.
+ 9. Reactive Shield    [ ] Un bouclier d'énergie crépitant entoure le
+                           lanceur : quand on le frappe, il explose et repousse
+                           les attaquants (3 charges).
+10. Cataclysm          [ ] ULTIME - Le lanceur s'élève dans les airs ; une
+                           sphère d'énergie grandit au-dessus de lui pendant 3
+                           secondes en aspirant la lumière autour, puis explose
+                           en un dôme de lumière blanche géant : onde de choc
+                           qui balaie tout l'écran, ciel qui tremble, et une
+                           couronne d'explosions secondaires tout autour.
 
-Livre : Captain's Logbook (livre de bord pirate) [ ]
+Livre : Detonation Codex (couverture noire craquelée, fissures incandescentes
+        qui pulsent comme du magma) [ ]
 
 
 ================================================================================
