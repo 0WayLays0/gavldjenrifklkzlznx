@@ -17,6 +17,11 @@ import com.waylays.arcanes.entity.book.RewriteAura;
 import com.waylays.arcanes.entity.book.SilenceSeal;
 import com.waylays.arcanes.entity.book.TomeOfJudgment;
 import com.waylays.arcanes.entity.book.WordOfPower;
+import com.waylays.arcanes.entity.errethys.ManaCamel;
+import com.waylays.arcanes.entity.errethys.ManaCrow;
+import com.waylays.arcanes.entity.errethys.ManaRat;
+import com.waylays.arcanes.entity.errethys.ManaSalmon;
+import com.waylays.arcanes.entity.errethys.ManaSerpent;
 import com.waylays.arcanes.entity.explosion.BlastEffect;
 import com.waylays.arcanes.entity.explosion.CataclysmCore;
 import com.waylays.arcanes.entity.explosion.ChainDetonation;
@@ -157,6 +162,22 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<AegisPages>> AEGIS_PAGES = register("aegis_pages",
             EntityType.Builder.<AegisPages>of(AegisPages::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
+    // Errethys school
+    public static final RegistryObject<EntityType<ManaRat>> MANA_RAT = register("mana_rat",
+            EntityType.Builder.<ManaRat>of(ManaRat::new, MobCategory.MISC).sized(.5f, .4f).clientTrackingRange(10));
+
+    public static final RegistryObject<EntityType<ManaSalmon>> MANA_SALMON = register("mana_salmon",
+            EntityType.Builder.<ManaSalmon>of(ManaSalmon::new, MobCategory.MISC).sized(.7f, .4f).clientTrackingRange(10));
+
+    public static final RegistryObject<EntityType<ManaSerpent>> MANA_SERPENT = register("mana_serpent",
+            EntityType.Builder.<ManaSerpent>of(ManaSerpent::new, MobCategory.MISC).sized(.7f, .4f).clientTrackingRange(10));
+
+    public static final RegistryObject<EntityType<ManaCrow>> MANA_CROW = register("mana_crow",
+            EntityType.Builder.<ManaCrow>of(ManaCrow::new, MobCategory.MISC).sized(.5f, .6f).clientTrackingRange(10));
+
+    public static final RegistryObject<EntityType<ManaCamel>> MANA_DROMEDARY = register("mana_dromedary",
+            EntityType.Builder.<ManaCamel>of(ManaCamel::new, MobCategory.MISC).sized(1.7f, 2.375f).clientTrackingRange(10));
+
     private ModEntities() {}
 
     private static <T extends Entity> RegistryObject<EntityType<T>> register(String name, EntityType.Builder<T> builder) {
@@ -167,5 +188,10 @@ public final class ModEntities {
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(GOLDEN_SENTINEL.get(), GoldenSentinel.createAttributes().build());
         event.put(FLYING_GRIMOIRE.get(), FlyingGrimoire.createAttributes().build());
+        event.put(MANA_RAT.get(), ManaRat.createAttributes().build());
+        event.put(MANA_SALMON.get(), ManaSalmon.createAttributes().build());
+        event.put(MANA_SERPENT.get(), ManaSerpent.createAttributes().build());
+        event.put(MANA_CROW.get(), ManaCrow.createAttributes().build());
+        event.put(MANA_DROMEDARY.get(), ManaCamel.createAttributes().build());
     }
 }

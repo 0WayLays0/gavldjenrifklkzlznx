@@ -69,5 +69,21 @@ public final class ModSchools {
             BOOK_MAGIC
     ));
 
+    /** Errethys: creatures of sky-blue mana summoned to fight or carry their caster. */
+    public static final ResourceLocation ERRETHYS_RESOURCE = ArcanesOublies.id("errethys");
+    public static final TagKey<Item> ERRETHYS_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("errethys_focus"));
+    public static final ResourceKey<DamageType> ERRETHYS_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("errethys_magic"));
+    public static final int ERRETHYS_COLOR = 0x87CEEB;
+
+    public static final RegistryObject<SchoolType> ERRETHYS = SCHOOLS.register(ERRETHYS_RESOURCE.getPath(), () -> new SchoolType(
+            ERRETHYS_RESOURCE,
+            ERRETHYS_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".errethys").withStyle(Style.EMPTY.withColor(ERRETHYS_COLOR)),
+            LazyOptional.of(ModAttributes.ERRETHYS_SPELL_POWER::get),
+            LazyOptional.of(ModAttributes.ERRETHYS_MAGIC_RESIST::get),
+            LazyOptional.of(() -> SoundEvents.AMETHYST_BLOCK_CHIME),
+            ERRETHYS_MAGIC
+    ));
+
     private ModSchools() {}
 }

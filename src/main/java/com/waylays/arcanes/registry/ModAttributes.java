@@ -23,6 +23,8 @@ public final class ModAttributes {
     public static final RegistryObject<Attribute> EXPLOSION_MAGIC_RESIST = resistanceAttribute("explosion");
     public static final RegistryObject<Attribute> BOOK_SPELL_POWER = powerAttribute("book");
     public static final RegistryObject<Attribute> BOOK_MAGIC_RESIST = resistanceAttribute("book");
+    public static final RegistryObject<Attribute> ERRETHYS_SPELL_POWER = powerAttribute("errethys");
+    public static final RegistryObject<Attribute> ERRETHYS_MAGIC_RESIST = resistanceAttribute("errethys");
 
     private ModAttributes() {}
 

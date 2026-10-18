@@ -25,6 +25,7 @@ Ordre de développement :
   7. Néant / Vide
   8. Miroirs
   9. Cosmos / Étoiles
+ 10. Errethys (invocations de mana) - demandée en plus
 
 
 ================================================================================
@@ -347,6 +348,25 @@ Sons : carillons célestes, bourdonnements spatiaux, impacts de météores
                            zone.
 
 Livre : Star Atlas (couverture de ciel étoilé animé) [ ]
+
+
+================================================================================
+10. ERRETHYS (invocations de créatures de mana)                  [~] EN COURS
+================================================================================
+Couleur : bleu ciel transparent, veines de lumière
+Ambiance : animaux de mana translucides qui se battent pour le lanceur
+Sons : carillons d'améthyste, cris des animaux adoucis
+
+ 1. Rats de Mana       [~] Une nuée de rats rapides qui mordent les ennemis.
+ 2. Saumons de Mana    [~] Des saumons qui nagent dans l'eau comme dans l'air
+                           (mouvements de saumon) et percutent les ennemis.
+ 3. Dromadaire de Mana [~] Un dromadaire sellé que le lanceur peut monter
+                           (ruée, 2 places).
+ 4. Serpent de Mana    [~] Des serpents qui ondulent ; leur morsure empoisonne.
+ 5. Corbeaux de Mana   [~] Des corbeaux qui volent comme des oiseaux, tournent
+                           au-dessus du lanceur et piquent sur les ennemis.
+
+Livre : pas encore demandé [ ]
 
 
 ================================================================================

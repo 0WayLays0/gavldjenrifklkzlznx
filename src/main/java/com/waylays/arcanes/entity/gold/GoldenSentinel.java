@@ -2,6 +2,7 @@ package com.waylays.arcanes.entity.gold;
 
 import com.waylays.arcanes.entity.OwnedSummon;
 import com.waylays.arcanes.entity.OwnerTargetGoal;
+import com.waylays.arcanes.entity.SummonFollowOwnerGoal;
 import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import net.minecraft.core.BlockPos;
@@ -20,7 +21,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
@@ -35,7 +35,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
-import java.util.EnumSet;
 import java.util.UUID;
 
 /**
@@ -104,7 +103,7 @@ public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.25, true));
-        this.goalSelector.addGoal(2, new FollowOwnerGoal(this, 1.15));
+        this.goalSelector.addGoal(2, new SummonFollowOwnerGoal(this, 1.15, 6, 3, -1));
         this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, .8));
         this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 8));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
@@ -209,68 +208,6 @@ public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
         lifeTicks = tag.getInt("LifeTicks");
         if (tag.hasUUID("Owner")) {
             ownerUUID = tag.getUUID("Owner");
-        }
-    }
-
-    /** Stays near the owner when there is nothing to fight; teleports back when left far behind. */
-    static class FollowOwnerGoal extends Goal {
-        private final GoldenSentinel sentinel;
-        private final double speed;
-        private int recalc;
-
-        FollowOwnerGoal(GoldenSentinel sentinel, double speed) {
-            this.sentinel = sentinel;
-            this.speed = speed;
-            setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
-        }
-
-        @Override
-        public boolean canUse() {
-            LivingEntity owner = sentinel.getOwner();
-            return owner != null && !owner.isSpectator() && sentinel.getTarget() == null && sentinel.distanceToSqr(owner) > 6 * 6;
-        }
-
-        @Override
-        public boolean canContinueToUse() {
-            LivingEntity owner = sentinel.getOwner();
-            return owner != null && sentinel.getTarget() == null && !sentinel.getNavigation().isDone() && sentinel.distanceToSqr(owner) > 3 * 3;
-        }
-
-        @Override
-        public void start() {
-            recalc = 0;
-        }
-
-        @Override
-        public void stop() {
-            sentinel.getNavigation().stop();
-        }
-
-        @Override
-        public void tick() {
-            LivingEntity owner = sentinel.getOwner();
-            if (owner == null) {
-                return;
-            }
-            sentinel.getLookControl().setLookAt(owner, 10, sentinel.getMaxHeadXRot());
-            if (--recalc > 0) {
-                return;
-            }
-            recalc = 10;
-            if (sentinel.distanceToSqr(owner) > 20 * 20) {
-                BlockPos base = owner.blockPosition();
-                for (int i = 0; i < 10; i++) {
-                    BlockPos pos = base.offset(sentinel.getRandom().nextInt(5) - 2, 0, sentinel.getRandom().nextInt(5) - 2);
-                    if (sentinel.level().getBlockState(pos.below()).isSolidRender(sentinel.level(), pos.below())
-                            && sentinel.level().noCollision(sentinel, sentinel.getBoundingBox().move(pos.getCenter().subtract(sentinel.position()).add(0, -.5, 0)))) {
-                        sentinel.moveTo(pos.getX() + .5, pos.getY(), pos.getZ() + .5, sentinel.getYRot(), sentinel.getXRot());
-                        sentinel.getNavigation().stop();
-                        return;
-                    }
-                }
-            } else {
-                sentinel.getNavigation().moveTo(owner, speed);
-            }
         }
     }
 }

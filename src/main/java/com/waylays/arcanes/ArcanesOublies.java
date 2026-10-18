@@ -18,8 +18,8 @@ import org.slf4j.Logger;
 
 /**
  * Arcanes Oubliés: an addon for Iron's Spells 'n Spellbooks that adds new schools of magic.
- * Content so far: the Gold and Explosion schools (10 spells and a spellbook each) and the Book school (13 spells
- * and a spellbook).
+ * Content so far: the Gold and Explosion schools (10 spells and a spellbook each), the Book school (13 spells and a
+ * spellbook) and Errethys, the school of summoned mana creatures (5 spells).
  */
 @Mod(ArcanesOublies.MODID)
 public class ArcanesOublies {

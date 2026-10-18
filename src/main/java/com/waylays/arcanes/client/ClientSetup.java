@@ -1,6 +1,9 @@
 package com.waylays.arcanes.client;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.client.model.ManaCrowModel;
+import com.waylays.arcanes.client.model.ManaRatModel;
+import com.waylays.arcanes.client.model.ManaSerpentModel;
 import com.waylays.arcanes.client.render.AegisPagesRenderer;
 import com.waylays.arcanes.client.render.AurumBladeRenderer;
 import com.waylays.arcanes.client.render.BlastEffectRenderer;
@@ -18,6 +21,9 @@ import com.waylays.arcanes.client.render.GoldenSentinelRenderer;
 import com.waylays.arcanes.client.render.ImplosionRenderer;
 import com.waylays.arcanes.client.render.InkHandsRenderer;
 import com.waylays.arcanes.client.render.InkWaveRenderer;
+import com.waylays.arcanes.client.render.ManaCamelRenderer;
+import com.waylays.arcanes.client.render.ManaCreatureRenderer;
+import com.waylays.arcanes.client.render.ManaSalmonRenderer;
 import com.waylays.arcanes.client.render.MoltenPoolRenderer;
 import com.waylays.arcanes.client.render.PageStormRenderer;
 import com.waylays.arcanes.client.render.PaperCraneRenderer;
@@ -88,6 +94,22 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.PAPER_CRANE.get(), PaperCraneRenderer::new);
         event.registerEntityRenderer(ModEntities.QUILL_STROKE.get(), QuillStrokeRenderer::new);
         event.registerEntityRenderer(ModEntities.AEGIS_PAGES.get(), AegisPagesRenderer::new);
+
+        event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));
+        event.registerEntityRenderer(ModEntities.MANA_SERPENT.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaSerpentModel(context.bakeLayer(ManaSerpentModel.LAYER)), .35f, 1.1f, true));
+        event.registerEntityRenderer(ModEntities.MANA_CROW.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaCrowModel(context.bakeLayer(ManaCrowModel.LAYER)), .25f, 1.25f, true));
+        event.registerEntityRenderer(ModEntities.MANA_SALMON.get(), ManaSalmonRenderer::new);
+        event.registerEntityRenderer(ModEntities.MANA_DROMEDARY.get(), ManaCamelRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(ManaRatModel.LAYER, ManaRatModel::createBodyLayer);
+        event.registerLayerDefinition(ManaSerpentModel.LAYER, ManaSerpentModel::createBodyLayer);
+        event.registerLayerDefinition(ManaCrowModel.LAYER, ManaCrowModel::createBodyLayer);
     }
 
     @SubscribeEvent

@@ -3,12 +3,12 @@
 Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.20.1, Forge 47.4+), pour notre serveur RP.
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 0.5.0 : écoles de l'Or, de l'Explosion et du Livre
+## Contenu de la bêta 0.6.0 : écoles de l'Or, de l'Explosion, du Livre et d'Errethys
 
 Trois nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
-12 pour le Grimoire Vivant). Un onglet créatif « Arcanes Oubliés » contient les livres et tous les parchemins à tous
-les niveaux.
+12 pour le Grimoire Vivant), plus l'école d'invocation Errethys (5 sorts, pas encore de livre). Un onglet créatif
+« Arcanes Oubliés » contient les livres et tous les parchemins à tous les niveaux.
 
 ### Or
 
@@ -72,8 +72,25 @@ Même activée, la roche du fond, l'obsidienne et les blocs résistants aux expl
 Livre : **Grimoire Vivant** (Living Grimoire) : couverture violette aux veines de runes qui pulsent, un œil qui
 regarde autour de lui et cligne, des pages qui bougent toutes seules. Focus de l'école : livre.
 
+### Errethys (invocations de créatures de mana)
+
+Des animaux de mana bleu ciel transparent, aux veines de lumière qui brillent de l'intérieur. Ils se battent pour
+le lanceur (ce qu'il attaque, ce qui l'attaque, et les monstres proches), ne touchent jamais ses alliés, ne laissent
+rien en mourant et se dissolvent en étincelles quand leur temps est écoulé.
+
+| Sort | Effet |
+|---|---|
+| **Rats de Mana** (Mana Rats) | 3 à 5 rats rapides (queue qui ondule) qui suivent le lanceur et mordent ses ennemis, 30 s ou plus. |
+| **Saumons de Mana** (Mana Salmon) | 2 à 4 saumons qui nagent dans l'eau comme dans l'air, avec les mouvements du saumon, et percutent les ennemis (plus rapides dans l'eau). |
+| **Dromadaire de Mana** (Mana Dromedary) | Un dromadaire sellé : clic droit pour le monter, avec la ruée du chameau ; un second joueur peut monter derrière le lanceur. 2 à 4 min, un seul à la fois. |
+| **Serpent de Mana** (Mana Serpent) | 1 à 3 serpents qui ondulent en S ; leur morsure empoisonne (Poison II au niveau 4) et ralentit. |
+| **Corbeaux de Mana** (Mana Crows) | 2 à 4 corbeaux qui volent comme des oiseaux : battements d'ailes, vol plané en descente, cercles au-dessus du lanceur, piqués sur les ennemis. |
+
+Focus de l'école : cristaux de prismarine.
+
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
-(`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre).
+(`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre, `tools/errethys_assets.py`
+pour Errethys).
 
 ## Récupérer le mod
 

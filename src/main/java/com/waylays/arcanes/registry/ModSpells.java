@@ -14,6 +14,11 @@ import com.waylays.arcanes.spells.book.RewriteSpell;
 import com.waylays.arcanes.spells.book.SealOfSilenceSpell;
 import com.waylays.arcanes.spells.book.TomeOfJudgmentSpell;
 import com.waylays.arcanes.spells.book.WordOfPowerSpell;
+import com.waylays.arcanes.spells.errethys.ManaCrowsSpell;
+import com.waylays.arcanes.spells.errethys.ManaDromedarySpell;
+import com.waylays.arcanes.spells.errethys.ManaRatsSpell;
+import com.waylays.arcanes.spells.errethys.ManaSalmonSpell;
+import com.waylays.arcanes.spells.errethys.ManaSerpentSpell;
 import com.waylays.arcanes.spells.explosion.BlastLeapSpell;
 import com.waylays.arcanes.spells.explosion.BlastOrbSpell;
 import com.waylays.arcanes.spells.explosion.CataclysmSpell;
@@ -84,6 +89,13 @@ public final class ModSpells {
     public static final RegistryObject<AbstractSpell> PAPER_CRANES = register(new PaperCranesSpell());
     public static final RegistryObject<AbstractSpell> QUILL_OF_FATE = register(new QuillOfFateSpell());
     public static final RegistryObject<AbstractSpell> PARCHMENT_AEGIS = register(new ParchmentAegisSpell());
+
+    // Errethys school: summoned creatures of mana
+    public static final RegistryObject<AbstractSpell> MANA_RATS = register(new ManaRatsSpell());
+    public static final RegistryObject<AbstractSpell> MANA_SALMON = register(new ManaSalmonSpell());
+    public static final RegistryObject<AbstractSpell> MANA_DROMEDARY = register(new ManaDromedarySpell());
+    public static final RegistryObject<AbstractSpell> MANA_SERPENT = register(new ManaSerpentSpell());
+    public static final RegistryObject<AbstractSpell> MANA_CROWS = register(new ManaCrowsSpell());
 
     private ModSpells() {}
 
