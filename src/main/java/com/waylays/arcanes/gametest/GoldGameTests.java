@@ -39,6 +39,7 @@ import net.minecraftforge.registries.RegistryObject;
 @GameTestHolder(ArcanesOublies.MODID)
 @PrefixGameTestTemplate(false)
 public final class GoldGameTests {
+    // Test coordinates: y=1 is the platform's floor block, entities stand at y=2
     private static final TagKey<Item> CURIOS_SPELLBOOK = TagKey.create(Registries.ITEM, new ResourceLocation("curios", "spellbook"));
 
     private GoldGameTests() {}
@@ -63,11 +64,11 @@ public final class GoldGameTests {
 
     @GameTest(template = "platform", timeoutTicks = 100)
     public static void goldBoltHitsAndShatters(GameTestHelper helper) {
-        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 1, 1.5));
-        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 1, 6.5));
-        Pig bystander = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(5.8, 1, 7.0));
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
+        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 6.5));
+        Pig bystander = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(5.8, 2, 7.0));
         GoldBoltProjectile bolt = new GoldBoltProjectile(helper.getLevel(), caster);
-        bolt.setPos(helper.absoluteVec(new Vec3(4.5, 1.3, 2.5)));
+        bolt.setPos(helper.absoluteVec(new Vec3(4.5, 2.3, 2.5)));
         bolt.shoot(new Vec3(0, 0, 1));
         bolt.setDamage(6f);
         helper.getLevel().addFreshEntity(bolt);
@@ -88,8 +89,8 @@ public final class GoldGameTests {
 
     @GameTest(template = "platform", timeoutTicks = 200)
     public static void gildedChainsPinTargetThenBreak(GameTestHelper helper) {
-        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 1, 1.5));
-        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 1, 5.5));
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
+        Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 5.5));
         MagicData castData = new MagicData(true);
         castData.setAdditionalCastData(new TargetEntityCastData(target));
         ModSpells.GILDED_CHAINS.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, castData);

@@ -54,6 +54,8 @@ public class GoldBoltProjectile extends AbstractMagicProjectile {
     @Override
     protected void onHitBlock(BlockHitResult blockHitResult) {
         super.onHitBlock(blockHitResult);
+        // Burst where the ingot touched, not where this tick's movement started
+        setPos(blockHitResult.getLocation());
         shatter(null);
         discard();
     }
@@ -66,6 +68,10 @@ public class GoldBoltProjectile extends AbstractMagicProjectile {
             return;
         }
         Entity target = entityHitResult.getEntity();
+        // Burst on the target's surface, along the ingot's path
+        Vec3 from = position().add(0, getBbHeight() * .5, 0);
+        Vec3 contact = target.getBoundingBox().inflate(.3).clip(from, from.add(getDeltaMovement())).orElse(target.getBoundingBox().getCenter());
+        setPos(contact.x, contact.y - getBbHeight() * .5, contact.z);
         DamageSources.applyDamage(target, getDamage(), ModSpells.GOLD_BOLT.get().getDamageSource(this, getOwner()));
         shatter(target);
         discard();
@@ -87,7 +93,7 @@ public class GoldBoltProjectile extends AbstractMagicProjectile {
 
     @Override
     public void impactParticles(double x, double y, double z) {
-        GoldFx.shatterBurst(level(), x, y, z, 1f);
+        GoldFx.shatterBurst(level(), x, y + getBbHeight() * .5, z, 1f);
     }
 
     /** Client side, every tick: a dense gold dust core, a pale glitter spiral and stray sparks. */
