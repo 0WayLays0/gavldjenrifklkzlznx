@@ -97,7 +97,7 @@ Livre : Gyroscopic Spellbook (anneaux qui tournent sur la couverture) [ ]
 
 
 ================================================================================
- 3. MAGIE DE L'EXPLOSION (Explosion / Arcanes détonants)          [ ] À FAIRE
+ 3. MAGIE DE L'EXPLOSION (Explosion / Arcanes détonants)          [~] EN COURS
 ================================================================================
 Couleur : cœur blanc-or, flammes orange vif, ondes de choc violet-magenta
 Ambiance : énergie instable qui gonfle puis éclate ; flashs aveuglants, ondes
@@ -108,35 +108,35 @@ Sons : sifflement aigu qui monte avant chaque explosion, détonations sourdes,
 Note RP : les explosions ne cassent pas les blocs (option staff dans la config
           pour l'activer si besoin).
 
- 1. Blast Orb          [ ] Un orbe d'énergie instable, parcouru d'éclairs
+ 1. Blast Orb          [~] Un orbe d'énergie instable, parcouru d'éclairs
                            orange, file vers la cible et éclate en double onde
                            de choc (un anneau blanc puis un anneau violet).
- 2. Chain Detonation   [ ] Une explosion frappe la cible puis saute d'ennemi
+ 2. Chain Detonation   [~] Une explosion frappe la cible puis saute d'ennemi
                            en ennemi (jusqu'à 5) ; chaque saut est plus gros
                            et plus lumineux que le précédent.
- 3. Sigils of Ruin     [ ] Pose 3 à 5 sceaux runiques qui brillent au sol.
+ 3. Sigils of Ruin     [~] Pose 3 à 5 sceaux runiques qui brillent au sol.
                            Quand un ennemi marche dessus, le sceau explose et
                            fait exploser les sceaux voisins en cascade.
- 4. Detonation Wave    [ ] Le lanceur frappe le sol : un anneau d'explosions
+ 4. Detonation Wave    [~] Le lanceur frappe le sol : un anneau d'explosions
                            successives s'étend en cercle autour de lui, comme
                            une vague de feu.
- 5. Implosion          [ ] Un point de lumière noire aspire tous les ennemis
+ 5. Implosion          [~] Un point de lumière noire aspire tous les ennemis
                            proches vers son centre, se contracte... puis
                            détone en une sphère blanche aveuglante.
- 6. Volatile Brand     [ ] Une marque incandescente s'imprime sur la cible.
+ 6. Volatile Brand     [~] Une marque incandescente s'imprime sur la cible.
                            Chaque coup qu'elle reçoit la charge (elle brille de
                            plus en plus) ; à 5 charges, elle explose.
- 7. Blast Leap         [ ] Une explosion sous les pieds propulse le lanceur
+ 7. Blast Leap         [~] Une explosion sous les pieds propulse le lanceur
                            dans le ciel (sans dégâts pour lui) ; il retombe en
                            piqué et l'atterrissage provoque une seconde
                            explosion.
- 8. Cluster Barrage    [ ] Une grosse sphère monte dans le ciel, éclate en 8
+ 8. Cluster Barrage    [~] Une grosse sphère monte dans le ciel, éclate en 8
                            sous-charges lumineuses qui retombent et explosent
                            en cascade, comme un feu d'artifice destructeur.
- 9. Reactive Shield    [ ] Un bouclier d'énergie crépitant entoure le
+ 9. Reactive Shield    [~] Un bouclier d'énergie crépitant entoure le
                            lanceur : quand on le frappe, il explose et repousse
                            les attaquants (3 charges).
-10. Cataclysm          [ ] ULTIME - Le lanceur s'élève dans les airs ; une
+10. Cataclysm          [~] ULTIME - Le lanceur s'élève dans les airs ; une
                            sphère d'énergie grandit au-dessus de lui pendant 3
                            secondes en aspirant la lumière autour, puis explose
                            en un dôme de lumière blanche géant : onde de choc
@@ -144,7 +144,7 @@ Note RP : les explosions ne cassent pas les blocs (option staff dans la config
                            couronne d'explosions secondaires tout autour.
 
 Livre : Detonation Codex (couverture noire craquelée, fissures incandescentes
-        qui pulsent comme du magma) [ ]
+        qui pulsent comme du magma) [~]
 
 
 ================================================================================

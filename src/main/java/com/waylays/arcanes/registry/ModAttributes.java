@@ -19,6 +19,8 @@ public final class ModAttributes {
 
     public static final RegistryObject<Attribute> GOLD_SPELL_POWER = powerAttribute("gold");
     public static final RegistryObject<Attribute> GOLD_MAGIC_RESIST = resistanceAttribute("gold");
+    public static final RegistryObject<Attribute> EXPLOSION_SPELL_POWER = powerAttribute("explosion");
+    public static final RegistryObject<Attribute> EXPLOSION_MAGIC_RESIST = resistanceAttribute("explosion");
 
     private ModAttributes() {}
 

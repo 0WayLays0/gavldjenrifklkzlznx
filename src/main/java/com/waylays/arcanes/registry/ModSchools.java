@@ -39,5 +39,20 @@ public final class ModSchools {
             GOLD_MAGIC
     ));
 
+    public static final ResourceLocation EXPLOSION_RESOURCE = ArcanesOublies.id("explosion");
+    public static final TagKey<Item> EXPLOSION_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("explosion_focus"));
+    public static final ResourceKey<DamageType> EXPLOSION_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("explosion_magic"));
+    public static final int EXPLOSION_COLOR = 0xFF6A2A;
+
+    public static final RegistryObject<SchoolType> EXPLOSION = SCHOOLS.register(EXPLOSION_RESOURCE.getPath(), () -> new SchoolType(
+            EXPLOSION_RESOURCE,
+            EXPLOSION_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".explosion").withStyle(Style.EMPTY.withColor(EXPLOSION_COLOR)),
+            LazyOptional.of(ModAttributes.EXPLOSION_SPELL_POWER::get),
+            LazyOptional.of(ModAttributes.EXPLOSION_MAGIC_RESIST::get),
+            LazyOptional.of(() -> SoundEvents.FIRECHARGE_USE),
+            EXPLOSION_MAGIC
+    ));
+
     private ModSchools() {}
 }

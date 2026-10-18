@@ -4,6 +4,7 @@ import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.gold.GildedChainsEntity;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -98,8 +99,8 @@ public class GildedChainsSpell extends AbstractSpell {
         double x = entity.getX() + Mth.cos(angle) * radius;
         double z = entity.getZ() + Mth.sin(angle) * radius;
         double y = entity.getY() + 1.1 + Mth.sin(angle * .5f) * .2;
-        GoldFx.particles(level, GoldFx.GOLD_DUST, x, y, z, 2, .03, .03, .03, 0);
-        GoldFx.particles(level, GoldFx.PALE_DUST, entity.getX() - Mth.cos(angle) * radius, y, entity.getZ() - Mth.sin(angle) * radius, 1, .03, .03, .03, 0);
+        SpellUtil.particles(level, GoldFx.GOLD_DUST, x, y, z, 2, .03, .03, .03, 0);
+        SpellUtil.particles(level, GoldFx.PALE_DUST, entity.getX() - Mth.cos(angle) * radius, y, entity.getZ() - Mth.sin(angle) * radius, 1, .03, .03, .03, 0);
     }
 
     @Override

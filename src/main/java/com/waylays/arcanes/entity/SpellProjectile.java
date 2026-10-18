@@ -1,4 +1,4 @@
-package com.waylays.arcanes.entity.gold;
+package com.waylays.arcanes.entity;
 
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.entity.mobs.AntiMagicSusceptible;
@@ -14,13 +14,13 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
 
 /**
- * Base of the Gold school projectiles. Built on vanilla {@link Projectile} only (no Iron's internal base class), so a
+ * Base of the addon's spell projectiles. Built on vanilla {@link Projectile} only (no Iron's internal base class), so a
  * different Iron's Spells build cannot break it. Hits are resolved on the server; the client only moves and draws.
  */
-public abstract class GoldProjectile extends Projectile implements AntiMagicSusceptible {
+public abstract class SpellProjectile extends Projectile implements AntiMagicSusceptible {
     protected float damage;
 
-    protected GoldProjectile(EntityType<? extends GoldProjectile> entityType, Level level) {
+    protected SpellProjectile(EntityType<? extends SpellProjectile> entityType, Level level) {
         super(entityType, level);
     }
 
@@ -89,7 +89,7 @@ public abstract class GoldProjectile extends Projectile implements AntiMagicSusc
 
     @Override
     protected boolean canHitEntity(Entity target) {
-        return super.canHitEntity(target) && target != getOwner() && !(target instanceof GoldProjectile);
+        return super.canHitEntity(target) && target != getOwner() && !(target instanceof SpellProjectile);
     }
 
     @Override

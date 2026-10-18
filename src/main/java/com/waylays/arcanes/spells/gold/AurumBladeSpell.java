@@ -3,6 +3,7 @@ package com.waylays.arcanes.spells.gold;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
 import com.waylays.arcanes.registry.ModSchools;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -86,14 +87,14 @@ public class AurumBladeSpell extends AbstractSpell {
 
     @Override
     public void onServerCastTick(Level level, int spellLevel, LivingEntity entity, @Nullable MagicData playerMagicData) {
-        GoldFx.particles(level, GoldFx.sparks(), entity.getX(), entity.getY() + 2.2, entity.getZ(), 1, .15, .1, .15, .2);
+        SpellUtil.particles(level, GoldFx.sparks(), entity.getX(), entity.getY() + 2.2, entity.getZ(), 1, .15, .1, .15, .2);
     }
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         HitResult hit = Utils.raycastForEntity(level, entity, 24, true, .35f);
         Vec3 at = hit instanceof EntityHitResult entityHit ? entityHit.getEntity().position() : hit.getLocation();
-        Vec3 ground = GoldFx.groundAt(level, at, 4, 1);
+        Vec3 ground = SpellUtil.groundAt(level, at, 4, 1);
         AurumBladeEntity blade = new AurumBladeEntity(level, entity, getDamage(spellLevel, entity));
         blade.moveTo(ground.x, ground.y, ground.z, entity.getYRot(), 0);
         level.addFreshEntity(blade);

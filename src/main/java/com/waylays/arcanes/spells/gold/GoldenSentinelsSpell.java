@@ -4,6 +4,7 @@ import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.gold.GoldenSentinel;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSchools;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -89,7 +90,7 @@ public class GoldenSentinelsSpell extends AbstractSpell {
         float angle = entity.tickCount * .4f;
         for (int i = 0; i < getCount(spellLevel); i++) {
             float a = angle + i * Mth.TWO_PI / getCount(spellLevel);
-            GoldFx.particles(level, GoldFx.GOLD_DUST, entity.getX() + Mth.cos(a) * 2, entity.getY() + .2, entity.getZ() + Mth.sin(a) * 2, 2, .1, .1, .1, .02);
+            SpellUtil.particles(level, GoldFx.GOLD_DUST, entity.getX() + Mth.cos(a) * 2, entity.getY() + .2, entity.getZ() + Mth.sin(a) * 2, 2, .1, .1, .1, .02);
         }
     }
 
@@ -98,7 +99,7 @@ public class GoldenSentinelsSpell extends AbstractSpell {
         int count = getCount(spellLevel);
         for (int i = 0; i < count; i++) {
             float a = entity.getYRot() * Mth.DEG_TO_RAD + i * Mth.TWO_PI / count;
-            Vec3 spot = GoldFx.groundAt(level, entity.position().add(-Mth.sin(a) * 2, 0, Mth.cos(a) * 2), 3, 2);
+            Vec3 spot = SpellUtil.groundAt(level, entity.position().add(-Mth.sin(a) * 2, 0, Mth.cos(a) * 2), 3, 2);
             GoldenSentinel sentinel = ModEntities.GOLDEN_SENTINEL.get().create(level);
             if (sentinel == null) {
                 continue;
@@ -113,9 +114,9 @@ public class GoldenSentinelsSpell extends AbstractSpell {
                 sentinel.setTarget(mob.getTarget());
             }
             level.addFreshEntity(sentinel);
-            GoldFx.particles(level, GoldFx.sparks(), spot.x, spot.y + .1, spot.z, 15, .3, .05, .3, .3);
-            GoldFx.particles(level, GoldFx.DEEP_DUST, spot.x, spot.y + 1, spot.z, 30, .35, .9, .35, .02);
-            GoldFx.particles(level, GoldFx.nuggetShards(), spot.x, spot.y + 2, spot.z, 12, .3, .2, .3, .1);
+            SpellUtil.particles(level, GoldFx.sparks(), spot.x, spot.y + .1, spot.z, 15, .3, .05, .3, .3);
+            SpellUtil.particles(level, GoldFx.DEEP_DUST, spot.x, spot.y + 1, spot.z, 30, .35, .9, .35, .02);
+            SpellUtil.particles(level, GoldFx.nuggetShards(), spot.x, spot.y + 2, spot.z, 12, .3, .2, .3, .1);
             level.playSound(null, spot.x, spot.y, spot.z, SoundEvents.ANVIL_PLACE, SoundSource.PLAYERS, .6f, 1.2f + i * .1f);
         }
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 1.5f, .8f);

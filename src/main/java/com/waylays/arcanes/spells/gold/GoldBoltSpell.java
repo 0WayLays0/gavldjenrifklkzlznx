@@ -3,6 +3,7 @@ package com.waylays.arcanes.spells.gold;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.gold.GoldBoltProjectile;
 import com.waylays.arcanes.registry.ModSchools;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -90,8 +91,8 @@ public class GoldBoltSpell extends AbstractSpell {
         level.addFreshEntity(bolt);
 
         Vec3 hand = entity.getEyePosition().add(look.scale(.8)).subtract(0, .2, 0);
-        GoldFx.particles(level, GoldFx.sparks(), hand.x, hand.y, hand.z, 6, .05, .05, .05, .2);
-        GoldFx.particles(level, GoldFx.PALE_DUST, hand.x, hand.y, hand.z, 8, .15, .15, .15, .02);
+        SpellUtil.particles(level, GoldFx.sparks(), hand.x, hand.y, hand.z, 6, .05, .05, .05, .2);
+        SpellUtil.particles(level, GoldFx.PALE_DUST, hand.x, hand.y, hand.z, 8, .15, .15, .15, .02);
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.2f, 1.4f + Utils.random.nextFloat() * .2f);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }

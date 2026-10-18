@@ -3,7 +3,7 @@
 
 All art is original (Iron's Spells' license forbids reusing its assets). Run from the repository root:
     python3 tools/gen_assets.py
-Needs Pillow. Re-running overwrites the files listed in OUTPUTS below and nothing else.
+Needs Pillow. Re-running overwrites the files it writes (see main() here and in explosion_assets.py) and nothing else.
 """
 import json
 import math
@@ -708,13 +708,18 @@ def golden_sentinel_eyes():
 def item_models():
     write_json("models/item/scroll_gold.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/scroll_gold"}})
     write_json("models/item/affinity_ring_gold.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_gold"}})
-    write_json("models/item/golden_grimoire.json", {
+    book_models("golden_grimoire")
+
+
+def book_models(name):
+    """A spellbook: flat icon in the GUI, the 3D book (textures/item/{name}_3d.png, grimoire layout) everywhere else."""
+    write_json(f"models/item/{name}.json", {
         "parent": "minecraft:item/handheld",
         "loader": "forge:separate_transforms",
-        "base": {"parent": "arcanes_oublies:item/golden_grimoire_3d"},
-        "perspectives": {"gui": {"parent": "arcanes_oublies:item/golden_grimoire_gui"}},
+        "base": {"parent": f"arcanes_oublies:item/{name}_3d"},
+        "perspectives": {"gui": {"parent": f"arcanes_oublies:item/{name}_gui"}},
     })
-    write_json("models/item/golden_grimoire_gui.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/golden_grimoire"}})
+    write_json(f"models/item/{name}_gui.json", {"parent": "item/generated", "textures": {"layer0": f"arcanes_oublies:item/{name}"}})
 
     t = "#book"
 
@@ -766,8 +771,8 @@ def item_models():
         solid([4.3, -.3, 7.4], [11.7, 0, 8.6], strap),
         solid([11.5, 0, 7.4], [11.8, 2.4, 8.6], strap),
     ]
-    write_json("models/item/golden_grimoire_3d.json", {
-        "textures": {"book": "arcanes_oublies:item/golden_grimoire_3d", "particle": "arcanes_oublies:item/golden_grimoire_3d"},
+    write_json(f"models/item/{name}_3d.json", {
+        "textures": {"book": f"arcanes_oublies:item/{name}_3d", "particle": f"arcanes_oublies:item/{name}_3d"},
         "elements": elements,
         "display": {
             "thirdperson_righthand": {"rotation": [90, 180, 0], "translation": [0, -1.5, 2], "scale": [0.65, 0.65, 0.65]},
@@ -807,6 +812,8 @@ def main():
     save(golden_sentinel_skin(), "textures/entity/golden_sentinel.png")
     save(golden_sentinel_eyes(), "textures/entity/golden_sentinel_eyes.png")
     item_models()
+    import explosion_assets
+    explosion_assets.main()
 
 
 if __name__ == "__main__":

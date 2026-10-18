@@ -2,6 +2,7 @@ package com.waylays.arcanes.entity.gold;
 
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.damage.DamageSources;
@@ -95,16 +96,16 @@ public class GoldSpikeEntity extends Entity implements AntiMagicSusceptible {
         Entity owner = getOwner();
         AABB area = new AABB(getX() - .6, getY(), getZ() - .6, getX() + .6, getY() + 1.8, getZ() + .6);
         for (LivingEntity victim : level().getEntitiesOfClass(LivingEntity.class, area)) {
-            if (victim.isAlive() && !GoldFx.isAlly(owner, victim)
-                    && DamageSources.applyDamage(victim, damage, GoldFx.damageSource(ModSpells.GOLDEN_SPIKES.get(), this, owner))) {
+            if (victim.isAlive() && !SpellUtil.isAlly(owner, victim)
+                    && DamageSources.applyDamage(victim, damage, SpellUtil.damageSource(ModSpells.GOLDEN_SPIKES.get(), this, owner))) {
                 Vec3 v = victim.getDeltaMovement();
                 victim.setDeltaMovement(v.x, Math.max(v.y, .55), v.z);
                 victim.hurtMarked = true;
             }
         }
-        GoldFx.particles(level(), GoldFx.nuggetShards(), getX(), getY() + .3, getZ(), 8, .25, .1, .25, .2);
-        GoldFx.particles(level(), GoldFx.sparks(), getX(), getY() + .5, getZ(), 6, .2, .4, .2, .3);
-        GoldFx.particles(level(), GoldFx.DEEP_DUST, getX(), getY() + .1, getZ(), 6, .4, .05, .4, .02);
+        SpellUtil.particles(level(), GoldFx.nuggetShards(), getX(), getY() + .3, getZ(), 8, .25, .1, .25, .2);
+        SpellUtil.particles(level(), GoldFx.sparks(), getX(), getY() + .5, getZ(), 6, .2, .4, .2, .3);
+        SpellUtil.particles(level(), GoldFx.DEEP_DUST, getX(), getY() + .1, getZ(), 6, .4, .05, .4, .02);
         level().playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.NEUTRAL, 1.2f, .7f + random.nextFloat() * .3f);
         level().playSound(null, getX(), getY(), getZ(), SoundEvents.ARMOR_EQUIP_GOLD, SoundSource.NEUTRAL, 1f, .6f);
     }

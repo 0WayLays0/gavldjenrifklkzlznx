@@ -1,15 +1,19 @@
 package com.waylays.arcanes.gametest;
 
 import com.waylays.arcanes.ArcanesOublies;
-import com.waylays.arcanes.entity.gold.GildedChainsEntity;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
+import com.waylays.arcanes.entity.gold.GildedChainsEntity;
+import com.waylays.arcanes.entity.gold.GoldBoltProjectile;
 import com.waylays.arcanes.entity.gold.GoldenSentinel;
 import com.waylays.arcanes.entity.gold.GoldfallIngot;
 import com.waylays.arcanes.entity.gold.MoltenGoldBlob;
 import com.waylays.arcanes.entity.gold.MoltenPool;
 import com.waylays.arcanes.registry.ModEffects;
+import com.waylays.arcanes.registry.ModItems;
+import com.waylays.arcanes.registry.ModSchools;
+import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.gold.GoldenSentinelsSpell;
 import com.waylays.arcanes.spells.gold.GoldfallSpell;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -17,10 +21,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Husk;
 import java.util.List;
-import com.waylays.arcanes.entity.gold.GoldBoltProjectile;
-import com.waylays.arcanes.registry.ModItems;
-import com.waylays.arcanes.registry.ModSchools;
-import com.waylays.arcanes.registry.ModSpells;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
@@ -63,11 +63,15 @@ public final class GoldGameTests {
     public static void goldSchoolIsRegistered(GameTestHelper helper) {
         SchoolType gold = SchoolRegistry.getSchool(ModSchools.GOLD_RESOURCE);
         helper.assertTrue(gold != null, "Gold school missing from Iron's school registry");
+        int goldSpells = 0;
         for (RegistryObject<AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
             AbstractSpell spell = SpellRegistry.getSpell(entry.getId());
             helper.assertTrue(spell != SpellRegistry.none(), entry.getId() + " missing from Iron's spell registry");
-            helper.assertTrue(spell.getSchoolType() == gold, entry.getId() + " is not in the Gold school but in " + spell.getSchoolType().getId());
+            if (spell.getSchoolType() == gold) {
+                goldSpells++;
+            }
         }
+        helper.assertTrue(goldSpells == 10, "expected 10 Gold spells, got " + goldSpells);
         helper.assertTrue(helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).containsKey(ModSchools.GOLD_MAGIC),
                 "gold_magic damage type missing");
         helper.assertTrue(gold.isFocus(new ItemStack(Items.GOLD_BLOCK)), "gold block is not the Gold focus");

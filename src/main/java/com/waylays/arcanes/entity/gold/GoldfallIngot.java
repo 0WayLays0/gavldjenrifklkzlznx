@@ -1,7 +1,9 @@
 package com.waylays.arcanes.entity.gold;
 
+import com.waylays.arcanes.entity.SpellProjectile;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import com.waylays.arcanes.spells.gold.GoldfallSpell;
 import net.minecraft.sounds.SoundEvents;
@@ -15,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Goldfall: a massive ingot dropped from the sky. Crashes into the ground and hurts every enemy around the impact.
  */
-public class GoldfallIngot extends GoldProjectile {
+public class GoldfallIngot extends SpellProjectile {
     public GoldfallIngot(EntityType<? extends GoldfallIngot> entityType, Level level) {
         super(entityType, level);
     }
@@ -38,10 +40,10 @@ public class GoldfallIngot extends GoldProjectile {
     @Override
     protected void onImpact(HitResult hit) {
         Vec3 at = hit.getLocation();
-        GoldFx.areaDamage(level(), at, GoldfallSpell.IMPACT_RADIUS, getDamage(), ModSpells.GOLDFALL.get(), this, getOwner());
+        SpellUtil.areaDamage(level(), at, GoldfallSpell.IMPACT_RADIUS, getDamage(), ModSpells.GOLDFALL.get(), this, getOwner());
         GoldFx.shatterBurst(level(), at.x, at.y + .3, at.z, 1.4f);
-        GoldFx.particles(level(), GoldFx.DEEP_DUST, at.x, at.y + .2, at.z, 25, 1.2, .1, 1.2, .02);
-        GoldFx.cameraShake(level(), at, 8, 10);
+        SpellUtil.particles(level(), GoldFx.DEEP_DUST, at.x, at.y + .2, at.z, 25, 1.2, .1, 1.2, .02);
+        SpellUtil.cameraShake(level(), at, 8, 10);
         level().playSound(null, at.x, at.y, at.z, SoundEvents.ANVIL_LAND, SoundSource.NEUTRAL, 1.4f, .7f + random.nextFloat() * .2f);
         level().playSound(null, at.x, at.y, at.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.NEUTRAL, 2f, .8f);
         level().playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, .5f, 1.6f);

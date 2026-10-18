@@ -3,6 +3,7 @@ package com.waylays.arcanes.spells.gold;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
 import com.waylays.arcanes.registry.ModSchools;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -94,9 +95,9 @@ public class SunOfEldoradoSpell extends AbstractSpell {
         float a = entity.tickCount * .5f;
         for (int i = 0; i < 3; i++) {
             float b = a + i * Mth.TWO_PI / 3;
-            GoldFx.particles(level, GoldFx.GOLD_DUST, entity.getX() + Mth.cos(b) * .8, entity.getY() + 2 + (entity.tickCount % 20) * .2, entity.getZ() + Mth.sin(b) * .8, 1, 0, 0, 0, 0);
+            SpellUtil.particles(level, GoldFx.GOLD_DUST, entity.getX() + Mth.cos(b) * .8, entity.getY() + 2 + (entity.tickCount % 20) * .2, entity.getZ() + Mth.sin(b) * .8, 1, 0, 0, 0, 0);
         }
-        GoldFx.particles(level, GoldFx.sparks(), entity.getX(), entity.getY() + HEIGHT, entity.getZ(), 2, .3, .3, .3, .2);
+        SpellUtil.particles(level, GoldFx.sparks(), entity.getX(), entity.getY() + HEIGHT, entity.getZ(), 2, .3, .3, .3, .2);
     }
 
     @Override

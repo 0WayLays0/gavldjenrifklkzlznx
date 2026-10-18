@@ -15,5 +15,9 @@ public final class ModItems {
     public static final RegistryObject<Item> GOLDEN_GRIMOIRE = ITEMS.register("golden_grimoire",
             () -> new SimpleAttributeSpellBook(10, SpellRarity.LEGENDARY, ModAttributes.GOLD_SPELL_POWER.get(), .10, 200));
 
+    /** Explosion school spellbook: 10 slots, +10% Explosion Spell Power, +200 max mana. */
+    public static final RegistryObject<Item> DETONATION_CODEX = ITEMS.register("detonation_codex",
+            () -> new SimpleAttributeSpellBook(10, SpellRarity.LEGENDARY, ModAttributes.EXPLOSION_SPELL_POWER.get(), .10, 200));
+
     private ModItems() {}
 }

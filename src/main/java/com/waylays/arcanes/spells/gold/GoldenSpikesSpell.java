@@ -3,6 +3,7 @@ package com.waylays.arcanes.spells.gold;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.gold.GoldSpikeEntity;
 import com.waylays.arcanes.registry.ModSchools;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -86,7 +87,7 @@ public class GoldenSpikesSpell extends AbstractSpell {
         int count = getSpikeCount(spellLevel);
         for (int i = 0; i < count; i++) {
             Vec3 at = entity.position().add(forward.scale(1.5 + i * SPACING));
-            Vec3 ground = GoldFx.groundAt(level, at, 4, 1);
+            Vec3 ground = SpellUtil.groundAt(level, at, 4, 1);
             GoldSpikeEntity spike = new GoldSpikeEntity(level, entity, damage, 2 + i * TICKS_BETWEEN_SPIKES);
             spike.moveTo(ground.x, ground.y, ground.z);
             level.addFreshEntity(spike);

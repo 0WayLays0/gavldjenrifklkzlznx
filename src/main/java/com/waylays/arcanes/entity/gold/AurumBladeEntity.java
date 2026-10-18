@@ -2,6 +2,7 @@ package com.waylays.arcanes.entity.gold;
 
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.AurumBladeSpell;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -72,7 +73,7 @@ public class AurumBladeEntity extends Entity implements AntiMagicSusceptible {
             strike();
         }
         if (tickCount >= END_TICK) {
-            GoldFx.particles(level(), GoldFx.GOLD_DUST, getX(), getY() + 1.5, getZ(), 30, .3, 1.2, .3, .02);
+            SpellUtil.particles(level(), GoldFx.GOLD_DUST, getX(), getY() + 1.5, getZ(), 30, .3, 1.2, .3, .02);
             discard();
         }
     }
@@ -81,14 +82,14 @@ public class AurumBladeEntity extends Entity implements AntiMagicSusceptible {
         Entity owner = getOwner();
         Vec3 at = position();
         LivingEntity closest = null;
-        for (LivingEntity e : GoldFx.enemiesAround(level(), at.add(0, 1, 0), AurumBladeSpell.RADIUS, owner, x -> true)) {
+        for (LivingEntity e : SpellUtil.enemiesAround(level(), at.add(0, 1, 0), AurumBladeSpell.RADIUS, owner, x -> true)) {
             if (closest == null || e.distanceToSqr(at) < closest.distanceToSqr(at)) {
                 closest = e;
             }
         }
-        for (LivingEntity e : GoldFx.enemiesAround(level(), at.add(0, 1, 0), AurumBladeSpell.RADIUS, owner, x -> true)) {
+        for (LivingEntity e : SpellUtil.enemiesAround(level(), at.add(0, 1, 0), AurumBladeSpell.RADIUS, owner, x -> true)) {
             float amount = e == closest ? damage : damage * AurumBladeSpell.SPLASH_RATIO;
-            if (DamageSources.applyDamage(e, amount, GoldFx.damageSource(ModSpells.AURUM_BLADE.get(), this, owner))) {
+            if (DamageSources.applyDamage(e, amount, SpellUtil.damageSource(ModSpells.AURUM_BLADE.get(), this, owner))) {
                 Vec3 push = e.position().subtract(at).multiply(1, 0, 1);
                 push = push.lengthSqr() < 1.0E-4 ? Vec3.ZERO : push.normalize().scale(.6);
                 e.push(push.x, .35, push.z);
@@ -96,8 +97,8 @@ public class AurumBladeEntity extends Entity implements AntiMagicSusceptible {
             }
         }
         GoldFx.shatterBurst(level(), at.x, at.y + .3, at.z, 1.8f);
-        GoldFx.particles(level(), GoldFx.DEEP_DUST, at.x, at.y + .1, at.z, 40, 1.6, .05, 1.6, .03);
-        GoldFx.cameraShake(level(), at, 10, 12);
+        SpellUtil.particles(level(), GoldFx.DEEP_DUST, at.x, at.y + .1, at.z, 40, 1.6, .05, 1.6, .03);
+        SpellUtil.cameraShake(level(), at, 10, 12);
         level().playSound(null, at.x, at.y, at.z, SoundEvents.ANVIL_LAND, SoundSource.NEUTRAL, 2f, .5f);
         level().playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, .8f, 1.3f);
         level().playSound(null, at.x, at.y, at.z, SoundEvents.BELL_BLOCK, SoundSource.NEUTRAL, 2f, .6f);

@@ -2,6 +2,7 @@ package com.waylays.arcanes.entity.gold;
 
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import com.waylays.arcanes.spells.gold.SunOfEldoradoSpell;
 import io.redspace.ironsspellbooks.damage.DamageSources;
@@ -117,15 +118,15 @@ public class EldoradoSun extends Entity {
     private void volley() {
         Entity owner = getOwner();
         Vec3 from = center();
-        List<LivingEntity> targets = GoldFx.enemiesAround(level(), from, SunOfEldoradoSpell.RANGE, owner, this::canSee);
+        List<LivingEntity> targets = SpellUtil.enemiesAround(level(), from, SunOfEldoradoSpell.RANGE, owner, this::canSee);
         targets.sort(Comparator.comparingDouble(e -> e.distanceToSqr(from)));
         for (int i = 0; i < MAX_BEAMS; i++) {
             LivingEntity target = i < targets.size() ? targets.get(i) : null;
             this.entityData.set(DATA_BEAMS.get(i), target == null ? -1 : target.getId());
             if (target != null) {
-                DamageSources.applyDamage(target, beamDamage, GoldFx.damageSource(ModSpells.SUN_OF_ELDORADO.get(), this, owner));
+                DamageSources.applyDamage(target, beamDamage, SpellUtil.damageSource(ModSpells.SUN_OF_ELDORADO.get(), this, owner));
                 Vec3 hit = target.getBoundingBox().getCenter();
-                GoldFx.particles(level(), GoldFx.sparks(), hit.x, hit.y, hit.z, 8, .2, .2, .2, .3);
+                SpellUtil.particles(level(), GoldFx.sparks(), hit.x, hit.y, hit.z, 8, .2, .2, .2, .3);
                 target.setSecondsOnFire(2);
             }
         }
@@ -143,8 +144,8 @@ public class EldoradoSun extends Entity {
     private void explode() {
         Entity owner = getOwner();
         Vec3 c = center();
-        for (LivingEntity e : GoldFx.enemiesAround(level(), c, SunOfEldoradoSpell.EXPLOSION_RADIUS, owner, x -> true)) {
-            if (DamageSources.applyDamage(e, explosionDamage, GoldFx.damageSource(ModSpells.SUN_OF_ELDORADO.get(), this, owner))) {
+        for (LivingEntity e : SpellUtil.enemiesAround(level(), c, SunOfEldoradoSpell.EXPLOSION_RADIUS, owner, x -> true)) {
+            if (DamageSources.applyDamage(e, explosionDamage, SpellUtil.damageSource(ModSpells.SUN_OF_ELDORADO.get(), this, owner))) {
                 Vec3 push = e.position().subtract(c);
                 push = push.lengthSqr() < 1.0E-4 ? new Vec3(0, 1, 0) : push.normalize();
                 e.push(push.x * 1.2, .5, push.z * 1.2);
@@ -152,9 +153,9 @@ public class EldoradoSun extends Entity {
             }
         }
         GoldFx.shatterBurst(level(), c.x, c.y, c.z, 3.2f);
-        GoldFx.particles(level(), GoldFx.sparks(), c.x, c.y, c.z, 60, .5, .5, .5, .9);
-        GoldFx.particles(level(), GoldFx.nuggetShards(), c.x, c.y, c.z, 50, .5, .5, .5, .6);
-        GoldFx.cameraShake(level(), c, 20, 24);
+        SpellUtil.particles(level(), GoldFx.sparks(), c.x, c.y, c.z, 60, .5, .5, .5, .9);
+        SpellUtil.particles(level(), GoldFx.nuggetShards(), c.x, c.y, c.z, 50, .5, .5, .5, .6);
+        SpellUtil.cameraShake(level(), c, 20, 24);
         level().playSound(null, c.x, c.y, c.z, SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, 4f, .7f);
         level().playSound(null, c.x, c.y, c.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.NEUTRAL, 3f, .5f);
         level().playSound(null, c.x, c.y, c.z, SoundEvents.BELL_BLOCK, SoundSource.NEUTRAL, 3f, .5f);

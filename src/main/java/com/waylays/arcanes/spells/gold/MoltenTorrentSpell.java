@@ -3,6 +3,7 @@ package com.waylays.arcanes.spells.gold;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.gold.MoltenGoldBlob;
 import com.waylays.arcanes.registry.ModSchools;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -96,7 +97,7 @@ public class MoltenTorrentSpell extends AbstractSpell {
             blob.setDamage(damage);
             level.addFreshEntity(blob);
         }
-        GoldFx.particles(level, GoldFx.MOLTEN_DUST, origin.x, origin.y, origin.z, 2, .05, .05, .05, .02);
+        SpellUtil.particles(level, GoldFx.MOLTEN_DUST, origin.x, origin.y, origin.z, 2, .05, .05, .05, .02);
     }
 
     public float getDamage(int spellLevel, @Nullable LivingEntity caster) {

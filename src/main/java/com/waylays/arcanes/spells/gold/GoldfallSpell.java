@@ -3,6 +3,7 @@ package com.waylays.arcanes.spells.gold;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.gold.GoldfallIngot;
 import com.waylays.arcanes.registry.ModSchools;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -89,8 +90,8 @@ public class GoldfallSpell extends AbstractSpell {
     /** While charging: gold dust rises from the caster's hands toward the sky. */
     @Override
     public void onServerCastTick(Level level, int spellLevel, LivingEntity entity, @Nullable MagicData playerMagicData) {
-        GoldFx.particles(level, GoldFx.GOLD_DUST, entity.getX(), entity.getY() + 1.2, entity.getZ(), 3, .4, .2, .4, 0);
-        GoldFx.particles(level, GoldFx.sparks(), entity.getX(), entity.getY() + 2, entity.getZ(), 1, .2, .2, .2, .3);
+        SpellUtil.particles(level, GoldFx.GOLD_DUST, entity.getX(), entity.getY() + 1.2, entity.getZ(), 3, .4, .2, .4, 0);
+        SpellUtil.particles(level, GoldFx.sparks(), entity.getX(), entity.getY() + 2, entity.getZ(), 1, .2, .2, .2, .3);
     }
 
     @Override
@@ -115,7 +116,7 @@ public class GoldfallSpell extends AbstractSpell {
             ingot.setDamage(damage);
             level.addFreshEntity(ingot);
         }
-        GoldFx.particles(level, GoldFx.sparks(), center.x, center.y + .2, center.z, 20, AREA_RADIUS * .5, .1, AREA_RADIUS * .5, .1);
+        SpellUtil.particles(level, GoldFx.sparks(), center.x, center.y + .2, center.z, 20, AREA_RADIUS * .5, .1, AREA_RADIUS * .5, .1);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 

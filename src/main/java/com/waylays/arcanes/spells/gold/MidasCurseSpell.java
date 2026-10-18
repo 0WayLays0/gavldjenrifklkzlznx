@@ -3,6 +3,7 @@ package com.waylays.arcanes.spells.gold;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.registry.ModSchools;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -90,7 +91,7 @@ public class MidasCurseSpell extends AbstractSpell {
 
     @Override
     public void onServerCastTick(Level level, int spellLevel, LivingEntity entity, @Nullable MagicData playerMagicData) {
-        GoldFx.particles(level, GoldFx.GOLD_DUST, entity.getX(), entity.getY() + 1.3, entity.getZ(), 2, .35, .3, .35, 0);
+        SpellUtil.particles(level, GoldFx.GOLD_DUST, entity.getX(), entity.getY() + 1.3, entity.getZ(), 2, .35, .3, .35, 0);
     }
 
     @Override
@@ -102,7 +103,7 @@ public class MidasCurseSpell extends AbstractSpell {
                 Vec3 from = entity.getEyePosition();
                 Vec3 to = target.getBoundingBox().getCenter();
                 GoldFx.particleLine(level, from, to, .4);
-                GoldFx.particles(level, GoldFx.sparks(), to.x, to.y, to.z, 12, .3, .4, .3, .3);
+                SpellUtil.particles(level, GoldFx.sparks(), to.x, to.y, to.z, 12, .3, .4, .3, .3);
             }
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);

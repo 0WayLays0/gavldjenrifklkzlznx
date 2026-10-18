@@ -1,5 +1,6 @@
 package com.waylays.arcanes.entity.gold;
 
+import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -110,7 +111,7 @@ public class GoldenSentinel extends PathfinderMob {
         this.targetSelector.addGoal(2, new OwnerTargetGoal(this, false));
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Mob.class, 5, true, false,
-                e -> e instanceof Enemy && !GoldFx.isAlly(getOwner(), e)));
+                e -> e instanceof Enemy && !SpellUtil.isAlly(getOwner(), e)));
     }
 
     @Override
@@ -126,7 +127,7 @@ public class GoldenSentinel extends PathfinderMob {
             shatter();
         }
         LivingEntity target = getTarget();
-        if (target != null && GoldFx.isAlly(getOwner(), target)) {
+        if (target != null && SpellUtil.isAlly(getOwner(), target)) {
             setTarget(null);
         }
     }
@@ -152,7 +153,7 @@ public class GoldenSentinel extends PathfinderMob {
     public boolean doHurtTarget(Entity target) {
         boolean hit = super.doHurtTarget(target);
         if (hit) {
-            GoldFx.particles(level(), GoldFx.sparks(), target.getX(), target.getY() + target.getBbHeight() * .6, target.getZ(), 5, .2, .2, .2, .25);
+            SpellUtil.particles(level(), GoldFx.sparks(), target.getX(), target.getY() + target.getBbHeight() * .6, target.getZ(), 5, .2, .2, .2, .25);
         }
         return hit;
     }
@@ -232,7 +233,7 @@ public class GoldenSentinel extends PathfinderMob {
             }
             candidate = defend ? owner.getLastHurtByMob() : owner.getLastHurtMob();
             int timestamp = defend ? owner.getLastHurtByMobTimestamp() : owner.getLastHurtMobTimestamp();
-            return candidate != null && timestamp != lastTimestamp && !GoldFx.isAlly(owner, candidate)
+            return candidate != null && timestamp != lastTimestamp && !SpellUtil.isAlly(owner, candidate)
                     && canAttack(candidate, TargetingConditions.DEFAULT);
         }
 

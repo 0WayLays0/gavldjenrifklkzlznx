@@ -4,6 +4,7 @@ import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.effect.GildedArmorEffect;
 import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModSchools;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -88,10 +89,10 @@ public class GildedArmorSpell extends AbstractSpell {
         for (int i = 0; i < 40; i++) {
             float f = i / 40f;
             float angle = f * Mth.TWO_PI * 3;
-            GoldFx.particles(level, i % 3 == 0 ? GoldFx.PALE_DUST : GoldFx.DEEP_DUST,
+            SpellUtil.particles(level, i % 3 == 0 ? GoldFx.PALE_DUST : GoldFx.DEEP_DUST,
                     entity.getX() + Mth.cos(angle) * w, entity.getY() + f * h, entity.getZ() + Mth.sin(angle) * w, 1, 0, .02, 0, .01);
         }
-        GoldFx.particles(level, GoldFx.sparks(), entity.getX(), entity.getY() + h * .5, entity.getZ(), 12, w * .5, h * .3, w * .5, .25);
+        SpellUtil.particles(level, GoldFx.sparks(), entity.getX(), entity.getY() + h * .5, entity.getZ(), 12, w * .5, h * .3, w * .5, .25);
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.5f, .8f);
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ANVIL_PLACE, SoundSource.PLAYERS, .4f, 1.8f);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);

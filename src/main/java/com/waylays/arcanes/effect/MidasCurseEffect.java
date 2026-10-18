@@ -4,6 +4,7 @@ import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import com.waylays.arcanes.spells.gold.MidasCurseSpell;
 import io.redspace.ironsspellbooks.damage.DamageSources;
@@ -84,10 +85,10 @@ public class MidasCurseEffect extends MobEffect {
         double h = entity.getBbHeight();
         if (entity.tickCount % 2 == 0) {
             int count = 1 + (int) (progress * 6);
-            GoldFx.particles(entity.level(), GoldFx.GOLD_DUST, entity.getX(), entity.getY() + h * .5, entity.getZ(), count, w, h * .4, w, 0);
+            SpellUtil.particles(entity.level(), GoldFx.GOLD_DUST, entity.getX(), entity.getY() + h * .5, entity.getZ(), count, w, h * .4, w, 0);
         }
         if (progress > .4f && entity.tickCount % 5 == 0) {
-            GoldFx.particles(entity.level(), GoldFx.nuggetShards(), entity.getX(), entity.getY() + h * .7, entity.getZ(), 1 + (int) (progress * 3), w * .6, h * .2, w * .6, .05);
+            SpellUtil.particles(entity.level(), GoldFx.nuggetShards(), entity.getX(), entity.getY() + h * .7, entity.getZ(), 1 + (int) (progress * 3), w * .6, h * .2, w * .6, .05);
         }
         if (entity.tickCount % 10 == 0) {
             entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.HOSTILE, .8f + progress, .5f + progress);
@@ -130,12 +131,12 @@ public class MidasCurseEffect extends MobEffect {
         float damage = tag.contains("Damage") ? tag.getFloat("Damage") : MidasCurseSpell.FALLBACK_SHATTER_DAMAGE;
         double y = victim.getY() + victim.getBbHeight() * .5;
         GoldFx.shatterBurst(level, victim.getX(), y, victim.getZ(), 1.6f);
-        GoldFx.particles(level, GoldFx.nuggetShards(), victim.getX(), y, victim.getZ(), 30, victim.getBbWidth() * .5, victim.getBbHeight() * .3, victim.getBbWidth() * .5, .35);
+        SpellUtil.particles(level, GoldFx.nuggetShards(), victim.getX(), y, victim.getZ(), 30, victim.getBbWidth() * .5, victim.getBbHeight() * .3, victim.getBbWidth() * .5, .35);
         level.playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.HOSTILE, 2.5f, .6f);
         level.playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 1.5f, .7f);
         level.playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.ANVIL_LAND, SoundSource.HOSTILE, .6f, 1.4f);
         if (caster != null) {
-            DamageSources.applyDamage(victim, damage, GoldFx.damageSource(ModSpells.MIDAS_CURSE.get(), caster, caster));
+            DamageSources.applyDamage(victim, damage, SpellUtil.damageSource(ModSpells.MIDAS_CURSE.get(), caster, caster));
         } else {
             // Caster gone (logged out, dead, unloaded): a plain magic hit, since a spell source needs an attacker
             victim.hurt(level.damageSources().magic(), damage);

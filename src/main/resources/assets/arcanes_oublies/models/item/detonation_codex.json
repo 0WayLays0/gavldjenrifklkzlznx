@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:item/handheld",
+  "loader": "forge:separate_transforms",
+  "base": {
+    "parent": "arcanes_oublies:item/detonation_codex_3d"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "arcanes_oublies:item/detonation_codex_gui"
+    }
+  }
+}

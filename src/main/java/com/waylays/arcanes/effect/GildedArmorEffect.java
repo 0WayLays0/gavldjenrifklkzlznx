@@ -4,6 +4,7 @@ import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import io.redspace.ironsspellbooks.damage.DamageSources;
 import io.redspace.ironsspellbooks.damage.SpellDamageSource;
@@ -55,7 +56,7 @@ public class GildedArmorEffect extends MobEffect {
         for (int i = 0; i < 3; i++) {
             float angle = entity.tickCount * .35f + i * Mth.TWO_PI / 3;
             float y = (float) ((entity.tickCount * .07 + i * .33) % 1.0) * h;
-            GoldFx.particles(entity.level(), i == 0 ? GoldFx.GOLD_DUST : GoldFx.PALE_DUST,
+            SpellUtil.particles(entity.level(), i == 0 ? GoldFx.GOLD_DUST : GoldFx.PALE_DUST,
                     entity.getX() + Mth.cos(angle) * w, entity.getY() + y, entity.getZ() + Mth.sin(angle) * w, 1, 0, 0, 0, 0);
         }
     }
@@ -75,10 +76,10 @@ public class GildedArmorEffect extends MobEffect {
         if (reflected <= 0) {
             return;
         }
-        DamageSources.applyDamage(attacker, reflected, GoldFx.damageSource(ModSpells.GILDED_ARMOR.get(), victim, victim));
+        DamageSources.applyDamage(attacker, reflected, SpellUtil.damageSource(ModSpells.GILDED_ARMOR.get(), victim, victim));
         double y = victim.getY() + victim.getBbHeight() * .6;
-        GoldFx.particles(victim.level(), GoldFx.sparks(), victim.getX(), y, victim.getZ(), 10, .3, .3, .3, .35);
-        GoldFx.particles(victim.level(), GoldFx.nuggetShards(), victim.getX(), y, victim.getZ(), 4, .2, .2, .2, .15);
+        SpellUtil.particles(victim.level(), GoldFx.sparks(), victim.getX(), y, victim.getZ(), 10, .3, .3, .3, .35);
+        SpellUtil.particles(victim.level(), GoldFx.nuggetShards(), victim.getX(), y, victim.getZ(), 4, .2, .2, .2, .15);
         victim.level().playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.ARMOR_EQUIP_GOLD, SoundSource.PLAYERS, 1.2f, 1.6f);
         victim.level().playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.PLAYERS, 1.5f, 1.2f);
     }

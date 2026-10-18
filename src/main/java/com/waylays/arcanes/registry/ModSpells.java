@@ -1,6 +1,16 @@
 package com.waylays.arcanes.registry;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.spells.explosion.BlastLeapSpell;
+import com.waylays.arcanes.spells.explosion.BlastOrbSpell;
+import com.waylays.arcanes.spells.explosion.CataclysmSpell;
+import com.waylays.arcanes.spells.explosion.ChainDetonationSpell;
+import com.waylays.arcanes.spells.explosion.ClusterBarrageSpell;
+import com.waylays.arcanes.spells.explosion.DetonationWaveSpell;
+import com.waylays.arcanes.spells.explosion.ImplosionSpell;
+import com.waylays.arcanes.spells.explosion.ReactiveShieldSpell;
+import com.waylays.arcanes.spells.explosion.SigilsOfRuinSpell;
+import com.waylays.arcanes.spells.explosion.VolatileBrandSpell;
 import com.waylays.arcanes.spells.gold.AurumBladeSpell;
 import com.waylays.arcanes.spells.gold.GildedArmorSpell;
 import com.waylays.arcanes.spells.gold.GildedChainsSpell;
@@ -34,6 +44,18 @@ public final class ModSpells {
     public static final RegistryObject<AbstractSpell> GILDED_ARMOR = register(new GildedArmorSpell());
     public static final RegistryObject<AbstractSpell> GOLDEN_SENTINELS = register(new GoldenSentinelsSpell());
     public static final RegistryObject<AbstractSpell> SUN_OF_ELDORADO = register(new SunOfEldoradoSpell());
+
+    // Explosion school
+    public static final RegistryObject<AbstractSpell> BLAST_ORB = register(new BlastOrbSpell());
+    public static final RegistryObject<AbstractSpell> CHAIN_DETONATION = register(new ChainDetonationSpell());
+    public static final RegistryObject<AbstractSpell> SIGILS_OF_RUIN = register(new SigilsOfRuinSpell());
+    public static final RegistryObject<AbstractSpell> DETONATION_WAVE = register(new DetonationWaveSpell());
+    public static final RegistryObject<AbstractSpell> IMPLOSION = register(new ImplosionSpell());
+    public static final RegistryObject<AbstractSpell> VOLATILE_BRAND = register(new VolatileBrandSpell());
+    public static final RegistryObject<AbstractSpell> BLAST_LEAP = register(new BlastLeapSpell());
+    public static final RegistryObject<AbstractSpell> CLUSTER_BARRAGE = register(new ClusterBarrageSpell());
+    public static final RegistryObject<AbstractSpell> REACTIVE_SHIELD = register(new ReactiveShieldSpell());
+    public static final RegistryObject<AbstractSpell> CATACLYSM = register(new CataclysmSpell());
 
     private ModSpells() {}
 

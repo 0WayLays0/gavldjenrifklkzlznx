@@ -1,7 +1,9 @@
 package com.waylays.arcanes.entity.gold;
 
+import com.waylays.arcanes.entity.SpellProjectile;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldBoltSpell;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import io.redspace.ironsspellbooks.damage.DamageSources;
@@ -20,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
  * Gold Bolt: a spinning ingot. The direct hit takes full damage; the ingot then bursts into shards that hit
  * every enemy within {@link GoldBoltSpell#SPLASH_RADIUS} for {@link GoldBoltSpell#SPLASH_RATIO} of it.
  */
-public class GoldBoltProjectile extends GoldProjectile {
+public class GoldBoltProjectile extends SpellProjectile {
     public static final float SPEED = 1.6f;
 
     public GoldBoltProjectile(EntityType<? extends GoldBoltProjectile> entityType, Level level) {
@@ -47,11 +49,11 @@ public class GoldBoltProjectile extends GoldProjectile {
             // Burst on the target's surface, along the ingot's path
             Vec3 from = position().add(0, getBbHeight() * .5, 0);
             burst = directTarget.getBoundingBox().inflate(.3).clip(from, from.add(getDeltaMovement())).orElse(directTarget.getBoundingBox().getCenter());
-            DamageSources.applyDamage(directTarget, getDamage(), GoldFx.damageSource(ModSpells.GOLD_BOLT.get(), this, owner));
+            DamageSources.applyDamage(directTarget, getDamage(), SpellUtil.damageSource(ModSpells.GOLD_BOLT.get(), this, owner));
         }
         Entity excluded = directTarget;
-        for (LivingEntity victim : GoldFx.enemiesAround(level(), burst, GoldBoltSpell.SPLASH_RADIUS, owner, e -> e != excluded)) {
-            DamageSources.applyDamage(victim, getDamage() * GoldBoltSpell.SPLASH_RATIO, GoldFx.damageSource(ModSpells.GOLD_BOLT.get(), this, owner));
+        for (LivingEntity victim : SpellUtil.enemiesAround(level(), burst, GoldBoltSpell.SPLASH_RADIUS, owner, e -> e != excluded)) {
+            DamageSources.applyDamage(victim, getDamage() * GoldBoltSpell.SPLASH_RATIO, SpellUtil.damageSource(ModSpells.GOLD_BOLT.get(), this, owner));
         }
         GoldFx.shatterBurst(level(), burst.x, burst.y, burst.z, 1f);
         level().playSound(null, burst.x, burst.y, burst.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.NEUTRAL, 2f, 1.1f + random.nextFloat() * .2f);

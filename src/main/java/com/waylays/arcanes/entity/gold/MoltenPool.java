@@ -2,6 +2,7 @@ package com.waylays.arcanes.entity.gold;
 
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.damage.DamageSources;
@@ -84,8 +85,8 @@ public class MoltenPool extends Entity implements AntiMagicSusceptible {
             Entity owner = getOwner();
             AABB area = new AABB(getX() - RADIUS, getY() - .2, getZ() - RADIUS, getX() + RADIUS, getY() + .6, getZ() + RADIUS);
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, area)) {
-                if (e.isAlive() && !GoldFx.isAlly(owner, e)
-                        && DamageSources.applyDamage(e, damage, GoldFx.damageSource(ModSpells.MOLTEN_TORRENT.get(), this, owner))) {
+                if (e.isAlive() && !SpellUtil.isAlly(owner, e)
+                        && DamageSources.applyDamage(e, damage, SpellUtil.damageSource(ModSpells.MOLTEN_TORRENT.get(), this, owner))) {
                     e.setSecondsOnFire(2);
                     e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 1));
                 }

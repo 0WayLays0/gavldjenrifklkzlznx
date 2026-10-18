@@ -2,11 +2,13 @@ package com.waylays.arcanes.debug;
 
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.registry.ModItems;
+import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.server.IntegratedServer;
@@ -38,8 +40,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Automated client test, only with {@code -Darcanes.autotest=true} (CI job {@code client-smoke}, headless under xvfb).
- * Creates a creative world, holds the Golden Grimoire, then casts every addon spell (level 5) at a target dummy in
+ * Creates a creative world, holds the school's spellbook, then casts every addon spell (level 5) at a target dummy in
  * front of the camera, one every few seconds, so every spell entity, particle and renderer runs on a real client.
+ * The camera is in third person so the caster, its spellbook and the shells around it are drawn too.
  * A client crash ends the run with a crash report; a spell that throws is logged as {@code [SmokeTest] FAIL}.
  * The run ends with {@code [SmokeTest] PASS} or {@code [SmokeTest] FAIL ...} and stops the client.
  * A watchdog halts the JVM (exit code 3) if the whole run takes too long.
@@ -50,7 +53,7 @@ public final class ClientSmokeTest {
     private static final int SPELL_LEVEL = 5;
     private static final int SETTLE_TICKS = 100;
     private static final int TICKS_PER_SPELL = 80;
-    /** The last spell (the sun) lives about 8 s: let it finish before stopping. */
+    /** Let the last spells (the ultimates, about 8 s) finish before stopping. */
     private static final int FINAL_TICKS = 220;
     private static final long WATCHDOG_SECONDS = 1200;
 
@@ -126,6 +129,7 @@ public final class ClientSmokeTest {
             }
             case SETTLING -> {
                 if (ticks >= SETTLE_TICKS) {
+                    mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
                     stage = Stage.CASTING;
                     ticks = 0;
                     spellIndex = 0;
@@ -165,7 +169,8 @@ public final class ClientSmokeTest {
         }
         try {
             ServerLevel level = player.serverLevel();
-            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.GOLDEN_GRIMOIRE.get()));
+            boolean explosion = spell.getSchoolType().getId().equals(ModSchools.EXPLOSION_RESOURCE);
+            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(explosion ? ModItems.DETONATION_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get()));
             // A sturdy target dummy 6 blocks in front of the player, at eye level of the raycast
             Vec3 forward = Vec3.directionFromRotation(0, player.getYRot());
             Husk dummy = EntityType.HUSK.create(level);

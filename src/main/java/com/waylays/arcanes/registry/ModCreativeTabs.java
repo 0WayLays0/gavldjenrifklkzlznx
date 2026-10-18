@@ -22,6 +22,7 @@ public final class ModCreativeTabs {
             .icon(() -> new ItemStack(ModItems.GOLDEN_GRIMOIRE.get()))
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.GOLDEN_GRIMOIRE.get());
+                output.accept(ModItems.DETONATION_CODEX.get());
                 for (RegistryObject<AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
                     AbstractSpell spell = entry.get();
                     if (!spell.isEnabled()) {
