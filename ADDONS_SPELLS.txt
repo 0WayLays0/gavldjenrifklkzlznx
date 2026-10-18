@@ -61,145 +61,201 @@ Livre : Golden Spellbook (livre d'or) [ ]
  2. MAGIE DE ROTATION (Rotation)                                  [ ] À FAIRE
 ================================================================================
 Couleur : cyan / blanc argenté
-Ambiance : tourbillons, disques, vortex, gyroscopes, force centrifuge
-Sons : sifflements de vent, vrombissements, lames qui tournent
+Ambiance : runes circulaires, anneaux d'énergie, vortex cosmiques, gravité
+Sons : vrombissements, sifflements de vent, résonances cristallines qui tournent
 
- 1. Spinning Blade     [ ] Un disque tranchant tournoyant part comme un
-                           boomerang et revient vers le lanceur.
- 2. Cyclone            [ ] Une tornade avance, aspire les ennemis puis les
-                           projette en l'air.
- 3. Centrifuge         [ ] Le lanceur tourne sur lui-même, repousse et blesse
-                           tout ce qui l'entoure.
- 4. Gyro Shield        [ ] Des anneaux tournent autour du lanceur et dévient
-                           les projectiles.
- 5. Vertigo            [ ] La cible est prise de vertige : elle tourne sur
-                           elle-même et se déplace au hasard.
- 6. Orbitals           [ ] Des sphères orbitent autour du lanceur, puis se
-                           lancent une par une sur les ennemis.
- 7. Drill              [ ] Une foreuse d'énergie en rotation transperce tous
-                           les ennemis en ligne droite.
- 8. Spin Dash          [ ] Dash en vrille qui blesse les ennemis traversés.
- 9. Reversal           [ ] Inverse la trajectoire des projectiles proches et
-                           les renvoie vers leur tireur.
-10. Maelstrom          [ ] ULTIME - Un vortex géant aspire tout vers son
-                           centre et broie les ennemis.
+ 1. Runic Disc         [ ] Un disque runique lumineux tournoie, traverse les
+                           ennemis et revient vers le lanceur comme un
+                           boomerang en laissant une traînée d'étincelles.
+ 2. Arcane Cyclone     [ ] Une tornade d'énergie cyan, parcourue de runes,
+                           aspire les ennemis et les projette dans les airs.
+ 3. Halo Rings         [ ] Trois anneaux d'énergie tournent autour du lanceur,
+                           tranchent les ennemis proches et dévient les
+                           projectiles.
+ 4. Gyre Lance         [ ] Une lance-vrille d'énergie en rotation perce tous
+                           les ennemis alignés et creuse un sillon lumineux.
+ 5. Vertigo Sigil      [ ] Un sceau tournant apparaît sous la cible : elle
+                           tourne sur elle-même, désorientée, et ses coups
+                           partent au hasard.
+ 6. Orbiting Stars     [ ] Cinq étoiles orbitent autour du lanceur puis
+                           fondent une à une sur les ennemis.
+ 7. Spiral Step        [ ] Le lanceur se change en spirale de lumière et se
+                           téléporte en vrille, blessant tout sur son passage.
+ 8. Reversal Field     [ ] Un champ tournant capte les projectiles proches,
+                           les fait tourner autour du lanceur puis les renvoie.
+ 9. Gravity Wheel      [ ] Une roue runique géante se dresse au sol et fait
+                           tourner la gravité : les ennemis sont soulevés et
+                           projetés en cercle.
+10. Maelstrom          [ ] ULTIME - Un vortex cosmique ouvre le ciel, aspire
+                           tous les ennemis vers son œil et les broie dans un
+                           tourbillon d'étoiles avant d'exploser.
 
-Livre : Gyroscopic Spellbook [ ]
-
-
-================================================================================
- 3. MAGIE DE POUDRE À CANON (Gunpowder)                           [ ] À FAIRE
-================================================================================
-Couleur : noir / orange feu
-Ambiance : barils, boulets, mèches, fumée, artillerie de pirate
-Sons : détonations, mèches qui crépitent, tirs de mousquet, canons
-
- 1. Musket Shot        [ ] Une balle de mousquet rapide qui transperce la
-                           cible.
- 2. Powder Keg         [ ] Lance un baril de poudre qui explose à l'impact.
- 3. Grapeshot          [ ] Tir de mitraille en cône à courte portée.
- 4. Fuse Trail         [ ] Une traînée de poudre au sol s'enflamme et provoque
-                           une chaîne d'explosions.
- 5. Sticky Bomb        [ ] Une bombe collante s'accroche à la cible et explose
-                           après quelques secondes.
- 6. Cannonball         [ ] Un boulet de canon lourd qui rebondit et écrase les
-                           ennemis sur sa route.
- 7. Smoke Screen       [ ] Un nuage de fumée noire aveugle les ennemis et rend
-                           le lanceur difficile à viser.
- 8. Blast Jump         [ ] Une explosion sous les pieds propulse le lanceur
-                           dans les airs (sans dégâts pour lui).
- 9. Minefield          [ ] Pose plusieurs mines cachées qui explosent quand un
-                           ennemi passe dessus.
-10. Artillery Barrage  [ ] ULTIME - Des canons fantômes apparaissent et
-                           bombardent toute la zone.
-
-Livre : Powder Keg Spellbook [ ]
+Livre : Gyroscopic Spellbook (anneaux qui tournent sur la couverture) [ ]
 
 
 ================================================================================
- 4. MAGIE DU LIVRE (Book)                                         [ ] À FAIRE
+ 3. MAGIE DE POUDRE À CANON (Gunpowder / Pyrotechnie arcanique)  [ ] À FAIRE
 ================================================================================
-Couleur : violet / parchemin crème
-Ambiance : pages, encre, plumes, runes, bibliothèque vivante
-Sons : pages qui se tournent, froissements, livres qui claquent, chuchotements
+Couleur : noir de suie / orange incandescent
+Ambiance : poudre ensorcelée, fantômes de pirates, mèches runiques, feux
+           d'artifice magiques
+Sons : détonations, mèches qui crépitent, canons spectraux, échos de bataille
 
- 1. Paper Cut          [ ] Une salve de feuilles tranchantes.
- 2. Page Storm         [ ] Un tourbillon de pages entoure la cible et la
-                           lacère.
- 3. Ink Splash         [ ] Un jet d'encre aveugle et ralentit les ennemis.
- 4. Tome Slam          [ ] Un livre géant tombe du ciel et écrase la zone.
- 5. Bookmark           [ ] Pose un marque-page à un endroit ; relancer le sort
-                           téléporte le lanceur dessus.
- 6. Silence            [ ] La cible est réduite au silence : elle ne peut plus
-                           lancer de sorts pendant un moment.
- 7. Living Library     [ ] Invoque des livres volants qui mordent les ennemis.
- 8. Quill Barrage      [ ] Une rafale de plumes d'écriture projectiles.
- 9. Errata             [ ] Efface les effets négatifs du lanceur.
-10. The Final Chapter  [ ] ULTIME - Un grimoire géant s'ouvre ; ses pages
-                           forment un dôme et des runes explosent sur tous les
-                           ennemis.
+ 1. Arcane Musket      [ ] Une balle de poudre ensorcelée, entourée de runes
+                           de feu, transperce la cible et explose derrière elle.
+ 2. Spectral Keg       [ ] Un baril fantôme apparaît, roule vers les ennemis
+                           et détone en gerbe de flammes orange.
+ 3. Hellfire Grapeshot [ ] Un cône de mitraille incandescente qui enflamme
+                           tout devant le lanceur.
+ 4. Runic Fuse         [ ] Une mèche runique court au sol jusqu'à la cible et
+                           déclenche une chaîne d'explosions sur son chemin.
+ 5. Cursed Bomb        [ ] Une bombe maudite se colle à la cible, compte à
+                           rebours visible au-dessus d'elle, puis explose.
+ 6. Ghost Cannonball   [ ] Un canon spectral apparaît derrière le lanceur et
+                           tire un boulet fantôme qui rebondit et écrase tout.
+ 7. Black Powder Veil  [ ] Un nuage de poudre noire enveloppe le lanceur : il
+                           devient invisible et le nuage explose s'il est
+                           enflammé.
+ 8. Blast Jump         [ ] Une explosion magique sous les pieds propulse le
+                           lanceur très haut, sans dégâts pour lui.
+ 9. Firework Volley    [ ] Une salve de fusées magiques colorées qui
+                           poursuivent les ennemis et éclatent en étoiles.
+10. Phantom Armada     [ ] ULTIME - Un navire pirate fantôme apparaît dans le
+                           ciel et bombarde toute la zone de boulets spectraux.
 
-Livre : Grimoire Vivant [ ]
-
-
-================================================================================
- 5. MAGIE DU CHEWING-GUM (Bubblegum)                              [ ] À FAIRE
-================================================================================
-Couleur : rose bonbon / bleu clair
-Ambiance : bulles, collant, élastique, rebondissant, cartoon
-Sons : bulles qui éclatent, bruits élastiques, "boing", mastication
-
- 1. Gum Ball           [ ] Une boule de chewing-gum collante qui ralentit la
-                           cible.
- 2. Bubble Trap        [ ] Une bulle enferme un ennemi et le fait flotter dans
-                           les airs.
- 3. Sticky Puddle      [ ] Une flaque collante au sol immobilise les ennemis
-                           qui marchent dedans.
- 4. Bubble Pop         [ ] Une grosse bulle explose et repousse tout autour.
- 5. Gum Shield         [ ] Une bulle élastique protège le lanceur et renvoie
-                           les projectiles.
- 6. Stretch            [ ] Un grappin de chewing-gum attire la cible vers le
-                           lanceur, ou propulse le lanceur vers un bloc.
- 7. Bounce             [ ] Le lanceur rebondit très haut et ne prend plus de
-                           dégâts de chute pendant un moment.
- 8. Gum Web            [ ] Une toile de chewing-gum piège les ennemis dans une
-                           zone.
- 9. Gum Blob           [ ] Invoque un blob rose qui avale et colle les
-                           ennemis.
-10. Mega Bubble        [ ] ULTIME - Une bulle géante enferme tous les ennemis
-                           de la zone, les soulève puis éclate.
-
-Livre : Bubblegum Spellbook [ ]
+Livre : Captain's Logbook (livre de bord pirate) [ ]
 
 
 ================================================================================
- 6. MAGIE DE LA MOUSSE ET DE LA FLORE (Moss & Flora)              [ ] À FAIRE
+ 4. MAGIE DU LIVRE (Book / Arcanes écrites)                       [ ] À FAIRE
 ================================================================================
-Couleur : vert mousse / rose fleur
-Ambiance : mousse, lianes, épines, fleurs, spores, forêt ancienne
-Sons : bruissements de feuilles, craquements de bois, éclosions, pollen
+Couleur : violet profond / parchemin doré
+Ambiance : pages volantes, encre vivante, runes, bibliothèque interdite
+Sons : pages qui tournent, chuchotements, livres qui claquent, plume qui gratte
+
+ 1. Razor Pages        [ ] Une salve de pages aux bords lumineux, tranchantes
+                           comme des lames.
+ 2. Page Storm         [ ] Un tourbillon de pages runiques entoure la cible et
+                           la lacère.
+ 3. Living Ink         [ ] Une vague d'encre vivante forme des mains noires
+                           qui agrippent et aveuglent les ennemis.
+ 4. Tome of Judgment   [ ] Un livre géant s'ouvre dans le ciel et se referme
+                           sur la zone en écrasant les ennemis.
+ 5. Bookmark           [ ] Pose un marque-page lumineux ; relancer le sort
+                           ramène le lanceur à cet endroit dans une pluie de
+                           pages.
+ 6. Seal of Silence    [ ] Une rune scellée s'imprime sur la cible : elle ne
+                           peut plus lancer de sorts.
+ 7. Forbidden Library  [ ] Invoque des grimoires volants qui mordent et
+                           lancent de petits sorts.
+ 8. Word of Power      [ ] Le lanceur prononce un mot runique géant qui se
+                           matérialise en lettres de feu et explose devant lui.
+ 9. Rewrite            [ ] Le lanceur réécrit sa propre histoire : il efface
+                           ses effets négatifs et récupère un peu de vie.
+10. The Final Chapter  [ ] ULTIME - Un grimoire colossal s'ouvre au-dessus de
+                           la zone ; ses pages forment un dôme et chaque
+                           ennemi est marqué d'une rune qui explose.
+
+Livre : Living Grimoire (les pages bougent toutes seules) [ ]
+
+
+================================================================================
+ 5. MAGIE DU CHEWING-GUM (Bubblegum / Magie sucrée)               [ ] À FAIRE
+================================================================================
+Couleur : rose bonbon / bleu pastel brillant
+Ambiance : bulles irisées, sucre magique, élastique, féérie cartoon
+Sons : bulles qui éclatent, "boing", carillons sucrés, étirements
+
+ 1. Bubble Orb         [ ] Un orbe de gomme irisée qui colle la cible et la
+                           ralentit fortement.
+ 2. Bubble Prison      [ ] Une bulle scintillante enferme un ennemi et le fait
+                           flotter, impuissant, avant d'éclater.
+ 3. Sugar Pool         [ ] Une mare de gomme enchantée au sol englue et
+                           immobilise les ennemis.
+ 4. Pop Nova           [ ] Une bulle géante gonfle autour du lanceur puis
+                           éclate en onde de choc rose.
+ 5. Elastic Barrier    [ ] Une membrane de gomme protège le lanceur et renvoie
+                           les projectiles en rebondissant.
+ 6. Gum Tether         [ ] Un filament de gomme lumineux attire la cible vers
+                           le lanceur, ou propulse le lanceur vers un bloc.
+ 7. Bouncy Aura        [ ] Le lanceur devient élastique : sauts géants, plus
+                           de dégâts de chute et les coups reçus rebondissent.
+ 8. Candy Web          [ ] Une toile de gomme sucrée géante piège tous les
+                           ennemis d'une zone.
+ 9. Gumdrop Golem      [ ] Invoque un golem de gomme qui avale les ennemis et
+                           les recrache collés.
+10. Bubble Galaxy      [ ] ULTIME - Des centaines de bulles irisées emplissent
+                           la zone, enferment chaque ennemi, les soulèvent dans
+                           le ciel puis éclatent toutes ensemble.
+
+Livre : Bubblegum Spellbook (couverture qui gonfle) [ ]
+
+
+================================================================================
+ 6. MAGIE DE LA MOUSSE ET DE LA FLORE (Moss & Flora / Sylvestre) [ ] À FAIRE
+================================================================================
+Couleur : vert émeraude lumineux / rose fleur
+Ambiance : forêt ancienne, esprits sylvestres, lucioles, bioluminescence
+Sons : bruissements, craquements de bois, éclosions, chants de forêt
 
 Attention : Iron's Spells a déjà une école Nature (Root, Oakskin, Blight,
 Poison Arrow...). Les sorts ci-dessous sont pensés pour ne pas faire doublon,
 à vérifier au moment du développement.
 
- 1. Thorn Shot         [ ] Une salve d'épines qui font saigner la cible.
- 2. Strangling Vines   [ ] Des lianes sortent du sol, enserrent la cible et
-                           lui infligent des dégâts dans la durée.
- 3. Moss Carpet        [ ] Un tapis de mousse se répand et soigne les alliés
-                           qui se tiennent dessus.
- 4. Spore Cloud        [ ] Un nuage de spores empoisonne et désoriente.
- 5. Bloom              [ ] Des fleurs éclosent autour du lanceur et donnent
-                           de la régénération.
- 6. Vine Whip          [ ] Un fouet de lianes frappe et attire la cible.
- 7. Mossy Hide         [ ] La peau du lanceur se couvre de mousse : il absorbe
-                           les dégâts et se soigne lentement.
- 8. Moss Guardian      [ ] Invoque un gardien de mousse et de pierre.
- 9. Sleeping Pollen    [ ] Un nuage de pollen endort les ennemis touchés.
-10. Overgrowth         [ ] ULTIME - La zone se couvre de végétation ; lianes et
-                           fleurs carnivores attaquent tous les ennemis.
+ 1. Thorn Volley       [ ] Une salve d'épines lumineuses qui font saigner la
+                           cible.
+ 2. Strangling Vines   [ ] Des lianes vivantes jaillissent du sol, enserrent
+                           la cible et l'étouffent.
+ 3. Sacred Grove       [ ] Un cercle de mousse lumineuse se répand et soigne
+                           les alliés qui se tiennent dessus.
+ 4. Spore Bloom        [ ] Des champignons géants poussent et libèrent un
+                           nuage de spores toxiques.
+ 5. Petal Storm        [ ] Une tempête de pétales tranchants tourbillonne
+                           autour du lanceur.
+ 6. Vine Lash          [ ] Un fouet de lianes épineuses frappe et attire la
+                           cible.
+ 7. Ancient Bark       [ ] Le lanceur se couvre d'écorce millénaire couverte
+                           de mousse : il absorbe les dégâts et se régénère.
+ 8. Forest Spirit      [ ] Invoque un esprit de la forêt (cerf de mousse et de
+                           lumière) qui combat pour le lanceur.
+ 9. Dream Pollen       [ ] Un nuage de pollen doré endort les ennemis touchés.
+10. Heart of the Forest[ ] ULTIME - Un arbre-monde géant surgit du sol ; ses
+                           racines écrasent les ennemis, ses fleurs soignent
+                           les alliés.
 
-Livre : Mossbound Spellbook [ ]
+Livre : Mossbound Spellbook (couvert de mousse et de fleurs) [ ]
+
+
+================================================================================
+ IDÉES D'AUTRES ÉCOLES (pas encore dans la liste officielle)
+================================================================================
+Écoles qui, à ma connaissance, n'existent ni dans Iron's Spells ni dans ses
+addons connus. À vérifier avant de se lancer.
+
+ - Magie du Cristal   : prismes, lasers réfractés, prisons de cristal,
+                        miroirs qui dupliquent les sorts.
+ - Magie du Sable     : tempêtes de sable, sables mouvants, golems de sable,
+                        sablier qui ralentit le temps dans une zone.
+ - Magie de l'Encre de Calmar / Abysses : tentacules, encre noire, pression
+                        des profondeurs, appel d'une créature abyssale.
+ - Magie de la Musique: notes qui blessent, mélodie de soin, onde sonore,
+                        orchestre fantôme en ultime.
+ - Magie des Miroirs  : clones du lanceur, reflets qui renvoient les sorts,
+                        téléportation par miroirs.
+ - Magie du Temps     : ralentir, accélérer, rembobiner sa position, figer
+                        une zone.
+ - Magie de l'Ombre   : se fondre dans les ombres, ombres vivantes, voler
+                        l'ombre d'un ennemi pour le contrôler.
+ - Magie des Rêves    : endormir, cauchemars, moutons de rêve invoqués,
+                        illusions.
+ - Magie des Cartes   : cartes à jouer tranchantes, roulette du destin,
+                        tirage aléatoire de bonus/malus.
+ - Magie du Métal / Rouille : aimantation, lames de métal, faire rouiller
+                        l'armure ennemie.
+ - Magie de la Lave Noire / Obsidienne : piliers d'obsidienne, éclats
+                        volcaniques, armure de roche.
+ - Magie des Étoiles / Constellations : dessiner des constellations qui
+                        invoquent des créatures stellaires.
 
 
 ================================================================================
