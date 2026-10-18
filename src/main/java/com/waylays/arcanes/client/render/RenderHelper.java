@@ -34,6 +34,22 @@ public final class RenderHelper {
         vertex(consumer, pose, -half, half, 0, 0, 0, argb, light, 0, 0, 1);
     }
 
+    /** Rectangle {@code width} x {@code height} in the XY plane centred on the origin, facing +Z (and -Z if {@code twoSided}). */
+    public static void rect(VertexConsumer consumer, PoseStack.Pose pose, float width, float height, int argb, int light, boolean twoSided) {
+        float w = width * .5f;
+        float h = height * .5f;
+        vertex(consumer, pose, -w, -h, 0, 0, 1, argb, light, 0, 0, 1);
+        vertex(consumer, pose, w, -h, 0, 1, 1, argb, light, 0, 0, 1);
+        vertex(consumer, pose, w, h, 0, 1, 0, argb, light, 0, 0, 1);
+        vertex(consumer, pose, -w, h, 0, 0, 0, argb, light, 0, 0, 1);
+        if (twoSided) {
+            vertex(consumer, pose, -w, h, 0, 0, 0, argb, light, 0, 0, -1);
+            vertex(consumer, pose, w, h, 0, 1, 0, argb, light, 0, 0, -1);
+            vertex(consumer, pose, w, -h, 0, 1, 1, argb, light, 0, 0, -1);
+            vertex(consumer, pose, -w, -h, 0, 0, 1, argb, light, 0, 0, -1);
+        }
+    }
+
     /** Square in the XZ plane centred on the origin, facing up. */
     public static void groundQuad(VertexConsumer consumer, PoseStack.Pose pose, float half, int argb, int light) {
         vertex(consumer, pose, -half, 0, -half, 0, 0, argb, light, 0, 1, 0);

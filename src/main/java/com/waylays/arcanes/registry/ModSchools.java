@@ -54,5 +54,20 @@ public final class ModSchools {
             EXPLOSION_MAGIC
     ));
 
+    public static final ResourceLocation BOOK_RESOURCE = ArcanesOublies.id("book");
+    public static final TagKey<Item> BOOK_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("book_focus"));
+    public static final ResourceKey<DamageType> BOOK_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("book_magic"));
+    public static final int BOOK_COLOR = 0x9A5CFF;
+
+    public static final RegistryObject<SchoolType> BOOK = SCHOOLS.register(BOOK_RESOURCE.getPath(), () -> new SchoolType(
+            BOOK_RESOURCE,
+            BOOK_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".book").withStyle(Style.EMPTY.withColor(BOOK_COLOR)),
+            LazyOptional.of(ModAttributes.BOOK_SPELL_POWER::get),
+            LazyOptional.of(ModAttributes.BOOK_MAGIC_RESIST::get),
+            LazyOptional.of(() -> SoundEvents.BOOK_PAGE_TURN),
+            BOOK_MAGIC
+    ));
+
     private ModSchools() {}
 }

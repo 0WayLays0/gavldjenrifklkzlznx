@@ -148,7 +148,7 @@ Livre : Detonation Codex (couverture noire craquelée, fissures incandescentes
 
 
 ================================================================================
- 4. MAGIE DU LIVRE (Book / Arcanes écrites)                       [ ] À FAIRE
+ 4. MAGIE DU LIVRE (Book / Arcanes écrites)                       [~] EN COURS
 ================================================================================
 Couleur : violet profond / parchemin doré
 Ambiance : pages volantes, encre vivante, runes, bibliothèque interdite
@@ -156,9 +156,9 @@ Sons : pages qui tournent, chuchotements, livres qui claquent, plume qui gratte
 
  1. Razor Pages        [ ] Une salve de pages aux bords lumineux, tranchantes
                            comme des lames.
- 2. Page Storm         [ ] Un tourbillon de pages runiques entoure la cible et
+ 2. Page Storm         [~] Un tourbillon de pages runiques entoure la cible et
                            la lacère.
- 3. Living Ink         [ ] Une vague d'encre vivante forme des mains noires
+ 3. Living Ink         [~] Une vague d'encre vivante forme des mains noires
                            qui agrippent et aveuglent les ennemis.
  4. Tome of Judgment   [ ] Un livre géant s'ouvre dans le ciel et se referme
                            sur la zone en écrasant les ennemis.
@@ -173,7 +173,7 @@ Sons : pages qui tournent, chuchotements, livres qui claquent, plume qui gratte
                            matérialise en lettres de feu et explose devant lui.
  9. Rewrite            [ ] Le lanceur réécrit sa propre histoire : il efface
                            ses effets négatifs et récupère un peu de vie.
-10. The Final Chapter  [ ] ULTIME - Un grimoire colossal s'ouvre au-dessus de
+10. The Final Chapter  [~] ULTIME - Un grimoire colossal s'ouvre au-dessus de
                            la zone ; ses pages forment un dôme et chaque
                            ennemi est marqué d'une rune qui explose.
 

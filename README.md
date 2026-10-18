@@ -3,10 +3,11 @@
 Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.20.1, Forge 47.4+), pour notre serveur RP.
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 0.3.0 : écoles de l'Or et de l'Explosion
+## Contenu de la bêta 0.4.0 : écoles de l'Or et de l'Explosion, début de l'école du Livre
 
-Deux nouvelles écoles dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et « Résistance »,
-son livre de sorts 3D (10 emplacements, +10 % puissance de l'école, +200 mana) et ses parchemins. Un onglet
+Trois nouvelles écoles dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et « Résistance » et
+ses parchemins. L'Or et l'Explosion sont complètes, avec leur livre de sorts 3D (10 emplacements, +10 % puissance
+de l'école, +200 mana). Un onglet
 créatif « Arcanes Oubliés » contient les livres et tous les parchemins à tous les niveaux.
 
 ### Or
@@ -50,8 +51,18 @@ Livre : **Codex de Détonation** (couverture noire craquelée, fissures de magma
 `<monde>/serverconfig/arcanes_oublies-server.toml`, mettre `explosionsBreakBlocks = true` (section `[explosion]`).
 Même activée, la roche du fond, l'obsidienne et les blocs résistants aux explosions ne cassent pas.
 
+### Livre (3 sorts sur 10 pour l'instant)
+
+| Sort | Effet |
+|---|---|
+| **Tempête de Pages** (Page Storm) | Un tourbillon de pages runiques entoure la cible, la suit et la lacère toutes les 0,4 s (et la ralentit). |
+| **Encre Vivante** (Living Ink) | Vague d'encre qui s'étend en cône devant le lanceur ; des mains noires saisissent chaque ennemi touché, l'immobilisent, l'aveuglent et le serrent. |
+| **Le Dernier Chapitre** (The Final Chapter, ultime) | Un grimoire colossal s'ouvre au-dessus de la zone, ses 64 pages forment un dôme, chaque ennemi dessous est marqué d'une rune qui explose ; puis le livre se referme. |
+
+Focus de l'école : livre. Les 7 autres sorts et le livre de sorts (Living Grimoire) viendront plus tard.
+
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
-(et `tools/explosion_assets.py` pour l'Explosion).
+(`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre).
 
 ## Récupérer le mod
 
@@ -70,6 +81,6 @@ Dans le dossier `mods` (client et serveur), à côté de :
 ## Développer
 
 - Le code est dans `src/main/java/com/waylays/arcanes`.
-- Textures et modèles d'objets : modifier `tools/gen_assets.py` (ou `tools/explosion_assets.py`) puis lancer
+- Textures et modèles d'objets : modifier `tools/gen_assets.py` (ou `explosion_assets.py`, `book_assets.py`) puis lancer
   `python3 tools/gen_assets.py` (Pillow).
   Une texture faite à la main peut aussi remplacer directement le PNG du même nom.

@@ -1,6 +1,9 @@
 package com.waylays.arcanes.registry;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.spells.book.FinalChapterSpell;
+import com.waylays.arcanes.spells.book.LivingInkSpell;
+import com.waylays.arcanes.spells.book.PageStormSpell;
 import com.waylays.arcanes.spells.explosion.BlastLeapSpell;
 import com.waylays.arcanes.spells.explosion.BlastOrbSpell;
 import com.waylays.arcanes.spells.explosion.CataclysmSpell;
@@ -56,6 +59,11 @@ public final class ModSpells {
     public static final RegistryObject<AbstractSpell> CLUSTER_BARRAGE = register(new ClusterBarrageSpell());
     public static final RegistryObject<AbstractSpell> REACTIVE_SHIELD = register(new ReactiveShieldSpell());
     public static final RegistryObject<AbstractSpell> CATACLYSM = register(new CataclysmSpell());
+
+    // Book school (3 of 10 so far)
+    public static final RegistryObject<AbstractSpell> PAGE_STORM = register(new PageStormSpell());
+    public static final RegistryObject<AbstractSpell> LIVING_INK = register(new LivingInkSpell());
+    public static final RegistryObject<AbstractSpell> THE_FINAL_CHAPTER = register(new FinalChapterSpell());
 
     private ModSpells() {}
 

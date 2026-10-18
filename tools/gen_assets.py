@@ -3,7 +3,7 @@
 
 All art is original (Iron's Spells' license forbids reusing its assets). Run from the repository root:
     python3 tools/gen_assets.py
-Needs Pillow. Re-running overwrites the files it writes (see main() here and in explosion_assets.py) and nothing else.
+Needs Pillow. Re-running overwrites the files it writes (see main() here, in explosion_assets.py and in book_assets.py) and nothing else.
 """
 import json
 import math
@@ -814,6 +814,8 @@ def main():
     item_models()
     import explosion_assets
     explosion_assets.main()
+    import book_assets
+    book_assets.main()
 
 
 if __name__ == "__main__":

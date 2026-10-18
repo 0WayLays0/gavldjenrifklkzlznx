@@ -4,6 +4,8 @@ import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.client.render.AurumBladeRenderer;
 import com.waylays.arcanes.client.render.BlastEffectRenderer;
 import com.waylays.arcanes.client.render.CataclysmRenderer;
+import com.waylays.arcanes.client.render.ChapterRuneRenderer;
+import com.waylays.arcanes.client.render.FinalChapterRenderer;
 import com.waylays.arcanes.client.render.EldoradoSunRenderer;
 import com.waylays.arcanes.client.render.GildedChainsRenderer;
 import com.waylays.arcanes.client.render.GlowOrbRenderer;
@@ -11,7 +13,10 @@ import com.waylays.arcanes.client.render.GoldItemProjectileRenderer;
 import com.waylays.arcanes.client.render.GoldSpikeRenderer;
 import com.waylays.arcanes.client.render.GoldenSentinelRenderer;
 import com.waylays.arcanes.client.render.ImplosionRenderer;
+import com.waylays.arcanes.client.render.InkHandsRenderer;
+import com.waylays.arcanes.client.render.InkWaveRenderer;
 import com.waylays.arcanes.client.render.MoltenPoolRenderer;
+import com.waylays.arcanes.client.render.PageStormRenderer;
 import com.waylays.arcanes.client.render.RuinSigilRenderer;
 import com.waylays.arcanes.client.render.ShieldBubbleRenderer;
 import com.waylays.arcanes.registry.ModEntities;
@@ -56,6 +61,12 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.CLUSTER_BOMBLET.get(), context -> new GlowOrbRenderer<>(context, .4f, 0xFF8A3A));
         event.registerEntityRenderer(ModEntities.SHIELD_BUBBLE.get(), ShieldBubbleRenderer::new);
         event.registerEntityRenderer(ModEntities.CATACLYSM_CORE.get(), CataclysmRenderer::new);
+
+        event.registerEntityRenderer(ModEntities.PAGE_STORM.get(), PageStormRenderer::new);
+        event.registerEntityRenderer(ModEntities.INK_WAVE.get(), InkWaveRenderer::new);
+        event.registerEntityRenderer(ModEntities.INK_HANDS.get(), InkHandsRenderer::new);
+        event.registerEntityRenderer(ModEntities.FINAL_CHAPTER.get(), FinalChapterRenderer::new);
+        event.registerEntityRenderer(ModEntities.CHAPTER_RUNE.get(), ChapterRuneRenderer::new);
     }
 
     @SubscribeEvent

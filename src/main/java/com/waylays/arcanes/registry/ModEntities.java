@@ -1,6 +1,11 @@
 package com.waylays.arcanes.registry;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.entity.book.ChapterRune;
+import com.waylays.arcanes.entity.book.FinalChapter;
+import com.waylays.arcanes.entity.book.InkHands;
+import com.waylays.arcanes.entity.book.InkWave;
+import com.waylays.arcanes.entity.book.PageStorm;
 import com.waylays.arcanes.entity.explosion.BlastEffect;
 import com.waylays.arcanes.entity.explosion.CataclysmCore;
 import com.waylays.arcanes.entity.explosion.ChainDetonation;
@@ -91,6 +96,22 @@ public final class ModEntities {
 
     public static final RegistryObject<EntityType<CataclysmCore>> CATACLYSM_CORE = register("cataclysm_core",
             EntityType.Builder.<CataclysmCore>of(CataclysmCore::new, MobCategory.MISC).sized(2f, 2f).clientTrackingRange(160).fireImmune());
+
+    // Book school
+    public static final RegistryObject<EntityType<PageStorm>> PAGE_STORM = register("page_storm",
+            EntityType.Builder.<PageStorm>of(PageStorm::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
+
+    public static final RegistryObject<EntityType<InkWave>> INK_WAVE = register("ink_wave",
+            EntityType.Builder.<InkWave>of(InkWave::new, MobCategory.MISC).sized(.5f, .2f).clientTrackingRange(64));
+
+    public static final RegistryObject<EntityType<InkHands>> INK_HANDS = register("ink_hands",
+            EntityType.Builder.<InkHands>of(InkHands::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
+
+    public static final RegistryObject<EntityType<FinalChapter>> FINAL_CHAPTER = register("final_chapter",
+            EntityType.Builder.<FinalChapter>of(FinalChapter::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(160).fireImmune());
+
+    public static final RegistryObject<EntityType<ChapterRune>> CHAPTER_RUNE = register("chapter_rune",
+            EntityType.Builder.<ChapterRune>of(ChapterRune::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(96));
 
     private ModEntities() {}
 
