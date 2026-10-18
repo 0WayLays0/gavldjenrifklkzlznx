@@ -83,8 +83,11 @@ public class PaperCrane extends SpellProjectile {
             float t = Mth.clamp((tickCount - LAUNCH_TICKS) / 25f, 0f, 1f);
             double speed = Mth.lerp(t, .55, 1.15);
             if (target != null) {
-                Vec3 to = target.getBoundingBox().getCenter().subtract(position()).normalize().scale(speed);
-                double turn = Mth.lerp(t, .12, .3);
+                Vec3 toTarget = target.getBoundingBox().getCenter().subtract(position());
+                double distance = toTarget.length();
+                Vec3 to = toTarget.normalize().scale(speed);
+                // Turns tighter the closer it gets, and dives straight in at the end, so it never circles its prey
+                double turn = distance < 2.5 ? 1 : Math.max(Mth.lerp(t, .12, .3), 1.6 / distance);
                 setDeltaMovement(motion.scale(1 - turn).add(to.scale(turn)).normalize().scale(speed));
             } else {
                 setDeltaMovement(motion.normalize().scale(speed));
