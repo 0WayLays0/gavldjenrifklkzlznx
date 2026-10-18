@@ -1,0 +1,15 @@
+.gradle/
+build/
+out/
+run/
+run-gametest/
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+bin/
+__pycache__/

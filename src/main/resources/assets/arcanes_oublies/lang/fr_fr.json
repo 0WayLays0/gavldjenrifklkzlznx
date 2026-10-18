@@ -1,0 +1,19 @@
+{
+  "itemGroup.arcanes_oublies.main": "Arcanes Oubliés",
+  "school.arcanes_oublies.gold": "Or",
+  "attribute.arcanes_oublies.gold_spell_power": "Puissance des sorts d'Or",
+  "attribute.arcanes_oublies.gold_magic_resist": "Résistance à la magie de l'Or",
+  "item.arcanes_oublies.golden_grimoire": "Grimoire d'Or",
+  "entity.arcanes_oublies.gold_bolt": "Trait d'Or",
+  "entity.arcanes_oublies.gilded_chains": "Chaînes Dorées",
+  "spell.arcanes_oublies.gold_bolt": "Trait d'Or",
+  "spell.arcanes_oublies.gold_bolt.guide": "Lance un lingot d'or tournoyant qui explose en éclats tranchants à l'impact et blesse tout ce qui est autour.",
+  "spell.arcanes_oublies.gilded_chains": "Chaînes Dorées",
+  "spell.arcanes_oublies.gilded_chains.guide": "Des chaînes d'or jaillissent du sol et clouent ta cible sur place.",
+  "ui.arcanes_oublies.splash_damage": "%s dégâts d'éclats",
+  "death.attack.arcanes_oublies.gold_bolt": "%1$s a été pulvérisé par le Trait d'Or de %2$s",
+  "death.attack.arcanes_oublies.gilded_chains": "%1$s a été broyé par les chaînes d'or de %2$s",
+  "death.attack.gold_magic": "%1$s a été changé en or",
+  "death.attack.gold_magic.player": "%1$s a été changé en or par %2$s",
+  "death.attack.gold_magic.item": "%1$s a été changé en or par %2$s avec %3$s"
+}

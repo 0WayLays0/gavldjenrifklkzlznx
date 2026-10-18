@@ -2,8 +2,8 @@
   ADDONS POUR IRON'S SPELLS 'N SPELLBOOKS - LISTE DES ÉCOLES ET DES SORTS
 ================================================================================
 
-Version Minecraft / loader : À DÉCIDER (1.20.1 Forge ou 1.21.1 NeoForge)
-Nom du mod / modid       : À DÉCIDER
+Version Minecraft / loader : 1.20.1 Forge (choisi par défaut pour la bêta, modifiable)
+Nom du mod / modid       : Arcanes Oubliés / arcanes_oublies (provisoire)
 
 Contenu prévu pour chaque école :
   - 10 sorts (le n°10 est l'ultime)
@@ -34,9 +34,9 @@ Couleur : or / jaune brillant
 Ambiance : lingots, éclats, or fondu, statues, richesse
 Sons : tintements métalliques, carillons, impacts lourds, résonances
 
- 1. Gold Bolt          [ ] Un lingot-projectile qui explose en éclats dorés à
+ 1. Gold Bolt          [~] Un lingot-projectile qui explose en éclats dorés à
                            l'impact.
- 2. Gilded Chains      [ ] Des chaînes d'or sortent du sol et clouent la cible
+ 2. Gilded Chains      [~] Des chaînes d'or sortent du sol et clouent la cible
                            sur place.
  3. Goldfall           [ ] Des lingots massifs tombent du ciel sur la zone
                            visée, comme une pluie de météores en or.
@@ -57,7 +57,7 @@ Sons : tintements métalliques, carillons, impacts lourds, résonances
                            lanceur, tire des rayons dorés sur tous les
                            ennemis autour, puis s'effondre en explosion d'or.
 
-Livre : Golden Spellbook (livre d'or) [ ]
+Livre : Golden Grimoire (Grimoire d'Or) [~]
 
 
 ================================================================================

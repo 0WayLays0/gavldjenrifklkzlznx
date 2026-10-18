@@ -1,0 +1,19 @@
+{
+  "itemGroup.arcanes_oublies.main": "Arcanes Oubliés",
+  "school.arcanes_oublies.gold": "Gold",
+  "attribute.arcanes_oublies.gold_spell_power": "Gold Spell Power",
+  "attribute.arcanes_oublies.gold_magic_resist": "Gold Magic Resistance",
+  "item.arcanes_oublies.golden_grimoire": "Golden Grimoire",
+  "entity.arcanes_oublies.gold_bolt": "Gold Bolt",
+  "entity.arcanes_oublies.gilded_chains": "Gilded Chains",
+  "spell.arcanes_oublies.gold_bolt": "Gold Bolt",
+  "spell.arcanes_oublies.gold_bolt.guide": "Hurl a spinning golden ingot that bursts into razor-sharp shards on impact, hurting everything nearby.",
+  "spell.arcanes_oublies.gilded_chains": "Gilded Chains",
+  "spell.arcanes_oublies.gilded_chains.guide": "Golden chains burst out of the ground and pin your target in place.",
+  "ui.arcanes_oublies.splash_damage": "%s Shard Damage",
+  "death.attack.arcanes_oublies.gold_bolt": "%1$s was shattered by %2$s's Gold Bolt",
+  "death.attack.arcanes_oublies.gilded_chains": "%1$s was crushed in %2$s's golden chains",
+  "death.attack.gold_magic": "%1$s was turned to gold",
+  "death.attack.gold_magic.player": "%1$s was turned to gold by %2$s",
+  "death.attack.gold_magic.item": "%1$s was turned to gold by %2$s using %3$s"
+}
