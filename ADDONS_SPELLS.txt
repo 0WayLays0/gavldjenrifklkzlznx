@@ -259,6 +259,33 @@ addons connus. À vérifier avant de se lancer.
                         champignon.
  - Magie Clockwork    : rouages tranchants, automates, horloge géante.
 
+ - Magie du Sang Noir / Vampirisme : chauves-souris, drain de vie,
+                        forme de brume, seigneur vampire en ultime.
+ - Magie de l'Obsidienne / Volcanique : piliers d'obsidienne, éclats de
+                        roche en fusion, titan de magma.
+ - Magie des Tempêtes : nuages d'orage, vents violents, œil du cyclone.
+ - Magie du Givre Éternel / Glace Noire : glace noire maudite, spectres
+                        gelés, couronne de l'hiver.
+ - Magie Solaire     : rayons de soleil, éclipse, avatar solaire.
+ - Magie des Esprits / Spectres : invoquer des âmes, possession, armée
+                        spectrale.
+ - Magie du Dragon   : souffle draconique, écailles protectrices, ailes,
+                        dragon ancestral en ultime.
+ - Magie de la Terre Sacrée / Géomancie : séismes, murs de pierre, golem
+                        de montagne.
+ - Magie des Armes Spectrales : épées, haches et lances fantômes qui
+                        combattent autour du lanceur.
+ - Magie du Vide / Néant : fissures dans la réalité, sphères qui effacent,
+                        dévoreur du néant.
+ - Magie des Pierres Précieuses : rubis (feu), saphir (glace), émeraude
+                        (soin), diamant (bouclier).
+ - Magie de l'Aurore / Lumière Boréale : voiles de lumière colorée, soins,
+                        tempête d'aurore.
+ - Magie du Poison Royal / Serpents : serpents invoqués, venin, Gorgone
+                        qui pétrifie.
+ - Magie des Chaînes Infernales : chaînes de feu, cages, gardien des
+                        enfers.
+
  Exceptions plus originales :
  - Magie du Marionnettiste : fils magiques pour contrôler les mobs.
  - Magie du Chaos / Dés    : sorts aux effets aléatoires, dés géants.
