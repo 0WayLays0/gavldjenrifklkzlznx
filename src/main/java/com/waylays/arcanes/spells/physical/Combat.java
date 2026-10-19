@@ -6,8 +6,12 @@ import io.redspace.ironsspellbooks.damage.DamageSources;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -18,9 +22,11 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,6 +121,13 @@ public final class Combat {
         return out;
     }
 
+    /** The nearest one within {@code reach} in front (see {@link #inArc}), or null. */
+    @Nullable
+    public static LivingEntity nearestInArc(LivingEntity fighter, double reach, double halfAngle) {
+        List<LivingEntity> targets = inArc(fighter, reach, halfAngle);
+        return targets.isEmpty() ? null : targets.get(0);
+    }
+
     /** Everyone within {@code reach} all around the fighter. */
     public static List<LivingEntity> around(LivingEntity fighter, double reach) {
         return inArc(fighter, reach, 180);
@@ -153,6 +166,26 @@ public final class Combat {
             SpellUtil.particles(fighter.level(), ParticleTypes.CRIT, c.x, c.y, c.z, 6, .25, .3, .25, .3);
         }
         return hurt;
+    }
+
+    /** The swish of a blow that found nobody. */
+    public static void whiff(Level level, LivingEntity fighter) {
+        level.playSound(null, fighter.getX(), fighter.getY(), fighter.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, SoundSource.PLAYERS, 1f, 1.1f);
+    }
+
+    /** Turns {@code target} round on the spot by {@code degrees} (a player's own view turns with them). */
+    public static void turn(LivingEntity target, float degrees) {
+        if (target instanceof ServerPlayer player) {
+            player.connection.teleport(0, 0, 0, degrees, 0, EnumSet.allOf(RelativeMovement.class));
+        } else {
+            float yaw = target.getYRot() + degrees;
+            target.setYRot(yaw);
+            target.setYHeadRot(yaw);
+            target.setYBodyRot(yaw);
+            target.yRotO = yaw;
+            target.yHeadRotO = yaw;
+            target.yBodyRotO = yaw;
+        }
     }
 
     /** Dust and grit of the ground under {@code pos} thrown up (a stomp, a take-off, a skid). */

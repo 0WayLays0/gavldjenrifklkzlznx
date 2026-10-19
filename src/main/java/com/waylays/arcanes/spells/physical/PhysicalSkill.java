@@ -20,6 +20,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,6 +93,11 @@ public abstract class PhysicalSkill extends AbstractSpell {
             damage += EnchantmentHelper.getDamageBonus(fighter.getMainHandItem(), target.getMobType());
         }
         return damage;
+    }
+
+    /** A shot's bonus from an enchantment of the held weapon (a bow's Power): +{@code perLevel} per level. */
+    public static float enchantBonus(LivingEntity fighter, Enchantment enchantment, float perLevel) {
+        return 1 + perLevel * EnchantmentHelper.getItemEnchantmentLevel(enchantment, fighter.getMainHandItem());
     }
 
     /** One blow: {@code strengthShare} of the move's strength plus {@code weaponShare} of the weapon's damage. */

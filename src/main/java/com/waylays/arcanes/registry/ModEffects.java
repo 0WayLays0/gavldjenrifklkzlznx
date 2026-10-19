@@ -6,8 +6,10 @@ import com.waylays.arcanes.effect.BleedingEffect;
 import com.waylays.arcanes.effect.GildedArmorEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.effect.ParchmentAegisEffect;
+import com.waylays.arcanes.effect.PinnedEffect;
 import com.waylays.arcanes.effect.ReactiveShieldEffect;
 import com.waylays.arcanes.effect.SilenceEffect;
+import com.waylays.arcanes.effect.SunderedEffect;
 import com.waylays.arcanes.effect.VolatileBrandEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.registries.DeferredRegister;
@@ -25,6 +27,8 @@ public final class ModEffects {
     public static final RegistryObject<MobEffect> SILENCE = EFFECTS.register("silence", SilenceEffect::new);
     public static final RegistryObject<MobEffect> PARCHMENT_AEGIS = EFFECTS.register("parchment_aegis", ParchmentAegisEffect::new);
     public static final RegistryObject<MobEffect> BLEEDING = EFFECTS.register("bleeding", BleedingEffect::new);
+    public static final RegistryObject<MobEffect> SUNDERED = EFFECTS.register("sundered", SunderedEffect::new);
+    public static final RegistryObject<MobEffect> PINNED = EFFECTS.register("pinned", PinnedEffect::new);
 
     private ModEffects() {}
 }

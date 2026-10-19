@@ -43,7 +43,7 @@ public class SwordLungeSkill extends PhysicalSkill {
 
     @Override
     public AnimationHolder getCastStartAnimation() {
-        return PhysicalAnimations.LUNGE;
+        return PhysicalAnimations.SWORD_LUNGE;
     }
 
     @Override

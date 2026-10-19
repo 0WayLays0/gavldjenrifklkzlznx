@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
-"""Physical Prowess art: spell icons, the trace a blow leaves in the air, the bleeding icon, scroll and ring, and the
-fighters' own body animations (player_animation/physical_skills.json, read by Player Animator).
+"""Physical Prowess art: spell icons (the weapon styles' in physical_weapon_icons.py), the trace a blow leaves in the
+air, the bleeding, sundered and pinned icons, the throwing knife and javelin, scroll and ring, and the fighters' own
+body animations (player_animation/physical_skills.json, read by Player Animator; written by physical_animations.py).
 
 Called by gen_assets.py (run that one). All art is original. Nothing here glows: these moves are not magic.
-
-Animation conventions (Bedrock format, as in Iron's casting_animations.json): rotations in degrees, positions in
-pixels; right_arm at x -90 points straight ahead, a negative torso y turns the right shoulder forward, a negative
-position z moves forward.
 """
 import math
 
 from PIL import Image, ImageDraw
 
 import gen_assets as g
+import physical_animations
 from explosion_assets import smoothstep
 
 LEATHER = (170, 110, 70)
@@ -56,6 +54,58 @@ def bleeding_effect_icon():
             d.polygon([(x - rr * .8, y - rr * .5), (x + rr * .8, y - rr * .5), (x, y - rr * 2.2)], fill=BLOOD + (255,))
             d.ellipse((x - rr * .45, y - rr * .2, x - rr * .1, y + rr * .15), fill=(240, 120, 120, 255))
     return g.painted(72, draw, None, 18)
+
+
+def sundered_effect_icon():
+    def draw(d, img, S):
+        # A chestplate split by a cut
+        plate = [(.22, .2), (.4, .14), (.5, .24), (.6, .14), (.78, .2), (.84, .5), (.74, .52), (.72, .86), (.28, .86), (.26, .52), (.16, .5)]
+        d.polygon([(x * S, y * S) for x, y in plate], fill=(150, 156, 170, 255), outline=OUTLINE + (255,))
+        d.polygon([(.36 * S, .36 * S), (.64 * S, .36 * S), (.62 * S, .74 * S), (.38 * S, .74 * S)], fill=(186, 192, 204, 255))
+        d.line((.2 * S, .26 * S, .8 * S, .8 * S), fill=(40, 30, 26, 255), width=max(3, S // 10))
+        d.line((.24 * S, .24 * S, .82 * S, .76 * S), fill=(236, 236, 240, 255), width=max(1, S // 30))
+    return g.painted(72, draw, None, 18)
+
+
+def pinned_effect_icon():
+    def draw(d, img, S):
+        # A knife driven point first into the ground, cracks around it
+        d.rectangle((.08 * S, .74 * S, .92 * S, .9 * S), fill=(120, 92, 62, 255))
+        for x0, x1, y1 in ((.5, .3, .9), (.5, .72, .88), (.5, .2, .78)):
+            d.line((x0 * S, .76 * S, x1 * S, y1 * S), fill=(50, 34, 22, 255), width=max(1, S // 24))
+        d.polygon([(.44 * S, .3 * S), (.56 * S, .3 * S), (.56 * S, .7 * S), (.5 * S, .8 * S), (.44 * S, .7 * S)], fill=STEEL + (255,),
+                  outline=OUTLINE + (255,))
+        d.line((.5 * S, .34 * S, .5 * S, .72 * S), fill=STEEL_DARK + (255,), width=max(1, S // 30))
+        d.rectangle((.36 * S, .26 * S, .64 * S, .31 * S), fill=(96, 100, 114, 255), outline=OUTLINE + (255,))
+        d.rectangle((.45 * S, .08 * S, .55 * S, .26 * S), fill=(92, 58, 30, 255), outline=OUTLINE + (255,))
+    return g.painted(72, draw, None, 18)
+
+
+def throwing_knife():
+    """16 x 16, the knife's side seen flat in rows 6 to 9 (what the missile renderer draws), point to the right."""
+    img = Image.new("RGBA", (16, 16))
+    d = ImageDraw.Draw(img)
+    d.rectangle((0, 7, 4, 8), fill=(92, 58, 30, 255))
+    for x in (1, 3):
+        d.point((x, 7), fill=(60, 36, 18, 255))
+        d.point((x, 8), fill=(60, 36, 18, 255))
+    d.rectangle((5, 6, 5, 9), fill=(96, 100, 114, 255))
+    d.polygon([(6, 7), (12, 7), (15, 8), (12, 8), (6, 8)], fill=STEEL + (255,))
+    d.line((6, 8, 13, 8), fill=STEEL_DARK + (255,))
+    return img
+
+
+def javelin():
+    """32 x 4, the javelin's side seen flat: a wooden shaft and a leaf-shaped iron head to the right."""
+    img = Image.new("RGBA", (32, 4))
+    d = ImageDraw.Draw(img)
+    d.rectangle((0, 1, 23, 2), fill=WOOD + (255,))
+    d.line((0, 1, 23, 1), fill=(164, 116, 66, 255))
+    d.rectangle((21, 1, 22, 2), fill=(60, 40, 24, 255))
+    d.polygon([(23, 0), (28, 0), (31, 1), (31, 2), (28, 3), (23, 3)], fill=(150, 156, 170, 255))
+    d.line((24, 1, 30, 1), fill=STEEL + (255,))
+    d.line((24, 2, 30, 2), fill=STEEL_DARK + (255,))
+    return img
 
 
 # ---------------------------------------------------------------- icons
@@ -350,128 +400,6 @@ def affinity_ring_physical():
         "g": LEATHER, "t": (110, 66, 38)})
 
 
-# ---------------------------------------------------------------- body animations
-
-def _track(points, easing=None):
-    """A keyframe track {time: vector} with an optional easing on every key but the first."""
-    out = {}
-    for i, (t, v) in enumerate(sorted(points.items())):
-        key = {"vector": [round(x, 3) for x in v]}
-        if easing and i:
-            key["easing"] = easing
-        out[f"{t:.4f}".rstrip("0").rstrip(".") if t else "0.0"] = key
-    return out
-
-
-def _anim(length, bones):
-    return {"animation_length": length, "bones": bones}
-
-
-def punch_animation():
-    """A straight right: cocked back, the shoulder turning in, fist out at 0.08 s, back to guard."""
-    return _anim(.35, {
-        "right_arm": {
-            "rotation": _track({0: (-40, 15, 10), .08: (-95, -5, 0), .2: (-88, 0, 0), .35: (-55, 12, 10)}, "easeOutSine"),
-            "position": _track({0: (0, 0, 2), .08: (0, 0, -5), .2: (0, 0, -3), .35: (0, 0, 0)}, "easeOutSine"),
-        },
-        "left_arm": {
-            "rotation": _track({0: (-55, -15, -10), .08: (-40, -25, -10), .35: (-55, -15, -10)}),
-            "position": _track({0: (0, 0, 0), .08: (0, 0, 2), .35: (0, 0, 0)}),
-        },
-        "torso": {"rotation": _track({0: (0, 15, 0), .08: (0, -25, 0), .35: (0, -5, 0)}, "easeOutSine")},
-        "body": {"position": _track({0: (0, 0, 0), .08: (0, 0, -1), .35: (0, 0, 0)})},
-    })
-
-
-def punch_flurry_animation():
-    """Seven jabs, right and left, every eighth of a second, then a big right at 0.92 s."""
-    guard_r, ext_r = (-60, 15, 10), (-95, -5, 0)
-    guard_l, ext_l = (-60, -15, -10), (-95, 5, 0)
-    rr, rp, lr, lp, tr = {0: guard_r}, {0: (0, 0, 1)}, {0: guard_l}, {0: (0, 0, 1)}, {0: (0, 0, 0)}
-    for i in range(7):
-        t = .0625 + .125 * i
-        right = i % 2 == 0
-        for dt, out in ((-.04, False), (0, True), (.04, False)):
-            tt = round(t + dt, 4)
-            if right:
-                rr[tt] = ext_r if out else guard_r
-                rp[tt] = (0, 0, -5) if out else (0, 0, 1)
-                tr[tt] = (0, -18, 0) if out else (0, 0, 0)
-            else:
-                lr[tt] = ext_l if out else guard_l
-                lp[tt] = (0, 0, -5) if out else (0, 0, 1)
-                tr[tt] = (0, 18, 0) if out else (0, 0, 0)
-    rr.update({.86: (-40, 20, 10), .92: (-100, -10, 0), 1.0: guard_r})
-    rp.update({.86: (0, 0, 3), .92: (0, 1, -7), 1.0: (0, 0, 1)})
-    tr.update({.86: (0, 20, 0), .92: (0, -30, 0), 1.0: (0, 0, 0)})
-    return _anim(1.0, {
-        "right_arm": {"rotation": _track(rr), "position": _track(rp)},
-        "left_arm": {"rotation": _track(lr), "position": _track(lp)},
-        "torso": {"rotation": _track(tr)},
-        "body": {"position": _track({0: (0, 0, 0), .92: (0, 0, -1.5), 1.0: (0, 0, 0)})},
-    })
-
-
-def slash_flurry_animation():
-    """Forehand, backhand, forehand, then a wide level cut: the blade crosses at 0.15, 0.4, 0.65 and 0.9 s."""
-    high, low = (-150, -30, 55), (-15, 25, 80)
-    rr, tr = {0: high}, {0: (0, 25, 0)}
-    for k, t in enumerate((.15, .4, .65)):
-        start, end = (high, low) if k % 2 == 0 else (low, high)
-        rr[round(t - .1, 4)] = start
-        rr[t] = end
-        tr[round(t - .1, 4)] = (0, 25, 0) if k % 2 == 0 else (0, -25, 0)
-        tr[t] = (0, -25, 0) if k % 2 == 0 else (0, 25, 0)
-    rr.update({.78: (-90, -70, 90), .9: (-90, 60, 90), 1.0: (-30, 0, 20)})
-    tr.update({.78: (0, 35, 0), .9: (0, -35, 0), 1.0: (0, 0, 0)})
-    return _anim(1.0, {
-        "right_arm": {"rotation": _track(rr)},
-        "left_arm": {"rotation": _track({0: (-20, 0, -15), 1.0: (-20, 0, -15)})},
-        "torso": {"rotation": _track(tr)},
-    })
-
-
-def dash_animation():
-    """Leaning into a burst of speed, arms swept back, legs in stride."""
-    pose = {
-        "torso": ((25, 0, 0), (0, -1, -2)),
-        "head": ((0, 0, 0), (0, -1, -2)),
-        "right_arm": ((40, 0, 12), (0, 0, 0)),
-        "left_arm": ((40, 0, -12), (0, 0, 0)),
-        "right_leg": ((-35, 0, 0), (0, 0, -1)),
-        "left_leg": ((30, 0, 0), (0, 0, 1)),
-    }
-    bones = {}
-    for bone, (rot, pos) in pose.items():
-        bones[bone] = {
-            "rotation": _track({0: (0, 0, 0), .06: rot, .28: rot, .35: (0, 0, 0)}),
-            "position": _track({0: (0, 0, 0), .06: pos, .28: pos, .35: (0, 0, 0)}),
-        }
-    return _anim(.35, bones)
-
-
-def leap_animation():
-    """Crouch, spring up with the arms thrown up, tuck the legs at the top."""
-    return _anim(.6, {
-        "body": {"position": _track({0: (0, -2, 0), .12: (0, 0, 0), .6: (0, 0, 0)})},
-        "torso": {"rotation": _track({0: (20, 0, 0), .12: (-5, 0, 0), .45: (5, 0, 0), .6: (0, 0, 0)})},
-        "right_arm": {"rotation": _track({0: (40, 0, 10), .12: (-150, 0, 15), .45: (-90, 0, 20), .6: (0, 0, 0)}, "easeOutSine")},
-        "left_arm": {"rotation": _track({0: (40, 0, -10), .12: (-150, 0, -15), .45: (-90, 0, -20), .6: (0, 0, 0)}, "easeOutSine")},
-        "right_leg": {"rotation": _track({0: (-20, 0, 0), .12: (10, 0, 0), .45: (-35, 0, 0), .6: (0, 0, 0)})},
-        "left_leg": {"rotation": _track({0: (-20, 0, 0), .12: (-15, 0, 0), .45: (-30, 0, 0), .6: (0, 0, 0)})},
-    })
-
-
-def animations():
-    return {"format_version": "1.8.0", "animations": {
-        "punch": punch_animation(),
-        "punch_flurry": punch_flurry_animation(),
-        "slash_flurry": slash_flurry_animation(),
-        "dash": dash_animation(),
-        "leap": leap_animation(),
-    }}
-
-
 def main():
     g.save(strike_trail(), "textures/entity/strike_trail.png")
     g.save(bleeding_effect_icon(), "textures/mob_effect/bleeding.png")
@@ -484,4 +412,11 @@ def main():
     g.save(affinity_ring_physical(), "textures/item/affinity_ring_physical.png")
     g.write_json("models/item/scroll_physical.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/scroll_physical"}})
     g.write_json("models/item/affinity_ring_physical.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_physical"}})
-    g.write_json("player_animation/physical_skills.json", animations())
+    g.save(sundered_effect_icon(), "textures/mob_effect/sundered.png")
+    g.save(pinned_effect_icon(), "textures/mob_effect/pinned.png")
+    g.save(throwing_knife(), "textures/entity/throwing_knife.png")
+    g.save(javelin(), "textures/entity/javelin.png")
+    # It draws with this module's helpers, so it is loaded once this module is
+    import physical_weapon_icons
+    physical_weapon_icons.main()
+    g.write_json("player_animation/physical_skills.json", physical_animations.animations())

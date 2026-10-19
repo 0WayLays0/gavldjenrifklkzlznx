@@ -86,6 +86,12 @@ public class ManaCrow extends ManaSummon implements FlyingAnimal {
         }
     }
 
+    /** Faster than a running player: the vanilla 0.02 caps a flying mob at a parrot's pace whatever its speed. */
+    @Override
+    protected float getFlyingSpeed() {
+        return getSpeed() * .04f;
+    }
+
     @Override
     public boolean isFlying() {
         return !onGround();

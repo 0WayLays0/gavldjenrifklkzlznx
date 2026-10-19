@@ -19,13 +19,13 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 /**
- * Dagger 1, Quick Stabs: three fast thrusts at the nearest enemy in front (2.6 blocks). Each one leaves it bleeding;
- * the third deepens the wound.
+ * Dagger 1, Quick Stabs: three short stabs from the hip at the nearest enemy in front (2.6 blocks), to the belly, the
+ * chest, then a step in and one to the throat. Each one leaves it bleeding; the third deepens the wound.
  */
 @AutoSpellConfig
 public class DaggerStabsSkill extends PhysicalSkill {
     public static final double LENGTH = 2.6;
-    public static final int[] STABS = {2, 5, 8};
+    public static final int[] STABS = {3, 6, 9};
 
     public DaggerStabsSkill() {
         super("dagger_stabs", SpellRarity.UNCOMMON, 5, 6);
@@ -47,7 +47,7 @@ public class DaggerStabsSkill extends PhysicalSkill {
 
     @Override
     public AnimationHolder getCastStartAnimation() {
-        return PhysicalAnimations.QUICK_STABS;
+        return PhysicalAnimations.DAGGER_STABS;
     }
 
     @Override

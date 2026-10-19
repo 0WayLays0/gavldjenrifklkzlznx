@@ -16,13 +16,13 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 /**
- * Punch: a step in and a straight punch with the whole body behind it. It hits the nearest enemy in front (3 blocks)
- * hard and shoves them back, with a burst of air at the fist.
+ * Punch: the fist chambered at the hip, then a straight punch with the hips and shoulders turning in behind it. It
+ * hits the nearest enemy in front (3 blocks) hard and shoves them back, with a burst of air at the fist.
  */
 @AutoSpellConfig
 public class PunchSkill extends PhysicalSkill {
     public static final double REACH = 3;
-    public static final int HIT_TICK = 2;
+    public static final int HIT_TICK = 4;
 
     public PunchSkill() {
         super("punch", SpellRarity.COMMON, 5, 3);

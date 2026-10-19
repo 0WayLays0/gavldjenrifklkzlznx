@@ -18,14 +18,15 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 /**
- * Punch Flurry: feet planted, the fighter throws seven jabs in a second, left and right, at everyone in front of them
- * (2.8 blocks), then a last straight punch that sends them back.
+ * Punch Flurry: feet planted, the fighter throws seven jabs in under a second, right and left from the guard, at
+ * everyone in front of them (2.8 blocks), then chambers the rear fist and drives a last straight punch that sends them
+ * back.
  */
 @AutoSpellConfig
 public class PunchFlurrySkill extends PhysicalSkill {
     public static final double REACH = 2.8;
     /** When each jab lands, timed on the animation; the last one is the big punch. */
-    public static final int[] BLOWS = {1, 4, 6, 9, 11, 14, 16, 18};
+    public static final int[] BLOWS = {3, 5, 7, 9, 11, 13, 15, 20};
 
     public PunchFlurrySkill() {
         super("punch_flurry", SpellRarity.UNCOMMON, 5, 10);

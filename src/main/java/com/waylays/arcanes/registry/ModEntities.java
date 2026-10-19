@@ -44,6 +44,7 @@ import com.waylays.arcanes.entity.gold.GoldenSentinel;
 import com.waylays.arcanes.entity.gold.GoldfallIngot;
 import com.waylays.arcanes.entity.gold.MoltenGoldBlob;
 import com.waylays.arcanes.entity.gold.MoltenPool;
+import com.waylays.arcanes.entity.physical.Missile;
 import com.waylays.arcanes.entity.physical.StrikeTrail;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -194,6 +195,9 @@ public final class ModEntities {
     // Physical Prowess
     public static final RegistryObject<EntityType<StrikeTrail>> STRIKE_TRAIL = register("strike_trail",
             EntityType.Builder.<StrikeTrail>of(StrikeTrail::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(20));
+    // Updated every tick, unlike vanilla arrows: guided arrows turn in flight
+    public static final RegistryObject<EntityType<Missile>> MISSILE = register("missile",
+            EntityType.Builder.<Missile>of(Missile::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(1));
 
     private ModEntities() {}
 

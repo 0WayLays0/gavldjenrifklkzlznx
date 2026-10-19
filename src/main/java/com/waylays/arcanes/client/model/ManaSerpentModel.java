@@ -68,10 +68,10 @@ public class ManaSerpentModel extends HierarchicalModel<ManaSerpent> {
 
     @Override
     public void setupAnim(ManaSerpent entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        // The wave travels faster and wider while it moves
-        float speed = .12f + .5f * limbSwingAmount;
-        float width = .22f + .25f * limbSwingAmount;
-        float phase = ageInTicks * speed * 2.2f;
+        // The wave runs down the body with time and, faster, with the ground covered (limbSwing only grows, so
+        // the wave never jumps when the serpent speeds up or stops); it widens while it moves
+        float width = .2f + .22f * Math.min(1, limbSwingAmount);
+        float phase = ageInTicks * .26f + limbSwing * 1.5f;
         for (int i = 0; i < SEGMENTS; i++) {
             segments[i].yRot = Mth.sin(phase - i * .85f) * width * (i == 0 ? .6f : 1f);
         }

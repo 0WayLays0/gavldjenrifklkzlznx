@@ -383,7 +383,7 @@ Livre : pas encore demandé [ ]
 
 
 ================================================================================
-11. CARACTÉRISTIQUE PHYSIQUE (techniques de combat)              [~] EN COURS
+11. CARACTÉRISTIQUE PHYSIQUE (techniques de combat)              [~] EN TEST
 ================================================================================
 Ce n'est pas de la magie : coups et mouvements de combattant, rangés dans
 Iron's comme des sorts. Force selon la Puissance physique et l'arme tenue,
@@ -408,6 +408,20 @@ Couleur : cuir / bronze, traînées pâles, poussière
     Rapides
 12. Dague 2 :            [~] Bond dans le dos de l'ennemi et coup dans le
     Contournement            dos.
+13. Esquive              [~] Grand bond en arrière (6 à 8 blocs).
+14. Faux 3 : Crochet     [~] Accroche et traîne les ennemis à tes pieds.
+15. Épée 3 : Désarmement [~] Arrache l'arme (créature) / la prise (joueur).
+16. Dague 3 : Coup de    [~] Achève les blessés (x2,5 sous un tiers de vie).
+    Grâce
+17-19. Marteau 1-3       [~] Coup Sonné (tête tournée à 180°), Séisme,
+                             Bélier.
+20-22. Hache 1-3         [~] Fendoir (brise la garde), Lancer de Hache,
+                             Brise-Armure.
+23-25. Lance 1-3         [~] Estoc Long (5 blocs), Charge, Javelot.
+26-28. Épée Longue 1-3   [~] Taille de Colère, Demi-Lune, Parade-Riposte.
+29-31. Arc 1-3           [~] Flèche Téléguidée, Volée, Pluie de Flèches.
+32-34. Arbalète 1-3      [~] Carreau Perforant, Rafale, Harpon.
+35-37. Couteaux 1-3      [~] Lancer Précis, Éventail de Lames, Clouage.
 
 Livre : pas encore demandé [ ]
 

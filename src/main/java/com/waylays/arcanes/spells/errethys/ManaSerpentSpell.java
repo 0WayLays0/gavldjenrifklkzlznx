@@ -52,7 +52,7 @@ public class ManaSerpentSpell extends ManaSummonSpell {
 
     @Override
     public double getHealth(int spellLevel) {
-        return 16 + spellLevel * 4;
+        return 16;
     }
 
     /** Poison amplifier: Poison I, Poison II from level 4. */

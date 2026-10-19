@@ -42,8 +42,8 @@ public class ManaSerpent extends ManaSummon {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 14)
-                .add(Attributes.MOVEMENT_SPEED, .27)
+                .add(Attributes.MAX_HEALTH, 16)
+                .add(Attributes.MOVEMENT_SPEED, .22)
                 .add(Attributes.ATTACK_DAMAGE, 3)
                 .add(Attributes.FOLLOW_RANGE, 24);
     }

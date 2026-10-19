@@ -25,6 +25,7 @@ import com.waylays.arcanes.client.render.InkWaveRenderer;
 import com.waylays.arcanes.client.render.ManaCamelRenderer;
 import com.waylays.arcanes.client.render.ManaCreatureRenderer;
 import com.waylays.arcanes.client.render.ManaSalmonRenderer;
+import com.waylays.arcanes.client.render.MissileRenderer;
 import com.waylays.arcanes.client.render.MoltenPoolRenderer;
 import com.waylays.arcanes.client.render.OrigamiDragonRenderer;
 import com.waylays.arcanes.client.render.PageStormRenderer;
@@ -102,6 +103,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.FLYING_STACK.get(), FlyingStackRenderer::new);
         event.registerEntityRenderer(ModEntities.ORIGAMI_DRAGON.get(), OrigamiDragonRenderer::new);
         event.registerEntityRenderer(ModEntities.STRIKE_TRAIL.get(), StrikeTrailRenderer::new);
+        event.registerEntityRenderer(ModEntities.MISSILE.get(), MissileRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));

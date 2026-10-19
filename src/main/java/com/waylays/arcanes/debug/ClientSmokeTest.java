@@ -5,6 +5,7 @@ import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SummoningSpell;
+import com.waylays.arcanes.spells.physical.LongswordParrySkill;
 import com.waylays.arcanes.spells.physical.PhysicalAnimations;
 import com.waylays.arcanes.spells.physical.PhysicalSkill;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
@@ -51,7 +52,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Creates a creative world, holds the school's spellbook, then casts every addon spell (level 5) at a target dummy in
  * front of the camera, one every few seconds, so every spell entity, particle and renderer runs on a real client.
  * Summoning spells are then cast again, which must send their summons away. Fighting moves are done sword in hand
- * close to the dummy, with their body animation played on the player; every animation they use must have loaded.
+ * close to the dummy, with their body animation played on the player (the parry is put to the test by the dummy, so
+ * the riposte plays too); every animation they use must have loaded.
  * The camera is in third person so the caster, its spellbook and the shells around it are drawn too.
  * A client crash ends the run with a crash report; a spell that throws is logged as {@code [SmokeTest] FAIL}.
  * The run ends with {@code [SmokeTest] PASS} or {@code [SmokeTest] FAIL ...} and stops the client.
@@ -254,6 +256,16 @@ public final class ClientSmokeTest {
             Vec3 before = player.position();
             spell.onCast(level, SPELL_LEVEL, player, CastSource.COMMAND, magicData);
             log("cast {}", spell.getSpellId());
+            if (spell == ModSpells.LONGSWORD_PARRY.get() && dummy != null) {
+                // The dummy swings at the player: the guard must catch it, and the riposte plays its animation
+                player.hurt(level.damageSources().mobAttack(dummy), 1);
+                if (LongswordParrySkill.isGuarding(player)) {
+                    failures.incrementAndGet();
+                    ArcanesOublies.LOGGER.error("[SmokeTest] FAIL longsword_parry: the guard did not catch the dummy's blow");
+                } else {
+                    log("longsword_parry caught the dummy's blow and riposted");
+                }
+            }
             if (spell == ModSpells.DAGGER_FLANK.get()) {
                 log("dagger_flank moved the player {} blocks (behind the dummy: {})", String.format("%.2f", before.distanceTo(player.position())),
                         dummy != null && player.position().subtract(dummy.position()).dot(Vec3.directionFromRotation(0, dummy.getYRot())) < 0);

@@ -1,6 +1,7 @@
 package com.waylays.arcanes;
 
 import com.mojang.logging.LogUtils;
+import com.waylays.arcanes.network.ArcanesNetwork;
 import com.waylays.arcanes.registry.ModAttributes;
 import com.waylays.arcanes.registry.ModCreativeTabs;
 import com.waylays.arcanes.registry.ModEffects;
@@ -20,7 +21,7 @@ import org.slf4j.Logger;
  * Arcanes Oubliés: an addon for Iron's Spells 'n Spellbooks that adds new schools of magic.
  * Content so far: the Gold and Explosion schools (10 spells and a spellbook each), the Book school (16 spells and a
  * spellbook), Errethys, the school of summoned mana creatures (5 spells), and Physical Prowess, fighting moves that
- * are not magic (12 moves).
+ * are not magic (37 moves, with weapons from fists to crossbows).
  */
 @Mod(ArcanesOublies.MODID)
 public class ArcanesOublies {
@@ -37,6 +38,7 @@ public class ArcanesOublies {
         ModEffects.EFFECTS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ArcanesConfig.SPEC);
+        ArcanesNetwork.register();
     }
 
     public static ResourceLocation id(String path) {

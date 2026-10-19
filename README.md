@@ -3,12 +3,12 @@
 Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.20.1, Forge 47.4+), pour notre serveur RP.
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 0.8.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys et Caractéristique Physique
+## Contenu de la bêta 0.9.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys et Caractéristique Physique
 
 Trois nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
 12 pour le Grimoire Vivant), plus l'école d'invocation Errethys (5 sorts, pas encore de livre) et les techniques de
-combat de Caractéristique Physique (12 techniques, ce n'est pas de la magie). Un onglet créatif
+combat de Caractéristique Physique (37 techniques pour 9 styles d'armes, ce n'est pas de la magie). Un onglet créatif
 « Arcanes Oubliés » contient les livres et tous les parchemins à tous les niveaux.
 
 **Invocations** (Sentinelles d'Or, Bibliothèque Interdite, Pile Volante, Dragon d'Origami et tous les sorts
@@ -105,34 +105,63 @@ Des coups et des mouvements de combattant pour se battre sans magie, rangés dan
 de sorts, ou incrustés dans une arme à l'Enclume Arcanique d'Iron's). Ce n'est pas de la magie : la force d'une
 technique vient de son niveau et de la **Puissance physique** (jamais de la puissance des sorts), les armes ajoutent
 une part de leurs dégâts (Tranchant compris), les dégâts sont physiques (l'armure et la **Résistance physique** les
-réduisent) et le Sceau du Silence ne les empêche pas. Chaque coup est calé sur l'animation du corps (les coups de faux
-et d'épée reprennent les animations de combat d'Iron's, les poings, la rafale de tranches, le dash et le saut ont les
-leurs) et laisse une traînée pâle dans l'air (lame, tour complet, estoc, onde d'un coup de poing). Coût en mana faible,
-recharges courtes.
+réduisent) et le Sceau du Silence ne les empêche pas. Chaque coup est calé sur l'animation du corps : presque toutes
+sont propres à l'addon (hanches et épaules qui tournent derrière le coup, la main gauche qui vient saisir les armes à
+deux mains, la tête qui garde ton regard), seules la tranche, la coupe montante et les deux premières techniques de faux
+reprennent les animations de combat d'Iron's. Les coups laissent une traînée pâle dans l'air (lame, tour complet,
+estoc, onde d'un coup de poing). Les armes de jet et de tir (haches, javelots, couteaux, flèches, carreaux) sont des
+projectiles qu'on ne peut pas ramasser et qui ne touchent jamais les alliés. Coût en mana faible, recharges courtes.
 
 | Technique | Effet |
 |---|---|
-| **Coup de Poing** (Punch) | Un pas en avant et un direct : frappe fort l'ennemi le plus proche devant (3 blocs) et le repousse. |
-| **Rafale de Coups de Poing** (Punch Flurry) | Pieds plantés, 7 coups en une seconde sur tout ce qui est devant, puis un direct qui repousse. |
+| **Coup de Poing** (Punch) | Le poing armé à la hanche, puis un direct avec les hanches et les épaules derrière : frappe fort l'ennemi le plus proche devant (3 blocs) et le repousse. |
+| **Rafale de Coups de Poing** (Punch Flurry) | Pieds plantés, 7 directs gauche-droite depuis la garde sur tout ce qui est devant, puis un direct armé qui repousse. |
 | **Tranche** (Slash) | Une entaille en diagonale à travers tout un arc devant (3,2 blocs), à la lame ou au tranchant de la main. |
 | **Rafale de Tranches** (Slash Flurry) | Trois entailles en aller-retour puis une grande taille horizontale qui repousse, en une seconde. |
 | **Dash** | 3 à 4 blocs d'un coup dans le sens où l'on se déplace déjà (en arrière ou de côté pour esquiver), sinon droit devant ; s'arrête net. |
 | **Saut** (Leap) | Un saut environ deux fois plus haut qu'un saut normal (2,4 à 3 blocs, jamais de dégâts de chute en retombant au même niveau), en gardant l'élan ; pieds au sol seulement. |
+| **Esquive** (Evade) | Un grand bond en arrière pour sortir d'un combat : 6 à 8 blocs, en arc bas, sans dégâts de chute ; pieds au sol seulement. |
 | **Faux 1 : Fauchage** (Scythe 1: Reap) | Armé lent puis balayage au ras du sol à travers un grand demi-cercle (4,5 blocs) : ralentit les victimes. |
 | **Faux 2 : Danse de la Faucheuse** (Scythe 2: Reaper's Dance) | Une taille devant, puis un tour complet qui fauche tout autour (4,5 blocs) et projette. |
+| **Faux 3 : Crochet de la Faucheuse** (Scythe 3: Reaper's Hook) | La lame accroche les ennemis loin devant (5,5 blocs, cône étroit) et les traîne jusqu'à tes pieds. |
 | **Épée 1 : Coupe Montante** (Sword 1: Rising Cut) | Une taille de bas en haut qui soulève les ennemis d'environ un bloc et demi. |
-| **Épée 2 : Fente** (Sword 2: Lunge) | Un bond de deux blocs en avant et un estoc qui traverse toute la ligne (3,5 blocs). |
-| **Dague 1 : Estocs Rapides** (Dagger 1: Quick Stabs) | Trois estocs rapides sur l'ennemi le plus proche ; il saigne, et le troisième creuse la blessure (Saignement II). |
+| **Épée 2 : Fente** (Sword 2: Lunge) | Une fente d'escrime : la jambe avant part, le corps descend et l'estoc traverse toute la ligne (3,5 blocs). |
+| **Épée 3 : Désarmement** (Sword 3: Disarm) | Lie et arrache l'arme de l'ennemi en face : une créature la perd quelques secondes (rien n'est perdu), un joueur perd sa prise (Faiblesse, bouclier écarté, objet en main inutilisable). |
+| **Dague 1 : Estocs Rapides** (Dagger 1: Quick Stabs) | Trois estocs courts depuis la hanche sur l'ennemi le plus proche ; il saigne, et le troisième creuse la blessure (Saignement II). |
 | **Dague 2 : Contournement** (Dagger 2: Flank) | Un bond autour de l'ennemi en face (5 blocs) pour finir dans son dos (ou sur son flanc), puis un coup : dans le dos, x1,75 et saignement. |
+| **Dague 3 : Coup de Grâce** (Dagger 3: Coup de Grâce) | Dague retournée, enfoncée de haut en bas : x2,5 contre un ennemi à moins d'un tiers de sa vie, x1,6 s'il saigne, est cloué ou ralenti. |
+| **Marteau 1 : Coup Sonné** (Hammer 1: Concussive Blow) | Un coup à plat à la tête : l'ennemi pivote d'un demi-tour (la vue d'un joueur tourne de 180°), étourdi (nausée) et ralenti. |
+| **Marteau 2 : Séisme** (Hammer 2: Earthshaker) | Le marteau abattu au sol : l'onde blesse, soulève et ralentit tous ceux qui sont au sol à 4 blocs autour de l'impact. |
+| **Marteau 3 : Bélier** (Hammer 3: Battering Ram) | Le marteau enfoncé droit devant : l'ennemi est projeté plusieurs blocs en arrière, second coup s'il percute un mur. |
+| **Hache 1 : Fendoir** (Axe 1: Cleave) | Coup vertical sur l'ennemi le plus proche ; un bouclier levé est écarté (5 s sans pouvoir le relever) avant que la hache ne morde. |
+| **Hache 2 : Lancer de Hache** (Axe 2: Axe Throw) | Une hache lancée en tournoyant là où tu regardes (celle que tu tiens si c'est une hache). |
+| **Hache 3 : Brise-Armure** (Axe 3: Armor Splitter) | Un coup en biais qui fend l'armure : Armure Fendue (-25 % d'armure, -50 % dès le niveau 4) et usure de chaque pièce. |
+| **Lance 1 : Estoc Long** (Spear 1: Long Thrust) | Un estoc à deux mains qui traverse toute la ligne jusqu'à 5 blocs. |
+| **Lance 2 : Charge** (Spear 2: Charge) | Une course de 7 blocs lance baissée : le premier ennemi touché est embroché et projeté, la charge s'arrête là. |
+| **Lance 3 : Javelot** (Spear 3: Javelin) | Une lance projetée loin et vite qui traverse le premier ennemi et touche le suivant, et les ralentit. |
+| **Épée Longue 1 : Taille de Colère** (Longsword 1: Wrath Cut) | Une grande taille en diagonale à deux mains dans un large arc (3,6 blocs) qui fait chanceler. |
+| **Épée Longue 2 : Demi-Lune** (Longsword 2: Half-Moon) | Un balayage à plat en demi-cercle jusque sur les côtés (4 blocs) qui repousse. |
+| **Épée Longue 3 : Parade-Riposte** (Longsword 3: Parry and Riposte) | Une garde d'environ une seconde : le premier coup porté de face est paré (les flèches déviées), l'attaquant est déséquilibré et reçoit la riposte. Ne pare pas la magie. |
+| **Arc 1 : Flèche Téléguidée** (Bow 1: Guided Arrow) | Une flèche qui suit ton regard pendant 3 à 5 secondes, vers la créature que tu regardes. |
+| **Arc 2 : Volée** (Bow 2: Volley) | Cinq flèches d'un coup en éventail de 40 degrés. |
+| **Arc 3 : Pluie de Flèches** (Bow 3: Arrow Rain) | Des flèches tirées vers le ciel qui retombent une seconde plus tard là où tu regardais (cercle de 3,5 blocs). |
+| **Arbalète 1 : Carreau Perforant** (Crossbow 1: Piercing Bolt) | Un carreau très rapide qui traverse 3 ennemis et touche un quatrième (plus avec Perforation). |
+| **Arbalète 2 : Rafale de Carreaux** (Crossbow 2: Bolt Burst) | Trois carreaux à un cinquième de seconde d'intervalle, chacun là où tu vises. |
+| **Arbalète 3 : Harpon** (Crossbow 3: Harpoon) | Un carreau barbelé sur une corde de ~24 blocs : ramène l'ennemi à tes pieds, ou te tire jusqu'au mur touché. |
+| **Couteaux 1 : Lancer Précis** (Throwing Knives 1: Precise Throw) | Un couteau rapide et droit qui fait saigner ; x1,5 à 8 blocs ou plus. |
+| **Couteaux 2 : Éventail de Lames** (Throwing Knives 2: Fan of Knives) | Cinq couteaux en éventail de 60 degrés. |
+| **Couteaux 3 : Clouage** (Throwing Knives 3: Pinning Throw) | Un couteau dans le pied : impossible de marcher ou de sauter pendant 2,4 à 4 secondes (Cloué). |
 
-Les techniques d'armes ne demandent pas d'avoir l'arme en main (à vous de les donner aux bons personnages), mais elles
-frappent surtout avec les dégâts de l'arme tenue : à mains nues, une technique de faux fait peu de mal. Focus de
+Les techniques d'armes ne demandent pas d'avoir l'arme en main (à vous de les donner aux bons personnages), mais les
+techniques de mêlée frappent surtout avec les dégâts de l'arme tenue : à mains nues, une technique de faux fait peu de
+mal. Les tirs ne consomment pas de flèches ; la Puissance d'un arc tenu renforce les techniques d'arc, la Perforation
+d'une arbalète allonge le Carreau Perforant. Focus de
 l'école : cuir. Les coûts, recharges et la puissance de chaque technique se règlent dans la configuration serveur
 d'Iron's, comme pour tous les sorts.
 
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
 (`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre, `tools/errethys_assets.py`
-pour Errethys).
+pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` pour Caractéristique Physique).
 
 ## Récupérer le mod
 
@@ -155,3 +184,7 @@ Dans le dossier `mods` (client et serveur), à côté de :
   `book_assets.py`, `errethys_assets.py`, `physical_assets.py`) puis lancer
   `python3 tools/gen_assets.py` (Pillow).
   Une texture faite à la main peut aussi remplacer directement le PNG du même nom.
+- Animations des techniques : `tools/physical_animations.py`, écrites avec le petit squelette de `tools/anim_rig.py`
+  (hanches, buste, bras qui suivent les épaules, main gauche qui saisit les armes à deux mains, une clé par tick).
+  `python3 tools/anim_preview.py <fichier.json> <animation> <sortie.png>` dessine une animation tick par tick (de
+  profil, de trois quarts et de dessus) comme Player Animator la joue, pour la vérifier avant de lancer le jeu.

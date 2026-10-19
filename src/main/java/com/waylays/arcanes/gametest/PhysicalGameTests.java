@@ -73,7 +73,7 @@ public final class PhysicalGameTests {
                 count++;
             }
         }
-        helper.assertTrue(count == 12, "expected 12 fighting moves, got " + count);
+        helper.assertTrue(count == 37, "expected 37 fighting moves, got " + count);
         Holder<DamageType> damage = helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(ModSchools.PHYSICAL_STRIKE);
         helper.assertTrue(!damage.is(DamageTypeTags.BYPASSES_ARMOR), "fighting moves should not go through armor");
         helper.assertTrue(physical.isFocus(new ItemStack(Items.LEATHER)), "leather is not the Physical Prowess focus");
