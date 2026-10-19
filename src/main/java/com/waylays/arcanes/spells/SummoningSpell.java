@@ -99,7 +99,8 @@ public abstract class SummoningSpell extends AbstractSpell {
             return;
         }
         UUID summoner = summon.getSummonerUUID();
-        if (summoner == null || !(level.getServer().getPlayerList().getPlayer(summoner) instanceof ServerPlayer player)) {
+        ServerPlayer player = summoner == null ? null : level.getServer().getPlayerList().getPlayer(summoner);
+        if (player == null) {
             return;
         }
         AbstractSpell spell = summon.getSummoningSpell();
