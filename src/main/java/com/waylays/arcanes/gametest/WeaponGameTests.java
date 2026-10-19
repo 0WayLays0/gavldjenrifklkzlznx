@@ -99,7 +99,7 @@ public final class WeaponGameTests {
 
     // ---------------------------------------------------------------- moving, scythe, sword, dagger
 
-    @GameTest(template = "platform", batch = "weapons_evade", timeoutTicks = 60)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_evade", timeoutTicks = 60)
     public static void evadeLeapsFarBackward(GameTestHelper helper) {
         ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 2, 7.5));
         double[] start = new double[1];
@@ -115,7 +115,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_hook", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_hook", timeoutTicks = 40)
     public static void reapersHookDragsTheVictimIn(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 1.5);
         Pig pig = helper.spawn(EntityType.PIG, new Vec3(4.5, 2, 6.5));
@@ -129,7 +129,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 120)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 120)
     public static void disarmTakesTheWeaponForAWhile(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 1.5);
         Vindicator vindicator = helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(4.5, 2, 3.5));
@@ -146,7 +146,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void coupDeGraceFinishesTheWounded(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 1.5);
         IronGolem golem = golem(helper, 4.5, 3.5);
@@ -167,7 +167,7 @@ public final class WeaponGameTests {
 
     // ---------------------------------------------------------------- hammer
 
-    @GameTest(template = "platform", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void concussionTurnsTheVictimAround(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 1.5);
         Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 3.5));
@@ -184,7 +184,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_quake", timeoutTicks = 50)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_quake", timeoutTicks = 50)
     public static void earthshakerHitsEveryoneStandingNearTheImpact(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 1.5);
         Pig front = helper.spawn(EntityType.PIG, new Vec3(4.5, 2, 3.8));
@@ -199,7 +199,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_ram", timeoutTicks = 50)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_ram", timeoutTicks = 50)
     public static void batteringRamSendsTheVictimFlying(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, .5);
         Pig pig = helper.spawn(EntityType.PIG, new Vec3(4.5, 2, 2.5));
@@ -215,7 +215,7 @@ public final class WeaponGameTests {
 
     // ---------------------------------------------------------------- axe
 
-    @GameTest(template = "platform", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void cleaveHitsOnlyTheNearest(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 1.5);
         IronGolem near = golem(helper, 4.5, 3.5);
@@ -228,7 +228,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_axe_throw", timeoutTicks = 50)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_axe_throw", timeoutTicks = 50)
     public static void thrownAxeHitsAtRange(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, .5);
         IronGolem golem = golem(helper, 4.5, 7.5);
@@ -245,7 +245,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void armorSplitterSundersTheArmor(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 1.5);
         Vindicator vindicator = helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(4.5, 2, 3.5));
@@ -264,7 +264,7 @@ public final class WeaponGameTests {
 
     // ---------------------------------------------------------------- spear
 
-    @GameTest(template = "platform", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void longThrustReachesFiveBlocks(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, .5);
         IronGolem first = golem(helper, 4.5, 2.8);
@@ -276,7 +276,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_charge", timeoutTicks = 50)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_charge", timeoutTicks = 50)
     public static void chargeSkewersTheFirstInTheWayAndStops(GameTestHelper helper) {
         ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 2, .5));
         IronGolem golem = golem(helper, 4.5, 6.5);
@@ -289,7 +289,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_javelin", timeoutTicks = 50)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_javelin", timeoutTicks = 50)
     public static void javelinGoesThroughTwo(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, .5);
         IronGolem first = golem(helper, 4.5, 4.5);
@@ -304,7 +304,7 @@ public final class WeaponGameTests {
 
     // ---------------------------------------------------------------- longsword
 
-    @GameTest(template = "platform", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void wrathCutStaggersTheWholeArc(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 1.5);
         Pig left = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.2, 2, 3.8));
@@ -317,7 +317,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void halfMoonReachesTheSides(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 2.5);
         Pig side = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(7.5, 2, 2.5));
@@ -330,7 +330,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void parryTurnsABlowFromInFrontAndRipostes(GameTestHelper helper) {
         Witch fighter = caster(helper, 4.5, 1.5);
         Vindicator attacker = helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(4.5, 2, 3));
@@ -348,7 +348,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void parryDoesNotCoverTheBack(GameTestHelper helper) {
         Witch fighter = caster(helper, 4.5, 3.5);
         Vindicator attacker = helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(4.5, 2, 1.5));
@@ -362,7 +362,7 @@ public final class WeaponGameTests {
 
     // ---------------------------------------------------------------- bow
 
-    @GameTest(template = "platform", batch = "weapons_guided", timeoutTicks = 80)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_guided", timeoutTicks = 80)
     public static void guidedArrowFollowsTheArchersEyes(GameTestHelper helper) {
         Witch archer = caster(helper, 4.5, .5);
         // Well off the line the arrow leaves on
@@ -372,7 +372,7 @@ public final class WeaponGameTests {
         helper.succeedWhen(() -> helper.assertTrue(hurt(golem), "the arrow did not turn onto the golem the archer looked at"));
     }
 
-    @GameTest(template = "platform", batch = "weapons_volley", timeoutTicks = 50)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_volley", timeoutTicks = 50)
     public static void volleyFansOut(GameTestHelper helper) {
         Witch archer = caster(helper, 4.5, .5);
         IronGolem middle = golem(helper, 4.5, 6.5);
@@ -390,7 +390,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_rain", timeoutTicks = 80)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_rain", timeoutTicks = 80)
     public static void arrowRainFallsWhereTheArcherLooked(GameTestHelper helper) {
         Witch archer = caster(helper, 4.5, .5);
         // Looking down at the floor a few blocks ahead
@@ -410,7 +410,7 @@ public final class WeaponGameTests {
 
     // ---------------------------------------------------------------- crossbow
 
-    @GameTest(template = "platform", batch = "weapons_pierce", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_pierce", timeoutTicks = 40)
     public static void piercingBoltGoesThroughFour(GameTestHelper helper) {
         Witch shooter = caster(helper, 4.5, .5);
         IronGolem[] golems = {golem(helper, 4.5, 2.2), golem(helper, 4.5, 3.8), golem(helper, 4.5, 5.4), golem(helper, 4.5, 7)};
@@ -423,7 +423,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_burst", timeoutTicks = 50)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_burst", timeoutTicks = 50)
     public static void burstShootsThreeBolts(GameTestHelper helper) {
         Witch shooter = caster(helper, 4.5, .5);
         IronGolem golem = golem(helper, 4.5, 4.5);
@@ -436,7 +436,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_harpoon", timeoutTicks = 50)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_harpoon", timeoutTicks = 50)
     public static void harpoonHaulsTheVictimIn(GameTestHelper helper) {
         Witch shooter = caster(helper, 4.5, .5);
         Pig pig = helper.spawn(EntityType.PIG, new Vec3(4.5, 2, 7.5));
@@ -450,7 +450,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_harpoon_wall", timeoutTicks = 50)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_harpoon_wall", timeoutTicks = 50)
     public static void harpoonHaulsTheShooterToAWall(GameTestHelper helper) {
         ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 2, .5));
         for (int y = 2; y <= 4; y++) {
@@ -471,7 +471,7 @@ public final class WeaponGameTests {
 
     // ---------------------------------------------------------------- throwing knives
 
-    @GameTest(template = "platform", batch = "weapons_knife", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_knife", timeoutTicks = 40)
     public static void preciseThrowLeavesItBleeding(GameTestHelper helper) {
         Witch thrower = caster(helper, 4.5, .5);
         IronGolem golem = golem(helper, 4.5, 4.5);
@@ -483,7 +483,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_fan", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_fan", timeoutTicks = 40)
     public static void fanOfKnivesSpreads(GameTestHelper helper) {
         Witch thrower = caster(helper, 4.5, .5);
         IronGolem middle = golem(helper, 4.5, 5);
@@ -497,7 +497,7 @@ public final class WeaponGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "weapons_pin", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_pin", timeoutTicks = 40)
     public static void pinningThrowPinsTheFoot(GameTestHelper helper) {
         Witch thrower = caster(helper, 4.5, .5);
         Pig pig = helper.spawn(EntityType.PIG, new Vec3(4.5, 2, 4.5));

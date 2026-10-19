@@ -50,6 +50,8 @@ public class OrigamiDragon extends SpellEffectEntity implements OwnedSummon {
     public static final double BREATH_RANGE = 10;
     /** Distance from its chest (the entity's position) to the tip of its snout. */
     public static final double HEAD_REACH = 2.3;
+    /** How long its summoner can be out of sight before it counts as gone. */
+    public static final int OWNER_GRACE_TICKS = 20;
 
     private static final EntityDataAccessor<Integer> DATA_DURATION = SynchedEntityData.defineId(OrigamiDragon.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_BREATHING = SynchedEntityData.defineId(OrigamiDragon.class, EntityDataSerializers.BOOLEAN);
@@ -58,6 +60,7 @@ public class OrigamiDragon extends SpellEffectEntity implements OwnedSummon {
 
     private Phase phase = Phase.CIRCLE;
     private int phaseTicks;
+    private int ownerMissingTicks;
     @Nullable
     private LivingEntity target;
     private final Set<Integer> hitThisDive = new HashSet<>();
@@ -148,7 +151,10 @@ public class OrigamiDragon extends SpellEffectEntity implements OwnedSummon {
         }
         LivingEntity owner = getLivingOwner();
         int duration = getDuration();
-        if ((owner == null || !owner.isAlive()) && tickCount < duration - FOLD_TICKS) {
+        // A summoner out of sight for a moment (a chunk still loading) is not gone
+        ownerMissingTicks = owner == null ? ownerMissingTicks + 1 : 0;
+        boolean ownerGone = owner != null ? !owner.isAlive() : ownerMissingTicks > OWNER_GRACE_TICKS;
+        if (ownerGone && tickCount < duration - FOLD_TICKS) {
             // Its summoner is gone: it folds up early
             duration = tickCount + FOLD_TICKS;
             this.entityData.set(DATA_DURATION, duration);

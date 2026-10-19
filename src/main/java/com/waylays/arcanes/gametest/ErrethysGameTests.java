@@ -80,7 +80,7 @@ public final class ErrethysGameTests {
         }
     }
 
-    @GameTest(template = "platform")
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS)
     public static void errethysSchoolIsRegistered(GameTestHelper helper) {
         SchoolType errethys = SchoolRegistry.getSchool(ModSchools.ERRETHYS_RESOURCE);
         helper.assertTrue(errethys != null, "Errethys missing from Iron's school registry");
@@ -97,7 +97,7 @@ public final class ErrethysGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", batch = "errethys_summon")
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "errethys_summon")
     public static void eachSpellSummonsOneCreature(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         MagicData magicData = new MagicData(true);
@@ -132,7 +132,7 @@ public final class ErrethysGameTests {
     }
 
     /** What a player's recast does: only that spell's summons, and only the caster's, go away. */
-    @GameTest(template = "platform", batch = "errethys_summon")
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "errethys_summon")
     public static void sendingSummonsAwayTakesOnlyThatSpells(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(2.5, 2, 4.5));
         Witch other = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(6.5, 2, 4.5));
@@ -162,7 +162,7 @@ public final class ErrethysGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", batch = "errethys_ride")
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "errethys_ride")
     public static void summonerRidesTheDromedary(GameTestHelper helper) {
         Player rider = helper.makeMockPlayer();
         ManaCamel camel = ModEntities.MANA_DROMEDARY.get().create(helper.getLevel());
@@ -179,7 +179,7 @@ public final class ErrethysGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", batch = "errethys_life", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "errethys_life", timeoutTicks = 40)
     public static void creaturesFadeWhenTheirTimeIsUp(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         ManaRat rat = ModEntities.MANA_RAT.get().create(helper.getLevel());
@@ -208,19 +208,19 @@ public final class ErrethysGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "errethys_rats", timeoutTicks = 300)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "errethys_rats", timeoutTicks = 300)
     public static void manaRatsBite(GameTestHelper helper) {
         fight(helper, ModSpells.MANA_RATS, () -> {}, new Vindicator[1]);
     }
 
-    @GameTest(template = "platform", batch = "errethys_salmon", timeoutTicks = 300)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "errethys_salmon", timeoutTicks = 300)
     public static void manaSalmonRam(GameTestHelper helper) {
         // The vindicator stands in a pool the salmon can reach it through
         pool(helper, 3, 5, 5, 7);
         fight(helper, ModSpells.MANA_SALMON, () -> {}, new Vindicator[1]);
     }
 
-    @GameTest(template = "platform", batch = "errethys_dry", timeoutTicks = ManaSalmon.DRY_TICKS + 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "errethys_dry", timeoutTicks = ManaSalmon.DRY_TICKS + 40)
     public static void theSalmonNeedsWater(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         helper.assertTrue(ManaSalmonSpell.findWater(helper.getLevel(), caster) == null, "found water on a dry platform");
@@ -236,13 +236,13 @@ public final class ErrethysGameTests {
         helper.succeedWhen(() -> helper.assertTrue(salmon.isRemoved(), "the stranded salmon did not fade"));
     }
 
-    @GameTest(template = "platform", batch = "errethys_serpent", timeoutTicks = 300)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "errethys_serpent", timeoutTicks = 300)
     public static void manaSerpentPoisons(GameTestHelper helper) {
         Vindicator[] foe = new Vindicator[1];
         fight(helper, ModSpells.MANA_SERPENT, () -> helper.assertTrue(foe[0].hasEffect(MobEffects.POISON), "the bite did not poison"), foe);
     }
 
-    @GameTest(template = "platform", batch = "errethys_crows", timeoutTicks = 300)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "errethys_crows", timeoutTicks = 300)
     public static void manaCrowsPeck(GameTestHelper helper) {
         fight(helper, ModSpells.MANA_CROWS, () -> {}, new Vindicator[1]);
     }

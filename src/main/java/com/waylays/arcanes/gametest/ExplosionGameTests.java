@@ -68,7 +68,7 @@ public final class ExplosionGameTests {
                 + ", last hit " + (last == null ? "none" : last.getMsgId() + " by " + last.getDirectEntity());
     }
 
-    @GameTest(template = "platform")
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS)
     public static void explosionSchoolIsRegistered(GameTestHelper helper) {
         SchoolType explosion = SchoolRegistry.getSchool(ModSchools.EXPLOSION_RESOURCE);
         helper.assertTrue(explosion != null, "Explosion school missing from Iron's school registry");
@@ -89,7 +89,7 @@ public final class ExplosionGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", timeoutTicks = 80)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 80)
     public static void blastOrbExplodesWithoutBreakingBlocks(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 6.5));
@@ -108,7 +108,7 @@ public final class ExplosionGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 100)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 100)
     public static void chainDetonationJumpsBetweenEnemies(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 7.5));
         Pig first = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(1.5, 2, 1.5));
@@ -123,7 +123,7 @@ public final class ExplosionGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 120)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 120)
     public static void sigilsTriggerAndCascade(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Pig stepping = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(2.5, 2, 4.5));
@@ -147,7 +147,7 @@ public final class ExplosionGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void sigilsOfRuinPlacesItsSigils(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         SigilsOfRuinSpell spell = (SigilsOfRuinSpell) ModSpells.SIGILS_OF_RUIN.get();
@@ -163,7 +163,7 @@ public final class ExplosionGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", batch = "explosion_wave", timeoutTicks = 80)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "explosion_wave", timeoutTicks = 80)
     public static void detonationWaveRollsOutward(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         Pig near = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(7.0, 2, 4.5));
@@ -177,7 +177,7 @@ public final class ExplosionGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "explosion_implosion", timeoutTicks = 120)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "explosion_implosion", timeoutTicks = 120)
     public static void implosionPullsThenDetonates(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(8.0, 2, 4.5));
@@ -199,7 +199,7 @@ public final class ExplosionGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 120)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 120)
     public static void volatileBrandExplodesOnTheFifthHit(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.0, 2, 1.0));
         Husk attacker = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(7.5, 2, 7.5));
@@ -225,7 +225,7 @@ public final class ExplosionGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 100)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 100)
     public static void blastLeapDivesAndLandsWithoutFallDamage(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, 2, 4.5));
@@ -242,7 +242,7 @@ public final class ExplosionGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "explosion_cluster", timeoutTicks = 200)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "explosion_cluster", timeoutTicks = 200)
     public static void clusterShellRainsBomblets(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.0, 2, 1.0));
         Pig[] pigs = {
@@ -273,7 +273,7 @@ public final class ExplosionGameTests {
         });
     }
 
-    @GameTest(template = "platform", timeoutTicks = 80)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 80)
     public static void reactiveShieldExplodesThreeTimes(GameTestHelper helper) {
         Pig bearer = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
         Husk attacker = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(6.0, 2, 4.5));
@@ -294,7 +294,7 @@ public final class ExplosionGameTests {
         });
     }
 
-    @GameTest(template = "platform", batch = "explosion_ultimate", timeoutTicks = 200)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "explosion_ultimate", timeoutTicks = 200)
     public static void cataclysmDetonatesWithItsCrown(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         IronGolem enemy = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(7.5, 2, 7.5));
