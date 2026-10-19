@@ -75,6 +75,8 @@ public final class ClientSmokeTest {
     private static int spellIndex;
     /** The summoning spell cast last: a while later it is cast again, which must send its summons away. */
     private static volatile AbstractSpell toRecast;
+    /** The last target dummy, cleared before the next one so they do not pile up in front of the camera. */
+    private static Husk lastDummy;
     private static final AtomicInteger failures = new AtomicInteger();
 
     static {
@@ -205,7 +207,11 @@ public final class ClientSmokeTest {
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(book));
             // A sturdy target dummy 6 blocks in front of the player, at eye level of the raycast
             Vec3 forward = Vec3.directionFromRotation(0, player.getYRot());
+            if (lastDummy != null) {
+                lastDummy.discard();
+            }
             Husk dummy = EntityType.HUSK.create(level);
+            lastDummy = dummy;
             if (dummy != null) {
                 Vec3 at = player.position().add(forward.scale(fighting ? 3 : 6));
                 dummy.moveTo(at.x, player.getY(), at.z, player.getYRot() + 180, 0);
@@ -245,8 +251,13 @@ public final class ClientSmokeTest {
                     spell.onServerCastTick(level, SPELL_LEVEL, player, magicData);
                 }
             }
+            Vec3 before = player.position();
             spell.onCast(level, SPELL_LEVEL, player, CastSource.COMMAND, magicData);
             log("cast {}", spell.getSpellId());
+            if (spell == ModSpells.DAGGER_FLANK.get()) {
+                log("dagger_flank moved the player {} blocks (behind the dummy: {})", String.format("%.2f", before.distanceTo(player.position())),
+                        dummy != null && player.position().subtract(dummy.position()).dot(Vec3.directionFromRotation(0, dummy.getYRot())) < 0);
+            }
             if (spell instanceof SummoningSpell) {
                 toRecast = spell;
             }
