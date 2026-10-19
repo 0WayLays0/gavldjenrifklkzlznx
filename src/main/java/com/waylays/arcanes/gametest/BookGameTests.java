@@ -6,13 +6,17 @@ import com.waylays.arcanes.entity.book.BookmarkMarker;
 import com.waylays.arcanes.entity.book.ChapterRune;
 import com.waylays.arcanes.entity.book.FinalChapter;
 import com.waylays.arcanes.entity.book.FlyingGrimoire;
+import com.waylays.arcanes.entity.book.FlyingStack;
 import com.waylays.arcanes.entity.book.InkHands;
+import com.waylays.arcanes.entity.book.OrigamiDragon;
 import com.waylays.arcanes.entity.book.PageStorm;
+import com.waylays.arcanes.entity.book.PaperTempest;
 import com.waylays.arcanes.entity.book.QuillStroke;
 import com.waylays.arcanes.entity.book.SilenceSeal;
 import com.waylays.arcanes.entity.book.TomeOfJudgment;
 import com.waylays.arcanes.entity.book.WordOfPower;
 import com.waylays.arcanes.registry.ModEffects;
+import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
@@ -28,6 +32,8 @@ import io.redspace.ironsspellbooks.api.spells.SchoolType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -50,7 +56,7 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.List;
 
 /**
- * Server-side checks run by CI for the Book school's 13 spells: wiring into Iron's Spells, then what each spell does
+ * Server-side checks run by CI for the Book school's 16 spells: wiring into Iron's Spells, then what each spell does
  * to its targets (and never to its caster). Spells whose projectiles or areas reach past the test platform run in
  * batches of their own so they cannot touch another test's mobs.
  */
@@ -325,5 +331,71 @@ public final class BookGameTests {
             helper.assertTrue(ParchmentAegisEffect.pages(bearer) == 1, "softening the blow did not use a page");
         });
         helper.succeedWhen(() -> helper.assertTrue(attacker.getHealth() < attacker.getMaxHealth(), "no page flew back at the attacker [" + describe(helper, attacker) + "]"));
+    }
+
+    @GameTest(template = "platform", batch = "book_tempest", timeoutTicks = 100)
+    public static void paperTempestCutsAndBlindsWhatItCatches(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
+        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(6.5, 2, 5.5));
+        caster.setTarget(golem);
+        ModSpells.PAPER_TEMPEST.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        List<PaperTempest> storms = helper.getLevel().getEntitiesOfClass(PaperTempest.class, caster.getBoundingBox().inflate(16));
+        helper.assertTrue(storms.size() == 1, "expected 1 tempest, got " + storms.size());
+        helper.succeedWhen(() -> {
+            helper.assertTrue(golem.getHealth() < golem.getMaxHealth(), "the tempest never cut the golem [" + describe(helper, golem) + "]");
+            helper.assertTrue(golem.hasEffect(MobEffects.BLINDNESS), "the golem caught in the tempest is not blinded");
+            helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the tempest cut its caster");
+            storms.forEach(PaperTempest::discard);
+        });
+    }
+
+    @GameTest(template = "platform", batch = "book_stack")
+    public static void flyingStackCarriesOnlyItsSummoner(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
+        ModSpells.FLYING_STACK.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        helper.assertTrue(caster.getVehicle() instanceof FlyingStack, "the caster is not riding a flying stack");
+        FlyingStack stack = (FlyingStack) caster.getVehicle();
+        helper.assertTrue(caster.getUUID().equals(stack.getSummonerUUID()), "the stack has no master");
+        helper.assertTrue(SpellUtil.isAlly(caster, stack), "the caster's spells would tear its own stack");
+        Player stranger = helper.makeMockPlayer();
+        helper.assertTrue(stack.mobInteract(stranger, InteractionHand.MAIN_HAND) == InteractionResult.PASS, "a stranger climbed on the stack");
+        stack.dismissSummon();
+        helper.assertTrue(stack.isRemoved(), "the stack is still there after being sent away");
+        helper.assertTrue(!caster.isPassenger(), "the scattered stack kept its rider");
+        helper.succeed();
+    }
+
+    @GameTest(template = "platform", batch = "book_stack", timeoutTicks = FlyingStack.RIDERLESS_TICKS + 40)
+    public static void anEmptyFlyingStackScattersAndItsRiderFloatsDown(GameTestHelper helper) {
+        Player rider = helper.makeMockPlayer();
+        FlyingStack stack = ModEntities.FLYING_STACK.get().create(helper.getLevel());
+        helper.assertTrue(stack != null, "no flying stack");
+        Vec3 at = helper.absoluteVec(new Vec3(4.5, 5, 4.5));
+        stack.moveTo(at.x, at.y, at.z, 0, 0);
+        stack.setup(rider, 1200, 20, .6f);
+        helper.getLevel().addFreshEntity(stack);
+        rider.startRiding(stack, true);
+        helper.assertTrue(rider.getVehicle() == stack && stack.getControllingPassenger() == rider, "the rider does not steer the stack");
+        rider.stopRiding();
+        helper.assertTrue(rider.hasEffect(MobEffects.SLOW_FALLING), "getting off in mid-air should float the rider down");
+        helper.succeedWhen(() -> helper.assertTrue(stack.isRemoved(), "the empty stack never scattered"));
+    }
+
+    @GameTest(template = "platform", batch = "book_dragon", timeoutTicks = 300)
+    public static void origamiDragonHuntsWhatItsSummonerFights(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
+        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(6.5, 2, 6.5));
+        caster.setTarget(golem);
+        ModSpells.ORIGAMI_DRAGON.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        List<OrigamiDragon> dragons = helper.getLevel().getEntitiesOfClass(OrigamiDragon.class, caster.getBoundingBox().inflate(16));
+        helper.assertTrue(dragons.size() == 1, "expected 1 dragon, got " + dragons.size());
+        OrigamiDragon dragon = dragons.get(0);
+        helper.assertTrue(caster.getUUID().equals(dragon.getSummonerUUID()), "the dragon has no master");
+        helper.succeedWhen(() -> {
+            helper.assertTrue(golem.getHealth() < golem.getMaxHealth(), "the dragon never hurt its prey [" + describe(helper, golem) + "]");
+            helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the dragon hurt its summoner");
+            dragon.dismissSummon();
+            helper.assertTrue(dragon.isRemoved(), "the dragon is still there after being sent away");
+        });
     }
 }

@@ -202,5 +202,19 @@
   "ui.arcanes_oublies.venom": "Poison %s Venom",
   "death.attack.errethys_magic": "%1$s was torn apart by mana",
   "death.attack.errethys_magic.player": "%1$s was torn apart by %2$s's mana",
-  "death.attack.errethys_magic.item": "%1$s was torn apart by %2$s's mana using %3$s"
+  "death.attack.errethys_magic.item": "%1$s was torn apart by %2$s's mana using %3$s",
+  "entity.arcanes_oublies.paper_tempest": "Paper Tempest",
+  "entity.arcanes_oublies.flying_stack": "Flying Stack",
+  "entity.arcanes_oublies.origami_dragon": "Origami Dragon",
+  "spell.arcanes_oublies.paper_tempest": "Paper Tempest",
+  "spell.arcanes_oublies.paper_tempest.guide": "A tornado of pages rises where you look and follows your eyes. It drags enemies in, cuts and blinds them, swallows arrows, then flings everything away when it blows out.",
+  "spell.arcanes_oublies.flying_stack": "Flying Stack",
+  "spell.arcanes_oublies.flying_stack.guide": "A pile of paper lifts you off the ground: fly where you look (forward to move, look up or down to climb or dive), sneak to get off and float down. Right click it to climb back on. Cast again to send it away.",
+  "spell.arcanes_oublies.origami_dragon": "Origami Dragon",
+  "spell.arcanes_oublies.origami_dragon.guide": "A great sheet of paper folds itself into a dragon that hunts your enemies: it circles them, breathes a cone of razor-sharp paper and dives through them, then folds back into a sheet and bursts into confetti. Cast again to send it away.",
+  "ui.arcanes_oublies.flight_speed": "%s Blocks per Second",
+  "ui.arcanes_oublies.paper_breath": "%s Breath Damage per Cut",
+  "ui.arcanes_oublies.dive_damage": "%s Dive Damage",
+  "death.attack.arcanes_oublies.paper_tempest": "%1$s was torn apart by %2$s's Paper Tempest",
+  "death.attack.arcanes_oublies.origami_dragon": "%1$s was shredded by %2$s's Origami Dragon"
 }

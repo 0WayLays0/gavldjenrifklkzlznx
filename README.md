@@ -3,12 +3,16 @@
 Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.20.1, Forge 47.4+), pour notre serveur RP.
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 0.6.0 : écoles de l'Or, de l'Explosion, du Livre et d'Errethys
+## Contenu de la bêta 0.7.0 : écoles de l'Or, de l'Explosion, du Livre et d'Errethys
 
 Trois nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
 12 pour le Grimoire Vivant), plus l'école d'invocation Errethys (5 sorts, pas encore de livre). Un onglet créatif
 « Arcanes Oubliés » contient les livres et tous les parchemins à tous les niveaux.
+
+**Invocations** (Sentinelles d'Or, Bibliothèque Interdite, Pile Volante, Dragon d'Origami et tous les sorts
+d'Errethys) : relancer le sort renvoie ses invocations (relance d'Iron's, instantanée et gratuite, visible sur
+l'écran) ; le temps de recharge démarre quand elles sont toutes parties (renvoyées, tuées ou à la fin de leur temps).
 
 ### Or
 
@@ -51,7 +55,7 @@ Livre : **Codex de Détonation** (couverture noire craquelée, fissures de magma
 `<monde>/serverconfig/arcanes_oublies-server.toml`, mettre `explosionsBreakBlocks = true` (section `[explosion]`).
 Même activée, la roche du fond, l'obsidienne et les blocs résistants aux explosions ne cassent pas.
 
-### Livre (10 sorts + 3 sorts bonus)
+### Livre (10 sorts + 6 sorts bonus)
 
 | Sort | Effet |
 |---|---|
@@ -68,6 +72,9 @@ Même activée, la roche du fond, l'obsidienne et les blocs résistants aux expl
 | **Grues de Papier** (Paper Cranes, bonus) | 3 à 5 grues en origami lumineuses s'envolent, puis piquent sur les ennemis devant le lanceur et éclatent en confettis de papier. |
 | **Plume du Destin** (Quill of Fate, bonus) | Une plume spectrale géante trace une ligne d'encre au sol ; l'écriture s'illumine puis s'embrase en piliers de runes qui projettent les ennemis en l'air. |
 | **Égide de Parchemin** (Parchment Aegis, bonus) | 3 à 6 pages tournent autour du lanceur : chacune arrête un projectile ennemi ou absorbe une partie d'un coup et repart lacérer l'attaquant. |
+| **Tempête de Papier** (Paper Tempest, bonus) | Une tornade de pages (7 blocs de haut) se lève là où le lanceur regarde et suit son regard : elle aspire les ennemis, les lacère deux fois par seconde, les aveugle, avale les flèches, puis projette tout au loin en se dissipant. 6 à 12 s. |
+| **Pile Volante** (Flying Stack, bonus) | Une pile de papier soulève le lanceur : il vole là où il regarde (avancer, regarder en haut ou en bas pour monter ou piquer, pas de côté ; sans touche elle flotte sur place). S'accroupir pour descendre, avec une chute lente ; clic droit dessus pour remonter (elle attend 5 s). 11 à 16 blocs/s, 1 à 3 min ; on peut l'abattre. |
+| **Dragon d'Origami** (Origami Dragon, ultime bonus) | Une grande feuille de papier apparaît au-dessus du lanceur et se plie toute seule, pli après pli, en un dragon de 8 blocs aux cornes et aux crêtes dorées. Il chasse ce que le lanceur combat (sinon les monstres autour) : il tourne autour, crache un cône de papier tranchant qui ralentit, puis fond sur sa proie en piqué et la projette. À la fin il se replie en feuille et éclate en confettis. 18 à 24 s, invulnérable. |
 
 Livre : **Grimoire Vivant** (Living Grimoire) : couverture violette aux veines de runes qui pulsent, un œil qui
 regarde autour de lui et cligne, des pages qui bougent toutes seules. Focus de l'école : livre.
@@ -80,11 +87,14 @@ rien en mourant et se dissolvent en étincelles quand leur temps est écoulé.
 
 | Sort | Effet |
 |---|---|
-| **Rats de Mana** (Mana Rats) | 3 à 5 rats rapides (queue qui ondule) qui suivent le lanceur et mordent ses ennemis, 30 s ou plus. |
-| **Saumons de Mana** (Mana Salmon) | 2 à 4 saumons qui nagent dans l'eau comme dans l'air, avec les mouvements du saumon, et percutent les ennemis (plus rapides dans l'eau). |
-| **Dromadaire de Mana** (Mana Dromedary) | Un dromadaire sellé : clic droit pour le monter, avec la ruée du chameau ; un second joueur peut monter derrière le lanceur. 2 à 4 min, un seul à la fois. |
-| **Serpent de Mana** (Mana Serpent) | 1 à 3 serpents qui ondulent en S ; leur morsure empoisonne (Poison II au niveau 4) et ralentit. |
-| **Corbeaux de Mana** (Mana Crows) | 2 à 4 corbeaux qui volent comme des oiseaux : battements d'ailes, vol plané en descente, cercles au-dessus du lanceur, piqués sur les ennemis. |
+| **Rat de Mana** (Mana Rat) | Un rat rapide (queue qui ondule) qui suit le lanceur et mord ses ennemis, 30 s ou plus. |
+| **Saumon de Mana** (Mana Salmon) | Un saumon qui nage dans l'eau comme dans l'air, avec les mouvements du saumon, et percute les ennemis (plus rapide dans l'eau). |
+| **Dromadaire de Mana** (Mana Dromedary) | Un dromadaire sellé : clic droit pour le monter, avec la ruée du chameau ; un second joueur peut monter derrière le lanceur. 2 à 4 min. |
+| **Serpent de Mana** (Mana Serpent) | Un serpent qui ondule en S ; sa morsure empoisonne (Poison II au niveau 4) et ralentit. |
+| **Corbeau de Mana** (Mana Crow) | Un corbeau qui vole comme un oiseau : battements d'ailes, vol plané en descente, cercles au-dessus du lanceur, piqués sur les ennemis. |
+
+Chaque sort n'invoque qu'une seule créature (plus forte qu'un membre des anciennes nuées) ; le relancer la renvoie.
+Les créatures de sorts différents peuvent se battre ensemble.
 
 Focus de l'école : cristaux de prismarine.
 
@@ -109,6 +119,7 @@ Dans le dossier `mods` (client et serveur), à côté de :
 ## Développer
 
 - Le code est dans `src/main/java/com/waylays/arcanes`.
-- Textures et modèles d'objets : modifier `tools/gen_assets.py` (ou `explosion_assets.py`, `book_assets.py`) puis lancer
+- Textures et modèles d'objets : modifier `tools/gen_assets.py` (ou `explosion_assets.py`, `book_assets.py`,
+  `errethys_assets.py`) puis lancer
   `python3 tools/gen_assets.py` (Pillow).
   Une texture faite à la main peut aussi remplacer directement le PNG du même nom.

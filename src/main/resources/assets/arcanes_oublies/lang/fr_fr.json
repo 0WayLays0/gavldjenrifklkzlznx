@@ -202,5 +202,19 @@
   "ui.arcanes_oublies.venom": "Venin : Poison %s",
   "death.attack.errethys_magic": "%1$s a été déchiré par la mana",
   "death.attack.errethys_magic.player": "%1$s a été déchiré par la mana de %2$s",
-  "death.attack.errethys_magic.item": "%1$s a été déchiré par la mana de %2$s avec %3$s"
+  "death.attack.errethys_magic.item": "%1$s a été déchiré par la mana de %2$s avec %3$s",
+  "entity.arcanes_oublies.paper_tempest": "Tempête de Papier",
+  "entity.arcanes_oublies.flying_stack": "Pile Volante",
+  "entity.arcanes_oublies.origami_dragon": "Dragon d'Origami",
+  "spell.arcanes_oublies.paper_tempest": "Tempête de Papier",
+  "spell.arcanes_oublies.paper_tempest.guide": "Une tornade de pages se lève là où tu regardes et suit ton regard. Elle aspire tes ennemis, les lacère et les aveugle, avale les flèches, puis projette tout au loin en se dissipant.",
+  "spell.arcanes_oublies.flying_stack": "Pile Volante",
+  "spell.arcanes_oublies.flying_stack.guide": "Une pile de papier te soulève du sol : vole là où tu regardes (avancer pour bouger, regarder en haut ou en bas pour monter ou piquer), accroupis-toi pour descendre en planant. Clic droit dessus pour remonter. Relance le sort pour la renvoyer.",
+  "spell.arcanes_oublies.origami_dragon": "Dragon d'Origami",
+  "spell.arcanes_oublies.origami_dragon.guide": "Une grande feuille de papier se plie toute seule en un dragon qui chasse tes ennemis : il tourne autour d'eux, crache un cône de papier tranchant et fond sur eux en piqué, puis se replie en feuille et éclate en confettis. Relance le sort pour le renvoyer.",
+  "ui.arcanes_oublies.flight_speed": "%s blocs par seconde",
+  "ui.arcanes_oublies.paper_breath": "%s dégâts de souffle par entaille",
+  "ui.arcanes_oublies.dive_damage": "%s dégâts en piqué",
+  "death.attack.arcanes_oublies.paper_tempest": "%1$s a été mis en pièces par la Tempête de Papier de %2$s",
+  "death.attack.arcanes_oublies.origami_dragon": "%1$s a été déchiqueté par le Dragon d'Origami de %2$s"
 }

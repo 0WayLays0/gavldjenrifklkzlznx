@@ -187,6 +187,14 @@ Sons : pages qui tournent, chuchotements, livres qui claquent, plume qui gratte
 13. Parchment Aegis    [~] BONUS - Des pages tournent autour du lanceur comme
                            une armure : chacune intercepte un projectile ou
                            amortit un coup, puis part lacérer l'attaquant.
+14. Paper Tempest      [~] BONUS - Tempête de Papier : une tornade de pages
+                           que le lanceur guide du regard ; elle aspire,
+                           lacère et aveugle les ennemis, avale les flèches.
+15. Flying Stack       [~] BONUS - Pile Volante : une pile de papier que le
+                           lanceur monte et dirige en vol.
+16. Origami Dragon     [~] BONUS ULTIME - Dragon d'Origami : une feuille se
+                           plie en dragon de papier qui chasse les ennemis
+                           (souffle de papier tranchant, piqués).
 
 Livre : Living Grimoire (les pages bougent toutes seules) [~]
 
@@ -357,14 +365,17 @@ Couleur : bleu ciel transparent, veines de lumière
 Ambiance : animaux de mana translucides qui se battent pour le lanceur
 Sons : carillons d'améthyste, cris des animaux adoucis
 
- 1. Rats de Mana       [~] Une nuée de rats rapides qui mordent les ennemis.
- 2. Saumons de Mana    [~] Des saumons qui nagent dans l'eau comme dans l'air
-                           (mouvements de saumon) et percutent les ennemis.
+ 1. Rat de Mana        [~] Un rat rapide qui mord les ennemis.
+ 2. Saumon de Mana     [~] Un saumon qui nage dans l'eau comme dans l'air
+                           (mouvements de saumon) et percute les ennemis.
  3. Dromadaire de Mana [~] Un dromadaire sellé que le lanceur peut monter
                            (ruée, 2 places).
- 4. Serpent de Mana    [~] Des serpents qui ondulent ; leur morsure empoisonne.
- 5. Corbeaux de Mana   [~] Des corbeaux qui volent comme des oiseaux, tournent
-                           au-dessus du lanceur et piquent sur les ennemis.
+ 4. Serpent de Mana    [~] Un serpent qui ondule ; sa morsure empoisonne.
+ 5. Corbeau de Mana    [~] Un corbeau qui vole comme un oiseau, tourne
+                           au-dessus du lanceur et pique sur les ennemis.
+
+Une seule créature par sort ; relancer le sort la renvoie (comme pour toutes
+les invocations de l'addon).
 
 Livre : pas encore demandé [ ]
 

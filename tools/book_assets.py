@@ -792,6 +792,122 @@ def rune_pillar():
     return bloom(img, 1.2, .8)
 
 
+# ---------------------------------------------------------------- paper tempest, flying stack, origami dragon
+
+def origami_paper():
+    """64 x 64 crisp folding paper for the Origami Dragon's facets: pearly white to lavender, faint fibres, a gilded
+    edge on all four sides and on the diagonal (each facet uses half the square, so every facet gets a gold outline),
+    and a few faint violet glyphs."""
+    S = 64
+    img = Image.new("RGBA", (S, S))
+    px = img.load()
+    for y in range(S):
+        for x in range(S):
+            t = (x + (S - y)) / (2 * S)
+            n = fbm(x / 10, y / 10, 3, 211)
+            px[x, y] = g.lerp((255, 252, 255), (226, 212, 252), t * .8 + n * .25) + (255,)
+    d = ImageDraw.Draw(img)
+    rnd = random.Random(31)
+    for _ in range(5):
+        x, y = rnd.randint(14, 48), rnd.randint(14, 48)
+        d.line((x, y, x + rnd.randint(3, 7), y), fill=VIOLET_LIGHT + (255,), width=1)
+    gold = GILT + (255,)
+    dark_gold = GILT_DARK + (255,)
+    d.rectangle((0, 0, S - 1, S - 1), outline=dark_gold)
+    d.rectangle((1, 1, S - 2, S - 2), outline=gold)
+    d.line((0, 0, S - 1, S - 1), fill=gold, width=2)
+    return img
+
+
+def origami_eye():
+    """Additive glow for the dragon's eyes, centred on the upper-right half of the square (the half an eye facet uses)."""
+    S = 64
+    img = Image.new("RGB", (S, S), (0, 0, 0))
+    px = img.load()
+    cx, cy = S * .66, S * .34
+    for y in range(S):
+        for x in range(S):
+            dist = math.hypot(x - cx, y - cy) / (S * .3)
+            if dist < 1:
+                k = (1 - dist) ** 1.6
+                px[x, y] = g.lerp((0, 0, 0), (235, 215, 255), k)
+    return img.resize((16, 16), Image.LANCZOS)
+
+
+def paper_tempest_icon():
+    """Pixel art: a tornado of white and lavender paper, scraps of parchment flying off, a rune circle at its foot."""
+    tornado = g.from_grid([
+        "................",
+        ".pwwlllllllwwwp.",
+        "..wllwwwwwwllw..",
+        "p..lwwlllllwwl..",
+        "...wllwwwwwll..p",
+        "....lwwllllww...",
+        "..p..wllwwwl....",
+        ".....lwwlllw..p.",
+        "......wllww.....",
+        "...p..lwwl......",
+        ".......wll......",
+        ".......lw...p...",
+        "......vlwv......",
+        ".....vvvvvv.....",
+        "....v......v....",
+        ".....vvvvvv.....",
+    ], {"w": (252, 248, 255), "l": (200, 176, 246), "p": PARCH, "v": VIOLET_LIGHT})
+    img = g.spell_background(8, 7, (110, 60, 190), NIGHT)
+    img.alpha_composite(tornado)
+    return img
+
+
+def flying_stack_icon():
+    """Pixel art: a pile of parchment floating over a rune circle, a loose sheet blowing off the top."""
+    stack = g.from_grid([
+        "................",
+        "...pp...........",
+        "..ppppp.........",
+        "....pppbb.......",
+        "................",
+        "...wwwwwwwwwwd..",
+        "..wpppppppppppd.",
+        "..dddddddddddd..",
+        "...pppppppppppd.",
+        "..dddddddddddd..",
+        "..pppppppppppd..",
+        "...ddddddddddd..",
+        "....vvvvvvvvv...",
+        "..vv.........vv.",
+        "....vvvvvvvvv...",
+        "................",
+    ], {"w": (252, 246, 232), "p": PARCH, "d": PARCH_DARK, "b": BROWN_INK, "v": VIOLET_LIGHT})
+    img = g.spell_background(8, 13, (110, 60, 190), NIGHT)
+    img.alpha_composite(stack)
+    return img
+
+
+def origami_dragon_icon():
+    """Pixel art: a folded-paper dragon, wings raised, gilded horn and tail tip, glowing violet eye."""
+    dragon = g.from_grid([
+        "................",
+        "......l....l....",
+        ".....lw...lw....",
+        "....lww..lww....",
+        "g..lwwwllwwwl...",
+        "ggwwlwwwwwwwl...",
+        "wwewlwwwwwwl....",
+        "wwww.swwwwwwg...",
+        "w.ww..swwwwwwg..",
+        "......sswwwwwwg.",
+        ".......sss.lwwg.",
+        "...........lwwg.",
+        "............lwg.",
+        "...........lwg..",
+        "..........ggg...",
+        "................",
+    ], {"w": (252, 248, 255), "l": (200, 176, 246), "s": (160, 124, 230), "g": GILT, "e": (190, 120, 255)})
+    img = g.spell_background(9, 7, (110, 60, 190), NIGHT)
+    img.alpha_composite(dragon)
+    return img
+
 # ---------------------------------------------------------------- icons
 
 BG = ((60, 28, 96), NIGHT)
@@ -1258,6 +1374,11 @@ def main():
                      ("seal_of_silence", seal_of_silence_icon), ("forbidden_library", forbidden_library_icon),
                      ("word_of_power", word_of_power_icon), ("rewrite", rewrite_icon), ("paper_cranes", paper_cranes_icon),
                      ("quill_of_fate", quill_of_fate_icon), ("parchment_aegis", parchment_aegis_icon)):
+        g.save(fn(), f"textures/gui/spell_icons/{name}.png")
+    # Paper Tempest, Flying Stack, Origami Dragon
+    g.save(origami_paper(), "textures/entity/origami_paper.png")
+    g.save(origami_eye(), "textures/entity/origami_eye.png")
+    for name, fn in (("paper_tempest", paper_tempest_icon), ("flying_stack", flying_stack_icon), ("origami_dragon", origami_dragon_icon)):
         g.save(fn(), f"textures/gui/spell_icons/{name}.png")
     g.save(silence_effect_icon(), "textures/mob_effect/silence.png")
     g.save(parchment_aegis_effect_icon(), "textures/mob_effect/parchment_aegis.png")
