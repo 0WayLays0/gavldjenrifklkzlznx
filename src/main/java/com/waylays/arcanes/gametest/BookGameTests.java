@@ -29,6 +29,7 @@ import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.SchoolType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -47,12 +48,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -383,6 +386,8 @@ public final class BookGameTests {
 
     @GameTest(template = "platform", batch = "book_dragon", timeoutTicks = 300)
     public static void origamiDragonHuntsWhatItsSummonerFights(GameTestHelper helper) {
+        // The dragon circles 8 blocks out, past the platform's chunk: keep the chunks around ticking or it freezes there
+        List<ChunkPos> forced = forceChunksAround(helper, 1);
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(6.5, 2, 6.5));
         caster.setTarget(golem);
@@ -396,6 +401,21 @@ public final class BookGameTests {
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the dragon hurt its summoner");
             dragon.dismissSummon();
             helper.assertTrue(dragon.isRemoved(), "the dragon is still there after being sent away");
+            forced.forEach(chunk -> helper.getLevel().setChunkForced(chunk.x, chunk.z, false));
         });
+    }
+
+    /** Force-loads the chunks within {@code radius} of the platform's middle (those not already forced) and returns them. */
+    private static List<ChunkPos> forceChunksAround(GameTestHelper helper, int radius) {
+        ChunkPos middle = new ChunkPos(BlockPos.containing(helper.absoluteVec(new Vec3(4.5, 2, 4.5))));
+        List<ChunkPos> forced = new ArrayList<>();
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                if (helper.getLevel().setChunkForced(middle.x + dx, middle.z + dz, true)) {
+                    forced.add(new ChunkPos(middle.x + dx, middle.z + dz));
+                }
+            }
+        }
+        return forced;
     }
 }
