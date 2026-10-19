@@ -28,9 +28,9 @@ import java.util.List;
 @AutoSpellConfig
 public class BowGuidedSkill extends PhysicalSkill implements MissileSkill {
     public static final int SHOT_TICK = 12;
-    public static final float SPEED = 1.5f;
-    /** How much of the way to the new heading it turns each tick. */
-    public static final double TURN = .22;
+    public static final float SPEED = 1.4f;
+    /** How sharply it can turn, in degrees a tick: enough to curve onto a target a few blocks off its line. */
+    public static final double MAX_TURN = 20;
     public static final double GUIDE_RANGE = 48;
 
     public BowGuidedSkill() {
@@ -77,9 +77,20 @@ public class BowGuidedSkill extends PhysicalSkill implements MissileSkill {
             return;
         }
         Vec3 velocity = missile.getDeltaMovement();
-        Vec3 heading = velocity.lengthSqr() > 1.0E-6 ? velocity.normalize() : to.normalize();
-        Vec3 turned = heading.add(to.normalize().subtract(heading).scale(TURN)).normalize();
-        missile.setDeltaMovement(turned.scale(SPEED));
+        Vec3 want = to.normalize();
+        Vec3 heading = velocity.lengthSqr() > 1.0E-6 ? velocity.normalize() : want;
+        missile.setDeltaMovement(turnToward(heading, want, Math.toRadians(MAX_TURN)).scale(SPEED));
+    }
+
+    /** {@code heading} turned toward {@code want} (both unit vectors) by at most {@code maxAngle} radians. */
+    public static Vec3 turnToward(Vec3 heading, Vec3 want, double maxAngle) {
+        double angle = Math.acos(Math.max(-1, Math.min(1, heading.dot(want))));
+        double sin = Math.sin(angle);
+        if (angle <= maxAngle || sin < 1.0E-6) {
+            return angle <= maxAngle ? want : heading;
+        }
+        double t = maxAngle / angle;
+        return heading.scale(Math.sin((1 - t) * angle) / sin).add(want.scale(Math.sin(t * angle) / sin));
     }
 
     /** What the archer looks at: the middle of the creature under their eyes, else the block, else a point far ahead. */

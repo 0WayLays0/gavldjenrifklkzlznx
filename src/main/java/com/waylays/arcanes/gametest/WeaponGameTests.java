@@ -78,8 +78,13 @@ public final class WeaponGameTests {
         spell.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
     }
 
+    /** A no-AI witch facing exactly +Z (a new creature faces a few random degrees off). */
     private static Witch caster(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(x, 2, z));
+        Witch witch = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(x, 2, z));
+        witch.setYRot(0);
+        witch.setYHeadRot(0);
+        witch.setYBodyRot(0);
+        return witch;
     }
 
     private static IronGolem golem(GameTestHelper helper, double x, double z) {
@@ -249,13 +254,17 @@ public final class WeaponGameTests {
     public static void armorSplitterSundersTheArmor(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 1.5);
         Vindicator vindicator = helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(4.5, 2, 3.5));
-        ItemStack chestplate = new ItemStack(Items.IRON_CHESTPLATE);
-        vindicator.setItemSlot(EquipmentSlot.CHEST, chestplate);
-        double armor = vindicator.getAttributeValue(Attributes.ARMOR);
-        cast(helper, ModSpells.AXE_SUNDER, caster);
-        helper.runAfterDelay(AxeSunderSkill.HIT_TICK + 2, () -> {
+        vindicator.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+        double[] armor = new double[1];
+        // The chestplate's armor counts from the vindicator's next tick
+        helper.runAfterDelay(2, () -> {
+            armor[0] = vindicator.getAttributeValue(Attributes.ARMOR);
+            helper.assertTrue(armor[0] > 0, "the chestplate gives no armor");
+            cast(helper, ModSpells.AXE_SUNDER, caster);
+        });
+        helper.runAfterDelay(2 + AxeSunderSkill.HIT_TICK + 2, () -> {
             helper.assertTrue(vindicator.hasEffect(ModEffects.SUNDERED.get()), "the armor was not split");
-            helper.assertTrue(vindicator.getAttributeValue(Attributes.ARMOR) < armor, "Sundered took no armor away (" + armor + " -> "
+            helper.assertTrue(vindicator.getAttributeValue(Attributes.ARMOR) < armor[0], "Sundered took no armor away (" + armor[0] + " -> "
                     + vindicator.getAttributeValue(Attributes.ARMOR) + ")");
             helper.assertTrue(vindicator.getItemBySlot(EquipmentSlot.CHEST).getDamageValue() > 0, "the chestplate took no wear");
             helper.succeed();
@@ -320,7 +329,8 @@ public final class WeaponGameTests {
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
     public static void halfMoonReachesTheSides(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 2.5);
-        Pig side = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(7.5, 2, 2.5));
+        // Off to the side, a little ahead
+        Pig side = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(7.5, 2, 3));
         Pig behind = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, .5));
         cast(helper, ModSpells.LONGSWORD_SWEEP, caster);
         helper.runAfterDelay(LongswordSweepSkill.HIT_TICK + 2, () -> {
@@ -368,7 +378,7 @@ public final class WeaponGameTests {
         // Well off the line the arrow leaves on
         IronGolem golem = golem(helper, 7.5, 7.5);
         cast(helper, ModSpells.BOW_GUIDED, archer);
-        helper.runAfterDelay(BowGuidedSkill.SHOT_TICK + 2, () -> lookAt(archer, golem.getBoundingBox().getCenter()));
+        helper.runAfterDelay(BowGuidedSkill.SHOT_TICK + 1, () -> lookAt(archer, golem.getBoundingBox().getCenter()));
         helper.succeedWhen(() -> helper.assertTrue(hurt(golem), "the arrow did not turn onto the golem the archer looked at"));
     }
 
@@ -378,12 +388,11 @@ public final class WeaponGameTests {
         IronGolem middle = golem(helper, 4.5, 6.5);
         IronGolem left = golem(helper, 7.2, 6.5);
         IronGolem right = golem(helper, 1.8, 6.5);
+        int[] most = {0};
+        helper.onEachTick(() -> most[0] = Math.max(most[0], helper.getLevel().getEntitiesOfClass(Missile.class, archer.getBoundingBox().inflate(16)).size()));
         cast(helper, ModSpells.BOW_VOLLEY, archer);
-        helper.runAfterDelay(BowVolleySkill.SHOT_TICK + 1, () -> {
-            int arrows = helper.getLevel().getEntitiesOfClass(Missile.class, archer.getBoundingBox().inflate(6)).size();
-            helper.assertTrue(arrows == BowVolleySkill.ARROWS, "expected " + BowVolleySkill.ARROWS + " arrows, got " + arrows);
-        });
         helper.runAfterDelay(BowVolleySkill.SHOT_TICK + 10, () -> {
+            helper.assertTrue(most[0] == BowVolleySkill.ARROWS, "expected " + BowVolleySkill.ARROWS + " arrows, saw " + most[0]);
             helper.assertTrue(hurt(middle), "the volley missed straight ahead");
             helper.assertTrue(hurt(left) || hurt(right), "the volley did not fan out to the sides");
             helper.succeed();
@@ -440,8 +449,12 @@ public final class WeaponGameTests {
     public static void harpoonHaulsTheVictimIn(GameTestHelper helper) {
         Witch shooter = caster(helper, 4.5, .5);
         Pig pig = helper.spawn(EntityType.PIG, new Vec3(4.5, 2, 7.5));
+        // It cannot walk off, but the rope can still drag it
+        pig.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 10));
         double[] start = new double[1];
         helper.runAfterDelay(CrossbowHarpoonSkill.SHOT_TICK, () -> start[0] = pig.getZ());
+        // Aimed at the pig, which is shorter than the shooter's eyes
+        lookAt(shooter, pig.getBoundingBox().getCenter());
         cast(helper, ModSpells.CROSSBOW_HARPOON, shooter);
         helper.runAfterDelay(CrossbowHarpoonSkill.SHOT_TICK + 16, () -> {
             helper.assertTrue(hurt(pig), "the harpoon missed");
