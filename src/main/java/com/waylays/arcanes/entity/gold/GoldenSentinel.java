@@ -3,8 +3,10 @@ package com.waylays.arcanes.entity.gold;
 import com.waylays.arcanes.entity.OwnedSummon;
 import com.waylays.arcanes.entity.OwnerTargetGoal;
 import com.waylays.arcanes.entity.SummonFollowOwnerGoal;
+import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
+import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -86,13 +88,13 @@ public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
 
     @Override
     @Nullable
-    public UUID getOwnerUUID() {
+    public UUID getSummonerUUID() {
         return ownerUUID;
     }
 
     @Override
     @Nullable
-    public LivingEntity getOwner() {
+    public LivingEntity getSummoner() {
         if (ownerUUID != null && level() instanceof ServerLevel serverLevel && serverLevel.getEntity(ownerUUID) instanceof LivingEntity living) {
             return living;
         }
@@ -112,7 +114,7 @@ public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
         this.targetSelector.addGoal(2, new OwnerTargetGoal(this, false));
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Mob.class, 5, true, false,
-                e -> e instanceof Enemy && !SpellUtil.isAlly(getOwner(), e)));
+                e -> e instanceof Enemy && !SpellUtil.isAlly(getSummoner(), e)));
     }
 
     @Override
@@ -128,9 +130,19 @@ public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
             shatter();
         }
         LivingEntity target = getTarget();
-        if (target != null && SpellUtil.isAlly(getOwner(), target)) {
+        if (target != null && SpellUtil.isAlly(getSummoner(), target)) {
             setTarget(null);
         }
+    }
+
+    @Override
+    public AbstractSpell getSummoningSpell() {
+        return ModSpells.GOLDEN_SENTINELS.get();
+    }
+
+    @Override
+    public void dismissSummon() {
+        shatter();
     }
 
     /** Bursts into gold and disappears (no drops). */
@@ -162,7 +174,7 @@ public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
     @Override
     public boolean isAlliedTo(Entity other) {
         if (ownerUUID != null && (ownerUUID.equals(other.getUUID())
-                || other instanceof OwnedSummon summon && ownerUUID.equals(summon.getOwnerUUID()))) {
+                || other instanceof OwnedSummon summon && ownerUUID.equals(summon.getSummonerUUID()))) {
             return true;
         }
         return super.isAlliedTo(other);

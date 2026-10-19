@@ -1,5 +1,7 @@
 package com.waylays.arcanes.entity.errethys;
 
+import com.waylays.arcanes.registry.ModSpells;
+import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -46,6 +48,11 @@ public class ManaCrow extends ManaSummon implements FlyingAnimal {
                 .add(Attributes.MOVEMENT_SPEED, .3)
                 .add(Attributes.ATTACK_DAMAGE, 2)
                 .add(Attributes.FOLLOW_RANGE, 32);
+    }
+
+    @Override
+    public AbstractSpell getSummoningSpell() {
+        return ModSpells.MANA_CROWS.get();
     }
 
     @Override
@@ -125,12 +132,12 @@ public class ManaCrow extends ManaSummon implements FlyingAnimal {
 
         @Override
         public boolean canUse() {
-            return crow.getOwner() != null && crow.getTarget() == null;
+            return crow.getSummoner() != null && crow.getTarget() == null;
         }
 
         @Override
         public void start() {
-            LivingEntity owner = crow.getOwner();
+            LivingEntity owner = crow.getSummoner();
             if (owner != null) {
                 angle = (float) Mth.atan2(crow.getZ() - owner.getZ(), crow.getX() - owner.getX());
             }
@@ -143,7 +150,7 @@ public class ManaCrow extends ManaSummon implements FlyingAnimal {
 
         @Override
         public void tick() {
-            LivingEntity owner = crow.getOwner();
+            LivingEntity owner = crow.getSummoner();
             if (owner == null) {
                 return;
             }

@@ -5,17 +5,17 @@ import com.waylays.arcanes.entity.errethys.ManaCamel;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.spells.SpellUtil;
+import com.waylays.arcanes.spells.SummoningSpell;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.AutoSpellConfig;
-import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -29,10 +29,10 @@ import java.util.Optional;
 
 /**
  * Mana Dromedary: a saddled dromedary of mana takes shape beside the caster, who can ride it (see
- * {@link ManaCamel}). One at a time: casting again sends the previous one away.
+ * {@link ManaCamel}). Casting the spell again sends it away (see {@link SummoningSpell}).
  */
 @AutoSpellConfig
-public class ManaDromedarySpell extends AbstractSpell {
+public class ManaDromedarySpell extends SummoningSpell {
     private final ResourceLocation spellId = ArcanesOublies.id("mana_dromedary");
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
@@ -93,11 +93,11 @@ public class ManaDromedarySpell extends AbstractSpell {
         SpellUtil.particles(level, ErrethysFx.PALE_DUST, spot.x - Mth.cos(a) * 1.2, spot.y + .2, spot.z - Mth.sin(a) * 1.2, 1, .05, .05, .05, 0);
     }
 
+    /** One dromedary per summoner: a new one replaces the one still around (from a scroll, say). */
     @Override
-    public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
-        // One dromedary per summoner
-        for (ManaCamel old : level.getEntitiesOfClass(ManaCamel.class, entity.getBoundingBox().inflate(96), c -> entity.getUUID().equals(c.getOwnerUUID()))) {
-            old.dissolve();
+    protected void summon(Level level, int spellLevel, LivingEntity entity) {
+        if (level instanceof ServerLevel serverLevel) {
+            dismissSummons(serverLevel, entity);
         }
         ManaCamel camel = ModEntities.MANA_DROMEDARY.get().create(level);
         if (camel != null) {
@@ -111,10 +111,10 @@ public class ManaDromedarySpell extends AbstractSpell {
             level.addFreshEntity(camel);
             ErrethysFx.materialize(level, camel.position(), 2.2f);
         }
-        super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 
     /** 2 min at level 1, +1 min per level. */
+    @Override
     public int getLifetime(int spellLevel) {
         return 1200 + spellLevel * 1200;
     }

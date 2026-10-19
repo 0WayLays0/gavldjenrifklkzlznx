@@ -1,7 +1,9 @@
 package com.waylays.arcanes.entity.errethys;
 
 import com.waylays.arcanes.entity.OwnedSummon;
+import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.errethys.ErrethysFx;
+import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -18,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 /**
  * The mana dromedary: a camel of sky-blue mana, saddled and tame from the start. Its summoner rides it (right click)
@@ -50,8 +53,15 @@ public class ManaCamel extends Camel implements OwnedSummon {
 
     @Override
     @Nullable
-    public LivingEntity getOwner() {
-        if (getOwnerUUID() != null && level() instanceof ServerLevel serverLevel && serverLevel.getEntity(getOwnerUUID()) instanceof LivingEntity living) {
+    public UUID getSummonerUUID() {
+        return getOwnerUUID();
+    }
+
+    @Override
+    @Nullable
+    public LivingEntity getSummoner() {
+        UUID uuid = getOwnerUUID();
+        if (uuid != null && level() instanceof ServerLevel serverLevel && serverLevel.getEntity(uuid) instanceof LivingEntity living) {
             return living;
         }
         return null;
@@ -114,6 +124,16 @@ public class ManaCamel extends Camel implements OwnedSummon {
         }
     }
 
+    @Override
+    public AbstractSpell getSummoningSpell() {
+        return ModSpells.MANA_DROMEDARY.get();
+    }
+
+    @Override
+    public void dismissSummon() {
+        dissolve();
+    }
+
     /** Sets its riders down and comes apart into motes of mana. */
     public void dissolve() {
         if (!level().isClientSide) {
@@ -134,7 +154,7 @@ public class ManaCamel extends Camel implements OwnedSummon {
     @Override
     public boolean isAlliedTo(Entity other) {
         if (getOwnerUUID() != null && (getOwnerUUID().equals(other.getUUID())
-                || other instanceof OwnedSummon summon && getOwnerUUID().equals(summon.getOwnerUUID()))) {
+                || other instanceof OwnedSummon summon && getOwnerUUID().equals(summon.getSummonerUUID()))) {
             return true;
         }
         return super.isAlliedTo(other);

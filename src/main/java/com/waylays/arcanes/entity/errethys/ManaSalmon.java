@@ -1,6 +1,8 @@
 package com.waylays.arcanes.entity.errethys;
 
 import com.waylays.arcanes.entity.SummonFollowOwnerGoal;
+import com.waylays.arcanes.registry.ModSpells;
+import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -42,6 +44,11 @@ public class ManaSalmon extends ManaSummon {
                 .add(Attributes.MOVEMENT_SPEED, .3)
                 .add(Attributes.ATTACK_DAMAGE, 2)
                 .add(Attributes.FOLLOW_RANGE, 24);
+    }
+
+    @Override
+    public AbstractSpell getSummoningSpell() {
+        return ModSpells.MANA_SALMON.get();
     }
 
     @Override

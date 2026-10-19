@@ -1,8 +1,10 @@
 package com.waylays.arcanes.entity.errethys;
 
 import com.waylays.arcanes.entity.SummonFollowOwnerGoal;
+import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.errethys.ErrethysFx;
+import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
@@ -49,6 +51,11 @@ public class ManaSerpent extends ManaSummon {
     /** Poison amplifier of the bite. */
     public void setVenom(int venom) {
         this.venom = venom;
+    }
+
+    @Override
+    public AbstractSpell getSummoningSpell() {
+        return ModSpells.MANA_SERPENT.get();
     }
 
     @Override

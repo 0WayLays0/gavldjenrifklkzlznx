@@ -5,11 +5,10 @@ import com.waylays.arcanes.entity.gold.GoldenSentinel;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.spells.SpellUtil;
+import com.waylays.arcanes.spells.SummoningSpell;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.AutoSpellConfig;
-import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.Utils;
@@ -31,9 +30,10 @@ import java.util.Optional;
 
 /**
  * Golden Sentinels: golden knights rise from a shower of gold around the caster and fight for them for a while.
+ * Casting the spell again sends them away (see {@link SummoningSpell}).
  */
 @AutoSpellConfig
-public class GoldenSentinelsSpell extends AbstractSpell {
+public class GoldenSentinelsSpell extends SummoningSpell {
     private final ResourceLocation spellId = ArcanesOublies.id("golden_sentinels");
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
@@ -95,7 +95,7 @@ public class GoldenSentinelsSpell extends AbstractSpell {
     }
 
     @Override
-    public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
+    protected void summon(Level level, int spellLevel, LivingEntity entity) {
         int count = getCount(spellLevel);
         for (int i = 0; i < count; i++) {
             float a = entity.getYRot() * Mth.DEG_TO_RAD + i * Mth.TWO_PI / count;
@@ -120,7 +120,6 @@ public class GoldenSentinelsSpell extends AbstractSpell {
             level.playSound(null, spot.x, spot.y, spot.z, SoundEvents.ANVIL_PLACE, SoundSource.PLAYERS, .6f, 1.2f + i * .1f);
         }
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 1.5f, .8f);
-        super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 
     public int getCount(int spellLevel) {
@@ -128,6 +127,7 @@ public class GoldenSentinelsSpell extends AbstractSpell {
     }
 
     /** 30 s at level 1, +5 s per level. */
+    @Override
     public int getLifetime(int spellLevel) {
         return 600 + (spellLevel - 1) * 100;
     }

@@ -13,14 +13,14 @@ import net.minecraft.world.entity.LivingEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Mana Serpent: serpents of mana whose bite carries a venom (poison, a short slowness). */
+/** Mana Serpent: a serpent of mana whose bite carries a venom (poison, a short slowness). */
 @AutoSpellConfig
 public class ManaSerpentSpell extends ManaSummonSpell {
     public ManaSerpentSpell() {
         super("mana_serpent", SpellRarity.RARE, 5, 35);
         this.manaCostPerLevel = 10;
-        this.baseSpellPower = 4;
-        this.spellPowerPerLevel = 1;
+        this.baseSpellPower = 5;
+        this.spellPowerPerLevel = 2;
         this.castTime = 25;
         this.baseManaCost = 60;
     }
@@ -44,12 +44,6 @@ public class ManaSerpentSpell extends ManaSummonSpell {
         return info;
     }
 
-    /** 1 serpent, 2 from level 3, 3 at level 5. */
-    @Override
-    public int getCount(int spellLevel) {
-        return 1 + (spellLevel >= 3 ? 1 : 0) + (spellLevel >= 5 ? 1 : 0);
-    }
-
     /** 40 s at level 1, +5 s per level. */
     @Override
     public int getLifetime(int spellLevel) {
@@ -58,7 +52,7 @@ public class ManaSerpentSpell extends ManaSummonSpell {
 
     @Override
     public double getHealth(int spellLevel) {
-        return 12 + spellLevel * 3;
+        return 16 + spellLevel * 4;
     }
 
     /** Poison amplifier: Poison I, Poison II from level 4. */

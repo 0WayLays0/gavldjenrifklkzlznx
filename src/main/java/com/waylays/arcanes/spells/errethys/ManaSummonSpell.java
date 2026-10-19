@@ -4,16 +4,16 @@ import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.errethys.ManaSummon;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.spells.SpellUtil;
+import com.waylays.arcanes.spells.SummoningSpell;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
-import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -29,11 +29,11 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * An Errethys summoning: while the caster chants, motes of mana spiral around them; then the creatures take shape
- * around the caster, starting in front of them (on the ground, or in the air for flyers and swimmers), and fight for
- * them for a while.
+ * An Errethys summoning: while the caster chants, motes of mana spiral around them; then a single creature takes shape
+ * in front of them (on the ground, or in the air for flyers and swimmers) and fights for them for a while. Casting the
+ * spell again sends it away (see {@link SummoningSpell}).
  */
-public abstract class ManaSummonSpell extends AbstractSpell {
+public abstract class ManaSummonSpell extends SummoningSpell {
     private final ResourceLocation spellId;
     private final DefaultConfig defaultConfig;
 
@@ -48,10 +48,6 @@ public abstract class ManaSummonSpell extends AbstractSpell {
     }
 
     protected abstract EntityType<? extends ManaSummon> summonType();
-
-    public abstract int getCount(int spellLevel);
-
-    public abstract int getLifetime(int spellLevel);
 
     public abstract double getHealth(int spellLevel);
 
@@ -71,7 +67,6 @@ public abstract class ManaSummonSpell extends AbstractSpell {
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
-                Component.translatable("ui.irons_spellbooks.summon_count", getCount(spellLevel)),
                 Component.translatable("ui.irons_spellbooks.duration", Utils.timeFromTicks(getLifetime(spellLevel), 1)),
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 1)),
                 Component.translatable("ui.irons_spellbooks.hp", (int) getHealth(spellLevel))
@@ -114,40 +109,40 @@ public abstract class ManaSummonSpell extends AbstractSpell {
         }
     }
 
+    /** One creature per summoner and spell: a new one replaces the one still around (from a scroll, say). */
     @Override
-    public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
-        int count = getCount(spellLevel);
-        Vec3 eye = entity.getEyePosition();
-        for (int i = 0; i < count; i++) {
-            // The first one right in front of the caster, the others fanning out around them
-            float a = entity.getYRot() * Mth.DEG_TO_RAD + (i - (count - 1) * .5f) * Mth.TWO_PI / Math.max(3, count);
-            Vec3 around = entity.position().add(-Mth.sin(a) * 1.8, 0, Mth.cos(a) * 1.8);
-            Vec3 spot;
-            if (airborne()) {
-                // As far out as there is room, never inside a wall or the ceiling
-                Vec3 wanted = around.add(0, entity.getBbHeight() * .8, 0);
-                spot = level.clip(new ClipContext(eye, wanted, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity)).getLocation();
-                spot = spot.add(eye.subtract(spot).normalize().scale(.4));
-            } else {
-                spot = SpellUtil.groundAt(level, around, 3, 1);
-            }
-            ManaSummon summon = summonType().create(level);
-            if (summon == null) {
-                continue;
-            }
-            summon.moveTo(spot.x, spot.y, spot.z, entity.getYRot(), 0);
-            if (!level.noCollision(summon)) {
-                // No room there: take shape at the caster's side
-                summon.moveTo(entity.getX(), entity.getY() + (airborne() ? entity.getBbHeight() * .5 : 0), entity.getZ(), entity.getYRot(), 0);
-            }
-            summon.setup(entity, getLifetime(spellLevel), getHealth(spellLevel), getDamage(spellLevel, entity));
-            configure(summon, spellLevel);
-            if (entity instanceof Mob mob && mob.getTarget() != null) {
-                summon.setTarget(mob.getTarget());
-            }
-            level.addFreshEntity(summon);
-            ErrethysFx.materialize(level, summon.position(), Math.max(.7f, summon.getBbWidth() * 1.6f));
+    protected void summon(Level level, int spellLevel, LivingEntity entity) {
+        if (level instanceof ServerLevel serverLevel) {
+            dismissSummons(serverLevel, entity);
         }
-        super.onCast(level, spellLevel, entity, castSource, playerMagicData);
+        // Right in front of the caster
+        float yaw = entity.getYRot() * Mth.DEG_TO_RAD;
+        Vec3 ahead = entity.position().add(-Mth.sin(yaw) * 1.8, 0, Mth.cos(yaw) * 1.8);
+        Vec3 spot;
+        if (airborne()) {
+            // As far out as there is room, never inside a wall or the ceiling
+            Vec3 eye = entity.getEyePosition();
+            Vec3 wanted = ahead.add(0, entity.getBbHeight() * .8, 0);
+            spot = level.clip(new ClipContext(eye, wanted, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity)).getLocation();
+            spot = spot.add(eye.subtract(spot).normalize().scale(.4));
+        } else {
+            spot = SpellUtil.groundAt(level, ahead, 3, 1);
+        }
+        ManaSummon summon = summonType().create(level);
+        if (summon == null) {
+            return;
+        }
+        summon.moveTo(spot.x, spot.y, spot.z, entity.getYRot(), 0);
+        if (!level.noCollision(summon)) {
+            // No room there: take shape at the caster's side
+            summon.moveTo(entity.getX(), entity.getY() + (airborne() ? entity.getBbHeight() * .5 : 0), entity.getZ(), entity.getYRot(), 0);
+        }
+        summon.setup(entity, getLifetime(spellLevel), getHealth(spellLevel), getDamage(spellLevel, entity));
+        configure(summon, spellLevel);
+        if (entity instanceof Mob mob && mob.getTarget() != null) {
+            summon.setTarget(mob.getTarget());
+        }
+        level.addFreshEntity(summon);
+        ErrethysFx.materialize(level, summon.position(), Math.max(.7f, summon.getBbWidth() * 1.6f));
     }
 }

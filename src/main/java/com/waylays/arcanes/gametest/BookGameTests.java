@@ -232,7 +232,7 @@ public final class BookGameTests {
         List<FlyingGrimoire> grimoires = helper.getLevel().getEntitiesOfClass(FlyingGrimoire.class, caster.getBoundingBox().inflate(4));
         helper.assertTrue(grimoires.size() == 2, "expected 2 grimoires at level 1, got " + grimoires.size());
         for (FlyingGrimoire grimoire : grimoires) {
-            helper.assertTrue(caster.getUUID().equals(grimoire.getOwnerUUID()), "a grimoire has no master");
+            helper.assertTrue(caster.getUUID().equals(grimoire.getSummonerUUID()), "a grimoire has no master");
             helper.assertTrue(SpellUtil.isAlly(caster, grimoire), "the caster's spells would hurt its grimoire");
         }
         helper.succeedWhen(() -> {

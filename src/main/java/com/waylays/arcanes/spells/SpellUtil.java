@@ -85,12 +85,12 @@ public final class SpellUtil {
         if (other == caster) {
             return true;
         }
-        if (other instanceof OwnedSummon summon && caster.getUUID().equals(summon.getOwnerUUID())) {
+        if (other instanceof OwnedSummon summon && caster.getUUID().equals(summon.getSummonerUUID())) {
             return true;
         }
         // A summon's own spells spare its master and the master's other summons
-        if (caster instanceof OwnedSummon summon && summon.getOwnerUUID() != null
-                && (summon.getOwnerUUID().equals(other.getUUID()) || other instanceof OwnedSummon sibling && summon.getOwnerUUID().equals(sibling.getOwnerUUID()))) {
+        if (caster instanceof OwnedSummon summon && summon.getSummonerUUID() != null
+                && (summon.getSummonerUUID().equals(other.getUUID()) || other instanceof OwnedSummon sibling && summon.getSummonerUUID().equals(sibling.getSummonerUUID()))) {
             return true;
         }
         return DamageSources.isFriendlyFireBetween(caster, other);

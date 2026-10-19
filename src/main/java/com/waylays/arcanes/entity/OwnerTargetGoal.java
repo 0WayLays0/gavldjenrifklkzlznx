@@ -27,7 +27,7 @@ public class OwnerTargetGoal extends TargetGoal {
 
     @Override
     public boolean canUse() {
-        LivingEntity owner = summon.getOwner();
+        LivingEntity owner = summon.getSummoner();
         if (owner == null) {
             return false;
         }
@@ -39,7 +39,7 @@ public class OwnerTargetGoal extends TargetGoal {
 
     @Override
     public void start() {
-        LivingEntity owner = summon.getOwner();
+        LivingEntity owner = summon.getSummoner();
         if (owner != null) {
             lastTimestamp = defend ? owner.getLastHurtByMobTimestamp() : owner.getLastHurtMobTimestamp();
         }

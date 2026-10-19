@@ -36,13 +36,13 @@ public class SummonFollowOwnerGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        LivingEntity owner = summon.getOwner();
+        LivingEntity owner = summon.getSummoner();
         return owner != null && !owner.isSpectator() && mob.getTarget() == null && mob.distanceToSqr(owner) > startDistance * startDistance;
     }
 
     @Override
     public boolean canContinueToUse() {
-        LivingEntity owner = summon.getOwner();
+        LivingEntity owner = summon.getSummoner();
         return owner != null && mob.getTarget() == null && !mob.getNavigation().isDone() && mob.distanceToSqr(owner) > stopDistance * stopDistance;
     }
 
@@ -58,7 +58,7 @@ public class SummonFollowOwnerGoal extends Goal {
 
     @Override
     public void tick() {
-        LivingEntity owner = summon.getOwner();
+        LivingEntity owner = summon.getSummoner();
         if (owner == null) {
             return;
         }

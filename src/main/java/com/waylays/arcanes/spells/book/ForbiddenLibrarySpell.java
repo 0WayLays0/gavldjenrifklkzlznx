@@ -5,11 +5,10 @@ import com.waylays.arcanes.entity.book.FlyingGrimoire;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.spells.SpellUtil;
+import com.waylays.arcanes.spells.SummoningSpell;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.AutoSpellConfig;
-import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.Utils;
@@ -34,10 +33,11 @@ import java.util.Optional;
 
 /**
  * Forbidden Library: flying grimoires tear themselves out of a rune circle around the caster and fight for them for
- * a while, biting and spitting small spells (see {@link FlyingGrimoire}).
+ * a while, biting and spitting small spells (see {@link FlyingGrimoire}). Casting the spell again sends them away
+ * (see {@link SummoningSpell}).
  */
 @AutoSpellConfig
-public class ForbiddenLibrarySpell extends AbstractSpell {
+public class ForbiddenLibrarySpell extends SummoningSpell {
     private final ResourceLocation spellId = ArcanesOublies.id("forbidden_library");
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
@@ -103,7 +103,7 @@ public class ForbiddenLibrarySpell extends AbstractSpell {
     }
 
     @Override
-    public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
+    protected void summon(Level level, int spellLevel, LivingEntity entity) {
         int count = getCount(spellLevel);
         Vec3 eye = entity.getEyePosition();
         for (int i = 0; i < count; i++) {
@@ -129,7 +129,6 @@ public class ForbiddenLibrarySpell extends AbstractSpell {
         }
         SpellUtil.particles(level, new BlastwaveParticleOptions(BookFx.VIOLET, 3.5f), entity.getX(), entity.getY() + .1, entity.getZ(), 1, 0, 0, 0, 0);
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 1.5f, .8f);
-        super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 
     /** 2 grimoires, 3 from level 2, 4 from level 4. */
@@ -138,6 +137,7 @@ public class ForbiddenLibrarySpell extends AbstractSpell {
     }
 
     /** 20 s at level 1, +4 s per level. */
+    @Override
     public int getLifetime(int spellLevel) {
         return 320 + spellLevel * 80;
     }

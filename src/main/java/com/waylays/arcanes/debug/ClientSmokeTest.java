@@ -4,6 +4,7 @@ import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SummoningSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
@@ -42,6 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Automated client test, only with {@code -Darcanes.autotest=true} (CI job {@code client-smoke}, headless under xvfb).
  * Creates a creative world, holds the school's spellbook, then casts every addon spell (level 5) at a target dummy in
  * front of the camera, one every few seconds, so every spell entity, particle and renderer runs on a real client.
+ * Summoning spells are then cast again, which must send their summons away.
  * The camera is in third person so the caster, its spellbook and the shells around it are drawn too.
  * A client crash ends the run with a crash report; a spell that throws is logged as {@code [SmokeTest] FAIL}.
  * The run ends with {@code [SmokeTest] PASS} or {@code [SmokeTest] FAIL ...} and stops the client.
@@ -53,6 +55,7 @@ public final class ClientSmokeTest {
     private static final int SPELL_LEVEL = 5;
     private static final int SETTLE_TICKS = 100;
     private static final int TICKS_PER_SPELL = 80;
+    private static final int RECAST_DELAY = 60;
     /** Let the last spells (the ultimates, about 8 s) finish before stopping. */
     private static final int FINAL_TICKS = 220;
     private static final long WATCHDOG_SECONDS = 1200;
@@ -62,6 +65,8 @@ public final class ClientSmokeTest {
     private static volatile Stage stage = Stage.WAIT_TITLE;
     private static int ticks;
     private static int spellIndex;
+    /** The summoning spell cast last: a while later it is cast again, which must send its summons away. */
+    private static volatile AbstractSpell toRecast;
     private static final AtomicInteger failures = new AtomicInteger();
 
     static {
@@ -155,6 +160,10 @@ public final class ClientSmokeTest {
             java.util.UUID id = mc.player.getUUID();
             server.execute(() -> castOnServer(server, id, spell));
         }
+        if (ticks % TICKS_PER_SPELL == RECAST_DELAY + 1) {
+            java.util.UUID id = mc.player.getUUID();
+            server.execute(() -> recastOnServer(server, id));
+        }
         if (spellIndex >= spells.size() && ticks > (spells.size() - 1) * TICKS_PER_SPELL + FINAL_TICKS) {
             finish(mc);
         }
@@ -209,9 +218,41 @@ public final class ClientSmokeTest {
             }
             spell.onCast(level, SPELL_LEVEL, player, CastSource.COMMAND, magicData);
             log("cast {}", spell.getSpellId());
+            if (spell instanceof SummoningSpell) {
+                toRecast = spell;
+            }
         } catch (Throwable t) {
             failures.incrementAndGet();
             ArcanesOublies.LOGGER.error("[SmokeTest] FAIL casting {}", spell.getSpellId(), t);
+        }
+    }
+
+    /** Casts the last summoning spell again through Iron's real cast path, as a second click would. */
+    private static void recastOnServer(IntegratedServer server, java.util.UUID id) {
+        AbstractSpell spell = toRecast;
+        toRecast = null;
+        ServerPlayer player = server.getPlayerList().getPlayer(id);
+        if (spell == null || player == null) {
+            return;
+        }
+        try {
+            ServerLevel level = player.serverLevel();
+            MagicData magicData = MagicData.getPlayerMagicData(player);
+            if (!magicData.getPlayerRecasts().hasRecastForSpell(spell.getSpellId()) || SummoningSpell.summonsOf(level, id, spell).isEmpty()) {
+                failures.incrementAndGet();
+                ArcanesOublies.LOGGER.error("[SmokeTest] FAIL {}: no recast open or no summons to send away", spell.getSpellId());
+                return;
+            }
+            spell.castSpell(level, SPELL_LEVEL, player, CastSource.COMMAND, true);
+            if (!SummoningSpell.summonsOf(level, id, spell).isEmpty() || magicData.getPlayerRecasts().hasRecastForSpell(spell.getSpellId())) {
+                failures.incrementAndGet();
+                ArcanesOublies.LOGGER.error("[SmokeTest] FAIL {}: casting again did not send the summons away", spell.getSpellId());
+            } else {
+                log("recast {}: summons sent away", spell.getSpellId());
+            }
+        } catch (Throwable t) {
+            failures.incrementAndGet();
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL recasting {}", spell.getSpellId(), t);
         }
     }
 

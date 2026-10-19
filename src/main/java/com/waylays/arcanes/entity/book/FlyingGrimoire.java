@@ -3,8 +3,10 @@ package com.waylays.arcanes.entity.book;
 import com.waylays.arcanes.entity.OwnedSummon;
 import com.waylays.arcanes.entity.OwnerTargetGoal;
 import com.waylays.arcanes.entity.SummonFollowOwnerGoal;
+import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.book.BookFx;
+import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -121,13 +123,13 @@ public class FlyingGrimoire extends PathfinderMob implements FlyingAnimal, Owned
 
     @Override
     @Nullable
-    public UUID getOwnerUUID() {
+    public UUID getSummonerUUID() {
         return ownerUUID;
     }
 
     @Override
     @Nullable
-    public LivingEntity getOwner() {
+    public LivingEntity getSummoner() {
         if (ownerUUID != null && level() instanceof ServerLevel serverLevel && serverLevel.getEntity(ownerUUID) instanceof LivingEntity living) {
             return living;
         }
@@ -150,7 +152,7 @@ public class FlyingGrimoire extends PathfinderMob implements FlyingAnimal, Owned
         this.targetSelector.addGoal(2, new OwnerTargetGoal(this, false));
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Mob.class, 5, true, false,
-                e -> e instanceof Enemy && !SpellUtil.isAlly(getOwner(), e)));
+                e -> e instanceof Enemy && !SpellUtil.isAlly(getSummoner(), e)));
     }
 
     @Override
@@ -170,7 +172,7 @@ public class FlyingGrimoire extends PathfinderMob implements FlyingAnimal, Owned
             return;
         }
         LivingEntity target = getTarget();
-        if (target != null && SpellUtil.isAlly(getOwner(), target)) {
+        if (target != null && SpellUtil.isAlly(getSummoner(), target)) {
             setTarget(null);
             target = null;
         }
@@ -185,7 +187,7 @@ public class FlyingGrimoire extends PathfinderMob implements FlyingAnimal, Owned
 
     /** Spits a rune bolt at the target. */
     private void spit(LivingEntity target) {
-        LivingEntity owner = getOwner();
+        LivingEntity owner = getSummoner();
         GrimoireBolt bolt = new GrimoireBolt(level(), owner != null ? owner : this, boltDamage);
         Vec3 from = position().add(0, getBbHeight() * .5, 0).add(getLookAngle().scale(.4));
         Vec3 to = target.getBoundingBox().getCenter();
@@ -205,6 +207,16 @@ public class FlyingGrimoire extends PathfinderMob implements FlyingAnimal, Owned
             SpellUtil.particles(level(), BookFx.paper(), target.getX(), target.getY() + target.getBbHeight() * .6, target.getZ(), 3, .2, .2, .2, .1);
         }
         return hit;
+    }
+
+    @Override
+    public AbstractSpell getSummoningSpell() {
+        return ModSpells.FORBIDDEN_LIBRARY.get();
+    }
+
+    @Override
+    public void dismissSummon() {
+        burst();
     }
 
     /** Bursts into pages and glyphs and disappears (no drops). */
@@ -244,7 +256,7 @@ public class FlyingGrimoire extends PathfinderMob implements FlyingAnimal, Owned
     @Override
     public boolean isAlliedTo(Entity other) {
         if (ownerUUID != null && (ownerUUID.equals(other.getUUID())
-                || other instanceof OwnedSummon summon && ownerUUID.equals(summon.getOwnerUUID()))) {
+                || other instanceof OwnedSummon summon && ownerUUID.equals(summon.getSummonerUUID()))) {
             return true;
         }
         return super.isAlliedTo(other);

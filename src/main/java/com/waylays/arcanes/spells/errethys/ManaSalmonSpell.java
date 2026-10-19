@@ -6,14 +6,14 @@ import io.redspace.ironsspellbooks.api.spells.AutoSpellConfig;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import net.minecraft.world.entity.EntityType;
 
-/** Mana Salmon: salmon of mana that swim through water and air alike and ram their summoner's enemies. */
+/** Mana Salmon: a salmon of mana that swims through water and air alike and rams its summoner's enemies. */
 @AutoSpellConfig
 public class ManaSalmonSpell extends ManaSummonSpell {
     public ManaSalmonSpell() {
         super("mana_salmon", SpellRarity.UNCOMMON, 6, 25);
         this.manaCostPerLevel = 6;
-        this.baseSpellPower = 2;
-        this.spellPowerPerLevel = 1;
+        this.baseSpellPower = 4;
+        this.spellPowerPerLevel = 2;
         this.castTime = 20;
         this.baseManaCost = 40;
     }
@@ -28,12 +28,6 @@ public class ManaSalmonSpell extends ManaSummonSpell {
         return true;
     }
 
-    /** 2 salmon, +1 every 2 levels. */
-    @Override
-    public int getCount(int spellLevel) {
-        return 2 + (spellLevel - 1) / 2;
-    }
-
     /** 30 s at level 1, +5 s per level. */
     @Override
     public int getLifetime(int spellLevel) {
@@ -42,6 +36,6 @@ public class ManaSalmonSpell extends ManaSummonSpell {
 
     @Override
     public double getHealth(int spellLevel) {
-        return 6 + spellLevel;
+        return 12 + spellLevel * 2;
     }
 }

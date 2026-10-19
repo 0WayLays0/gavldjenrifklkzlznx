@@ -60,13 +60,13 @@ public abstract class ManaSummon extends PathfinderMob implements OwnedSummon {
 
     @Override
     @Nullable
-    public UUID getOwnerUUID() {
+    public UUID getSummonerUUID() {
         return ownerUUID;
     }
 
     @Override
     @Nullable
-    public LivingEntity getOwner() {
+    public LivingEntity getSummoner() {
         if (ownerUUID != null && level() instanceof ServerLevel serverLevel && serverLevel.getEntity(ownerUUID) instanceof LivingEntity living) {
             return living;
         }
@@ -80,7 +80,7 @@ public abstract class ManaSummon extends PathfinderMob implements OwnedSummon {
         this.targetSelector.addGoal(2, new OwnerTargetGoal(this, false));
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Mob.class, 5, true, false,
-                e -> e instanceof Enemy && !SpellUtil.isAlly(getOwner(), e)));
+                e -> e instanceof Enemy && !SpellUtil.isAlly(getSummoner(), e)));
     }
 
     /** Movement and attack goals (called from the constructor, before subclass fields are set). */
@@ -101,9 +101,14 @@ public abstract class ManaSummon extends PathfinderMob implements OwnedSummon {
             return;
         }
         LivingEntity target = getTarget();
-        if (target != null && SpellUtil.isAlly(getOwner(), target)) {
+        if (target != null && SpellUtil.isAlly(getSummoner(), target)) {
             setTarget(null);
         }
+    }
+
+    @Override
+    public void dismissSummon() {
+        dissolve();
     }
 
     /** Comes apart into motes of mana and disappears. */
@@ -125,7 +130,7 @@ public abstract class ManaSummon extends PathfinderMob implements OwnedSummon {
     @Override
     public boolean isAlliedTo(Entity other) {
         if (ownerUUID != null && (ownerUUID.equals(other.getUUID())
-                || other instanceof OwnedSummon summon && ownerUUID.equals(summon.getOwnerUUID()))) {
+                || other instanceof OwnedSummon summon && ownerUUID.equals(summon.getSummonerUUID()))) {
             return true;
         }
         return super.isAlliedTo(other);

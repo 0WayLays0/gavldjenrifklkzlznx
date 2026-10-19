@@ -1,16 +1,20 @@
 package com.waylays.arcanes.gametest;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.entity.OwnedSummon;
+import com.waylays.arcanes.entity.book.FlyingGrimoire;
 import com.waylays.arcanes.entity.errethys.ManaCamel;
 import com.waylays.arcanes.entity.errethys.ManaCrow;
 import com.waylays.arcanes.entity.errethys.ManaRat;
 import com.waylays.arcanes.entity.errethys.ManaSalmon;
 import com.waylays.arcanes.entity.errethys.ManaSerpent;
 import com.waylays.arcanes.entity.errethys.ManaSummon;
+import com.waylays.arcanes.entity.gold.GoldenSentinel;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SpellUtil;
+import com.waylays.arcanes.spells.SummoningSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
@@ -39,9 +43,9 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.List;
 
 /**
- * Server-side checks run by CI for Errethys, the school of summoned mana creatures: each spell brings its creatures,
- * on the caster's side, the summoner can ride the dromedary, and each kind of creature fights (the serpent's bite
- * poisons). Fights run in batches of their
+ * Server-side checks run by CI for Errethys, the school of summoned mana creatures: each spell brings one creature,
+ * on the caster's side, sending summons away takes only that spell's, the summoner can ride the dromedary, and each
+ * kind of creature fights (the serpent's bite poisons). Fights run in batches of their
  * own, and every test sends its creatures away at the end, so they never go after another test's mobs.
  */
 @GameTestHolder(ArcanesOublies.MODID)
@@ -56,8 +60,11 @@ public final class ErrethysGameTests {
     }
 
     private static void dismissAll(GameTestHelper helper, LivingEntity center) {
-        around(helper, ManaSummon.class, center).forEach(ManaSummon::dissolve);
-        around(helper, ManaCamel.class, center).forEach(ManaCamel::dissolve);
+        for (LivingEntity entity : around(helper, LivingEntity.class, center)) {
+            if (entity instanceof OwnedSummon summon) {
+                summon.dismissSummon();
+            }
+        }
     }
 
     @GameTest(template = "platform")
@@ -78,19 +85,21 @@ public final class ErrethysGameTests {
     }
 
     @GameTest(template = "platform", batch = "errethys_summon")
-    public static void eachSpellSummonsItsCreatures(GameTestHelper helper) {
+    public static void eachSpellSummonsOneCreature(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         MagicData magicData = new MagicData(true);
-        ModSpells.MANA_RATS.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, magicData);
-        ModSpells.MANA_SALMON.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, magicData);
-        ModSpells.MANA_SERPENT.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, magicData);
-        ModSpells.MANA_CROWS.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, magicData);
-        helper.assertTrue(around(helper, ManaRat.class, caster).size() == 3, "expected 3 rats, got " + around(helper, ManaRat.class, caster).size());
-        helper.assertTrue(around(helper, ManaSalmon.class, caster).size() == 2, "expected 2 salmon, got " + around(helper, ManaSalmon.class, caster).size());
+        ModSpells.MANA_RATS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_SALMON.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_SERPENT.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_CROWS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        // Casting again replaces the creature instead of adding one
+        ModSpells.MANA_RATS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        helper.assertTrue(around(helper, ManaRat.class, caster).size() == 1, "expected 1 rat, got " + around(helper, ManaRat.class, caster).size());
+        helper.assertTrue(around(helper, ManaSalmon.class, caster).size() == 1, "expected 1 salmon, got " + around(helper, ManaSalmon.class, caster).size());
         helper.assertTrue(around(helper, ManaSerpent.class, caster).size() == 1, "expected 1 serpent, got " + around(helper, ManaSerpent.class, caster).size());
-        helper.assertTrue(around(helper, ManaCrow.class, caster).size() == 2, "expected 2 crows, got " + around(helper, ManaCrow.class, caster).size());
+        helper.assertTrue(around(helper, ManaCrow.class, caster).size() == 1, "expected 1 crow, got " + around(helper, ManaCrow.class, caster).size());
         for (ManaSummon summon : around(helper, ManaSummon.class, caster)) {
-            helper.assertTrue(caster.getUUID().equals(summon.getOwnerUUID()), "a creature has no master: " + summon);
+            helper.assertTrue(caster.getUUID().equals(summon.getSummonerUUID()), "a creature has no master: " + summon);
             helper.assertTrue(SpellUtil.isAlly(caster, summon), "the caster's spells would hurt " + summon);
         }
         // The dromedary: one at a time, saddled and tame
@@ -104,6 +113,37 @@ public final class ErrethysGameTests {
         Player stranger = helper.makeMockPlayer();
         helper.assertTrue(camel.mobInteract(stranger, InteractionHand.MAIN_HAND) == InteractionResult.PASS, "a stranger climbed on the dromedary");
         dismissAll(helper, caster);
+        helper.succeed();
+    }
+
+    /** What a player's recast does: only that spell's summons, and only the caster's, go away. */
+    @GameTest(template = "platform", batch = "errethys_summon")
+    public static void sendingSummonsAwayTakesOnlyThatSpells(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(2.5, 2, 4.5));
+        Witch other = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(6.5, 2, 4.5));
+        MagicData magicData = new MagicData(true);
+        ModSpells.MANA_RATS.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_RATS.get().onCast(helper.getLevel(), 1, other, CastSource.COMMAND, magicData);
+        ModSpells.MANA_SERPENT.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, magicData);
+        ModSpells.GOLDEN_SENTINELS.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, magicData);
+        ModSpells.FORBIDDEN_LIBRARY.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, magicData);
+        int sentinels = around(helper, GoldenSentinel.class, caster).size();
+        int grimoires = around(helper, FlyingGrimoire.class, caster).size();
+        helper.assertTrue(sentinels > 0 && grimoires > 0, "the sentinels or the grimoires did not come");
+
+        ((SummoningSpell) ModSpells.MANA_RATS.get()).dismissSummons(helper.getLevel(), caster);
+        List<ManaRat> rats = around(helper, ManaRat.class, caster);
+        helper.assertTrue(rats.size() == 1 && other.getUUID().equals(rats.get(0).getSummonerUUID()), "the caster's rat should be gone and the other's stay");
+        helper.assertTrue(around(helper, ManaSerpent.class, caster).size() == 1, "the serpent went away with the rat");
+
+        ((SummoningSpell) ModSpells.GOLDEN_SENTINELS.get()).dismissSummons(helper.getLevel(), caster);
+        helper.assertTrue(around(helper, GoldenSentinel.class, caster).isEmpty(), "sentinels left after being sent away");
+        helper.assertTrue(around(helper, FlyingGrimoire.class, caster).size() == grimoires, "the grimoires went away with the sentinels");
+
+        ((SummoningSpell) ModSpells.FORBIDDEN_LIBRARY.get()).dismissSummons(helper.getLevel(), caster);
+        helper.assertTrue(around(helper, FlyingGrimoire.class, caster).isEmpty(), "grimoires left after being sent away");
+        dismissAll(helper, caster);
+        dismissAll(helper, other);
         helper.succeed();
     }
 
