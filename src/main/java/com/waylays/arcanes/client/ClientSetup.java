@@ -36,6 +36,7 @@ import com.waylays.arcanes.client.render.RewriteAuraRenderer;
 import com.waylays.arcanes.client.render.RuinSigilRenderer;
 import com.waylays.arcanes.client.render.ShieldBubbleRenderer;
 import com.waylays.arcanes.client.render.SilenceSealRenderer;
+import com.waylays.arcanes.client.render.StrikeTrailRenderer;
 import com.waylays.arcanes.client.render.TomeOfJudgmentRenderer;
 import com.waylays.arcanes.client.render.WordOfPowerRenderer;
 import com.waylays.arcanes.registry.ModEntities;
@@ -100,6 +101,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.PAPER_TEMPEST.get(), PaperTempestRenderer::new);
         event.registerEntityRenderer(ModEntities.FLYING_STACK.get(), FlyingStackRenderer::new);
         event.registerEntityRenderer(ModEntities.ORIGAMI_DRAGON.get(), OrigamiDragonRenderer::new);
+        event.registerEntityRenderer(ModEntities.STRIKE_TRAIL.get(), StrikeTrailRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));

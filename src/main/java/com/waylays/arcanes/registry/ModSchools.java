@@ -85,5 +85,25 @@ public final class ModSchools {
             ERRETHYS_MAGIC
     ));
 
+    /**
+     * Physical Prowess: fighting moves, not magic (punches, slashes, a dash, a leap, weapon techniques). It lives in
+     * Iron's school system so the moves sit in spellbooks and on weapons like spells, but its damage is plain physical
+     * damage that armor reduces, and the Seal of Silence does not stop it.
+     */
+    public static final ResourceLocation PHYSICAL_RESOURCE = ArcanesOublies.id("physical");
+    public static final TagKey<Item> PHYSICAL_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("physical_focus"));
+    public static final ResourceKey<DamageType> PHYSICAL_STRIKE = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("physical_strike"));
+    public static final int PHYSICAL_COLOR = 0xC9875A;
+
+    public static final RegistryObject<SchoolType> PHYSICAL = SCHOOLS.register(PHYSICAL_RESOURCE.getPath(), () -> new SchoolType(
+            PHYSICAL_RESOURCE,
+            PHYSICAL_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".physical").withStyle(Style.EMPTY.withColor(PHYSICAL_COLOR)),
+            LazyOptional.of(ModAttributes.PHYSICAL_SPELL_POWER::get),
+            LazyOptional.of(ModAttributes.PHYSICAL_MAGIC_RESIST::get),
+            LazyOptional.of(() -> SoundEvents.PLAYER_ATTACK_STRONG),
+            PHYSICAL_STRIKE
+    ));
+
     private ModSchools() {}
 }

@@ -2,6 +2,7 @@ package com.waylays.arcanes.registry;
 
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.effect.BlastLeapEffect;
+import com.waylays.arcanes.effect.BleedingEffect;
 import com.waylays.arcanes.effect.GildedArmorEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.effect.ParchmentAegisEffect;
@@ -23,6 +24,7 @@ public final class ModEffects {
     public static final RegistryObject<MobEffect> REACTIVE_SHIELD = EFFECTS.register("reactive_shield", ReactiveShieldEffect::new);
     public static final RegistryObject<MobEffect> SILENCE = EFFECTS.register("silence", SilenceEffect::new);
     public static final RegistryObject<MobEffect> PARCHMENT_AEGIS = EFFECTS.register("parchment_aegis", ParchmentAegisEffect::new);
+    public static final RegistryObject<MobEffect> BLEEDING = EFFECTS.register("bleeding", BleedingEffect::new);
 
     private ModEffects() {}
 }

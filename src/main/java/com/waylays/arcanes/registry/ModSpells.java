@@ -42,6 +42,18 @@ import com.waylays.arcanes.spells.gold.GoldfallSpell;
 import com.waylays.arcanes.spells.gold.MidasCurseSpell;
 import com.waylays.arcanes.spells.gold.MoltenTorrentSpell;
 import com.waylays.arcanes.spells.gold.SunOfEldoradoSpell;
+import com.waylays.arcanes.spells.physical.DaggerFlankSkill;
+import com.waylays.arcanes.spells.physical.DaggerStabsSkill;
+import com.waylays.arcanes.spells.physical.DashSkill;
+import com.waylays.arcanes.spells.physical.LeapSkill;
+import com.waylays.arcanes.spells.physical.PunchFlurrySkill;
+import com.waylays.arcanes.spells.physical.PunchSkill;
+import com.waylays.arcanes.spells.physical.ScytheDanceSkill;
+import com.waylays.arcanes.spells.physical.ScytheReapSkill;
+import com.waylays.arcanes.spells.physical.SlashFlurrySkill;
+import com.waylays.arcanes.spells.physical.SlashSkill;
+import com.waylays.arcanes.spells.physical.SwordLungeSkill;
+import com.waylays.arcanes.spells.physical.SwordRisingCutSkill;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraftforge.registries.DeferredRegister;
@@ -102,6 +114,20 @@ public final class ModSpells {
     public static final RegistryObject<AbstractSpell> MANA_DROMEDARY = register(new ManaDromedarySpell());
     public static final RegistryObject<AbstractSpell> MANA_SERPENT = register(new ManaSerpentSpell());
     public static final RegistryObject<AbstractSpell> MANA_CROWS = register(new ManaCrowsSpell());
+
+    // Physical Prowess: fighting moves, not magic
+    public static final RegistryObject<AbstractSpell> PUNCH = register(new PunchSkill());
+    public static final RegistryObject<AbstractSpell> PUNCH_FLURRY = register(new PunchFlurrySkill());
+    public static final RegistryObject<AbstractSpell> SLASH = register(new SlashSkill());
+    public static final RegistryObject<AbstractSpell> SLASH_FLURRY = register(new SlashFlurrySkill());
+    public static final RegistryObject<AbstractSpell> DASH = register(new DashSkill());
+    public static final RegistryObject<AbstractSpell> LEAP = register(new LeapSkill());
+    public static final RegistryObject<AbstractSpell> SCYTHE_REAP = register(new ScytheReapSkill());
+    public static final RegistryObject<AbstractSpell> SCYTHE_DANCE = register(new ScytheDanceSkill());
+    public static final RegistryObject<AbstractSpell> SWORD_RISING_CUT = register(new SwordRisingCutSkill());
+    public static final RegistryObject<AbstractSpell> SWORD_LUNGE = register(new SwordLungeSkill());
+    public static final RegistryObject<AbstractSpell> DAGGER_STABS = register(new DaggerStabsSkill());
+    public static final RegistryObject<AbstractSpell> DAGGER_FLANK = register(new DaggerFlankSkill());
 
     private ModSpells() {}
 

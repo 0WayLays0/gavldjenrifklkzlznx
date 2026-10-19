@@ -25,6 +25,9 @@ public final class ModAttributes {
     public static final RegistryObject<Attribute> BOOK_MAGIC_RESIST = resistanceAttribute("book");
     public static final RegistryObject<Attribute> ERRETHYS_SPELL_POWER = powerAttribute("errethys");
     public static final RegistryObject<Attribute> ERRETHYS_MAGIC_RESIST = resistanceAttribute("errethys");
+    /** Physical Prowess: how hard the fighter's moves hit, and how well they shrug off others' moves. */
+    public static final RegistryObject<Attribute> PHYSICAL_SPELL_POWER = powerAttribute("physical");
+    public static final RegistryObject<Attribute> PHYSICAL_MAGIC_RESIST = resistanceAttribute("physical");
 
     private ModAttributes() {}
 

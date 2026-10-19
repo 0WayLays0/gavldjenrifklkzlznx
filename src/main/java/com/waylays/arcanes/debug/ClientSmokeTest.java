@@ -5,10 +5,14 @@ import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SummoningSpell;
+import com.waylays.arcanes.spells.physical.PhysicalAnimations;
+import com.waylays.arcanes.spells.physical.PhysicalSkill;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
+import io.redspace.ironsspellbooks.player.ClientSpellCastHelper;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -23,6 +27,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.LevelSettings;
@@ -45,7 +50,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Automated client test, only with {@code -Darcanes.autotest=true} (CI job {@code client-smoke}, headless under xvfb).
  * Creates a creative world, holds the school's spellbook, then casts every addon spell (level 5) at a target dummy in
  * front of the camera, one every few seconds, so every spell entity, particle and renderer runs on a real client.
- * Summoning spells are then cast again, which must send their summons away.
+ * Summoning spells are then cast again, which must send their summons away. Fighting moves are done sword in hand
+ * close to the dummy, with their body animation played on the player; every animation they use must have loaded.
  * The camera is in third person so the caster, its spellbook and the shells around it are drawn too.
  * A client crash ends the run with a crash report; a spell that throws is logged as {@code [SmokeTest] FAIL}.
  * The run ends with {@code [SmokeTest] PASS} or {@code [SmokeTest] FAIL ...} and stops the client.
@@ -161,6 +167,15 @@ public final class ClientSmokeTest {
             AbstractSpell spell = spells.get(spellIndex++).get();
             java.util.UUID id = mc.player.getUUID();
             server.execute(() -> castOnServer(server, id, spell));
+            if (spell instanceof PhysicalSkill) {
+                // Play the move's body animation on the real player, as Iron's does when it starts a cast
+                try {
+                    ClientSpellCastHelper.handleClientBoundOnCastStarted(id, spell.getSpellId(), SPELL_LEVEL);
+                } catch (Throwable t) {
+                    failures.incrementAndGet();
+                    ArcanesOublies.LOGGER.error("[SmokeTest] FAIL animating {}", spell.getSpellId(), t);
+                }
+            }
         }
         if (ticks % TICKS_PER_SPELL == RECAST_DELAY + 1) {
             java.util.UUID id = mc.player.getUUID();
@@ -183,14 +198,16 @@ public final class ClientSmokeTest {
             // Off the Flying Stack, so every spell is cast from the ground
             player.stopRiding();
             var school = spell.getSchoolType().getId();
-            var book = school.equals(ModSchools.EXPLOSION_RESOURCE) ? ModItems.DETONATION_CODEX.get()
+            boolean fighting = school.equals(ModSchools.PHYSICAL_RESOURCE);
+            // Fighting moves are done sword in hand (its damage counts), close to the dummy
+            var book = fighting ? Items.IRON_SWORD : school.equals(ModSchools.EXPLOSION_RESOURCE) ? ModItems.DETONATION_CODEX.get()
                     : school.equals(ModSchools.BOOK_RESOURCE) ? ModItems.LIVING_GRIMOIRE.get() : ModItems.GOLDEN_GRIMOIRE.get();
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(book));
             // A sturdy target dummy 6 blocks in front of the player, at eye level of the raycast
             Vec3 forward = Vec3.directionFromRotation(0, player.getYRot());
             Husk dummy = EntityType.HUSK.create(level);
             if (dummy != null) {
-                Vec3 at = player.position().add(forward.scale(6));
+                Vec3 at = player.position().add(forward.scale(fighting ? 3 : 6));
                 dummy.moveTo(at.x, player.getY(), at.z, player.getYRot() + 180, 0);
                 dummy.setNoAi(true);
                 dummy.setNoGravity(true);
@@ -270,6 +287,15 @@ public final class ClientSmokeTest {
 
     private static void finish(Minecraft mc) {
         stage = Stage.DONE;
+        // Every body animation the fighting moves use must have loaded (a missing one would leave the move unanimated)
+        for (var animation : PhysicalAnimations.ALL) {
+            animation.getForPlayer().ifPresent(id -> {
+                if (PlayerAnimationRegistry.getAnimation(id) == null) {
+                    failures.incrementAndGet();
+                    ArcanesOublies.LOGGER.error("[SmokeTest] FAIL animation {} did not load", id);
+                }
+            });
+        }
         if (failures.get() == 0) {
             log("PASS: every spell was cast and rendered without a crash");
         } else {

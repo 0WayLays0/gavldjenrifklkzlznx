@@ -44,6 +44,7 @@ import com.waylays.arcanes.entity.gold.GoldenSentinel;
 import com.waylays.arcanes.entity.gold.GoldfallIngot;
 import com.waylays.arcanes.entity.gold.MoltenGoldBlob;
 import com.waylays.arcanes.entity.gold.MoltenPool;
+import com.waylays.arcanes.entity.physical.StrikeTrail;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -189,6 +190,10 @@ public final class ModEntities {
 
     public static final RegistryObject<EntityType<ManaCamel>> MANA_DROMEDARY = register("mana_dromedary",
             EntityType.Builder.<ManaCamel>of(ManaCamel::new, MobCategory.MISC).sized(1.7f, 2.375f).clientTrackingRange(10));
+
+    // Physical Prowess
+    public static final RegistryObject<EntityType<StrikeTrail>> STRIKE_TRAIL = register("strike_trail",
+            EntityType.Builder.<StrikeTrail>of(StrikeTrail::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(20));
 
     private ModEntities() {}
 

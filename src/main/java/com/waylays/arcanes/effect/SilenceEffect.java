@@ -30,6 +30,10 @@ public class SilenceEffect extends MobEffect {
 
     @SubscribeEvent
     public static void onPreCast(SpellPreCastEvent event) {
+        // Fighting moves are not magic: a silenced fighter can still punch
+        if (event.getSchoolType() == ModSchools.PHYSICAL.get()) {
+            return;
+        }
         if (event.getEntity().hasEffect(ModEffects.SILENCE.get())) {
             event.setCanceled(true);
             if (event.getEntity() instanceof ServerPlayer player) {
@@ -46,7 +50,8 @@ public class SilenceEffect extends MobEffect {
             return;
         }
         if (entity instanceof ServerPlayer player) {
-            if (MagicData.getPlayerMagicData(player).isCasting()) {
+            MagicData magicData = MagicData.getPlayerMagicData(player);
+            if (magicData.isCasting() && magicData.getCastingSpell().getSpell().getSchoolType() != ModSchools.PHYSICAL.get()) {
                 Utils.serverSideCancelCast(player);
             }
         } else if (entity instanceof AbstractSpellCastingMob mob && mob.isCasting()) {

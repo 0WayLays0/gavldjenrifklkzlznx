@@ -3,11 +3,12 @@
 Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.20.1, Forge 47.4+), pour notre serveur RP.
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 0.7.0 : écoles de l'Or, de l'Explosion, du Livre et d'Errethys
+## Contenu de la bêta 0.8.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys et Caractéristique Physique
 
 Trois nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
-12 pour le Grimoire Vivant), plus l'école d'invocation Errethys (5 sorts, pas encore de livre). Un onglet créatif
+12 pour le Grimoire Vivant), plus l'école d'invocation Errethys (5 sorts, pas encore de livre) et les techniques de
+combat de Caractéristique Physique (12 techniques, ce n'est pas de la magie). Un onglet créatif
 « Arcanes Oubliés » contient les livres et tous les parchemins à tous les niveaux.
 
 **Invocations** (Sentinelles d'Or, Bibliothèque Interdite, Pile Volante, Dragon d'Origami et tous les sorts
@@ -88,7 +89,7 @@ rien en mourant et se dissolvent en étincelles quand leur temps est écoulé.
 | Sort | Effet |
 |---|---|
 | **Rat de Mana** (Mana Rat) | Un rat rapide (queue qui ondule) qui suit le lanceur et mord ses ennemis, 30 s ou plus. |
-| **Saumon de Mana** (Mana Salmon) | Un saumon qui nage dans l'eau comme dans l'air, avec les mouvements du saumon, et percute les ennemis (plus rapide dans l'eau). |
+| **Saumon de Mana** (Mana Salmon) | Un saumon qui ne vit que dans l'eau : il apparaît dans l'eau que regarde le lanceur (ou la plus proche, 6 blocs ; sinon le sort échoue), y nage comme un saumon, suit le lanceur le long de l'eau et percute les ennemis dans l'eau ou au bord. Échoué sur la terre ferme, il se débat puis se dissout au bout de 3 s. |
 | **Dromadaire de Mana** (Mana Dromedary) | Un dromadaire sellé : clic droit pour le monter, avec la ruée du chameau ; un second joueur peut monter derrière le lanceur. 2 à 4 min. |
 | **Serpent de Mana** (Mana Serpent) | Un serpent qui ondule en S ; sa morsure empoisonne (Poison II au niveau 4) et ralentit. |
 | **Corbeau de Mana** (Mana Crow) | Un corbeau qui vole comme un oiseau : battements d'ailes, vol plané en descente, cercles au-dessus du lanceur, piqués sur les ennemis. |
@@ -97,6 +98,37 @@ Chaque sort n'invoque qu'une seule créature (plus forte qu'un membre des ancien
 Les créatures de sorts différents peuvent se battre ensemble.
 
 Focus de l'école : cristaux de prismarine.
+
+### Caractéristique Physique (techniques de combat, pas de la magie)
+
+Des coups et des mouvements de combattant pour se battre sans magie, rangés dans Iron's comme des sorts (dans un livre
+de sorts, ou incrustés dans une arme à l'Enclume Arcanique d'Iron's). Ce n'est pas de la magie : la force d'une
+technique vient de son niveau et de la **Puissance physique** (jamais de la puissance des sorts), les armes ajoutent
+une part de leurs dégâts (Tranchant compris), les dégâts sont physiques (l'armure et la **Résistance physique** les
+réduisent) et le Sceau du Silence ne les empêche pas. Chaque coup est calé sur l'animation du corps (les coups de faux
+et d'épée reprennent les animations de combat d'Iron's, les poings, la rafale de tranches, le dash et le saut ont les
+leurs) et laisse une traînée pâle dans l'air (lame, tour complet, estoc, onde d'un coup de poing). Coût en mana faible,
+recharges courtes.
+
+| Technique | Effet |
+|---|---|
+| **Coup de Poing** (Punch) | Un pas en avant et un direct : frappe fort l'ennemi le plus proche devant (3 blocs) et le repousse. |
+| **Rafale de Coups de Poing** (Punch Flurry) | Pieds plantés, 7 coups en une seconde sur tout ce qui est devant, puis un direct qui repousse. |
+| **Tranche** (Slash) | Une entaille en diagonale à travers tout un arc devant (3,2 blocs), à la lame ou au tranchant de la main. |
+| **Rafale de Tranches** (Slash Flurry) | Trois entailles en aller-retour puis une grande taille horizontale qui repousse, en une seconde. |
+| **Dash** | 3 à 4 blocs d'un coup dans le sens où l'on se déplace déjà (en arrière ou de côté pour esquiver), sinon droit devant ; s'arrête net. |
+| **Saut** (Leap) | Un saut environ deux fois plus haut qu'un saut normal (2,4 à 3 blocs, jamais de dégâts de chute en retombant au même niveau), en gardant l'élan ; pieds au sol seulement. |
+| **Faux 1 : Fauchage** (Scythe 1: Reap) | Armé lent puis balayage au ras du sol à travers un grand demi-cercle (4,5 blocs) : ralentit les victimes. |
+| **Faux 2 : Danse de la Faucheuse** (Scythe 2: Reaper's Dance) | Une taille devant, puis un tour complet qui fauche tout autour (4,5 blocs) et projette. |
+| **Épée 1 : Coupe Montante** (Sword 1: Rising Cut) | Une taille de bas en haut qui soulève les ennemis d'environ un bloc et demi. |
+| **Épée 2 : Fente** (Sword 2: Lunge) | Un bond de deux blocs en avant et un estoc qui traverse toute la ligne (3,5 blocs). |
+| **Dague 1 : Estocs Rapides** (Dagger 1: Quick Stabs) | Trois estocs rapides sur l'ennemi le plus proche ; il saigne, et le troisième creuse la blessure (Saignement II). |
+| **Dague 2 : Contournement** (Dagger 2: Flank) | Un bond autour de l'ennemi en face (5 blocs) pour finir dans son dos (ou sur son flanc), puis un coup : dans le dos, x1,75 et saignement. |
+
+Les techniques d'armes ne demandent pas d'avoir l'arme en main (à vous de les donner aux bons personnages), mais elles
+frappent surtout avec les dégâts de l'arme tenue : à mains nues, une technique de faux fait peu de mal. Focus de
+l'école : cuir. Les coûts, recharges et la puissance de chaque technique se règlent dans la configuration serveur
+d'Iron's, comme pour tous les sorts.
 
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
 (`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre, `tools/errethys_assets.py`
@@ -119,7 +151,7 @@ Dans le dossier `mods` (client et serveur), à côté de :
 ## Développer
 
 - Le code est dans `src/main/java/com/waylays/arcanes`.
-- Textures et modèles d'objets : modifier `tools/gen_assets.py` (ou `explosion_assets.py`, `book_assets.py`,
-  `errethys_assets.py`) puis lancer
+- Textures, modèles d'objets et animations des techniques : modifier `tools/gen_assets.py` (ou `explosion_assets.py`,
+  `book_assets.py`, `errethys_assets.py`, `physical_assets.py`) puis lancer
   `python3 tools/gen_assets.py` (Pillow).
   Une texture faite à la main peut aussi remplacer directement le PNG du même nom.

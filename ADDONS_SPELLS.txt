@@ -26,6 +26,8 @@ Ordre de développement :
   8. Miroirs
   9. Cosmos / Étoiles
  10. Errethys (invocations de mana) - demandée en plus
+ 11. Caractéristique Physique (techniques de combat, pas de la magie) -
+     demandée en plus
 
 
 ================================================================================
@@ -366,8 +368,8 @@ Ambiance : animaux de mana translucides qui se battent pour le lanceur
 Sons : carillons d'améthyste, cris des animaux adoucis
 
  1. Rat de Mana        [~] Un rat rapide qui mord les ennemis.
- 2. Saumon de Mana     [~] Un saumon qui nage dans l'eau comme dans l'air
-                           (mouvements de saumon) et percute les ennemis.
+ 2. Saumon de Mana     [~] Un saumon qui ne vit que dans l'eau, y nage
+                           comme un saumon et percute les ennemis.
  3. Dromadaire de Mana [~] Un dromadaire sellé que le lanceur peut monter
                            (ruée, 2 places).
  4. Serpent de Mana    [~] Un serpent qui ondule ; sa morsure empoisonne.
@@ -376,6 +378,36 @@ Sons : carillons d'améthyste, cris des animaux adoucis
 
 Une seule créature par sort ; relancer le sort la renvoie (comme pour toutes
 les invocations de l'addon).
+
+Livre : pas encore demandé [ ]
+
+
+================================================================================
+11. CARACTÉRISTIQUE PHYSIQUE (techniques de combat)              [~] EN COURS
+================================================================================
+Ce n'est pas de la magie : coups et mouvements de combattant, rangés dans
+Iron's comme des sorts. Force selon la Puissance physique et l'arme tenue,
+dégâts physiques (réduits par l'armure), pas bloqués par le Silence.
+Couleur : cuir / bronze, traînées pâles, poussière
+
+ 1. Coup de Poing        [~] Un direct qui frappe fort et repousse.
+ 2. Rafale de Coups de   [~] Sept coups en une seconde puis un direct.
+    Poing
+ 3. Tranche              [~] Une entaille en diagonale dans un large arc.
+ 4. Rafale de Tranches   [~] Trois entailles puis une grande taille.
+ 5. Dash                 [~] 3 à 4 blocs d'un coup, pour esquiver ou foncer.
+ 6. Saut                 [~] Environ deux fois plus haut qu'un saut normal.
+ Par arme (au choix de l'équipe RP) :
+ 7. Faux 1 : Fauchage    [~] Balayage bas en demi-cercle, ralentit.
+ 8. Faux 2 : Danse de la [~] Une taille puis un tour complet.
+    Faucheuse
+ 9. Épée 1 : Coupe       [~] Taille montante qui soulève l'ennemi.
+    Montante
+10. Épée 2 : Fente       [~] Bond en avant et estoc qui traverse la ligne.
+11. Dague 1 : Estocs     [~] Trois estocs, saignement.
+    Rapides
+12. Dague 2 :            [~] Bond dans le dos de l'ennemi et coup dans le
+    Contournement            dos.
 
 Livre : pas encore demandé [ ]
 
