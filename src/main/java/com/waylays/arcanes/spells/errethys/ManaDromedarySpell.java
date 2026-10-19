@@ -95,22 +95,24 @@ public class ManaDromedarySpell extends SummoningSpell {
 
     /** One dromedary per summoner: a new one replaces the one still around (from a scroll, say). */
     @Override
-    protected void summon(Level level, int spellLevel, LivingEntity entity) {
+    protected boolean summon(Level level, int spellLevel, LivingEntity entity) {
         if (level instanceof ServerLevel serverLevel) {
             dismissSummons(serverLevel, entity);
         }
         ManaCamel camel = ModEntities.MANA_DROMEDARY.get().create(level);
-        if (camel != null) {
-            float yaw = entity.getYRot() * Mth.DEG_TO_RAD;
-            Vec3 spot = SpellUtil.groundAt(level, entity.position().add(-Mth.sin(yaw) * 2.5, 0, Mth.cos(yaw) * 2.5), 3, 3);
-            camel.moveTo(spot.x, spot.y, spot.z, entity.getYRot(), 0);
-            if (!level.noCollision(camel)) {
-                camel.moveTo(entity.getX(), entity.getY(), entity.getZ(), entity.getYRot(), 0);
-            }
-            camel.setup(entity, getLifetime(spellLevel), getHealth(spellLevel));
-            level.addFreshEntity(camel);
-            ErrethysFx.materialize(level, camel.position(), 2.2f);
+        if (camel == null) {
+            return false;
         }
+        float yaw = entity.getYRot() * Mth.DEG_TO_RAD;
+        Vec3 spot = SpellUtil.groundAt(level, entity.position().add(-Mth.sin(yaw) * 2.5, 0, Mth.cos(yaw) * 2.5), 3, 3);
+        camel.moveTo(spot.x, spot.y, spot.z, entity.getYRot(), 0);
+        if (!level.noCollision(camel)) {
+            camel.moveTo(entity.getX(), entity.getY(), entity.getZ(), entity.getYRot(), 0);
+        }
+        camel.setup(entity, getLifetime(spellLevel), getHealth(spellLevel));
+        level.addFreshEntity(camel);
+        ErrethysFx.materialize(level, camel.position(), 2.2f);
+        return true;
     }
 
     /** 2 min at level 1, +1 min per level. */

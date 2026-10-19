@@ -30,8 +30,8 @@ import java.util.UUID;
  */
 @Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
 public abstract class SummoningSpell extends AbstractSpell {
-    /** Brings the summons into the world (the cast that is not a recast). */
-    protected abstract void summon(Level level, int spellLevel, LivingEntity caster);
+    /** Brings the summons into the world (the cast that is not a recast). False if none could come. */
+    protected abstract boolean summon(Level level, int spellLevel, LivingEntity caster);
 
     /** How long the summons last, and so how long the recast stays open. */
     public abstract int getLifetime(int spellLevel);
@@ -43,8 +43,8 @@ public abstract class SummoningSpell extends AbstractSpell {
                 dismissSummons(serverLevel, entity);
             }
         } else {
-            summon(level, spellLevel, entity);
-            if (entity instanceof ServerPlayer && playerMagicData != null && castSource != CastSource.SCROLL) {
+            boolean summoned = summon(level, spellLevel, entity);
+            if (summoned && entity instanceof ServerPlayer && playerMagicData != null && castSource != CastSource.SCROLL) {
                 playerMagicData.getPlayerRecasts().addRecast(new RecastInstance(getSpellId(), spellLevel, 2, getLifetime(spellLevel), castSource, null), playerMagicData);
             }
         }
@@ -72,7 +72,8 @@ public abstract class SummoningSpell extends AbstractSpell {
         }
     }
 
-    private boolean hasOpenRecast(@Nullable LivingEntity entity) {
+    /** True when this cast would send the summons away. */
+    protected boolean hasOpenRecast(@Nullable LivingEntity entity) {
         return entity instanceof ServerPlayer player && MagicData.getPlayerMagicData(player).getPlayerRecasts().hasRecastForSpell(getSpellId());
     }
 

@@ -15,12 +15,14 @@ import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.SummoningSpell;
+import com.waylays.arcanes.spells.errethys.ManaSalmonSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.SchoolType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -35,6 +37,7 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
@@ -57,6 +60,16 @@ public final class ErrethysGameTests {
 
     private static <T extends LivingEntity> List<T> around(GameTestHelper helper, Class<T> type, LivingEntity center) {
         return helper.getLevel().getEntitiesOfClass(type, center.getBoundingBox().inflate(8), e -> !e.isRemoved());
+    }
+
+    /** A pool of water on the platform, x0..x1 by z0..z1, one block deep, walled in with glass so it does not spread. */
+    private static void pool(GameTestHelper helper, int x0, int z0, int x1, int z1) {
+        for (int x = x0 - 1; x <= x1 + 1; x++) {
+            for (int z = z0 - 1; z <= z1 + 1; z++) {
+                boolean inside = x >= x0 && x <= x1 && z >= z0 && z <= z1;
+                helper.setBlock(new BlockPos(x, 2, z), inside ? Blocks.WATER : Blocks.GLASS);
+            }
+        }
     }
 
     private static void dismissAll(GameTestHelper helper, LivingEntity center) {
@@ -88,6 +101,8 @@ public final class ErrethysGameTests {
     public static void eachSpellSummonsOneCreature(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         MagicData magicData = new MagicData(true);
+        // The salmon needs water
+        pool(helper, 4, 7, 4, 7);
         ModSpells.MANA_RATS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_SALMON.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_SERPENT.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
@@ -200,7 +215,25 @@ public final class ErrethysGameTests {
 
     @GameTest(template = "platform", batch = "errethys_salmon", timeoutTicks = 300)
     public static void manaSalmonRam(GameTestHelper helper) {
+        // The vindicator stands in a pool the salmon can reach it through
+        pool(helper, 3, 5, 5, 7);
         fight(helper, ModSpells.MANA_SALMON, () -> {}, new Vindicator[1]);
+    }
+
+    @GameTest(template = "platform", batch = "errethys_dry", timeoutTicks = ManaSalmon.DRY_TICKS + 40)
+    public static void theSalmonNeedsWater(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
+        helper.assertTrue(ManaSalmonSpell.findWater(helper.getLevel(), caster) == null, "found water on a dry platform");
+        ModSpells.MANA_SALMON.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        helper.assertTrue(around(helper, ManaSalmon.class, caster).isEmpty(), "a salmon came with no water around");
+        // One stranded on land comes apart
+        ManaSalmon salmon = ModEntities.MANA_SALMON.get().create(helper.getLevel());
+        helper.assertTrue(salmon != null, "no salmon");
+        Vec3 at = helper.absoluteVec(new Vec3(4.5, 2, 4.5));
+        salmon.moveTo(at.x, at.y, at.z, 0, 0);
+        salmon.setup(caster, 1200, 10, 2);
+        helper.getLevel().addFreshEntity(salmon);
+        helper.succeedWhen(() -> helper.assertTrue(salmon.isRemoved(), "the stranded salmon did not fade"));
     }
 
     @GameTest(template = "platform", batch = "errethys_serpent", timeoutTicks = 300)

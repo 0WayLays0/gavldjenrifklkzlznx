@@ -30,8 +30,8 @@ import java.util.Optional;
 
 /**
  * An Errethys summoning: while the caster chants, motes of mana spiral around them; then a single creature takes shape
- * in front of them (on the ground, or in the air for flyers and swimmers) and fights for them for a while. Casting the
- * spell again sends it away (see {@link SummoningSpell}).
+ * in front of them (on the ground, in the air for flyers, in water for swimmers) and fights for them for a while.
+ * Casting the spell again sends it away (see {@link SummoningSpell}).
  */
 public abstract class ManaSummonSpell extends SummoningSpell {
     private final ResourceLocation spellId;
@@ -55,7 +55,7 @@ public abstract class ManaSummonSpell extends SummoningSpell {
         return getSpellPower(spellLevel, caster);
     }
 
-    /** Flyers and swimmers appear around the caster's shoulders instead of on the ground. */
+    /** Flyers appear around the caster's shoulders instead of on the ground. */
     protected boolean airborne() {
         return false;
     }
@@ -111,26 +111,17 @@ public abstract class ManaSummonSpell extends SummoningSpell {
 
     /** One creature per summoner and spell: a new one replaces the one still around (from a scroll, say). */
     @Override
-    protected void summon(Level level, int spellLevel, LivingEntity entity) {
+    protected boolean summon(Level level, int spellLevel, LivingEntity entity) {
+        Vec3 spot = summonSpot(level, entity);
+        if (spot == null) {
+            return false;
+        }
         if (level instanceof ServerLevel serverLevel) {
             dismissSummons(serverLevel, entity);
         }
-        // Right in front of the caster
-        float yaw = entity.getYRot() * Mth.DEG_TO_RAD;
-        Vec3 ahead = entity.position().add(-Mth.sin(yaw) * 1.8, 0, Mth.cos(yaw) * 1.8);
-        Vec3 spot;
-        if (airborne()) {
-            // As far out as there is room, never inside a wall or the ceiling
-            Vec3 eye = entity.getEyePosition();
-            Vec3 wanted = ahead.add(0, entity.getBbHeight() * .8, 0);
-            spot = level.clip(new ClipContext(eye, wanted, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity)).getLocation();
-            spot = spot.add(eye.subtract(spot).normalize().scale(.4));
-        } else {
-            spot = SpellUtil.groundAt(level, ahead, 3, 1);
-        }
         ManaSummon summon = summonType().create(level);
         if (summon == null) {
-            return;
+            return false;
         }
         summon.moveTo(spot.x, spot.y, spot.z, entity.getYRot(), 0);
         if (!level.noCollision(summon)) {
@@ -144,5 +135,21 @@ public abstract class ManaSummonSpell extends SummoningSpell {
         }
         level.addFreshEntity(summon);
         ErrethysFx.materialize(level, summon.position(), Math.max(.7f, summon.getBbWidth() * 1.6f));
+        return true;
+    }
+
+    /** Where the creature takes shape: right in front of the caster, or null if it cannot come at all. */
+    @Nullable
+    protected Vec3 summonSpot(Level level, LivingEntity entity) {
+        float yaw = entity.getYRot() * Mth.DEG_TO_RAD;
+        Vec3 ahead = entity.position().add(-Mth.sin(yaw) * 1.8, 0, Mth.cos(yaw) * 1.8);
+        if (!airborne()) {
+            return SpellUtil.groundAt(level, ahead, 3, 1);
+        }
+        // As far out as there is room, never inside a wall or the ceiling
+        Vec3 eye = entity.getEyePosition();
+        Vec3 wanted = ahead.add(0, entity.getBbHeight() * .8, 0);
+        Vec3 spot = level.clip(new ClipContext(eye, wanted, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity)).getLocation();
+        return spot.add(eye.subtract(spot).normalize().scale(.4));
     }
 }

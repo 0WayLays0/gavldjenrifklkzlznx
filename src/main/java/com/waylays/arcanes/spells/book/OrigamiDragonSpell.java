@@ -104,7 +104,7 @@ public class OrigamiDragonSpell extends SummoningSpell {
 
     /** One dragon per caster: a new one replaces the one still around. */
     @Override
-    protected void summon(Level level, int spellLevel, LivingEntity entity) {
+    protected boolean summon(Level level, int spellLevel, LivingEntity entity) {
         if (level instanceof ServerLevel serverLevel) {
             dismissSummons(serverLevel, entity);
         }
@@ -114,6 +114,7 @@ public class OrigamiDragonSpell extends SummoningSpell {
         SpellUtil.particles(level, BookFx.paper(), at.x, at.y, at.z, 40, 1.5, .3, 1.5, .1);
         SpellUtil.particles(level, ParticleTypes.ENCHANT, at.x, at.y, at.z, 80, 1.5, .3, 1.5, 1);
         SpellUtil.cameraShake(level, at, 10, 16);
+        return true;
     }
 
     /** 18 s at level 1, +3 s per level. */

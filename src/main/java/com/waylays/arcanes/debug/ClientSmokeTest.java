@@ -13,6 +13,7 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.WorldDataConfiguration;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.phys.Vec3;
@@ -208,6 +210,14 @@ public final class ClientSmokeTest {
                 player.setYRot(yaw);
                 player.setXRot(pitch);
                 player.setYHeadRot(yaw);
+            }
+            if (spell == ModSpells.MANA_SALMON.get()) {
+                // The salmon lives only in water: dig a pool in front of the player
+                Vec3 pool = player.position().add(Vec3.directionFromRotation(0, player.getYRot()).scale(3));
+                BlockPos center = BlockPos.containing(pool.x, player.getY() - 1, pool.z);
+                for (BlockPos pos : BlockPos.betweenClosed(center.offset(-1, 0, -1), center.offset(1, 0, 1))) {
+                    level.setBlockAndUpdate(pos, Blocks.WATER.defaultBlockState());
+                }
             }
             MagicData magicData = MagicData.getPlayerMagicData(player);
             if (!spell.checkPreCastConditions(level, SPELL_LEVEL, player, magicData)) {

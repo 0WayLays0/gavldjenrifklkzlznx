@@ -96,13 +96,13 @@ public class FlyingStackSpell extends SummoningSpell {
 
     /** One stack per caster: a new one replaces the one still around. The caster climbs straight on. */
     @Override
-    protected void summon(Level level, int spellLevel, LivingEntity entity) {
+    protected boolean summon(Level level, int spellLevel, LivingEntity entity) {
         if (level instanceof ServerLevel serverLevel) {
             dismissSummons(serverLevel, entity);
         }
         FlyingStack stack = ModEntities.FLYING_STACK.get().create(level);
         if (stack == null) {
-            return;
+            return false;
         }
         entity.stopRiding();
         stack.moveTo(entity.getX(), entity.getY() + .1, entity.getZ(), entity.getYRot(), 0);
@@ -113,6 +113,7 @@ public class FlyingStackSpell extends SummoningSpell {
         stack.setDeltaMovement(0, .35, 0);
         SpellUtil.particles(level, BookFx.paper(), stack.getX(), stack.getY() + .3, stack.getZ(), 24, .5, .2, .5, .2);
         SpellUtil.particles(level, ParticleTypes.ENCHANT, stack.getX(), stack.getY() + .3, stack.getZ(), 30, .5, .2, .5, 1);
+        return true;
     }
 
     /** 1 min at level 1, +30 s per level. */

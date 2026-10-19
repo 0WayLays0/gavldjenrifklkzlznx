@@ -192,7 +192,7 @@
   "spell.arcanes_oublies.mana_rats": "Mana Rat",
   "spell.arcanes_oublies.mana_rats.guide": "Summon a rat of sky-blue mana. Small and fast, it bites whatever you fight. Cast again to send it away.",
   "spell.arcanes_oublies.mana_salmon": "Mana Salmon",
-  "spell.arcanes_oublies.mana_salmon.guide": "Summon a salmon of mana that swims through water and air alike and rams your enemies. Cast again to send it away.",
+  "spell.arcanes_oublies.mana_salmon.guide": "Summon a salmon of mana in the water you look at, or the nearest water around you. It lives only in water: it swims like a salmon, follows you along the water and rams your enemies in the water or at its edge. Stranded on land, it flops and fades. Cast again to send it away.",
   "spell.arcanes_oublies.mana_dromedary": "Mana Dromedary",
   "spell.arcanes_oublies.mana_dromedary.guide": "Summon a saddled dromedary of mana that you can ride (right click), dash included. A second rider can climb on behind you. Cast again to send it away.",
   "spell.arcanes_oublies.mana_serpent": "Mana Serpent",
@@ -216,5 +216,6 @@
   "ui.arcanes_oublies.paper_breath": "%s Breath Damage per Cut",
   "ui.arcanes_oublies.dive_damage": "%s Dive Damage",
   "death.attack.arcanes_oublies.paper_tempest": "%1$s was torn apart by %2$s's Paper Tempest",
-  "death.attack.arcanes_oublies.origami_dragon": "%1$s was shredded by %2$s's Origami Dragon"
+  "death.attack.arcanes_oublies.origami_dragon": "%1$s was shredded by %2$s's Origami Dragon",
+  "ui.arcanes_oublies.needs_water": "There is no water nearby for the salmon"
 }

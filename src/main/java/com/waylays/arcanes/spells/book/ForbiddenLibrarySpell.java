@@ -103,8 +103,9 @@ public class ForbiddenLibrarySpell extends SummoningSpell {
     }
 
     @Override
-    protected void summon(Level level, int spellLevel, LivingEntity entity) {
+    protected boolean summon(Level level, int spellLevel, LivingEntity entity) {
         int count = getCount(spellLevel);
+        boolean summoned = false;
         Vec3 eye = entity.getEyePosition();
         for (int i = 0; i < count; i++) {
             float a = entity.getYRot() * Mth.DEG_TO_RAD + (i + .5f) * Mth.TWO_PI / count;
@@ -121,7 +122,7 @@ public class ForbiddenLibrarySpell extends SummoningSpell {
             if (entity instanceof Mob mob && mob.getTarget() != null) {
                 grimoire.setTarget(mob.getTarget());
             }
-            level.addFreshEntity(grimoire);
+            summoned |= level.addFreshEntity(grimoire);
             SpellUtil.particles(level, BookFx.paper(), spot.x, spot.y, spot.z, 10, .2, .2, .2, .15);
             SpellUtil.particles(level, ParticleTypes.ENCHANT, spot.x, spot.y, spot.z, 25, .2, .2, .2, 1);
             SpellUtil.particles(level, BookFx.VIOLET_DUST, spot.x, spot.y, spot.z, 12, .3, .3, .3, 0);
@@ -129,6 +130,7 @@ public class ForbiddenLibrarySpell extends SummoningSpell {
         }
         SpellUtil.particles(level, new BlastwaveParticleOptions(BookFx.VIOLET, 3.5f), entity.getX(), entity.getY() + .1, entity.getZ(), 1, 0, 0, 0, 0);
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 1.5f, .8f);
+        return summoned;
     }
 
     /** 2 grimoires, 3 from level 2, 4 from level 4. */

@@ -10,7 +10,7 @@ import net.minecraft.util.Mth;
 
 /**
  * Mana salmon: Minecraft's salmon shape in mana, swaying from side to side as salmon swim and pitching up or down
- * with its course (never flopped on its side, it swims in the air too).
+ * with its course; stranded on land it lies on its side and thrashes.
  */
 public class ManaSalmonRenderer extends ManaCreatureRenderer<ManaSalmon, SalmonModel<ManaSalmon>> {
     public ManaSalmonRenderer(EntityRendererProvider.Context context) {
@@ -20,12 +20,21 @@ public class ManaSalmonRenderer extends ManaCreatureRenderer<ManaSalmon, SalmonM
     @Override
     protected void setupRotations(ManaSalmon entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
         super.setupRotations(entity, poseStack, ageInTicks, rotationYaw, partialTicks);
-        poseStack.mulPose(Axis.YP.rotationDegrees(4.3f * Mth.sin(.6f * ageInTicks)));
-        double dx = entity.getX() - entity.xo;
-        double dy = entity.getY() - entity.yo;
-        double dz = entity.getZ() - entity.zo;
-        float pitch = (float) Mth.clamp(Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz) + 1.0E-3)), -55, 55);
-        poseStack.mulPose(Axis.XP.rotationDegrees(pitch));
+        boolean inWater = entity.isInWater();
+        // Out of water it thrashes harder, lying on its side
+        float wriggle = inWater ? 4.3f * Mth.sin(.6f * ageInTicks) : 5.6f * Mth.sin(1.02f * ageInTicks);
+        poseStack.mulPose(Axis.YP.rotationDegrees(wriggle));
+        if (inWater) {
+            double dx = entity.getX() - entity.xo;
+            double dy = entity.getY() - entity.yo;
+            double dz = entity.getZ() - entity.zo;
+            float pitch = (float) Mth.clamp(Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz) + 1.0E-3)), -55, 55);
+            poseStack.mulPose(Axis.XP.rotationDegrees(pitch));
+        }
         poseStack.translate(0, 0, -.4f);
+        if (!inWater) {
+            poseStack.translate(.2f, .1f, 0);
+            poseStack.mulPose(Axis.ZP.rotationDegrees(90));
+        }
     }
 }

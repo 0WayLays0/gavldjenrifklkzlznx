@@ -95,8 +95,9 @@ public class GoldenSentinelsSpell extends SummoningSpell {
     }
 
     @Override
-    protected void summon(Level level, int spellLevel, LivingEntity entity) {
+    protected boolean summon(Level level, int spellLevel, LivingEntity entity) {
         int count = getCount(spellLevel);
+        boolean summoned = false;
         for (int i = 0; i < count; i++) {
             float a = entity.getYRot() * Mth.DEG_TO_RAD + i * Mth.TWO_PI / count;
             Vec3 spot = SpellUtil.groundAt(level, entity.position().add(-Mth.sin(a) * 2, 0, Mth.cos(a) * 2), 3, 2);
@@ -113,13 +114,14 @@ public class GoldenSentinelsSpell extends SummoningSpell {
             if (entity instanceof Mob mob && mob.getTarget() != null) {
                 sentinel.setTarget(mob.getTarget());
             }
-            level.addFreshEntity(sentinel);
+            summoned |= level.addFreshEntity(sentinel);
             SpellUtil.particles(level, GoldFx.sparks(), spot.x, spot.y + .1, spot.z, 15, .3, .05, .3, .3);
             SpellUtil.particles(level, GoldFx.DEEP_DUST, spot.x, spot.y + 1, spot.z, 30, .35, .9, .35, .02);
             SpellUtil.particles(level, GoldFx.nuggetShards(), spot.x, spot.y + 2, spot.z, 12, .3, .2, .3, .1);
             level.playSound(null, spot.x, spot.y, spot.z, SoundEvents.ANVIL_PLACE, SoundSource.PLAYERS, .6f, 1.2f + i * .1f);
         }
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 1.5f, .8f);
+        return summoned;
     }
 
     public int getCount(int spellLevel) {
