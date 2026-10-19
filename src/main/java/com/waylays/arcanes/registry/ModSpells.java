@@ -3,10 +3,13 @@ package com.waylays.arcanes.registry;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.spells.book.BookmarkSpell;
 import com.waylays.arcanes.spells.book.FinalChapterSpell;
+import com.waylays.arcanes.spells.book.FlyingStackSpell;
 import com.waylays.arcanes.spells.book.ForbiddenLibrarySpell;
 import com.waylays.arcanes.spells.book.LivingInkSpell;
+import com.waylays.arcanes.spells.book.OrigamiDragonSpell;
 import com.waylays.arcanes.spells.book.PageStormSpell;
 import com.waylays.arcanes.spells.book.PaperCranesSpell;
+import com.waylays.arcanes.spells.book.PaperTempestSpell;
 import com.waylays.arcanes.spells.book.ParchmentAegisSpell;
 import com.waylays.arcanes.spells.book.QuillOfFateSpell;
 import com.waylays.arcanes.spells.book.RazorPagesSpell;
@@ -89,6 +92,9 @@ public final class ModSpells {
     public static final RegistryObject<AbstractSpell> PAPER_CRANES = register(new PaperCranesSpell());
     public static final RegistryObject<AbstractSpell> QUILL_OF_FATE = register(new QuillOfFateSpell());
     public static final RegistryObject<AbstractSpell> PARCHMENT_AEGIS = register(new ParchmentAegisSpell());
+    public static final RegistryObject<AbstractSpell> PAPER_TEMPEST = register(new PaperTempestSpell());
+    public static final RegistryObject<AbstractSpell> FLYING_STACK = register(new FlyingStackSpell());
+    public static final RegistryObject<AbstractSpell> ORIGAMI_DRAGON = register(new OrigamiDragonSpell());
 
     // Errethys school: summoned creatures of mana
     public static final RegistryObject<AbstractSpell> MANA_RATS = register(new ManaRatsSpell());

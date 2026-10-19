@@ -77,7 +77,7 @@ public final class BookGameTests {
                 count++;
             }
         }
-        helper.assertTrue(count == 13, "expected 13 Book spells, got " + count);
+        helper.assertTrue(count == 16, "expected 16 Book spells, got " + count);
         helper.assertTrue(helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).containsKey(ModSchools.BOOK_MAGIC),
                 "book_magic damage type missing");
         helper.assertTrue(book.isFocus(new ItemStack(Items.BOOK)), "a book is not the Book focus");

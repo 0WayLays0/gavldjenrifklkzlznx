@@ -178,6 +178,8 @@ public final class ClientSmokeTest {
         }
         try {
             ServerLevel level = player.serverLevel();
+            // Off the Flying Stack, so every spell is cast from the ground
+            player.stopRiding();
             var school = spell.getSchoolType().getId();
             var book = school.equals(ModSchools.EXPLOSION_RESOURCE) ? ModItems.DETONATION_CODEX.get()
                     : school.equals(ModSchools.BOOK_RESOURCE) ? ModItems.LIVING_GRIMOIRE.get() : ModItems.GOLDEN_GRIMOIRE.get();

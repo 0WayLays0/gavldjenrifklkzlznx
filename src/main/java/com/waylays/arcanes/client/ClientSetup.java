@@ -13,6 +13,7 @@ import com.waylays.arcanes.client.render.ChapterRuneRenderer;
 import com.waylays.arcanes.client.render.FinalChapterRenderer;
 import com.waylays.arcanes.client.render.EldoradoSunRenderer;
 import com.waylays.arcanes.client.render.FlyingGrimoireRenderer;
+import com.waylays.arcanes.client.render.FlyingStackRenderer;
 import com.waylays.arcanes.client.render.GildedChainsRenderer;
 import com.waylays.arcanes.client.render.GlowOrbRenderer;
 import com.waylays.arcanes.client.render.GoldItemProjectileRenderer;
@@ -25,8 +26,10 @@ import com.waylays.arcanes.client.render.ManaCamelRenderer;
 import com.waylays.arcanes.client.render.ManaCreatureRenderer;
 import com.waylays.arcanes.client.render.ManaSalmonRenderer;
 import com.waylays.arcanes.client.render.MoltenPoolRenderer;
+import com.waylays.arcanes.client.render.OrigamiDragonRenderer;
 import com.waylays.arcanes.client.render.PageStormRenderer;
 import com.waylays.arcanes.client.render.PaperCraneRenderer;
+import com.waylays.arcanes.client.render.PaperTempestRenderer;
 import com.waylays.arcanes.client.render.QuillStrokeRenderer;
 import com.waylays.arcanes.client.render.RazorPageRenderer;
 import com.waylays.arcanes.client.render.RewriteAuraRenderer;
@@ -94,6 +97,9 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.PAPER_CRANE.get(), PaperCraneRenderer::new);
         event.registerEntityRenderer(ModEntities.QUILL_STROKE.get(), QuillStrokeRenderer::new);
         event.registerEntityRenderer(ModEntities.AEGIS_PAGES.get(), AegisPagesRenderer::new);
+        event.registerEntityRenderer(ModEntities.PAPER_TEMPEST.get(), PaperTempestRenderer::new);
+        event.registerEntityRenderer(ModEntities.FLYING_STACK.get(), FlyingStackRenderer::new);
+        event.registerEntityRenderer(ModEntities.ORIGAMI_DRAGON.get(), OrigamiDragonRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));

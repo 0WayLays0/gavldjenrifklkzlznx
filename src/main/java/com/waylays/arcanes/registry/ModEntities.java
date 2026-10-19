@@ -6,11 +6,14 @@ import com.waylays.arcanes.entity.book.BookmarkMarker;
 import com.waylays.arcanes.entity.book.ChapterRune;
 import com.waylays.arcanes.entity.book.FinalChapter;
 import com.waylays.arcanes.entity.book.FlyingGrimoire;
+import com.waylays.arcanes.entity.book.FlyingStack;
 import com.waylays.arcanes.entity.book.GrimoireBolt;
 import com.waylays.arcanes.entity.book.InkHands;
 import com.waylays.arcanes.entity.book.InkWave;
+import com.waylays.arcanes.entity.book.OrigamiDragon;
 import com.waylays.arcanes.entity.book.PageStorm;
 import com.waylays.arcanes.entity.book.PaperCrane;
+import com.waylays.arcanes.entity.book.PaperTempest;
 import com.waylays.arcanes.entity.book.QuillStroke;
 import com.waylays.arcanes.entity.book.RazorPage;
 import com.waylays.arcanes.entity.book.RewriteAura;
@@ -162,6 +165,15 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<AegisPages>> AEGIS_PAGES = register("aegis_pages",
             EntityType.Builder.<AegisPages>of(AegisPages::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
+    public static final RegistryObject<EntityType<PaperTempest>> PAPER_TEMPEST = register("paper_tempest",
+            EntityType.Builder.<PaperTempest>of(PaperTempest::new, MobCategory.MISC).sized(1f, 2f).clientTrackingRange(96).updateInterval(2));
+
+    public static final RegistryObject<EntityType<FlyingStack>> FLYING_STACK = register("flying_stack",
+            EntityType.Builder.<FlyingStack>of(FlyingStack::new, MobCategory.MISC).sized(1.3f, .5f).clientTrackingRange(10));
+
+    public static final RegistryObject<EntityType<OrigamiDragon>> ORIGAMI_DRAGON = register("origami_dragon",
+            EntityType.Builder.<OrigamiDragon>of(OrigamiDragon::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(1).fireImmune());
+
     // Errethys school
     public static final RegistryObject<EntityType<ManaRat>> MANA_RAT = register("mana_rat",
             EntityType.Builder.<ManaRat>of(ManaRat::new, MobCategory.MISC).sized(.5f, .4f).clientTrackingRange(10));
@@ -188,6 +200,7 @@ public final class ModEntities {
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(GOLDEN_SENTINEL.get(), GoldenSentinel.createAttributes().build());
         event.put(FLYING_GRIMOIRE.get(), FlyingGrimoire.createAttributes().build());
+        event.put(FLYING_STACK.get(), FlyingStack.createAttributes().build());
         event.put(MANA_RAT.get(), ManaRat.createAttributes().build());
         event.put(MANA_SALMON.get(), ManaSalmon.createAttributes().build());
         event.put(MANA_SERPENT.get(), ManaSerpent.createAttributes().build());
