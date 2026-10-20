@@ -91,7 +91,7 @@ public final class WeaponGameTests {
         return helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(x, 2, z));
     }
 
-    /** Turns a no-AI entity to look at {@code at}. */
+    /** Turns {@code entity} to look at {@code at}. */
     private static void lookAt(LivingEntity entity, Vec3 at) {
         Vec3 d = at.subtract(entity.getEyePosition());
         float yaw = (float) (Mth.atan2(-d.x, d.z) * Mth.RAD_TO_DEG);
@@ -401,11 +401,13 @@ public final class WeaponGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_rain", timeoutTicks = 80)
     public static void arrowRainFallsWhereTheArcherLooked(GameTestHelper helper) {
-        Witch archer = caster(helper, 4.5, .5);
+        // An armor stand keeps looking where it is turned (a mob's look control would level its eyes again)
+        ArmorStand archer = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 2, .5));
         // Looking down at the floor a few blocks ahead
-        lookAt(archer, helper.absoluteVec(new Vec3(4.5, 2, 5.5)));
-        Vec3 spot = BowRainSkill.target(helper.getLevel(), archer);
         Vec3 expected = helper.absoluteVec(new Vec3(4.5, 2, 5.5));
+        lookAt(archer, expected);
+        helper.onEachTick(() -> lookAt(archer, expected));
+        Vec3 spot = BowRainSkill.target(helper.getLevel(), archer);
         helper.assertTrue(spot.distanceTo(expected) < 1.5, "the rain would fall at " + spot + " instead of " + expected);
         cast(helper, ModSpells.BOW_RAIN, archer);
         helper.runAfterDelay(BowRainSkill.SHOT_TICK + BowRainSkill.FALL_DELAY + 7, () -> {
@@ -447,14 +449,15 @@ public final class WeaponGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "weapons_harpoon", timeoutTicks = 50)
     public static void harpoonHaulsTheVictimIn(GameTestHelper helper) {
-        Witch shooter = caster(helper, 4.5, .5);
+        // An armor stand keeps looking where it is turned (a mob's look control would level its eyes again)
+        ArmorStand shooter = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 2, .5));
         Pig pig = helper.spawn(EntityType.PIG, new Vec3(4.5, 2, 7.5));
         // It cannot walk off, but the rope can still drag it
         pig.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 10));
         double[] start = new double[1];
         helper.runAfterDelay(CrossbowHarpoonSkill.SHOT_TICK, () -> start[0] = pig.getZ());
-        // Aimed at the pig, which is shorter than the shooter's eyes
-        lookAt(shooter, pig.getBoundingBox().getCenter());
+        // Aimed at the pig, which is shorter than the shooter's eyes, a little high for the drop
+        helper.onEachTick(() -> lookAt(shooter, pig.getBoundingBox().getCenter().add(0, .3, 0)));
         cast(helper, ModSpells.CROSSBOW_HARPOON, shooter);
         helper.runAfterDelay(CrossbowHarpoonSkill.SHOT_TICK + 16, () -> {
             helper.assertTrue(hurt(pig), "the harpoon missed");
