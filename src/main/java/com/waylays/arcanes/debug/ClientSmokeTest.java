@@ -59,7 +59,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The run ends with {@code [SmokeTest] PASS} or {@code [SmokeTest] FAIL ...} and stops the client.
  * A watchdog halts the JVM (exit code 3) if the whole run takes too long.
  */
-@EventBusSubscriber(modid = ArcanesOublies.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ArcanesOublies.MODID, value = Dist.CLIENT)
 public final class ClientSmokeTest {
     private static final boolean ENABLED = Boolean.getBoolean("arcanes.autotest");
     private static final int SPELL_LEVEL = 5;

@@ -49,6 +49,8 @@ jobs:
         run: |
           set -o pipefail
           ./gradlew runGameTestServer --console=plain 2>&1 | tee gametest.log
+          # The run task succeeds even when the server never starts: the tests' own verdict decides
+          grep -q "required tests passed" gametest.log || { echo "::error::The GameTests did not all pass (or never ran)"; exit 1; }
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4

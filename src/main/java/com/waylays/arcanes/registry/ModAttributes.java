@@ -13,7 +13,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 /**
  * Per-school power and resistance attributes, built like Iron's own (default 1.0 = 100%).
  */
-@EventBusSubscriber(modid = ArcanesOublies.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public final class ModAttributes {
     public static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create(Registries.ATTRIBUTE, ArcanesOublies.MODID);
 

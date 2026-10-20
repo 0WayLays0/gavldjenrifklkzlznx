@@ -68,7 +68,7 @@ public final class SpellUtil {
 
     public static void cameraShake(Level level, Vec3 origin, int ticks, float radius) {
         if (!level.isClientSide) {
-            CameraShakeManager.addCameraShake(new CameraShakeData(ticks, origin, radius));
+            CameraShakeManager.addCameraShake(new CameraShakeData(level, ticks, origin, radius));
         }
     }
 

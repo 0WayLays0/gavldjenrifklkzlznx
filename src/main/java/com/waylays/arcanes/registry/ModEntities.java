@@ -56,7 +56,7 @@ import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-@EventBusSubscriber(modid = ArcanesOublies.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public final class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, ArcanesOublies.MODID);
 

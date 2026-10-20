@@ -53,7 +53,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
-@EventBusSubscriber(modid = ArcanesOublies.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ArcanesOublies.MODID, value = Dist.CLIENT)
 public final class ClientSetup {
     private ClientSetup() {}
 
