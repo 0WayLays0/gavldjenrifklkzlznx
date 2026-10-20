@@ -2,7 +2,7 @@
   ADDONS POUR IRON'S SPELLS 'N SPELLBOOKS - LISTE DES ÉCOLES ET DES SORTS
 ================================================================================
 
-Version Minecraft / loader : 1.20.1 Forge (choisi par défaut pour la bêta, modifiable)
+Version Minecraft / loader : 1.21.1 NeoForge (1.20.1 Forge jusqu'à la 0.9.0)
 Nom du mod / modid       : Arcanes Oubliés / arcanes_oublies (provisoire)
 
 Contenu prévu pour chaque école :
@@ -28,6 +28,7 @@ Ordre de développement :
  10. Errethys (invocations de mana) - demandée en plus
  11. Caractéristique Physique (techniques de combat, pas de la magie) -
      demandée en plus
+ 12. Magie de Boss (attaques de boss annoncées au sol) - demandée en plus
 
 
 ================================================================================
@@ -457,6 +458,37 @@ Commandes staff uniquement (permission opérateur, les joueurs ne les ont pas) :
 Points à régler en jeu :
  - sensibilité de la reconnaissance vocale,
  - choix de mots faciles à reconnaître pour chaque sort.
+
+
+================================================================================
+12. MAGIE DE BOSS (attaques de boss final)                       [~] EN TEST
+================================================================================
+Des attaques ultimes de boss de RPG : cercles runiques géants, symboles,
+zones de danger au sol. Chaque attaque est annoncée 3,5 s avant l'impact
+(réglable : [boss] warningTicks dans la config serveur) et ne touche que ceux
+encore dans la zone. Livre : Codex du Tyran. Focus : étoile du Nether.
+
+ 1. Crushing Meteor    [~] Cercle runique dans le ciel, météore qui s'écrase,
+                           puis onde de choc en anneau autour du cratère.
+ 2. Judgment Blade     [~] Lame de lumière géante abattue sur une longue bande,
+                           qui jaillit ensuite en piliers de lumière.
+ 3. Annihilation Beam  [~] Cercle runique debout qui se charge, puis rayon
+                           d'énergie de 2 s le long de la bande marquée.
+ 4. Triple Nova        [~] Disque central, puis anneau, puis anneau plus large
+                           qui explosent l'un après l'autre.
+ 5. Starfall           [~] Petits cercles marqués en cascade, une étoile tombe
+                           dans chacun à son tour.
+ 6. Seismic Rift       [~] Faille qui s'ouvre tronçon par tronçon depuis les
+                           pieds du lanceur et projette en l'air.
+ 7. Void Orb           [~] Sphère de ténèbres lente sur un chemin marqué ;
+                           effondrement qui aspire, puis explosion.
+ 8. Cross of Light     [~] Croix de piliers de lumière, puis seconde croix
+                           tournée d'un huitième de tour.
+ 9. Rune Prison        [~] Mur de runes en anneau autour de la cible : on ne
+                           le franchit pas sans être blessé et repoussé.
+10. Last Judgment      [~] ULTIME - Arène entière condamnée sauf trois
+                           refuges ; météores pendant le compte à rebours,
+                           puis le jugement frappe tout le reste.
 
 
 ================================================================================

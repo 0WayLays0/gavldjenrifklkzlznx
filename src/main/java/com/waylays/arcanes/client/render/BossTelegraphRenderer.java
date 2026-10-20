@@ -422,11 +422,12 @@ public class BossTelegraphRenderer extends EntityRenderer<BossTelegraph> {
         }
 
         static Ground of(BossTelegraph t) {
-            if (!(t.clientGround instanceof Ground g) || t.tickCount - g.builtAt > 20 || g.level != t.level()) {
-                g = new Ground(t.level(), t.getY(), t.tickCount);
-                t.clientGround = g;
+            if (t.clientGround instanceof Ground g && t.tickCount - g.builtAt <= 20 && g.level == t.level()) {
+                return g;
             }
-            return g;
+            Ground fresh = new Ground(t.level(), t.getY(), t.tickCount);
+            t.clientGround = fresh;
+            return fresh;
         }
 
         float height(double x, double z) {

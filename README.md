@@ -1,15 +1,20 @@
 # Arcanes Oubliés
 
-Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.20.1, Forge 47.4+), pour notre serveur RP.
+Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.21.1, NeoForge 21.1.221+), pour notre serveur RP.
+La dernière version pour Minecraft 1.20.1 (Forge) est la 0.9.0 (commit `6359b13` de l'historique).
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 0.9.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys et Caractéristique Physique
+## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique et Magie de Boss
 
-Trois nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
+Quatre nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
 12 pour le Grimoire Vivant), plus l'école d'invocation Errethys (5 sorts, pas encore de livre) et les techniques de
-combat de Caractéristique Physique (37 techniques pour 9 styles d'armes, ce n'est pas de la magie). Un onglet créatif
-« Arcanes Oubliés » contient les livres et tous les parchemins à tous les niveaux.
+combat de Caractéristique Physique (37 techniques pour 9 styles d'armes, ce n'est pas de la magie).
+
+**Onglets créatifs** : un onglet par école (« Arcanes Oubliés : Or », « … : Explosion », « … : Livre »,
+« … : Errethys », « … : Caractéristique Physique », « … : Magie de Boss »), côte à côte. Chacun contient le livre de
+l'école puis le parchemin de chacun de ses sorts à tous les niveaux, dans l'ordre (style par style pour
+Caractéristique Physique).
 
 **Invocations** (Sentinelles d'Or, Bibliothèque Interdite, Pile Volante, Dragon d'Origami et tous les sorts
 d'Errethys) : relancer le sort renvoie ses invocations (relance d'Iron's, instantanée et gratuite, visible sur
@@ -159,9 +164,42 @@ d'une arbalète allonge le Carreau Perforant. Focus de
 l'école : cuir. Les coûts, recharges et la puissance de chaque technique se règlent dans la configuration serveur
 d'Iron's, comme pour tous les sorts.
 
+### Magie de Boss
+
+Des attaques dignes d'un boss final de RPG. Chacune est **annoncée** : dès le lancement, la zone menacée est dessinée
+au sol (cercle, anneau, ligne ou cône) sous des cercles de runes qui tournent, épouse le relief bloc par bloc, se
+remplit comme un compte à rebours jusqu'à l'impact, son bord pulse de plus en plus vite et des symboles s'en élèvent ;
+les attaques venues d'en haut ont en plus un grand cercle runique dans le ciel. La dernière seconde, des étincelles
+soulignent le bord (lisible même dans l'herbe haute) et un son monte. **3,5 s** séparent l'apparition d'une zone de
+son impact (réglable) ; seuls ceux qui sont **encore dans la zone** au moment de l'impact sont touchés, sortir à temps
+suffit. Le lanceur et ses alliés ne sont jamais touchés, et le lanceur peut bouger pendant que l'attaque se prépare.
+Plusieurs attaques ont plusieurs temps (impact puis onde de choc, coup puis éruption, trois anneaux l'un après
+l'autre), chaque temps ayant sa propre zone et son propre compte à rebours.
+
+| Sort | Effet |
+|---|---|
+| **Météore Écrasant** (Crushing Meteor) | Un cercle de runes s'ouvre dans le ciel au-dessus de la cible et marque le sol ; un météore en flammes s'y écrase (gros dégâts, brûlure, recul), puis une onde de choc part en anneau autour du cratère une seconde plus tard. |
+| **Lame du Jugement** (Judgment Blade) | Une lame de lumière géante se dresse sur une longue bande marquée devant le lanceur (18 à 26 blocs) et s'abat dessus ; la bande jaillit en piliers de lumière une seconde après. |
+| **Rayon d'Anéantissement** (Annihilation Beam) | Un cercle de runes se dresse debout devant le lanceur et se charge, puis un rayon d'énergie balaie la bande marquée (28 à 32 blocs) pendant 2 s. |
+| **Nova Triple** (Triple Nova) | Trois zones de feu autour du lanceur : le disque central explose, puis un anneau, puis un anneau plus large (13 blocs), l'un après l'autre. |
+| **Pluie d'Étoiles** (Starfall) | De petits cercles se marquent en cascade autour de la cible ; une étoile tombe dans chacun à son tour (7 à 15 étoiles). |
+| **Faille Sismique** (Seismic Rift) | Une faille se marque depuis les pieds du lanceur et s'ouvre tronçon par tronçon en projetant en l'air ceux qui s'y trouvent : le danger avance le long de la ligne. |
+| **Orbe du Néant** (Void Orb) | Une énorme sphère de ténèbres roule lentement sur un chemin marqué (la toucher blesse, s'en approcher attire) ; au bout, elle s'effondre en aspirant tout autour, puis explose. |
+| **Croix de Lumière** (Cross of Light) | Une grande croix de lumière se marque autour de la cible et jaillit en piliers, puis une seconde croix tournée d'un huitième de tour. |
+| **Prison Runique** (Rune Prison) | Un anneau se marque autour de la cible, puis un mur de runes s'y dresse 10 à 16 s : quiconque n'est pas du camp du lanceur et tente de le franchir est blessé et repoussé. |
+| **Jugement Dernier** (Last Judgment, ultime) | Un cercle de runes géant s'ouvre dans le ciel ; toute l'arène autour du lanceur (15 blocs) est condamnée, sauf trois petits refuges verts. Cinq météores tombent pendant le compte à rebours, puis le jugement frappe tout ce qui est hors des refuges. |
+
+Livre : **Codex du Tyran** (cuir rouge sang, cercle de runes ardent sur la couverture, ferrures noires et dorées).
+Focus de l'école : étoile du Nether. Le lanceur a ses propres animations (bras levés vers le ciel, lame abattue,
+poings au sol, mains en avant pour le rayon, bras écartés pour la prison).
+
+**Option staff** : la durée d'avertissement se règle dans `<monde>/serverconfig/arcanes_oublies-server.toml`,
+section `[boss]`, `warningTicks` (70 ticks = 3,5 s par défaut, de 40 à 200).
+
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
 (`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre, `tools/errethys_assets.py`
-pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` pour Caractéristique Physique).
+pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` pour Caractéristique Physique,
+`tools/boss_assets.py` pour la Magie de Boss).
 
 ## Récupérer le mod
 
@@ -174,17 +212,19 @@ Chaque push lance le workflow GitHub Actions **Build & Test** :
 
 Dans le dossier `mods` (client et serveur), à côté de :
 
-- Iron's Spells 'n Spellbooks 1.20.1-3.4.0 ou plus récent
-- ses dépendances : Curios, GeckoLib, Player Animator, Caelus
+- NeoForge 21.1.221 ou plus récent (Minecraft 1.21.1)
+- Iron's Spells 'n Spellbooks 1.21.1-3.16 ou plus récent
+- ses dépendances : Iron's Lib, Curios, GeckoLib, Player Animator
 
 ## Développer
 
 - Le code est dans `src/main/java/com/waylays/arcanes`.
 - Textures, modèles d'objets et animations des techniques : modifier `tools/gen_assets.py` (ou `explosion_assets.py`,
-  `book_assets.py`, `errethys_assets.py`, `physical_assets.py`) puis lancer
+  `book_assets.py`, `errethys_assets.py`, `physical_assets.py`, `boss_assets.py`) puis lancer
   `python3 tools/gen_assets.py` (Pillow).
   Une texture faite à la main peut aussi remplacer directement le PNG du même nom.
-- Animations des techniques : `tools/physical_animations.py`, écrites avec le petit squelette de `tools/anim_rig.py`
+- Animations des techniques et des lanceurs de Magie de Boss : `tools/physical_animations.py` et
+  `tools/boss_animations.py`, écrites avec le petit squelette de `tools/anim_rig.py`
   (hanches, buste, bras qui suivent les épaules, main gauche qui saisit les armes à deux mains, une clé par tick).
   `python3 tools/anim_preview.py <fichier.json> <animation> <sortie.png>` dessine une animation tick par tick (de
   profil, de trois quarts et de dessus) comme Player Animator la joue, pour la vérifier avant de lancer le jeu.
