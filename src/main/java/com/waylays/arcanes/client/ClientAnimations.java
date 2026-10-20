@@ -27,10 +27,12 @@ public final class ClientAnimations {
         if (Minecraft.getInstance().level == null || !(Minecraft.getInstance().level.getEntity(entityId) instanceof AbstractClientPlayer player)) {
             return;
         }
-        KeyframeAnimation keyframes = PlayerAnimationRegistry.getAnimation(animation);
+        if (!(PlayerAnimationRegistry.getAnimation(animation) instanceof KeyframeAnimation keyframes)) {
+            return;
+        }
         @SuppressWarnings("unchecked")
         ModifierLayer<IAnimation> layer = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(player).get(SpellAnimations.ANIMATION_RESOURCE);
-        if (keyframes == null || layer == null) {
+        if (layer == null) {
             return;
         }
         KeyframeAnimationPlayer animationPlayer = new KeyframeAnimationPlayer(keyframes);

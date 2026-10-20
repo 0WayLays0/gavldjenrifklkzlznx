@@ -77,7 +77,7 @@ public class DetonationWaveSpell extends AbstractSpell {
 
     @Override
     public Optional<SoundEvent> getCastFinishSound() {
-        return Optional.of(SoundEvents.GENERIC_EXPLODE);
+        return Optional.of(SoundEvents.GENERIC_EXPLODE.value());
     }
 
     @Override

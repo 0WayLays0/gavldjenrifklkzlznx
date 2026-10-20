@@ -140,8 +140,8 @@ public class FlyingGrimoire extends PathfinderMob implements FlyingAnimal, Owned
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.3, true) {
             @Override
-            protected double getAttackReachSqr(LivingEntity target) {
-                return 2.2 * 2.2 + target.getBbWidth();
+            protected boolean canPerformAttack(LivingEntity target) {
+                return isTimeToAttack() && mob.distanceToSqr(target) <= 2.2 * 2.2 + target.getBbWidth() && mob.getSensing().hasLineOfSight(target);
             }
         });
         this.goalSelector.addGoal(2, new SummonFollowOwnerGoal(this, 1.2, 4, 2.5, .3f));

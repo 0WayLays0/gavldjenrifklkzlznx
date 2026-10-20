@@ -68,8 +68,8 @@ public class ManaCrow extends ManaSummon implements FlyingAnimal {
     protected void registerMoveGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.5, true) {
             @Override
-            protected double getAttackReachSqr(LivingEntity target) {
-                return 2 * 2 + target.getBbWidth();
+            protected boolean canPerformAttack(LivingEntity target) {
+                return isTimeToAttack() && mob.distanceToSqr(target) <= 2 * 2 + target.getBbWidth() && mob.getSensing().hasLineOfSight(target);
             }
         });
         this.goalSelector.addGoal(2, new CircleOwnerGoal(this));

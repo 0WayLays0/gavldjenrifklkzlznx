@@ -22,7 +22,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
@@ -42,7 +42,7 @@ public class ManaSalmon extends ManaSummon {
         super(entityType, level);
         this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, .02f, .01f, false);
         this.lookControl = new SmoothSwimmingLookControl(this, 10);
-        setPathfindingMalus(BlockPathTypes.WATER, 0);
+        setPathfindingMalus(PathType.WATER, 0);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -67,8 +67,8 @@ public class ManaSalmon extends ManaSummon {
     protected void registerMoveGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.4, true) {
             @Override
-            protected double getAttackReachSqr(LivingEntity target) {
-                return 1.8 * 1.8 + target.getBbWidth();
+            protected boolean canPerformAttack(LivingEntity target) {
+                return isTimeToAttack() && mob.distanceToSqr(target) <= 1.8 * 1.8 + target.getBbWidth() && mob.getSensing().hasLineOfSight(target);
             }
         });
         this.goalSelector.addGoal(2, new FollowOwnerInWaterGoal(this));
@@ -113,11 +113,6 @@ public class ManaSalmon extends ManaSummon {
         if (dryTicks > DRY_TICKS) {
             dissolve();
         }
-    }
-
-    @Override
-    public boolean canBreatheUnderwater() {
-        return true;
     }
 
     @Override

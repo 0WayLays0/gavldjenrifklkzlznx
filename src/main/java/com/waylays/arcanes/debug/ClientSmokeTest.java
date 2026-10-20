@@ -121,7 +121,7 @@ public final class ClientSmokeTest {
                 LevelSettings settings = new LevelSettings("arcanes_smoketest", GameType.CREATIVE, false, Difficulty.NORMAL, true,
                         rules, WorldDataConfiguration.DEFAULT);
                 WorldOptions options = new WorldOptions(20261018L, false, false);
-                mc.createWorldOpenFlows().createFreshLevel("arcanes_smoketest_" + System.currentTimeMillis(), settings, options, WorldPresets::createNormalWorldDimensions);
+                mc.createWorldOpenFlows().createFreshLevel("arcanes_smoketest_" + System.currentTimeMillis(), settings, options, WorldPresets::createNormalWorldDimensions, mc.screen);
             } catch (Throwable t) {
                 ArcanesOublies.LOGGER.error("[SmokeTest] FAIL creating the world", t);
                 finish(mc);

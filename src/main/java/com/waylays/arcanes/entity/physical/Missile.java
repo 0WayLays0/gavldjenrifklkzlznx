@@ -224,7 +224,7 @@ public class Missile extends AbstractArrow {
         super.addAdditionalSaveData(tag);
         tag.putInt("Kind", this.entityData.get(DATA_KIND));
         if (!getItem().isEmpty()) {
-            tag.put("Item", getItem().save(new CompoundTag()));
+            tag.put("Item", getItem().save(registryAccess()));
         }
         if (skillId != null) {
             tag.putString("Skill", skillId.toString());
@@ -241,7 +241,7 @@ public class Missile extends AbstractArrow {
         super.readAdditionalSaveData(tag);
         this.entityData.set(DATA_KIND, tag.getInt("Kind"));
         if (tag.contains("Item")) {
-            this.entityData.set(DATA_ITEM, ItemStack.of(tag.getCompound("Item")));
+            this.entityData.set(DATA_ITEM, ItemStack.parseOptional(registryAccess(), tag.getCompound("Item")));
         }
         skillId = tag.contains("Skill") ? ResourceLocation.tryParse(tag.getString("Skill")) : null;
         skillLevel = Math.max(1, tag.getInt("SkillLevel"));

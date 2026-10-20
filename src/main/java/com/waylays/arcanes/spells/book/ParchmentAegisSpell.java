@@ -80,7 +80,7 @@ public class ParchmentAegisSpell extends AbstractSpell {
 
     @Override
     public Optional<SoundEvent> getCastFinishSound() {
-        return Optional.of(SoundEvents.ARMOR_EQUIP_LEATHER);
+        return Optional.of(SoundEvents.ARMOR_EQUIP_LEATHER.value());
     }
 
     @Override

@@ -1,12 +1,13 @@
 package com.waylays.arcanes.spells.book;
 
 import io.redspace.ironsspellbooks.api.spells.ICastDataSerializable;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /** Where Bookmark's marker stands, kept in the caster's recast until the spell is cast again. */
 public class BookmarkData implements ICastDataSerializable {
@@ -58,7 +59,7 @@ public class BookmarkData implements ICastDataSerializable {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         tag.putDouble("X", pos.x);
         tag.putDouble("Y", pos.y);
@@ -73,7 +74,7 @@ public class BookmarkData implements ICastDataSerializable {
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         pos = new Vec3(tag.getDouble("X"), tag.getDouble("Y"), tag.getDouble("Z"));
         yRot = tag.getFloat("YRot");
         xRot = tag.getFloat("XRot");

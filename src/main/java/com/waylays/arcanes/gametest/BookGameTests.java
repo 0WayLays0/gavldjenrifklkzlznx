@@ -321,7 +321,7 @@ public final class BookGameTests {
         helper.assertTrue(pages == 3, "expected 3 pages at level 1, got " + pages);
         // An arrow flying in from the side is caught by a page
         Vec3 from = helper.absoluteVec(new Vec3(8.5, 3.2, 4.5));
-        Arrow arrow = new Arrow(helper.getLevel(), from.x, from.y, from.z);
+        Arrow arrow = new Arrow(helper.getLevel(), from.x, from.y, from.z, new ItemStack(Items.ARROW), null);
         arrow.setDeltaMovement(-1.2, 0, 0);
         helper.getLevel().addFreshEntity(arrow);
         helper.runAfterDelay(8, () -> {

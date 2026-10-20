@@ -13,6 +13,7 @@ import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.Utils;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -83,13 +84,13 @@ public class RewriteSpell extends AbstractSpell {
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         // Erase the bad chapters: harmful effects come off as ink
-        List<MobEffect> erased = new ArrayList<>();
+        List<Holder<MobEffect>> erased = new ArrayList<>();
         for (MobEffectInstance instance : entity.getActiveEffects()) {
-            if (instance.getEffect().getCategory() == MobEffectCategory.HARMFUL) {
+            if (instance.getEffect().value().getCategory() == MobEffectCategory.HARMFUL) {
                 erased.add(instance.getEffect());
             }
         }
-        for (MobEffect effect : erased) {
+        for (Holder<MobEffect> effect : erased) {
             entity.removeEffect(effect);
         }
         entity.clearFire();

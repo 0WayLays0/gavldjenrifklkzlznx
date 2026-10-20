@@ -18,8 +18,8 @@ public class ManaSalmonRenderer extends ManaCreatureRenderer<ManaSalmon, SalmonM
     }
 
     @Override
-    protected void setupRotations(ManaSalmon entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
-        super.setupRotations(entity, poseStack, ageInTicks, rotationYaw, partialTicks);
+    protected void setupRotations(ManaSalmon entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
+        super.setupRotations(entity, poseStack, ageInTicks, rotationYaw, partialTicks, scale);
         boolean inWater = entity.isInWater();
         // Out of water it thrashes harder, lying on its side
         float wriggle = inWater ? 4.3f * Mth.sin(.6f * ageInTicks) : 5.6f * Mth.sin(1.02f * ageInTicks);

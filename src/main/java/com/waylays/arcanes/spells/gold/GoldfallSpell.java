@@ -24,6 +24,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -84,7 +85,7 @@ public class GoldfallSpell extends AbstractSpell {
 
     @Override
     public Optional<SoundEvent> getCastFinishSound() {
-        return Optional.of(SoundEvents.ARMOR_EQUIP_GOLD);
+        return Optional.of(SoundEvents.ARMOR_EQUIP_GOLD.value());
     }
 
     /** While charging: gold dust rises from the caster's hands toward the sky. */
@@ -106,7 +107,7 @@ public class GoldfallSpell extends AbstractSpell {
             // Staggered heights: the ingots land one after the other. Under a roof they start just below it.
             double height = 14 + i * 2.5;
             Vec3 above = ground.add(0, 1, 0);
-            HitResult roof = level.clip(new ClipContext(above, above.add(0, height, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+            HitResult roof = level.clip(new ClipContext(above, above.add(0, height, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
             if (roof.getType() != HitResult.Type.MISS) {
                 height = Math.max(1.5, roof.getLocation().y - ground.y - 1.2);
             }

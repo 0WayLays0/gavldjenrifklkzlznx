@@ -82,7 +82,7 @@ public class AurumBladeSpell extends AbstractSpell {
 
     @Override
     public Optional<SoundEvent> getCastFinishSound() {
-        return Optional.of(SoundEvents.ARMOR_EQUIP_GOLD);
+        return Optional.of(SoundEvents.ARMOR_EQUIP_GOLD.value());
     }
 
     @Override
