@@ -63,7 +63,7 @@ public class KnifePinSkill extends PhysicalSkill implements MissileSkill {
     @Override
     public void onMissileHit(Missile missile, LivingEntity target) {
         missile.strike(target, missile.getDamage(), 0);
-        target.addEffect(new MobEffectInstance(ModEffects.PINNED.get(), getPinTicks(missile.getSkillLevel()), 0, false, true, true));
+        target.addEffect(new MobEffectInstance(ModEffects.PINNED, getPinTicks(missile.getSkillLevel()), 0, false, true, true));
         target.setDeltaMovement(target.getDeltaMovement().multiply(0, 1, 0));
         target.hurtMarked = true;
         missile.level().playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.TRIDENT_HIT_GROUND, SoundSource.PLAYERS, .9f, 1.4f);

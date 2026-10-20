@@ -63,7 +63,7 @@ public class DaggerStabsSkill extends PhysicalSkill {
                 }
                 LivingEntity target = targets.get(0);
                 if (Combat.hit(this, fighter, target, blow(spellLevel, fighter, target, .35f, .5f), 0)) {
-                    target.addEffect(new MobEffectInstance(ModEffects.BLEEDING.get(), getBleedTicks(spellLevel), deep ? 1 : 0, false, true, true));
+                    target.addEffect(new MobEffectInstance(ModEffects.BLEEDING, getBleedTicks(spellLevel), deep ? 1 : 0, false, true, true));
                     level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.PLAYERS, .9f, 1.4f);
                 }
             });

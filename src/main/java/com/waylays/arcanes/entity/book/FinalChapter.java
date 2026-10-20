@@ -6,8 +6,6 @@ import com.waylays.arcanes.spells.book.BookFx;
 import com.waylays.arcanes.spells.book.FinalChapterSpell;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -20,12 +18,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
-import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * The Final Chapter: a colossal grimoire floating above the area. It opens, its pages fly out to form a dome over
@@ -66,8 +63,8 @@ public class FinalChapter extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_HEIGHT, 8f);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_HEIGHT, 8f);
     }
 
     /** Height of the book above the ground (the centre of the dome). */
@@ -195,10 +192,5 @@ public class FinalChapter extends Entity {
         if (tag.hasUUID("Owner")) {
             ownerUUID = tag.getUUID("Owner");
         }
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

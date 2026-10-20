@@ -37,12 +37,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -59,7 +59,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The run ends with {@code [SmokeTest] PASS} or {@code [SmokeTest] FAIL ...} and stops the client.
  * A watchdog halts the JVM (exit code 3) if the whole run takes too long.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ArcanesOublies.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public final class ClientSmokeTest {
     private static final boolean ENABLED = Boolean.getBoolean("arcanes.autotest");
     private static final int SPELL_LEVEL = 5;
@@ -130,8 +130,8 @@ public final class ClientSmokeTest {
     }
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (!ENABLED || event.phase != TickEvent.Phase.END) {
+    public static void onClientTick(ClientTickEvent.Post event) {
+        if (!ENABLED) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
@@ -159,7 +159,7 @@ public final class ClientSmokeTest {
     }
 
     private static void cast(Minecraft mc) {
-        List<RegistryObject<AbstractSpell>> spells = List.copyOf(ModSpells.SPELLS.getEntries());
+        List<DeferredHolder<AbstractSpell, ? extends AbstractSpell>> spells = List.copyOf(ModSpells.SPELLS.getEntries());
         IntegratedServer server = mc.getSingleplayerServer();
         if (server == null || mc.player == null) {
             failures.incrementAndGet();

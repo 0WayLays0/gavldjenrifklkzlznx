@@ -23,19 +23,20 @@ public class BleedingEffect extends MobEffect {
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return duration % INTERVAL == 0;
     }
 
     @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         if (!(entity.level() instanceof ServerLevel level)) {
-            return;
+            return true;
         }
         DamageSource source = new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(ModSchools.PHYSICAL_STRIKE));
         entity.invulnerableTime = 0;
         entity.hurt(source, 1 + amplifier);
         level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.REDSTONE_BLOCK.defaultBlockState()),
                 entity.getX(), entity.getY() + entity.getBbHeight() * .6, entity.getZ(), 6, entity.getBbWidth() * .3, entity.getBbHeight() * .2, entity.getBbWidth() * .3, .05);
+        return true;
     }
 }

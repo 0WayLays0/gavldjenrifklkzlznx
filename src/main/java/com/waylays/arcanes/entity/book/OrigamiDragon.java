@@ -28,12 +28,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * The Origami Dragon: a single sheet of paper above the caster folds itself, crease after crease, into a dragon
@@ -84,9 +84,9 @@ public class OrigamiDragon extends SpellEffectEntity implements OwnedSummon {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_DURATION, 400);
-        this.entityData.define(DATA_BREATHING, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_DURATION, 400);
+        builder.define(DATA_BREATHING, false);
     }
 
     public int getDuration() {

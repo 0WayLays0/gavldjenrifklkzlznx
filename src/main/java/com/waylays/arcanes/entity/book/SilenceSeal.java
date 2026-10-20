@@ -42,9 +42,9 @@ public class SilenceSeal extends SpellEffectEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_TARGET, -1);
-        this.entityData.define(DATA_BREAK, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_TARGET, -1);
+        builder.define(DATA_BREAK, 0);
     }
 
     @Nullable
@@ -87,7 +87,7 @@ public class SilenceSeal extends SpellEffectEntity {
             SpellUtil.particles(level(), BookFx.VIOLET_DUST, target.getX(), y, target.getZ(), 16, .35, .25, .35, 0);
         }
         // Gone with the effect (time out, milk, death)
-        if (tickCount > 2 && (target == null || !target.isAlive() || !target.hasEffect(ModEffects.SILENCE.get()))) {
+        if (tickCount > 2 && (target == null || !target.isAlive() || !target.hasEffect(ModEffects.SILENCE))) {
             this.entityData.set(DATA_BREAK, tickCount);
             if (target != null) {
                 level().playSound(null, target.getX(), target.getEyeY(), target.getZ(), SoundEvents.CHAIN_BREAK, SoundSource.PLAYERS, 1f, 1.4f);

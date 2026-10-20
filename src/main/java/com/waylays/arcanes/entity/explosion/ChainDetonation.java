@@ -6,21 +6,19 @@ import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.explosion.ChainDetonationSpell;
 import com.waylays.arcanes.spells.explosion.ExplosionFx;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * Invisible conductor of Chain Detonation: blows up its current target, then leaps (with a crackling arc) to the
@@ -115,7 +113,7 @@ public class ChainDetonation extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
 
     @Override
@@ -134,10 +132,5 @@ public class ChainDetonation extends Entity {
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

@@ -16,11 +16,6 @@ import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.gold.GoldenSentinelsSpell;
 import com.waylays.arcanes.spells.gold.GoldfallSpell;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.monster.Husk;
-import java.util.List;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
@@ -35,17 +30,23 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.registries.DeferredHolder;
+
+import java.util.List;
 
 /**
  * Server-side checks run by CI: the Gold school is wired into Iron's Spells and both spells do what they say.
@@ -55,7 +56,7 @@ import net.minecraftforge.registries.RegistryObject;
 @PrefixGameTestTemplate(false)
 public final class GoldGameTests {
     // Test coordinates: y=1 is the platform's floor block, entities stand at y=2
-    private static final TagKey<Item> CURIOS_SPELLBOOK = TagKey.create(Registries.ITEM, new ResourceLocation("curios", "spellbook"));
+    private static final TagKey<Item> CURIOS_SPELLBOOK = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("curios", "spellbook"));
 
     private GoldGameTests() {}
 
@@ -64,7 +65,7 @@ public final class GoldGameTests {
         SchoolType gold = SchoolRegistry.getSchool(ModSchools.GOLD_RESOURCE);
         helper.assertTrue(gold != null, "Gold school missing from Iron's school registry");
         int goldSpells = 0;
-        for (RegistryObject<AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
+        for (DeferredHolder<AbstractSpell, ? extends AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
             AbstractSpell spell = SpellRegistry.getSpell(entry.getId());
             helper.assertTrue(spell != SpellRegistry.none(), entry.getId() + " missing from Iron's spell registry");
             if (spell.getSchoolType() == gold) {
@@ -178,7 +179,7 @@ public final class GoldGameTests {
         helper.runAfterDelay(30, () -> helper.assertTrue(target.getAttributeValue(Attributes.MOVEMENT_SPEED) < baseSpeed * .5,
                 "the cursed pig is not slowed (" + target.getAttributeValue(Attributes.MOVEMENT_SPEED) + " / " + baseSpeed + ")"));
         helper.succeedWhen(() -> {
-            helper.assertTrue(!target.hasEffect(ModEffects.MIDAS_CURSE.get()), "still cursed");
+            helper.assertTrue(!target.hasEffect(ModEffects.MIDAS_CURSE), "still cursed");
             helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 4f, "the statue did not shatter [" + describe(helper, target) + "]");
             helper.assertTrue(target.getAttributeValue(Attributes.MOVEMENT_SPEED) == baseSpeed, "speed not restored after the curse");
         });
@@ -224,7 +225,7 @@ public final class GoldGameTests {
         Witch attacker = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Pig wearer = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
         double armorBefore = wearer.getAttributeValue(Attributes.ARMOR);
-        wearer.addEffect(new MobEffectInstance(ModEffects.GILDED_ARMOR.get(), 200, 0));
+        wearer.addEffect(new MobEffectInstance(ModEffects.GILDED_ARMOR, 200, 0));
         helper.assertTrue(wearer.getAttributeValue(Attributes.ARMOR) >= armorBefore + 3, "Gilded Armor gave no armor");
         wearer.hurt(helper.getLevel().damageSources().mobAttack(attacker), 6f);
         helper.assertTrue(attacker.getHealth() < attacker.getMaxHealth(), "no damage was reflected to the attacker");

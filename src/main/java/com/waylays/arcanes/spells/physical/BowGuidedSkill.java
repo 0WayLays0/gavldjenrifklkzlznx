@@ -57,7 +57,7 @@ public class BowGuidedSkill extends PhysicalSkill implements MissileSkill {
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.CROSSBOW_LOADING_MIDDLE, SoundSource.PLAYERS, .8f, 1.4f);
         SkillTimeline.after(entity, SHOT_TICK, archer -> {
-            float damage = getStrength(spellLevel, archer) * enchantBonus(archer, Enchantments.POWER_ARROWS, .1f);
+            float damage = getStrength(spellLevel, archer) * enchantBonus(archer, Enchantments.POWER, .1f);
             Missile.shoot(archer, Missile.Kind.ARROW, this, spellLevel, damage, Missile.launchPoint(archer), archer.getLookAngle(), SPEED, 0)
                     .setNoGravity(true);
             level.playSound(null, archer.getX(), archer.getY(), archer.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1f, .9f);

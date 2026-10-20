@@ -10,8 +10,6 @@ import io.redspace.ironsspellbooks.entity.mobs.AntiMagicSusceptible;
 import io.redspace.ironsspellbooks.particle.BlastwaveParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -24,10 +22,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * Implosion: a point of black light that drags every enemy around it into its centre, contracts, then goes off in a
@@ -56,8 +53,8 @@ public class ImplosionCore extends Entity implements AntiMagicSusceptible {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_PULL_RADIUS, 6f);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_PULL_RADIUS, 6f);
     }
 
     public float getPullRadius() {
@@ -177,10 +174,5 @@ public class ImplosionCore extends Entity implements AntiMagicSusceptible {
         if (tag.hasUUID("Owner")) {
             ownerUUID = tag.getUUID("Owner");
         }
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

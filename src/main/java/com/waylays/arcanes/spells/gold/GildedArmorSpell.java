@@ -82,7 +82,7 @@ public class GildedArmorSpell extends AbstractSpell {
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
-        entity.addEffect(new MobEffectInstance(ModEffects.GILDED_ARMOR.get(), getDuration(spellLevel), getAmplifier(spellLevel), false, true, true));
+        entity.addEffect(new MobEffectInstance(ModEffects.GILDED_ARMOR, getDuration(spellLevel), getAmplifier(spellLevel), false, true, true));
         // Liquid gold spiralling up from the feet to the head
         float w = entity.getBbWidth() * .7f;
         float h = entity.getBbHeight();

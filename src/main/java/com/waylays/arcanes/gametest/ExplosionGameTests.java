@@ -43,9 +43,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ import java.util.List;
 @PrefixGameTestTemplate(false)
 public final class ExplosionGameTests {
     // Test coordinates: y=1 is the platform's floor block, entities stand at y=2
-    private static final TagKey<Item> CURIOS_SPELLBOOK = TagKey.create(Registries.ITEM, new ResourceLocation("curios", "spellbook"));
+    private static final TagKey<Item> CURIOS_SPELLBOOK = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("curios", "spellbook"));
 
     private ExplosionGameTests() {}
 
@@ -73,7 +73,7 @@ public final class ExplosionGameTests {
         SchoolType explosion = SchoolRegistry.getSchool(ModSchools.EXPLOSION_RESOURCE);
         helper.assertTrue(explosion != null, "Explosion school missing from Iron's school registry");
         int count = 0;
-        for (RegistryObject<AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
+        for (DeferredHolder<AbstractSpell, ? extends AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
             if (SpellRegistry.getSpell(entry.getId()).getSchoolType() == explosion) {
                 count++;
             }
@@ -211,7 +211,7 @@ public final class ExplosionGameTests {
             int n = i + 1;
             // Spaced out so each hit gets through the golem's hurt immunity
             helper.runAfterDelay(2 + i * 12, () -> {
-                helper.assertTrue(branded.hasEffect(ModEffects.VOLATILE_BRAND.get()), "the brand went off before hit " + n);
+                helper.assertTrue(branded.hasEffect(ModEffects.VOLATILE_BRAND), "the brand went off before hit " + n);
                 helper.assertTrue(bystander.getHealth() == bystander.getMaxHealth(), "the brand exploded early, before hit " + n);
                 branded.hurt(hit, 1f);
                 helper.assertTrue(VolatileBrandEffect.charges(branded) == n || n == VolatileBrandEffect.MAX_CHARGES,
@@ -219,7 +219,7 @@ public final class ExplosionGameTests {
             });
         }
         helper.succeedWhen(() -> {
-            helper.assertTrue(!branded.hasEffect(ModEffects.VOLATILE_BRAND.get()), "the brand is still on");
+            helper.assertTrue(!branded.hasEffect(ModEffects.VOLATILE_BRAND), "the brand is still on");
             helper.assertTrue(bystander.getHealth() < bystander.getMaxHealth(), "the brand did not explode [" + describe(helper, bystander) + "]");
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the brand hurt its caster");
         });
@@ -236,7 +236,7 @@ public final class ExplosionGameTests {
         helper.runAfterDelay(BlastLeapEffect.DIVE_TICK - 2, () ->
                 helper.assertTrue(caster.getY() > startY + 3, "the caster did not fly up (" + (caster.getY() - startY) + " blocks)"));
         helper.succeedWhen(() -> {
-            helper.assertTrue(!caster.hasEffect(ModEffects.BLAST_LEAP.get()), "the caster has not landed");
+            helper.assertTrue(!caster.hasEffect(ModEffects.BLAST_LEAP), "the caster has not landed");
             helper.assertTrue(target.getHealth() < target.getMaxHealth(), "the landing blast missed [" + describe(helper, target) + "]");
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the leap hurt the caster [" + describe(helper, caster) + "]");
         });
@@ -288,7 +288,7 @@ public final class ExplosionGameTests {
         helper.runAfterDelay(15, () -> bearer.hurt(hit, 2f));
         helper.runAfterDelay(30, () -> bearer.hurt(hit, 2f));
         helper.runAfterDelay(34, () -> {
-            helper.assertTrue(!bearer.hasEffect(ModEffects.REACTIVE_SHIELD.get()), "the shield is still on after three explosions");
+            helper.assertTrue(!bearer.hasEffect(ModEffects.REACTIVE_SHIELD), "the shield is still on after three explosions");
             helper.assertTrue(ShieldBubble.bubblesOf(bearer).isEmpty(), "the shell is still drawn after the shield broke");
             helper.succeed();
         });

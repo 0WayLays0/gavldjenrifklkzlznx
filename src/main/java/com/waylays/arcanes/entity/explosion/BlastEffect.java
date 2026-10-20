@@ -2,8 +2,6 @@ package com.waylays.arcanes.entity.explosion;
 
 import com.waylays.arcanes.registry.ModEntities;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -12,7 +10,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
 /**
  * Purely visual: the fireball, white-hot flash and expanding shock rings of one Explosion school blast.
@@ -66,9 +63,9 @@ public class BlastEffect extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_SIZE, 1f);
-        this.entityData.define(DATA_STYLE, STYLE_FIRE);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_SIZE, 1f);
+        builder.define(DATA_STYLE, STYLE_FIRE);
     }
 
     @Override
@@ -102,10 +99,5 @@ public class BlastEffect extends Entity {
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

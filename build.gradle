@@ -1,53 +1,52 @@
 plugins {
-    id 'eclipse'
+    id 'java-library'
     id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0.24,6.2)'
+    id 'net.neoforged.moddev' version '2.0.148'
 }
 
-version = "${mod_version}-forge-${minecraft_version}"
+version = "${mod_version}-neoforge-${minecraft_version}"
 group = mod_group_id
 
 base {
     archivesName = archive_name
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
-minecraft {
-    mappings channel: mapping_channel, version: mapping_version
-    copyIdeResources = true
+neoForge {
+    version = project.neo_version
 
     runs {
         configureEach {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'info'
-            property 'forge.enabledGameTestNamespaces', mod_id
-            // Iron's Spells, GeckoLib and Player Animator ship mixins
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            systemProperty 'forge.logging.console.level', 'info'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         client {
+            client()
             // Automated client smoke test (debug/ClientSmokeTest), only with -Parcanes.autotest=true
             if (project.hasProperty('arcanes.autotest')) {
-                property 'arcanes.autotest', project.property('arcanes.autotest')
+                systemProperty 'arcanes.autotest', project.property('arcanes.autotest').toString()
             }
         }
 
         server {
-            args '--nogui'
+            server()
+            programArgument '--nogui'
         }
 
         gameTestServer {
-            workingDirectory project.file('run-gametest')
+            type = 'gameTestServer'
+            gameDirectory = project.file('run-gametest')
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
         }
     }
 }
@@ -58,12 +57,15 @@ repositories {
         url = 'https://code.redspace.io/releases'
     }
     maven {
-        name = 'Curios / Caelus'
+        name = 'Curios'
         url = 'https://maven.theillusivec4.top/'
     }
     maven {
         name = 'GeckoLib'
         url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroup 'software.bernie.geckolib'
+        }
     }
     maven {
         name = 'Player Animator'
@@ -73,29 +75,29 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
-    implementation(fg.deobf("io.redspace.ironsspellbooks:irons_spellbooks:${irons_spells_version}")) {
+    implementation("io.redspace:irons_spellbooks:${irons_spells_version}") {
         transitive = false
     }
     // Iron's Spells' own required mods
-    implementation fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
-    implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${geckolib_version}")
-    implementation fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:${player_animator_version}")
-    runtimeOnly fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
+    implementation("io.redspace:irons_lib:${irons_lib_version}") {
+        transitive = false
+    }
+    implementation "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+    implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    implementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animator_version}"
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.compilerArgs << '-Xlint:deprecation' << '-Xmaxerrs' << '400'
+    options.compilerArgs << '-Xlint:deprecation' << '-Xmaxerrs' << '1000'
 }
 
-tasks.named('processResources', ProcessResources).configure {
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     var replaceProperties = [
             minecraft_version         : minecraft_version,
             minecraft_version_range   : minecraft_version_range,
-            forge_version             : forge_version,
-            forge_version_range       : forge_version_range,
+            neo_version               : neo_version,
+            neo_version_range         : neo_version_range,
             loader_version_range      : loader_version_range,
             irons_spells_version_range: irons_spells_version_range,
             mod_id                    : mod_id,
@@ -106,11 +108,12 @@ tasks.named('processResources', ProcessResources).configure {
             mod_description           : mod_description
     ]
     inputs.properties replaceProperties
-
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
-    }
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
 }
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
 
 tasks.named('jar', Jar).configure {
     manifest {
@@ -124,5 +127,4 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
-    finalizedBy 'reobfJar'
 }

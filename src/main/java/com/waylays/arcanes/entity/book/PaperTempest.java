@@ -59,9 +59,9 @@ public class PaperTempest extends SpellEffectEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_RADIUS, 4f);
-        this.entityData.define(DATA_DURATION, 120);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_RADIUS, 4f);
+        builder.define(DATA_DURATION, 120);
     }
 
     public float getRadius() {

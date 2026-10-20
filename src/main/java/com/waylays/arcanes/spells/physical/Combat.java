@@ -18,10 +18,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import java.util.UUID;
  * fighter is moving. A move never reaches through walls, never hurts its fighter's allies, and leaves armor stands
  * alone.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public final class Combat {
     /** Each player's last step, newest first: players move on their own client, the server only sees where they end up. */
     private static final Map<UUID, Vec3[]> STEPS = new HashMap<>();
@@ -69,12 +69,13 @@ public final class Combat {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || event.player.level().isClientSide) {
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        Player player = event.getEntity();
+        if (player.level().isClientSide) {
             return;
         }
-        Vec3 pos = event.player.position();
-        Vec3[] steps = STEPS.computeIfAbsent(event.player.getUUID(), k -> new Vec3[]{pos, Vec3.ZERO});
+        Vec3 pos = player.position();
+        Vec3[] steps = STEPS.computeIfAbsent(player.getUUID(), k -> new Vec3[]{pos, Vec3.ZERO});
         Vec3 step = pos.subtract(steps[0]);
         // A teleport is not a step
         steps[1] = step.lengthSqr() > 4 ? Vec3.ZERO : step;

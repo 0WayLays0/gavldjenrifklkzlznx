@@ -11,24 +11,24 @@ import com.waylays.arcanes.effect.ReactiveShieldEffect;
 import com.waylays.arcanes.effect.SilenceEffect;
 import com.waylays.arcanes.effect.SunderedEffect;
 import com.waylays.arcanes.effect.VolatileBrandEffect;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModEffects {
-    public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, ArcanesOublies.MODID);
+    public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, ArcanesOublies.MODID);
 
-    public static final RegistryObject<MobEffect> MIDAS_CURSE = EFFECTS.register("midas_curse", MidasCurseEffect::new);
-    public static final RegistryObject<MobEffect> GILDED_ARMOR = EFFECTS.register("gilded_armor", GildedArmorEffect::new);
-    public static final RegistryObject<MobEffect> VOLATILE_BRAND = EFFECTS.register("volatile_brand", VolatileBrandEffect::new);
-    public static final RegistryObject<MobEffect> BLAST_LEAP = EFFECTS.register("blast_leap", BlastLeapEffect::new);
-    public static final RegistryObject<MobEffect> REACTIVE_SHIELD = EFFECTS.register("reactive_shield", ReactiveShieldEffect::new);
-    public static final RegistryObject<MobEffect> SILENCE = EFFECTS.register("silence", SilenceEffect::new);
-    public static final RegistryObject<MobEffect> PARCHMENT_AEGIS = EFFECTS.register("parchment_aegis", ParchmentAegisEffect::new);
-    public static final RegistryObject<MobEffect> BLEEDING = EFFECTS.register("bleeding", BleedingEffect::new);
-    public static final RegistryObject<MobEffect> SUNDERED = EFFECTS.register("sundered", SunderedEffect::new);
-    public static final RegistryObject<MobEffect> PINNED = EFFECTS.register("pinned", PinnedEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> MIDAS_CURSE = EFFECTS.register("midas_curse", MidasCurseEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> GILDED_ARMOR = EFFECTS.register("gilded_armor", GildedArmorEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> VOLATILE_BRAND = EFFECTS.register("volatile_brand", VolatileBrandEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> BLAST_LEAP = EFFECTS.register("blast_leap", BlastLeapEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> REACTIVE_SHIELD = EFFECTS.register("reactive_shield", ReactiveShieldEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> SILENCE = EFFECTS.register("silence", SilenceEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> PARCHMENT_AEGIS = EFFECTS.register("parchment_aegis", ParchmentAegisEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> BLEEDING = EFFECTS.register("bleeding", BleedingEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> SUNDERED = EFFECTS.register("sundered", SunderedEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> PINNED = EFFECTS.register("pinned", PinnedEffect::new);
 
     private ModEffects() {}
 }

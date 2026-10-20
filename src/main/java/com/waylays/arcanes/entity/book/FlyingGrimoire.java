@@ -40,8 +40,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * A flying grimoire from the Forbidden Library: a little book with glowing eyes and fangs along its pages. It flies
@@ -97,10 +97,10 @@ public class FlyingGrimoire extends PathfinderMob implements FlyingAnimal, Owned
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_BITE, -100);
-        this.entityData.define(DATA_SPIT, -100);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_BITE, -100);
+        builder.define(DATA_SPIT, -100);
     }
 
     /** Ticks since the last bite / bolt began. */

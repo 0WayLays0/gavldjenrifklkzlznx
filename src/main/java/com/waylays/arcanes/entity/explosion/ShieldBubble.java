@@ -3,8 +3,6 @@ package com.waylays.arcanes.entity.explosion;
 import com.waylays.arcanes.effect.ReactiveShieldEffect;
 import com.waylays.arcanes.registry.ModEntities;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -13,10 +11,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.network.NetworkHooks;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * The visible shell of Reactive Shield, following its bearer so every player sees it (mob effects are only sent to
@@ -93,10 +90,10 @@ public class ShieldBubble extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_OWNER, -1);
-        this.entityData.define(DATA_CHARGES, ReactiveShieldEffect.CHARGES);
-        this.entityData.define(DATA_FLASH, -100);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_OWNER, -1);
+        builder.define(DATA_CHARGES, ReactiveShieldEffect.CHARGES);
+        builder.define(DATA_FLASH, -100);
     }
 
     @Override
@@ -125,10 +122,5 @@ public class ShieldBubble extends Entity {
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

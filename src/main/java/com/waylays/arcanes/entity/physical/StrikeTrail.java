@@ -62,13 +62,13 @@ public class StrikeTrail extends SpellEffectEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_STYLE, 0);
-        this.entityData.define(DATA_RADIUS, 3f);
-        this.entityData.define(DATA_SPAN, 120f);
-        this.entityData.define(DATA_TILT, 0f);
-        this.entityData.define(DATA_REVERSE, false);
-        this.entityData.define(DATA_COLOR, STEEL);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_STYLE, 0);
+        builder.define(DATA_RADIUS, 3f);
+        builder.define(DATA_SPAN, 120f);
+        builder.define(DATA_TILT, 0f);
+        builder.define(DATA_REVERSE, false);
+        builder.define(DATA_COLOR, STEEL);
     }
 
     public Style getStyle() {

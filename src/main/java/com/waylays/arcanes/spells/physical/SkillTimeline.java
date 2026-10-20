@@ -2,10 +2,10 @@ package com.waylays.arcanes.spells.physical;
 
 import com.waylays.arcanes.ArcanesOublies;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * Server side: the beats of a fighting move played out over the next ticks (each jab of a flurry, each step of a dash,
  * the strike timed on the swing of the animation). A beat is dropped if its fighter has died or left the world.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public final class SkillTimeline {
     private record Beat(LivingEntity fighter, long at, Consumer<LivingEntity> action) {}
 
@@ -35,10 +35,7 @@ public final class SkillTimeline {
     }
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+    public static void onServerTick(ServerTickEvent.Post event) {
         now++;
         if (BEATS.isEmpty()) {
             return;

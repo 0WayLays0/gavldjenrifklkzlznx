@@ -37,9 +37,9 @@ public class BookmarkMarker extends SpellEffectEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_LIFETIME, 400);
-        this.entityData.define(DATA_FADE, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_LIFETIME, 400);
+        builder.define(DATA_FADE, 0);
     }
 
     /** Ticks since the marker began to fade, or -1. */

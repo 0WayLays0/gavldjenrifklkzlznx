@@ -8,7 +8,9 @@ import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import com.waylays.arcanes.spells.gold.MidasCurseSpell;
 import io.redspace.ironsspellbooks.damage.DamageSources;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -22,9 +24,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 
 import java.util.UUID;
 
@@ -32,10 +34,10 @@ import java.util.UUID;
  * Midas Curse: the victim slowly turns to gold. It gets slower and slower until it is frozen as a golden statue,
  * and when the curse runs out the statue shatters. Milk (or any other cure) removes it without the shatter.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public class MidasCurseEffect extends MobEffect {
-    private static final UUID SPEED_ID = UUID.fromString("5f2c1d3e-7a4b-4c8d-9e1f-a0b1c2d3e4f5");
-    private static final UUID ATTACK_SPEED_ID = UUID.fromString("6a3d2e4f-8b5c-4d9e-af20-b1c2d3e4f5a6");
+    private static final ResourceLocation SPEED_ID = ArcanesOublies.id("effect.midas_curse.movement_speed");
+    private static final ResourceLocation ATTACK_SPEED_ID = ArcanesOublies.id("effect.midas_curse.attack_speed");
     private static final String TAG = ArcanesOublies.MODID + ":midas_curse";
 
     public MidasCurseEffect() {
@@ -49,12 +51,12 @@ public class MidasCurseEffect extends MobEffect {
         tag.putFloat("Damage", shatterDamage);
         tag.putInt("Duration", duration);
         victim.getPersistentData().put(TAG, tag);
-        victim.addEffect(new MobEffectInstance(ModEffects.MIDAS_CURSE.get(), duration, spellLevel - 1, false, true, true));
+        victim.addEffect(new MobEffectInstance(ModEffects.MIDAS_CURSE, duration, spellLevel - 1, false, true, true));
     }
 
     /** 0 when cast, 1 when the statue shatters. */
     public static float progress(LivingEntity entity) {
-        MobEffectInstance instance = entity.getEffect(ModEffects.MIDAS_CURSE.get());
+        MobEffectInstance instance = entity.getEffect(ModEffects.MIDAS_CURSE);
         if (instance == null) {
             return 0;
         }
@@ -63,14 +65,14 @@ public class MidasCurseEffect extends MobEffect {
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return true;
     }
 
     @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         if (entity.level().isClientSide) {
-            return;
+            return true;
         }
         float progress = progress(entity);
         // Slows to a near standstill well before the end: the last third is the frozen statue
@@ -93,20 +95,21 @@ public class MidasCurseEffect extends MobEffect {
         if (entity.tickCount % 10 == 0) {
             entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.HOSTILE, .8f + progress, .5f + progress);
         }
+        return true;
     }
 
-    private static void setModifier(LivingEntity entity, Attribute attribute, UUID id, double amount) {
+    private static void setModifier(LivingEntity entity, Holder<Attribute> attribute, ResourceLocation id, double amount) {
         AttributeInstance instance = entity.getAttribute(attribute);
         if (instance == null) {
             return;
         }
         instance.removeModifier(id);
-        instance.addTransientModifier(new AttributeModifier(id, "Midas Curse", amount, AttributeModifier.Operation.MULTIPLY_TOTAL));
+        instance.addTransientModifier(new AttributeModifier(id, amount, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
     }
 
     @Override
-    public void removeAttributeModifiers(LivingEntity entity, AttributeMap map, int amplifier) {
-        super.removeAttributeModifiers(entity, map, amplifier);
+    public void removeAttributeModifiers(AttributeMap map) {
+        super.removeAttributeModifiers(map);
         AttributeInstance speed = map.getInstance(Attributes.MOVEMENT_SPEED);
         if (speed != null) {
             speed.removeModifier(SPEED_ID);
@@ -122,7 +125,7 @@ public class MidasCurseEffect extends MobEffect {
     public static void onExpired(MobEffectEvent.Expired event) {
         MobEffectInstance instance = event.getEffectInstance();
         LivingEntity victim = event.getEntity();
-        if (instance == null || instance.getEffect() != ModEffects.MIDAS_CURSE.get() || !(victim.level() instanceof ServerLevel level)) {
+        if (instance == null || !instance.getEffect().is(ModEffects.MIDAS_CURSE.getKey()) || !(victim.level() instanceof ServerLevel level)) {
             return;
         }
         CompoundTag tag = victim.getPersistentData().getCompound(TAG);

@@ -716,7 +716,7 @@ def book_models(name):
     """A spellbook: flat icon in the GUI, the 3D book (textures/item/{name}_3d.png, grimoire layout) everywhere else."""
     write_json(f"models/item/{name}.json", {
         "parent": "minecraft:item/handheld",
-        "loader": "forge:separate_transforms",
+        "loader": "neoforge:separate_transforms",
         "base": {"parent": f"arcanes_oublies:item/{name}_3d"},
         "perspectives": {"gui": {"parent": f"arcanes_oublies:item/{name}_gui"}},
     })

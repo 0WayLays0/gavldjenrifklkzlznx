@@ -8,8 +8,6 @@ import com.waylays.arcanes.spells.explosion.SigilsOfRuinSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.entity.mobs.AntiMagicSusceptible;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -19,10 +17,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.network.NetworkHooks;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * A rune of ruin glowing on the ground. Armed after {@link #ARM_TICKS}; an enemy stepping on it sets it off, and a
@@ -54,8 +51,8 @@ public class RuinSigil extends Entity implements AntiMagicSusceptible {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_LIT, -1);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_LIT, -1);
     }
 
     public int getLitTick() {
@@ -160,10 +157,5 @@ public class RuinSigil extends Entity implements AntiMagicSusceptible {
         if (tag.hasUUID("Owner")) {
             ownerUUID = tag.getUUID("Owner");
         }
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

@@ -62,7 +62,7 @@ public class BowRainSkill extends PhysicalSkill implements MissileSkill {
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         SkillTimeline.after(entity, SHOT_TICK, archer -> {
             Vec3 spot = target(level, archer);
-            float damage = getStrength(spellLevel, archer) * .5f * enchantBonus(archer, Enchantments.POWER_ARROWS, .1f);
+            float damage = getStrength(spellLevel, archer) * .5f * enchantBonus(archer, Enchantments.POWER, .1f);
             // Arrows going up, for show: they vanish high above
             for (int i = 0; i < 3; i++) {
                 Missile.shoot(archer, Missile.Kind.ARROW, this, spellLevel, 0, Missile.launchPoint(archer), new Vec3(0, 1, 0), 2.6f, 6)

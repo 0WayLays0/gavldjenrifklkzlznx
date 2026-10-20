@@ -1,5 +1,9 @@
 {
-  "itemGroup.arcanes_oublies.main": "Arcanes Oubliés",
+  "itemGroup.arcanes_oublies.gold": "Arcanes Oubliés: Gold",
+  "itemGroup.arcanes_oublies.explosion": "Arcanes Oubliés: Explosion",
+  "itemGroup.arcanes_oublies.book": "Arcanes Oubliés: Book",
+  "itemGroup.arcanes_oublies.errethys": "Arcanes Oubliés: Errethys",
+  "itemGroup.arcanes_oublies.physical": "Arcanes Oubliés: Physical Prowess",
   "school.arcanes_oublies.gold": "Gold",
   "attribute.arcanes_oublies.gold_spell_power": "Gold Spell Power",
   "attribute.arcanes_oublies.gold_magic_resist": "Gold Magic Resistance",

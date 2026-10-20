@@ -46,162 +46,162 @@ import com.waylays.arcanes.entity.gold.MoltenGoldBlob;
 import com.waylays.arcanes.entity.gold.MoltenPool;
 import com.waylays.arcanes.entity.physical.Missile;
 import com.waylays.arcanes.entity.physical.StrikeTrail;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = ArcanesOublies.MODID, bus = EventBusSubscriber.Bus.MOD)
 public final class ModEntities {
-    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, ArcanesOublies.MODID);
+    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, ArcanesOublies.MODID);
 
-    public static final RegistryObject<EntityType<GoldBoltProjectile>> GOLD_BOLT = register("gold_bolt",
+    public static final DeferredHolder<EntityType<?>, EntityType<GoldBoltProjectile>> GOLD_BOLT = register("gold_bolt",
             EntityType.Builder.<GoldBoltProjectile>of(GoldBoltProjectile::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64).updateInterval(1));
 
-    public static final RegistryObject<EntityType<GildedChainsEntity>> GILDED_CHAINS = register("gilded_chains",
+    public static final DeferredHolder<EntityType<?>, EntityType<GildedChainsEntity>> GILDED_CHAINS = register("gilded_chains",
             EntityType.Builder.<GildedChainsEntity>of(GildedChainsEntity::new, MobCategory.MISC).sized(1f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<GoldfallIngot>> GOLDFALL_INGOT = register("goldfall_ingot",
+    public static final DeferredHolder<EntityType<?>, EntityType<GoldfallIngot>> GOLDFALL_INGOT = register("goldfall_ingot",
             EntityType.Builder.<GoldfallIngot>of(GoldfallIngot::new, MobCategory.MISC).sized(.9f, .9f).clientTrackingRange(96).updateInterval(1));
 
-    public static final RegistryObject<EntityType<GoldSpikeEntity>> GOLD_SPIKE = register("gold_spike",
+    public static final DeferredHolder<EntityType<?>, EntityType<GoldSpikeEntity>> GOLD_SPIKE = register("gold_spike",
             EntityType.Builder.<GoldSpikeEntity>of(GoldSpikeEntity::new, MobCategory.MISC).sized(1f, 1.8f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<AurumBladeEntity>> AURUM_BLADE = register("aurum_blade",
+    public static final DeferredHolder<EntityType<?>, EntityType<AurumBladeEntity>> AURUM_BLADE = register("aurum_blade",
             EntityType.Builder.<AurumBladeEntity>of(AurumBladeEntity::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(96));
 
-    public static final RegistryObject<EntityType<MoltenGoldBlob>> MOLTEN_GOLD_BLOB = register("molten_gold_blob",
+    public static final DeferredHolder<EntityType<?>, EntityType<MoltenGoldBlob>> MOLTEN_GOLD_BLOB = register("molten_gold_blob",
             EntityType.Builder.<MoltenGoldBlob>of(MoltenGoldBlob::new, MobCategory.MISC).sized(.3f, .3f).clientTrackingRange(64).updateInterval(1));
 
-    public static final RegistryObject<EntityType<MoltenPool>> MOLTEN_POOL = register("molten_pool",
+    public static final DeferredHolder<EntityType<?>, EntityType<MoltenPool>> MOLTEN_POOL = register("molten_pool",
             EntityType.Builder.<MoltenPool>of(MoltenPool::new, MobCategory.MISC).sized(2.4f, .2f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<GoldenSentinel>> GOLDEN_SENTINEL = register("golden_sentinel",
+    public static final DeferredHolder<EntityType<?>, EntityType<GoldenSentinel>> GOLDEN_SENTINEL = register("golden_sentinel",
             EntityType.Builder.<GoldenSentinel>of(GoldenSentinel::new, MobCategory.MISC).sized(.6f, 1.95f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<EldoradoSun>> ELDORADO_SUN = register("eldorado_sun",
+    public static final DeferredHolder<EntityType<?>, EntityType<EldoradoSun>> ELDORADO_SUN = register("eldorado_sun",
             EntityType.Builder.<EldoradoSun>of(EldoradoSun::new, MobCategory.MISC).sized(1.5f, 1.5f).clientTrackingRange(128).fireImmune());
 
     // Explosion school
-    public static final RegistryObject<EntityType<BlastEffect>> BLAST_EFFECT = register("blast_effect",
+    public static final DeferredHolder<EntityType<?>, EntityType<BlastEffect>> BLAST_EFFECT = register("blast_effect",
             EntityType.Builder.<BlastEffect>of(BlastEffect::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(160).fireImmune());
 
-    public static final RegistryObject<EntityType<ExplosiveOrb>> EXPLOSIVE_ORB = register("explosive_orb",
+    public static final DeferredHolder<EntityType<?>, EntityType<ExplosiveOrb>> EXPLOSIVE_ORB = register("explosive_orb",
             EntityType.Builder.<ExplosiveOrb>of(ExplosiveOrb::new, MobCategory.MISC).sized(.6f, .6f).clientTrackingRange(64).updateInterval(1));
 
-    public static final RegistryObject<EntityType<ChainDetonation>> CHAIN_DETONATION = register("chain_detonation",
+    public static final DeferredHolder<EntityType<?>, EntityType<ChainDetonation>> CHAIN_DETONATION = register("chain_detonation",
             EntityType.Builder.<ChainDetonation>of(ChainDetonation::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<RuinSigil>> RUIN_SIGIL = register("ruin_sigil",
+    public static final DeferredHolder<EntityType<?>, EntityType<RuinSigil>> RUIN_SIGIL = register("ruin_sigil",
             EntityType.Builder.<RuinSigil>of(RuinSigil::new, MobCategory.MISC).sized(1.6f, .2f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<DetonationWave>> DETONATION_WAVE = register("detonation_wave",
+    public static final DeferredHolder<EntityType<?>, EntityType<DetonationWave>> DETONATION_WAVE = register("detonation_wave",
             EntityType.Builder.<DetonationWave>of(DetonationWave::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<ImplosionCore>> IMPLOSION_CORE = register("implosion_core",
+    public static final DeferredHolder<EntityType<?>, EntityType<ImplosionCore>> IMPLOSION_CORE = register("implosion_core",
             EntityType.Builder.<ImplosionCore>of(ImplosionCore::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(96).fireImmune());
 
-    public static final RegistryObject<EntityType<ClusterShell>> CLUSTER_SHELL = register("cluster_shell",
+    public static final DeferredHolder<EntityType<?>, EntityType<ClusterShell>> CLUSTER_SHELL = register("cluster_shell",
             EntityType.Builder.<ClusterShell>of(ClusterShell::new, MobCategory.MISC).sized(.8f, .8f).clientTrackingRange(96).updateInterval(1));
 
-    public static final RegistryObject<EntityType<ClusterBomblet>> CLUSTER_BOMBLET = register("cluster_bomblet",
+    public static final DeferredHolder<EntityType<?>, EntityType<ClusterBomblet>> CLUSTER_BOMBLET = register("cluster_bomblet",
             EntityType.Builder.<ClusterBomblet>of(ClusterBomblet::new, MobCategory.MISC).sized(.35f, .35f).clientTrackingRange(96).updateInterval(1));
 
-    public static final RegistryObject<EntityType<ShieldBubble>> SHIELD_BUBBLE = register("shield_bubble",
+    public static final DeferredHolder<EntityType<?>, EntityType<ShieldBubble>> SHIELD_BUBBLE = register("shield_bubble",
             EntityType.Builder.<ShieldBubble>of(ShieldBubble::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<CataclysmCore>> CATACLYSM_CORE = register("cataclysm_core",
+    public static final DeferredHolder<EntityType<?>, EntityType<CataclysmCore>> CATACLYSM_CORE = register("cataclysm_core",
             EntityType.Builder.<CataclysmCore>of(CataclysmCore::new, MobCategory.MISC).sized(2f, 2f).clientTrackingRange(160).fireImmune());
 
     // Book school
-    public static final RegistryObject<EntityType<PageStorm>> PAGE_STORM = register("page_storm",
+    public static final DeferredHolder<EntityType<?>, EntityType<PageStorm>> PAGE_STORM = register("page_storm",
             EntityType.Builder.<PageStorm>of(PageStorm::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<InkWave>> INK_WAVE = register("ink_wave",
+    public static final DeferredHolder<EntityType<?>, EntityType<InkWave>> INK_WAVE = register("ink_wave",
             EntityType.Builder.<InkWave>of(InkWave::new, MobCategory.MISC).sized(.5f, .2f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<InkHands>> INK_HANDS = register("ink_hands",
+    public static final DeferredHolder<EntityType<?>, EntityType<InkHands>> INK_HANDS = register("ink_hands",
             EntityType.Builder.<InkHands>of(InkHands::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<FinalChapter>> FINAL_CHAPTER = register("final_chapter",
+    public static final DeferredHolder<EntityType<?>, EntityType<FinalChapter>> FINAL_CHAPTER = register("final_chapter",
             EntityType.Builder.<FinalChapter>of(FinalChapter::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(160).fireImmune());
 
-    public static final RegistryObject<EntityType<ChapterRune>> CHAPTER_RUNE = register("chapter_rune",
+    public static final DeferredHolder<EntityType<?>, EntityType<ChapterRune>> CHAPTER_RUNE = register("chapter_rune",
             EntityType.Builder.<ChapterRune>of(ChapterRune::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(96));
 
-    public static final RegistryObject<EntityType<RazorPage>> RAZOR_PAGE = register("razor_page",
+    public static final DeferredHolder<EntityType<?>, EntityType<RazorPage>> RAZOR_PAGE = register("razor_page",
             EntityType.Builder.<RazorPage>of(RazorPage::new, MobCategory.MISC).sized(.4f, .4f).clientTrackingRange(64).updateInterval(1));
 
-    public static final RegistryObject<EntityType<TomeOfJudgment>> TOME_OF_JUDGMENT = register("tome_of_judgment",
+    public static final DeferredHolder<EntityType<?>, EntityType<TomeOfJudgment>> TOME_OF_JUDGMENT = register("tome_of_judgment",
             EntityType.Builder.<TomeOfJudgment>of(TomeOfJudgment::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(128).fireImmune());
 
-    public static final RegistryObject<EntityType<BookmarkMarker>> BOOKMARK_MARKER = register("bookmark_marker",
+    public static final DeferredHolder<EntityType<?>, EntityType<BookmarkMarker>> BOOKMARK_MARKER = register("bookmark_marker",
             EntityType.Builder.<BookmarkMarker>of(BookmarkMarker::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<SilenceSeal>> SILENCE_SEAL = register("silence_seal",
+    public static final DeferredHolder<EntityType<?>, EntityType<SilenceSeal>> SILENCE_SEAL = register("silence_seal",
             EntityType.Builder.<SilenceSeal>of(SilenceSeal::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<FlyingGrimoire>> FLYING_GRIMOIRE = register("flying_grimoire",
+    public static final DeferredHolder<EntityType<?>, EntityType<FlyingGrimoire>> FLYING_GRIMOIRE = register("flying_grimoire",
             EntityType.Builder.<FlyingGrimoire>of(FlyingGrimoire::new, MobCategory.MISC).sized(.6f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<GrimoireBolt>> GRIMOIRE_BOLT = register("grimoire_bolt",
+    public static final DeferredHolder<EntityType<?>, EntityType<GrimoireBolt>> GRIMOIRE_BOLT = register("grimoire_bolt",
             EntityType.Builder.<GrimoireBolt>of(GrimoireBolt::new, MobCategory.MISC).sized(.3f, .3f).clientTrackingRange(64).updateInterval(1));
 
-    public static final RegistryObject<EntityType<WordOfPower>> WORD_OF_POWER = register("word_of_power",
+    public static final DeferredHolder<EntityType<?>, EntityType<WordOfPower>> WORD_OF_POWER = register("word_of_power",
             EntityType.Builder.<WordOfPower>of(WordOfPower::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64).fireImmune());
 
-    public static final RegistryObject<EntityType<RewriteAura>> REWRITE_AURA = register("rewrite_aura",
+    public static final DeferredHolder<EntityType<?>, EntityType<RewriteAura>> REWRITE_AURA = register("rewrite_aura",
             EntityType.Builder.<RewriteAura>of(RewriteAura::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<PaperCrane>> PAPER_CRANE = register("paper_crane",
+    public static final DeferredHolder<EntityType<?>, EntityType<PaperCrane>> PAPER_CRANE = register("paper_crane",
             EntityType.Builder.<PaperCrane>of(PaperCrane::new, MobCategory.MISC).sized(.4f, .4f).clientTrackingRange(64).updateInterval(1));
 
-    public static final RegistryObject<EntityType<QuillStroke>> QUILL_STROKE = register("quill_stroke",
+    public static final DeferredHolder<EntityType<?>, EntityType<QuillStroke>> QUILL_STROKE = register("quill_stroke",
             EntityType.Builder.<QuillStroke>of(QuillStroke::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(96));
 
-    public static final RegistryObject<EntityType<AegisPages>> AEGIS_PAGES = register("aegis_pages",
+    public static final DeferredHolder<EntityType<?>, EntityType<AegisPages>> AEGIS_PAGES = register("aegis_pages",
             EntityType.Builder.<AegisPages>of(AegisPages::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64));
 
-    public static final RegistryObject<EntityType<PaperTempest>> PAPER_TEMPEST = register("paper_tempest",
+    public static final DeferredHolder<EntityType<?>, EntityType<PaperTempest>> PAPER_TEMPEST = register("paper_tempest",
             EntityType.Builder.<PaperTempest>of(PaperTempest::new, MobCategory.MISC).sized(1f, 2f).clientTrackingRange(96).updateInterval(2));
 
-    public static final RegistryObject<EntityType<FlyingStack>> FLYING_STACK = register("flying_stack",
+    public static final DeferredHolder<EntityType<?>, EntityType<FlyingStack>> FLYING_STACK = register("flying_stack",
             EntityType.Builder.<FlyingStack>of(FlyingStack::new, MobCategory.MISC).sized(1.3f, .5f).clientTrackingRange(10));
 
-    public static final RegistryObject<EntityType<OrigamiDragon>> ORIGAMI_DRAGON = register("origami_dragon",
+    public static final DeferredHolder<EntityType<?>, EntityType<OrigamiDragon>> ORIGAMI_DRAGON = register("origami_dragon",
             EntityType.Builder.<OrigamiDragon>of(OrigamiDragon::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(1).fireImmune());
 
     // Errethys school
-    public static final RegistryObject<EntityType<ManaRat>> MANA_RAT = register("mana_rat",
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaRat>> MANA_RAT = register("mana_rat",
             EntityType.Builder.<ManaRat>of(ManaRat::new, MobCategory.MISC).sized(.5f, .4f).clientTrackingRange(10));
 
-    public static final RegistryObject<EntityType<ManaSalmon>> MANA_SALMON = register("mana_salmon",
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaSalmon>> MANA_SALMON = register("mana_salmon",
             EntityType.Builder.<ManaSalmon>of(ManaSalmon::new, MobCategory.MISC).sized(.7f, .4f).clientTrackingRange(10));
 
-    public static final RegistryObject<EntityType<ManaSerpent>> MANA_SERPENT = register("mana_serpent",
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaSerpent>> MANA_SERPENT = register("mana_serpent",
             EntityType.Builder.<ManaSerpent>of(ManaSerpent::new, MobCategory.MISC).sized(.7f, .4f).clientTrackingRange(10));
 
-    public static final RegistryObject<EntityType<ManaCrow>> MANA_CROW = register("mana_crow",
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaCrow>> MANA_CROW = register("mana_crow",
             EntityType.Builder.<ManaCrow>of(ManaCrow::new, MobCategory.MISC).sized(.5f, .6f).clientTrackingRange(10));
 
-    public static final RegistryObject<EntityType<ManaCamel>> MANA_DROMEDARY = register("mana_dromedary",
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaCamel>> MANA_DROMEDARY = register("mana_dromedary",
             EntityType.Builder.<ManaCamel>of(ManaCamel::new, MobCategory.MISC).sized(1.7f, 2.375f).clientTrackingRange(10));
 
     // Physical Prowess
-    public static final RegistryObject<EntityType<StrikeTrail>> STRIKE_TRAIL = register("strike_trail",
+    public static final DeferredHolder<EntityType<?>, EntityType<StrikeTrail>> STRIKE_TRAIL = register("strike_trail",
             EntityType.Builder.<StrikeTrail>of(StrikeTrail::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(20));
     // Updated every tick, unlike vanilla arrows: guided arrows turn in flight
-    public static final RegistryObject<EntityType<Missile>> MISSILE = register("missile",
+    public static final DeferredHolder<EntityType<?>, EntityType<Missile>> MISSILE = register("missile",
             EntityType.Builder.<Missile>of(Missile::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(1));
 
     private ModEntities() {}
 
-    private static <T extends Entity> RegistryObject<EntityType<T>> register(String name, EntityType.Builder<T> builder) {
+    private static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> register(String name, EntityType.Builder<T> builder) {
         return ENTITIES.register(name, () -> builder.build(ArcanesOublies.id(name).toString()));
     }
 

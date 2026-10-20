@@ -49,11 +49,12 @@ import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +82,7 @@ public final class BookGameTests {
         SchoolType book = SchoolRegistry.getSchool(ModSchools.BOOK_RESOURCE);
         helper.assertTrue(book != null, "Book school missing from Iron's school registry");
         int count = 0;
-        for (RegistryObject<AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
+        for (DeferredHolder<AbstractSpell, ? extends AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
             if (SpellRegistry.getSpell(entry.getId()).getSchoolType() == book) {
                 count++;
             }
@@ -216,19 +217,19 @@ public final class BookGameTests {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(5.5, 2, 5.5));
         SealOfSilenceSpell.seal(helper.getLevel(), caster, pig, 30);
-        helper.assertTrue(pig.hasEffect(ModEffects.SILENCE.get()), "the target is not silenced");
+        helper.assertTrue(pig.hasEffect(ModEffects.SILENCE), "the target is not silenced");
         // A silenced player's casts are refused before they start
-        Player player = helper.makeMockPlayer();
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         String spellId = ModSpells.RAZOR_PAGES.get().getSpellId();
         SchoolType book = SchoolRegistry.getSchool(ModSchools.BOOK_RESOURCE);
-        helper.assertTrue(!MinecraftForge.EVENT_BUS.post(new SpellPreCastEvent(player, spellId, 1, book, CastSource.SPELLBOOK)), "a cast was refused before the seal");
-        player.addEffect(new MobEffectInstance(ModEffects.SILENCE.get(), 100));
-        helper.assertTrue(MinecraftForge.EVENT_BUS.post(new SpellPreCastEvent(player, spellId, 1, book, CastSource.SPELLBOOK)), "a silenced player could still cast");
+        helper.assertTrue(!NeoForge.EVENT_BUS.post(new SpellPreCastEvent(player, spellId, 1, book, CastSource.SPELLBOOK)).isCanceled(), "a cast was refused before the seal");
+        player.addEffect(new MobEffectInstance(ModEffects.SILENCE, 100));
+        helper.assertTrue(NeoForge.EVENT_BUS.post(new SpellPreCastEvent(player, spellId, 1, book, CastSource.SPELLBOOK)).isCanceled(), "a silenced player could still cast");
         helper.runAfterDelay(10, () -> helper.assertTrue(!helper.getLevel().getEntitiesOfClass(SilenceSeal.class, pig.getBoundingBox().inflate(2)).isEmpty(),
                 "no seal on the silenced pig"));
         // The seal breaks with the effect
         helper.succeedWhen(() -> {
-            helper.assertTrue(!pig.hasEffect(ModEffects.SILENCE.get()), "still silenced");
+            helper.assertTrue(!pig.hasEffect(ModEffects.SILENCE), "still silenced");
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(SilenceSeal.class, pig.getBoundingBox().inflate(2)).isEmpty(), "the seal outlived the silence");
         });
     }
@@ -360,7 +361,7 @@ public final class BookGameTests {
         FlyingStack stack = (FlyingStack) caster.getVehicle();
         helper.assertTrue(caster.getUUID().equals(stack.getSummonerUUID()), "the stack has no master");
         helper.assertTrue(SpellUtil.isAlly(caster, stack), "the caster's spells would tear its own stack");
-        Player stranger = helper.makeMockPlayer();
+        Player stranger = helper.makeMockPlayer(GameType.SURVIVAL);
         helper.assertTrue(stack.mobInteract(stranger, InteractionHand.MAIN_HAND) == InteractionResult.PASS, "a stranger climbed on the stack");
         stack.dismissSummon();
         helper.assertTrue(stack.isRemoved(), "the stack is still there after being sent away");
@@ -370,7 +371,7 @@ public final class BookGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_stack", timeoutTicks = FlyingStack.RIDERLESS_TICKS + 40)
     public static void anEmptyFlyingStackScattersAndItsRiderFloatsDown(GameTestHelper helper) {
-        Player rider = helper.makeMockPlayer();
+        Player rider = helper.makeMockPlayer(GameType.SURVIVAL);
         FlyingStack stack = ModEntities.FLYING_STACK.get().create(helper.getLevel());
         helper.assertTrue(stack != null, "no flying stack");
         Vec3 at = helper.absoluteVec(new Vec3(4.5, 5, 4.5));

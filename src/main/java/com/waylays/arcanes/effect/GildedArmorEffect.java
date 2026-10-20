@@ -17,22 +17,22 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 
 /**
  * Gilded Armor: a coat of liquid gold. Armor, toughness and knockback resistance, and part of every hit taken is
  * sent back to the attacker as Gold magic.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public class GildedArmorEffect extends MobEffect {
     public GildedArmorEffect() {
         super(MobEffectCategory.BENEFICIAL, ModSchools.GOLD_COLOR);
         // Values are per effect level (amplifier + 1)
-        addAttributeModifier(Attributes.ARMOR, "c3f1a2b4-5d6e-4f70-8a91-b2c3d4e5f607", 3.0, AttributeModifier.Operation.ADDITION);
-        addAttributeModifier(Attributes.ARMOR_TOUGHNESS, "d4a2b3c5-6e7f-4081-9ba2-c3d4e5f60718", 1.0, AttributeModifier.Operation.ADDITION);
-        addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE, "e5b3c4d6-7f80-4192-acb3-d4e5f6071829", .1, AttributeModifier.Operation.ADDITION);
+        addAttributeModifier(Attributes.ARMOR, ArcanesOublies.id("effect.gilded_armor.armor"), 3.0, AttributeModifier.Operation.ADD_VALUE);
+        addAttributeModifier(Attributes.ARMOR_TOUGHNESS, ArcanesOublies.id("effect.gilded_armor.armor_toughness"), 1.0, AttributeModifier.Operation.ADD_VALUE);
+        addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE, ArcanesOublies.id("effect.gilded_armor.knockback_resistance"), .1, AttributeModifier.Operation.ADD_VALUE);
     }
 
     /** Share of the damage sent back to the attacker. */
@@ -41,15 +41,15 @@ public class GildedArmorEffect extends MobEffect {
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return duration % 3 == 0;
     }
 
     /** A shimmering shell of gold dust turning around the body. */
     @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         if (entity.level().isClientSide) {
-            return;
+            return true;
         }
         float w = entity.getBbWidth() * .65f;
         float h = entity.getBbHeight();
@@ -59,12 +59,13 @@ public class GildedArmorEffect extends MobEffect {
             SpellUtil.particles(entity.level(), i == 0 ? GoldFx.GOLD_DUST : GoldFx.PALE_DUST,
                     entity.getX() + Mth.cos(angle) * w, entity.getY() + y, entity.getZ() + Mth.sin(angle) * w, 1, 0, 0, 0, 0);
         }
+        return true;
     }
 
     @SubscribeEvent
-    public static void reflect(LivingHurtEvent event) {
+    public static void reflect(LivingDamageEvent.Pre event) {
         LivingEntity victim = event.getEntity();
-        MobEffectInstance armor = victim.getEffect(ModEffects.GILDED_ARMOR.get());
+        MobEffectInstance armor = victim.getEffect(ModEffects.GILDED_ARMOR);
         if (armor == null || victim.level().isClientSide || !(event.getSource().getEntity() instanceof LivingEntity attacker) || attacker == victim) {
             return;
         }
@@ -72,7 +73,7 @@ public class GildedArmorEffect extends MobEffect {
         if (event.getSource() instanceof SpellDamageSource spellSource && spellSource.spell() == ModSpells.GILDED_ARMOR.get()) {
             return;
         }
-        float reflected = event.getAmount() * reflectRatio(armor.getAmplifier());
+        float reflected = event.getNewDamage() * reflectRatio(armor.getAmplifier());
         if (reflected <= 0) {
             return;
         }

@@ -7,8 +7,6 @@ import com.waylays.arcanes.spells.gold.GoldFx;
 import com.waylays.arcanes.spells.gold.SunOfEldoradoSpell;
 import io.redspace.ironsspellbooks.damage.DamageSources;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -23,12 +21,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
-import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * Sun of Eldorado: a golden sun hanging above the caster. It grows, fires golden beams at the nearest enemies every
@@ -68,11 +65,11 @@ public class EldoradoSun extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
         for (EntityDataAccessor<Integer> beam : DATA_BEAMS) {
-            this.entityData.define(beam, -1);
+            builder.define(beam, -1);
         }
-        this.entityData.define(DATA_VOLLEY_TICK, -100);
+        builder.define(DATA_VOLLEY_TICK, -100);
     }
 
     /** Entity ids hit by the last volley (-1 = none). */
@@ -127,7 +124,7 @@ public class EldoradoSun extends Entity {
                 DamageSources.applyDamage(target, beamDamage, SpellUtil.damageSource(ModSpells.SUN_OF_ELDORADO.get(), this, owner));
                 Vec3 hit = target.getBoundingBox().getCenter();
                 SpellUtil.particles(level(), GoldFx.sparks(), hit.x, hit.y, hit.z, 8, .2, .2, .2, .3);
-                target.setSecondsOnFire(2);
+                target.igniteForSeconds(2);
             }
         }
         if (!targets.isEmpty()) {
@@ -221,10 +218,5 @@ public class EldoradoSun extends Entity {
         if (tag.hasUUID("Owner")) {
             ownerUUID = tag.getUUID("Owner");
         }
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

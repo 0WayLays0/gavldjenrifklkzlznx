@@ -77,7 +77,7 @@ public class SwordDisarmSkill extends PhysicalSkill {
         if (target instanceof Player player) {
             player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, ticks, 1, false, true, true));
             if (player.isBlocking()) {
-                player.disableShield(true);
+                player.disableShield();
             }
             if (!weapon.isEmpty()) {
                 player.getCooldowns().addCooldown(weapon.getItem(), ticks);

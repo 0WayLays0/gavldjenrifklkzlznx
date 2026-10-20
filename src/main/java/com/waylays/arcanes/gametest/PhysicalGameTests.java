@@ -35,11 +35,12 @@ import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 /**
  * Server-side checks run by CI for Physical Prowess, the fighting moves: wiring into Iron's (and plain physical
@@ -59,7 +60,7 @@ public final class PhysicalGameTests {
         return e.getHealth() < e.getMaxHealth();
     }
 
-    private static void cast(GameTestHelper helper, RegistryObject<AbstractSpell> spell, LivingEntity caster) {
+    private static void cast(GameTestHelper helper, DeferredHolder<AbstractSpell, ? extends AbstractSpell> spell, LivingEntity caster) {
         spell.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
     }
 
@@ -68,7 +69,7 @@ public final class PhysicalGameTests {
         SchoolType physical = SchoolRegistry.getSchool(ModSchools.PHYSICAL_RESOURCE);
         helper.assertTrue(physical != null, "Physical Prowess missing from Iron's school registry");
         int count = 0;
-        for (RegistryObject<AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
+        for (DeferredHolder<AbstractSpell, ? extends AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
             if (SpellRegistry.getSpell(entry.getId()).getSchoolType() == physical) {
                 count++;
             }
@@ -224,7 +225,7 @@ public final class PhysicalGameTests {
         cast(helper, ModSpells.DAGGER_STABS, caster);
         int last = DaggerStabsSkill.STABS[DaggerStabsSkill.STABS.length - 1];
         helper.runAfterDelay(last + 2, () -> {
-            MobEffectInstance bleeding = golem.getEffect(ModEffects.BLEEDING.get());
+            MobEffectInstance bleeding = golem.getEffect(ModEffects.BLEEDING);
             helper.assertTrue(bleeding != null, "the stabs left no bleeding");
             helper.assertTrue(bleeding.getAmplifier() == 1, "the third stab did not deepen the wound");
             helper.assertTrue(hurt(golem), "the stabs did no damage");
@@ -245,20 +246,20 @@ public final class PhysicalGameTests {
         helper.assertTrue(caster.getZ() > golem.getZ(), "the fighter did not get behind the golem");
         helper.runAfterDelay(6, () -> {
             helper.assertTrue(hurt(golem), "the backstab missed");
-            helper.assertTrue(golem.hasEffect(ModEffects.BLEEDING.get()), "the backstab left no bleeding");
+            helper.assertTrue(golem.hasEffect(ModEffects.BLEEDING), "the backstab left no bleeding");
             helper.succeed();
         });
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS)
     public static void silenceDoesNotStopFightingMoves(GameTestHelper helper) {
-        Player player = helper.makeMockPlayer();
-        player.addEffect(new MobEffectInstance(ModEffects.SILENCE.get(), 200));
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.addEffect(new MobEffectInstance(ModEffects.SILENCE, 200));
         SchoolType physical = SchoolRegistry.getSchool(ModSchools.PHYSICAL_RESOURCE);
         SchoolType book = SchoolRegistry.getSchool(ModSchools.BOOK_RESOURCE);
-        helper.assertTrue(!MinecraftForge.EVENT_BUS.post(new SpellPreCastEvent(player, ModSpells.PUNCH.get().getSpellId(), 1, physical, CastSource.SPELLBOOK)),
+        helper.assertTrue(!NeoForge.EVENT_BUS.post(new SpellPreCastEvent(player, ModSpells.PUNCH.get().getSpellId(), 1, physical, CastSource.SPELLBOOK)).isCanceled(),
                 "a silenced fighter could not punch");
-        helper.assertTrue(MinecraftForge.EVENT_BUS.post(new SpellPreCastEvent(player, ModSpells.PAGE_STORM.get().getSpellId(), 1, book, CastSource.SPELLBOOK)),
+        helper.assertTrue(NeoForge.EVENT_BUS.post(new SpellPreCastEvent(player, ModSpells.PAGE_STORM.get().getSpellId(), 1, book, CastSource.SPELLBOOK)).isCanceled(),
                 "the silence no longer stops magic");
         helper.succeed();
     }

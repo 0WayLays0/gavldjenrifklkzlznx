@@ -22,18 +22,18 @@ import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 /**
  * Parchment Aegis: pages circle the bearer like armour. Each page stops one enemy projectile flying at the bearer
  * (tridents and fishing hooks are left alone), or takes part of one hit and flies off as a razor page at whoever
  * struck. The pages left are kept on the bearer; the aegis ends with the last one.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public class ParchmentAegisEffect extends MobEffect {
     private static final String TAG = ArcanesOublies.MODID + ":parchment_aegis";
     /** Projectiles closer than this to the bearer's centre are caught. */
@@ -53,13 +53,13 @@ public class ParchmentAegisEffect extends MobEffect {
         tag.putInt("Pages", pages);
         tag.putFloat("Damage", razorDamage);
         entity.getPersistentData().put(TAG, tag);
-        entity.addEffect(new MobEffectInstance(ModEffects.PARCHMENT_AEGIS.get(), duration, spellLevel - 1, false, false, true));
+        entity.addEffect(new MobEffectInstance(ModEffects.PARCHMENT_AEGIS, duration, spellLevel - 1, false, false, true));
         AegisPages.attach(entity);
     }
 
     /** Pages still circling {@code entity} (a full set when the effect was given without the spell). */
     public static int pages(LivingEntity entity) {
-        if (!entity.hasEffect(ModEffects.PARCHMENT_AEGIS.get())) {
+        if (!entity.hasEffect(ModEffects.PARCHMENT_AEGIS)) {
             return 0;
         }
         CompoundTag tag = entity.getPersistentData().getCompound(TAG);
@@ -73,27 +73,28 @@ public class ParchmentAegisEffect extends MobEffect {
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return duration % 20 == 0;
     }
 
     @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         // The pages are not saved with the world: put them back after a reload
         if (!entity.level().isClientSide && AegisPages.of(entity).isEmpty()) {
             AegisPages.attach(entity);
         }
+        return true;
     }
 
     @SubscribeEvent
-    public static void onHurt(LivingHurtEvent event) {
+    public static void onHurt(LivingDamageEvent.Pre event) {
         LivingEntity bearer = event.getEntity();
-        MobEffectInstance aegis = bearer.getEffect(ModEffects.PARCHMENT_AEGIS.get());
+        MobEffectInstance aegis = bearer.getEffect(ModEffects.PARCHMENT_AEGIS);
         Entity attacker = event.getSource().getEntity();
         if (aegis == null || bearer.level().isClientSide || attacker == null || attacker == bearer || pages(bearer) <= 0) {
             return;
         }
-        event.setAmount(event.getAmount() * (1 - absorbRatio(aegis.getAmplifier())));
+        event.setNewDamage(event.getNewDamage() * (1 - absorbRatio(aegis.getAmplifier())));
         usePage(bearer);
         Vec3 c = bearer.getBoundingBox().getCenter();
         SpellUtil.particles(bearer.level(), BookFx.paper(), c.x, c.y, c.z, 8, .3, .3, .3, .15);
@@ -112,14 +113,16 @@ public class ParchmentAegisEffect extends MobEffect {
 
     /** Server side, every tick: catch a projectile flying in; end the aegis once the pages are spent. */
     @SubscribeEvent
-    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity bearer = event.getEntity();
-        if (bearer.level().isClientSide || !bearer.hasEffect(ModEffects.PARCHMENT_AEGIS.get())) {
+    public static void onLivingTick(EntityTickEvent.Pre event) {
+        if (!(event.getEntity() instanceof LivingEntity bearer)) {
+            return;
+        }
+        if (bearer.level().isClientSide || !bearer.hasEffect(ModEffects.PARCHMENT_AEGIS)) {
             return;
         }
         if (pages(bearer) <= 0) {
             bearer.getPersistentData().remove(TAG);
-            bearer.removeEffect(ModEffects.PARCHMENT_AEGIS.get());
+            bearer.removeEffect(ModEffects.PARCHMENT_AEGIS);
             return;
         }
         Vec3 c = bearer.getBoundingBox().getCenter();
@@ -143,7 +146,7 @@ public class ParchmentAegisEffect extends MobEffect {
 
     @SubscribeEvent
     public static void onExpired(MobEffectEvent.Expired event) {
-        if (event.getEffectInstance() != null && event.getEffectInstance().getEffect() == ModEffects.PARCHMENT_AEGIS.get()) {
+        if (event.getEffectInstance() != null && event.getEffectInstance().getEffect().is(ModEffects.PARCHMENT_AEGIS.getKey())) {
             event.getEntity().getPersistentData().remove(TAG);
         }
     }

@@ -55,7 +55,7 @@ public class AxeCleaveSkill extends PhysicalSkill {
                 return;
             }
             if (target instanceof Player player && player.isBlocking()) {
-                player.disableShield(true);
+                player.disableShield();
                 level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.SHIELD_BREAK, SoundSource.PLAYERS, 1f, .9f);
             }
             if (Combat.hit(this, fighter, target, blow(spellLevel, fighter, target, .7f, 1.2f), .3)) {

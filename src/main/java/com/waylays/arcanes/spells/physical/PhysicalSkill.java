@@ -11,15 +11,20 @@ import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.config.ServerConfigs;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.jetbrains.annotations.Nullable;
@@ -77,7 +82,7 @@ public abstract class PhysicalSkill extends AbstractSpell {
     public float getStrength(int spellLevel, @Nullable LivingEntity fighter) {
         double power = 1;
         if (fighter != null) {
-            AttributeInstance attribute = fighter.getAttribute(ModAttributes.PHYSICAL_SPELL_POWER.get());
+            AttributeInstance attribute = fighter.getAttribute(ModAttributes.PHYSICAL_SPELL_POWER);
             if (attribute != null) {
                 power = attribute.getValue();
             }
@@ -89,15 +94,23 @@ public abstract class PhysicalSkill extends AbstractSpell {
     public static float weaponDamage(LivingEntity fighter, @Nullable LivingEntity target) {
         AttributeInstance attack = fighter.getAttribute(Attributes.ATTACK_DAMAGE);
         float damage = attack == null ? 1 : (float) attack.getValue();
-        if (target != null) {
-            damage += EnchantmentHelper.getDamageBonus(fighter.getMainHandItem(), target.getMobType());
+        if (target != null && fighter.level() instanceof ServerLevel level) {
+            DamageSource source = fighter instanceof Player player ? fighter.damageSources().playerAttack(player) : fighter.damageSources().mobAttack(fighter);
+            damage = EnchantmentHelper.modifyDamage(level, fighter.getMainHandItem(), target, source, damage);
         }
         return damage;
     }
 
     /** A shot's bonus from an enchantment of the held weapon (a bow's Power): +{@code perLevel} per level. */
-    public static float enchantBonus(LivingEntity fighter, Enchantment enchantment, float perLevel) {
-        return 1 + perLevel * EnchantmentHelper.getItemEnchantmentLevel(enchantment, fighter.getMainHandItem());
+    public static float enchantBonus(LivingEntity fighter, ResourceKey<Enchantment> enchantment, float perLevel) {
+        return 1 + perLevel * enchantLevel(fighter, enchantment);
+    }
+
+    /** The level of an enchantment on the held weapon (0 without it). */
+    public static int enchantLevel(LivingEntity fighter, ResourceKey<Enchantment> enchantment) {
+        return fighter.level().registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(enchantment)
+                .map(holder -> EnchantmentHelper.getItemEnchantmentLevel(holder, fighter.getMainHandItem()))
+                .orElse(0);
     }
 
     /** One blow: {@code strengthShare} of the move's strength plus {@code weaponShare} of the weapon's damage. */

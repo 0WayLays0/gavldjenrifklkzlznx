@@ -14,9 +14,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import java.util.UUID;
  * away: it uses Iron's recast, open as long as the summons last, and that second cast is instant and costs no mana.
  * The cooldown starts once they are all gone, sent away, killed or expired. Mobs and scrolls just summon.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public abstract class SummoningSpell extends AbstractSpell {
     /** Brings the summons into the world (the cast that is not a recast). False if none could come. */
     protected abstract boolean summon(Level level, int spellLevel, LivingEntity caster);

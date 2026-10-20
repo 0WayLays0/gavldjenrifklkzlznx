@@ -64,7 +64,7 @@ public class KnifeThrowSkill extends PhysicalSkill implements MissileSkill {
     public void onMissileHit(Missile missile, LivingEntity target) {
         boolean far = missile.getOwner() != null && missile.getOwner().distanceTo(target) >= LONG_THROW;
         if (missile.strike(target, missile.getDamage() * (far ? LONG_THROW_BONUS : 1), .1)) {
-            target.addEffect(new MobEffectInstance(ModEffects.BLEEDING.get(), 60, 0, false, true, true));
+            target.addEffect(new MobEffectInstance(ModEffects.BLEEDING, 60, 0, false, true, true));
             missile.level().playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.PLAYERS, .8f, far ? 1.2f : 1.5f);
         }
     }

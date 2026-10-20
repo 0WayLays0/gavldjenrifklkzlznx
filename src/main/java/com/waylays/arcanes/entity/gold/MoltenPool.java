@@ -9,8 +9,6 @@ import io.redspace.ironsspellbooks.damage.DamageSources;
 import io.redspace.ironsspellbooks.entity.mobs.AntiMagicSusceptible;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -23,10 +21,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * A glowing pool of molten gold left by Molten Torrent. Burns and slows enemies standing in it, then cools down.
@@ -87,7 +84,7 @@ public class MoltenPool extends Entity implements AntiMagicSusceptible {
             for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, area)) {
                 if (e.isAlive() && !SpellUtil.isAlly(owner, e)
                         && DamageSources.applyDamage(e, damage, SpellUtil.damageSource(ModSpells.MOLTEN_TORRENT.get(), this, owner))) {
-                    e.setSecondsOnFire(2);
+                    e.igniteForSeconds(2);
                     e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 1));
                 }
             }
@@ -103,8 +100,8 @@ public class MoltenPool extends Entity implements AntiMagicSusceptible {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_EXPIRES, LIFETIME);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_EXPIRES, LIFETIME);
     }
 
     public int getExpires() {
@@ -143,10 +140,5 @@ public class MoltenPool extends Entity implements AntiMagicSusceptible {
         if (tag.hasUUID("Owner")) {
             ownerUUID = tag.getUUID("Owner");
         }
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

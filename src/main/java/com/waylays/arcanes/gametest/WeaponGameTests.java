@@ -50,9 +50,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.List;
 
@@ -74,7 +74,7 @@ public final class WeaponGameTests {
         return e.getHealth() < e.getMaxHealth();
     }
 
-    private static void cast(GameTestHelper helper, RegistryObject<AbstractSpell> spell, LivingEntity caster) {
+    private static void cast(GameTestHelper helper, DeferredHolder<AbstractSpell, ? extends AbstractSpell> spell, LivingEntity caster) {
         spell.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
     }
 
@@ -156,7 +156,7 @@ public final class WeaponGameTests {
         Witch caster = caster(helper, 4.5, 1.5);
         IronGolem golem = golem(helper, 4.5, 3.5);
         helper.assertTrue(DaggerFinisherSkill.multiplier(golem) == 1, "a golem at full health counts as wounded");
-        golem.addEffect(new MobEffectInstance(ModEffects.BLEEDING.get(), 200));
+        golem.addEffect(new MobEffectInstance(ModEffects.BLEEDING, 200));
         helper.assertTrue(DaggerFinisherSkill.multiplier(golem) == DaggerFinisherSkill.WOUNDED, "a bleeding golem does not count as wounded");
         golem.removeAllEffects();
         golem.setHealth(golem.getMaxHealth() * .3f);
@@ -263,7 +263,7 @@ public final class WeaponGameTests {
             cast(helper, ModSpells.AXE_SUNDER, caster);
         });
         helper.runAfterDelay(2 + AxeSunderSkill.HIT_TICK + 2, () -> {
-            helper.assertTrue(vindicator.hasEffect(ModEffects.SUNDERED.get()), "the armor was not split");
+            helper.assertTrue(vindicator.hasEffect(ModEffects.SUNDERED), "the armor was not split");
             helper.assertTrue(vindicator.getAttributeValue(Attributes.ARMOR) < armor[0], "Sundered took no armor away (" + armor[0] + " -> "
                     + vindicator.getAttributeValue(Attributes.ARMOR) + ")");
             helper.assertTrue(vindicator.getItemBySlot(EquipmentSlot.CHEST).getDamageValue() > 0, "the chestplate took no wear");
@@ -494,7 +494,7 @@ public final class WeaponGameTests {
         cast(helper, ModSpells.KNIFE_THROW, thrower);
         helper.runAfterDelay(KnifeThrowSkill.THROW_TICK + 6, () -> {
             helper.assertTrue(hurt(golem), "the knife missed");
-            helper.assertTrue(golem.hasEffect(ModEffects.BLEEDING.get()), "the knife left no bleeding");
+            helper.assertTrue(golem.hasEffect(ModEffects.BLEEDING), "the knife left no bleeding");
             helper.succeed();
         });
     }
@@ -519,7 +519,7 @@ public final class WeaponGameTests {
         Pig pig = helper.spawn(EntityType.PIG, new Vec3(4.5, 2, 4.5));
         cast(helper, ModSpells.KNIFE_PIN, thrower);
         helper.runAfterDelay(KnifePinSkill.THROW_TICK + 6, () -> {
-            helper.assertTrue(pig.hasEffect(ModEffects.PINNED.get()), "the pig was not pinned");
+            helper.assertTrue(pig.hasEffect(ModEffects.PINNED), "the pig was not pinned");
             helper.assertTrue(pig.getAttributeValue(Attributes.MOVEMENT_SPEED) <= 0, "a pinned pig can still walk");
             helper.succeed();
         });

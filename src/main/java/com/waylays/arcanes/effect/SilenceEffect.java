@@ -14,15 +14,15 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 /**
  * Silenced (Seal of Silence): the bearer cannot cast spells. A player's casts are refused before they start (spellbook
  * and scrolls alike) and a cast already under way is broken off; Iron's spellcasting mobs lose their casts too.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public class SilenceEffect extends MobEffect {
     public SilenceEffect() {
         super(MobEffectCategory.HARMFUL, ModSchools.BOOK_COLOR);
@@ -34,7 +34,7 @@ public class SilenceEffect extends MobEffect {
         if (event.getSchoolType() == ModSchools.PHYSICAL.get()) {
             return;
         }
-        if (event.getEntity().hasEffect(ModEffects.SILENCE.get())) {
+        if (event.getEntity().hasEffect(ModEffects.SILENCE)) {
             event.setCanceled(true);
             if (event.getEntity() instanceof ServerPlayer player) {
                 player.connection.send(new ClientboundSetActionBarTextPacket(Component.translatable("ui.arcanes_oublies.silenced").withStyle(ChatFormatting.DARK_PURPLE)));
@@ -44,9 +44,11 @@ public class SilenceEffect extends MobEffect {
 
     /** A cast started before the seal, or by a mob, is broken off on the bearer's next tick. */
     @SubscribeEvent
-    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity entity = event.getEntity();
-        if (entity.level().isClientSide || !entity.hasEffect(ModEffects.SILENCE.get())) {
+    public static void onLivingTick(EntityTickEvent.Pre event) {
+        if (!(event.getEntity() instanceof LivingEntity entity)) {
+            return;
+        }
+        if (entity.level().isClientSide || !entity.hasEffect(ModEffects.SILENCE)) {
             return;
         }
         if (entity instanceof ServerPlayer player) {

@@ -26,6 +26,7 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -35,13 +36,13 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * A flying stack of paper (Flying Stack): its summoner sits on it and flies where they look. Forward follows the eyes
@@ -49,7 +50,7 @@ import java.util.UUID;
  * a few seconds without a rider for its summoner to climb back on (right click), then scatters; it scatters too at
  * the end of its time, when shot down or when the spell is cast again.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public class FlyingStack extends Mob implements OwnedSummon, AntiMagicSusceptible {
     /** How long it waits for its rider before scattering. */
     public static final int RIDERLESS_TICKS = 100;
@@ -87,10 +88,10 @@ public class FlyingStack extends Mob implements OwnedSummon, AntiMagicSusceptibl
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_OWNER, Optional.empty());
-        this.entityData.define(DATA_SPEED, .6f);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_OWNER, Optional.empty());
+        builder.define(DATA_SPEED, .6f);
     }
 
     public float getFlySpeed() {
@@ -203,9 +204,10 @@ public class FlyingStack extends Mob implements OwnedSummon, AntiMagicSusceptibl
         calculateEntityAnimation(false);
     }
 
+    /** The rider sits on top of the stack (a player hangs .6 below their attachment point). */
     @Override
-    public double getPassengersRidingOffset() {
-        return .3;
+    protected Vec3 getPassengerAttachmentPoint(Entity passenger, EntityDimensions dimensions, float scale) {
+        return new Vec3(0, .55, 0);
     }
 
     /** A rider getting off in mid-air floats down like a loose page. */
@@ -294,7 +296,7 @@ public class FlyingStack extends Mob implements OwnedSummon, AntiMagicSusceptibl
 
     /** Its rider's head may go through a low ceiling: that never suffocates them. */
     @SubscribeEvent
-    public static void onRiderHurt(LivingAttackEvent event) {
+    public static void onRiderHurt(LivingIncomingDamageEvent event) {
         if (event.getSource().is(DamageTypes.IN_WALL) && event.getEntity().getVehicle() instanceof FlyingStack) {
             event.setCanceled(true);
         }

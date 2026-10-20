@@ -37,11 +37,12 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.List;
 
@@ -85,7 +86,7 @@ public final class ErrethysGameTests {
         SchoolType errethys = SchoolRegistry.getSchool(ModSchools.ERRETHYS_RESOURCE);
         helper.assertTrue(errethys != null, "Errethys missing from Iron's school registry");
         int count = 0;
-        for (RegistryObject<AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
+        for (DeferredHolder<AbstractSpell, ? extends AbstractSpell> entry : ModSpells.SPELLS.getEntries()) {
             if (SpellRegistry.getSpell(entry.getId()).getSchoolType() == errethys) {
                 count++;
             }
@@ -125,7 +126,7 @@ public final class ErrethysGameTests {
         ManaCamel camel = camels.get(0);
         helper.assertTrue(camel.isSaddled() && camel.isTamed(), "the dromedary is not ready to ride");
         helper.assertTrue(SpellUtil.isAlly(caster, camel), "the caster's spells would hurt its dromedary");
-        Player stranger = helper.makeMockPlayer();
+        Player stranger = helper.makeMockPlayer(GameType.SURVIVAL);
         helper.assertTrue(camel.mobInteract(stranger, InteractionHand.MAIN_HAND) == InteractionResult.PASS, "a stranger climbed on the dromedary");
         dismissAll(helper, caster);
         helper.succeed();
@@ -164,7 +165,7 @@ public final class ErrethysGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "errethys_ride")
     public static void summonerRidesTheDromedary(GameTestHelper helper) {
-        Player rider = helper.makeMockPlayer();
+        Player rider = helper.makeMockPlayer(GameType.SURVIVAL);
         ManaCamel camel = ModEntities.MANA_DROMEDARY.get().create(helper.getLevel());
         helper.assertTrue(camel != null, "no dromedary");
         Vec3 at = helper.absoluteVec(new Vec3(4.5, 2, 4.5));
@@ -195,7 +196,7 @@ public final class ErrethysGameTests {
      * A villager casts {@code spell} near a vindicator (a monster that poison works on) and the test waits for the
      * creatures to hurt it, and for {@code extra}.
      */
-    private static void fight(GameTestHelper helper, RegistryObject<AbstractSpell> spell, Runnable extra, Vindicator[] foe) {
+    private static void fight(GameTestHelper helper, DeferredHolder<AbstractSpell, ? extends AbstractSpell> spell, Runnable extra, Vindicator[] foe) {
         Villager caster = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(4.5, 2, 1.5));
         foe[0] = helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(4.5, 2, 6.5));
         Vindicator target = foe[0];

@@ -15,8 +15,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * The pages of Parchment Aegis, drawn circling their bearer; the count is synced from the bearer's aegis. Visual only:
@@ -49,9 +49,9 @@ public class AegisPages extends SpellEffectEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_TARGET, -1);
-        this.entityData.define(DATA_PAGES, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_TARGET, -1);
+        builder.define(DATA_PAGES, 0);
     }
 
     @Nullable
@@ -73,7 +73,7 @@ public class AegisPages extends SpellEffectEntity {
         if (level().isClientSide) {
             return;
         }
-        if (bearer == null || !bearer.isAlive() || !bearer.hasEffect(ModEffects.PARCHMENT_AEGIS.get())) {
+        if (bearer == null || !bearer.isAlive() || !bearer.hasEffect(ModEffects.PARCHMENT_AEGIS)) {
             double y = getY() + (bearer == null ? 1 : bearer.getBbHeight() * .5);
             SpellUtil.particles(level(), BookFx.paper(), getX(), y, getZ(), 3 + 2 * getPages(), .5, .4, .5, .2);
             SpellUtil.particles(level(), ParticleTypes.ENCHANT, getX(), y, getZ(), 20, .4, .4, .4, 1);

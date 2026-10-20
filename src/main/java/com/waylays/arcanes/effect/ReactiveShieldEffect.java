@@ -17,17 +17,17 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 /**
  * Reactive Shield: a crackling energy shell around the caster. When something hits the caster, the shell takes part
  * of the blow and explodes outward, throwing the attackers back. {@link #CHARGES} explosions, then it is spent.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public class ReactiveShieldEffect extends MobEffect {
     public static final int CHARGES = 3;
     /** Hits within this many ticks of an explosion are still softened but do not use up another charge. */
@@ -49,12 +49,12 @@ public class ReactiveShieldEffect extends MobEffect {
         tag.putFloat("Damage", blastDamage);
         tag.putLong("LastBlast", -100);
         entity.getPersistentData().put(TAG, tag);
-        entity.addEffect(new MobEffectInstance(ModEffects.REACTIVE_SHIELD.get(), duration, spellLevel - 1, false, false, true));
+        entity.addEffect(new MobEffectInstance(ModEffects.REACTIVE_SHIELD, duration, spellLevel - 1, false, false, true));
         ShieldBubble.attach(entity);
     }
 
     public static int charges(LivingEntity entity) {
-        if (!entity.hasEffect(ModEffects.REACTIVE_SHIELD.get())) {
+        if (!entity.hasEffect(ModEffects.REACTIVE_SHIELD)) {
             return 0;
         }
         CompoundTag tag = entity.getPersistentData().getCompound(TAG);
@@ -62,15 +62,15 @@ public class ReactiveShieldEffect extends MobEffect {
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return duration % 4 == 0;
     }
 
     /** Crackling sparks across the shell. */
     @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         if (entity.level().isClientSide) {
-            return;
+            return true;
         }
         // The bubble is not saved with the world: put it back after a reload
         if (entity.tickCount % 20 == 0 && ShieldBubble.bubblesOf(entity).isEmpty()) {
@@ -81,17 +81,18 @@ public class ReactiveShieldEffect extends MobEffect {
         float a = entity.getRandom().nextFloat() * Mth.TWO_PI;
         float b = (entity.getRandom().nextFloat() - .5f) * Mth.PI;
         SpellUtil.particles(entity.level(), ExplosionFx.arcaneSparks(), c.x + Mth.cos(a) * Mth.cos(b) * r, c.y + Mth.sin(b) * r, c.z + Mth.sin(a) * Mth.cos(b) * r, 1, 0, 0, 0, .05);
+        return true;
     }
 
     @SubscribeEvent
-    public static void onHurt(LivingHurtEvent event) {
+    public static void onHurt(LivingDamageEvent.Pre event) {
         LivingEntity bearer = event.getEntity();
-        MobEffectInstance shield = bearer.getEffect(ModEffects.REACTIVE_SHIELD.get());
+        MobEffectInstance shield = bearer.getEffect(ModEffects.REACTIVE_SHIELD);
         if (shield == null || bearer.level().isClientSide || event.getSource().getEntity() == null || event.getSource().getEntity() == bearer
                 || (event.getSource() instanceof SpellDamageSource spellSource && spellSource.spell() == ModSpells.REACTIVE_SHIELD.get())) {
             return;
         }
-        event.setAmount(event.getAmount() * (1 - absorbRatio(shield.getAmplifier())));
+        event.setNewDamage(event.getNewDamage() * (1 - absorbRatio(shield.getAmplifier())));
         CompoundTag tag = bearer.getPersistentData().getCompound(TAG);
         long now = bearer.level().getGameTime();
         if (now - tag.getLong("LastBlast") < REARM_TICKS) {
@@ -109,19 +110,21 @@ public class ReactiveShieldEffect extends MobEffect {
 
     /** A spent shell goes away on the bearer's next tick (never while its effects are being ticked). */
     @SubscribeEvent
-    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity bearer = event.getEntity();
-        if (!bearer.level().isClientSide && bearer.hasEffect(ModEffects.REACTIVE_SHIELD.get())
+    public static void onLivingTick(EntityTickEvent.Pre event) {
+        if (!(event.getEntity() instanceof LivingEntity bearer)) {
+            return;
+        }
+        if (!bearer.level().isClientSide && bearer.hasEffect(ModEffects.REACTIVE_SHIELD)
                 && bearer.getPersistentData().getCompound(TAG).contains("Charges")
                 && bearer.getPersistentData().getCompound(TAG).getInt("Charges") <= 0) {
             bearer.getPersistentData().remove(TAG);
-            bearer.removeEffect(ModEffects.REACTIVE_SHIELD.get());
+            bearer.removeEffect(ModEffects.REACTIVE_SHIELD);
         }
     }
 
     @SubscribeEvent
     public static void onExpired(MobEffectEvent.Expired event) {
-        if (event.getEffectInstance() != null && event.getEffectInstance().getEffect() == ModEffects.REACTIVE_SHIELD.get()) {
+        if (event.getEffectInstance() != null && event.getEffectInstance().getEffect().is(ModEffects.REACTIVE_SHIELD.getKey())) {
             event.getEntity().getPersistentData().remove(TAG);
         }
     }

@@ -27,10 +27,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +43,7 @@ import java.util.UUID;
  * thrown off balance (slowed and weakened) and gets the point straight back; an arrow or a thrown weapon is turned
  * aside. Magic is not something a blade can parry.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 @AutoSpellConfig
 public class LongswordParrySkill extends PhysicalSkill {
     /** The riposte lands this long after the parry. */
@@ -95,7 +95,7 @@ public class LongswordParrySkill extends PhysicalSkill {
     }
 
     @SubscribeEvent
-    public static void onAttacked(LivingAttackEvent event) {
+    public static void onAttacked(LivingIncomingDamageEvent event) {
         LivingEntity fighter = event.getEntity();
         Guard guard = GUARDS.get(fighter.getUUID());
         if (guard == null || fighter.level().isClientSide) {

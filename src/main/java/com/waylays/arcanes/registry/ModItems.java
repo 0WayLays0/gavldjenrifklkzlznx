@@ -1,27 +1,39 @@
 package com.waylays.arcanes.registry;
 
 import com.waylays.arcanes.ArcanesOublies;
-import io.redspace.ironsspellbooks.api.spells.SpellRarity;
-import io.redspace.ironsspellbooks.item.spell_books.SimpleAttributeSpellBook;
+import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
+import io.redspace.ironsspellbooks.item.SpellBook;
+import io.redspace.ironsspellbooks.item.weapons.AttributeContainer;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.item.Rarity;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModItems {
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ArcanesOublies.MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, ArcanesOublies.MODID);
 
     /** Gold school spellbook: 10 slots, +10% Gold Spell Power, +200 max mana. */
-    public static final RegistryObject<Item> GOLDEN_GRIMOIRE = ITEMS.register("golden_grimoire",
-            () -> new SimpleAttributeSpellBook(10, SpellRarity.LEGENDARY, ModAttributes.GOLD_SPELL_POWER.get(), .10, 200));
+    public static final DeferredHolder<Item, Item> GOLDEN_GRIMOIRE = ITEMS.register("golden_grimoire",
+            () -> spellbook(10, ModAttributes.GOLD_SPELL_POWER));
 
     /** Explosion school spellbook: 10 slots, +10% Explosion Spell Power, +200 max mana. */
-    public static final RegistryObject<Item> DETONATION_CODEX = ITEMS.register("detonation_codex",
-            () -> new SimpleAttributeSpellBook(10, SpellRarity.LEGENDARY, ModAttributes.EXPLOSION_SPELL_POWER.get(), .10, 200));
+    public static final DeferredHolder<Item, Item> DETONATION_CODEX = ITEMS.register("detonation_codex",
+            () -> spellbook(10, ModAttributes.EXPLOSION_SPELL_POWER));
 
     /** Book school spellbook: 12 slots, +10% Book Spell Power, +200 max mana. */
-    public static final RegistryObject<Item> LIVING_GRIMOIRE = ITEMS.register("living_grimoire",
-            () -> new SimpleAttributeSpellBook(12, SpellRarity.LEGENDARY, ModAttributes.BOOK_SPELL_POWER.get(), .10, 200));
+    public static final DeferredHolder<Item, Item> LIVING_GRIMOIRE = ITEMS.register("living_grimoire",
+            () -> spellbook(12, ModAttributes.BOOK_SPELL_POWER));
 
     private ModItems() {}
+
+    /** A legendary school spellbook, like Iron's own: +10% power in its school and +200 max mana. */
+    private static Item spellbook(int slots, Holder<Attribute> schoolPower) {
+        return new SpellBook(slots, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()).withSpellbookAttributes(
+                new AttributeContainer(schoolPower, .10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE),
+                new AttributeContainer(AttributeRegistry.MAX_MANA, 200, AttributeModifier.Operation.ADD_VALUE));
+    }
 }

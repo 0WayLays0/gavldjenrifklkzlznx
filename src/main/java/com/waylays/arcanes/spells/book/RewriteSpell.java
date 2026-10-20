@@ -25,7 +25,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -99,7 +99,7 @@ public class RewriteSpell extends AbstractSpell {
             SpellUtil.particles(level, ParticleTypes.SQUID_INK, entity.getX(), entity.getY() + h * .5, entity.getZ(), 4 * erased.size(), .3, h * .3, .3, .05);
         }
         float heal = getHealing(spellLevel, entity);
-        MinecraftForge.EVENT_BUS.post(new SpellHealEvent(entity, entity, heal, getSchoolType()));
+        NeoForge.EVENT_BUS.post(new SpellHealEvent(entity, entity, heal, getSchoolType()));
         entity.heal(heal);
         level.addFreshEntity(new RewriteAura(level, entity));
         SpellUtil.particles(level, BookFx.GILT_DUST, entity.getX(), entity.getY() + h * .5, entity.getZ(), 20, .4, h * .4, .4, 0);

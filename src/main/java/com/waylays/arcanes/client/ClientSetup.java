@@ -10,8 +10,8 @@ import com.waylays.arcanes.client.render.BlastEffectRenderer;
 import com.waylays.arcanes.client.render.BookmarkRenderer;
 import com.waylays.arcanes.client.render.CataclysmRenderer;
 import com.waylays.arcanes.client.render.ChapterRuneRenderer;
-import com.waylays.arcanes.client.render.FinalChapterRenderer;
 import com.waylays.arcanes.client.render.EldoradoSunRenderer;
+import com.waylays.arcanes.client.render.FinalChapterRenderer;
 import com.waylays.arcanes.client.render.FlyingGrimoireRenderer;
 import com.waylays.arcanes.client.render.FlyingStackRenderer;
 import com.waylays.arcanes.client.render.GildedChainsRenderer;
@@ -43,17 +43,17 @@ import com.waylays.arcanes.client.render.WordOfPowerRenderer;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModItems;
 import io.redspace.ironsspellbooks.render.SpellBookCurioRenderer;
+import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.client.renderer.entity.NoopRenderer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ArcanesOublies.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class ClientSetup {
     private ClientSetup() {}
 

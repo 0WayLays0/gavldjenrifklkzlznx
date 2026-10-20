@@ -16,11 +16,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
+
+      - name: Iron's Spells versions on its maven
+        run: |
+          for a in irons_spellbooks irons_lib; do
+            echo "== $a"; curl -s "https://code.redspace.io/releases/io/redspace/$a/maven-metadata.xml" | grep -oE '<(version|latest|release)>1\.21[^<]*' | tail -n 8 || true
+          done
 
       - name: Cache Gradle and ForgeGradle
         uses: actions/cache@v4
@@ -28,11 +34,11 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('build.gradle', 'settings.gradle', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
+          key: gradle121-${{ runner.os }}-${{ hashFiles('build.gradle', 'settings.gradle', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
-            gradle-${{ runner.os }}-
+            gradle121-${{ runner.os }}-
 
-      - name: Build (compile, reobf jar)
+      - name: Build (compile, jar)
         run: |
           set -o pipefail
           chmod +x gradlew
@@ -57,7 +63,7 @@ jobs:
           echo "================ REPORT ================"
           if [ -f build.log ]; then
             echo "--- compiler errors ---"
-            grep -E "error:|warning: \[deprecation\]|FAILED|What went wrong" -A3 build.log | head -n 250 || true
+            grep -E "error:|FAILED|What went wrong|Could not (find|resolve)" -A3 build.log | head -n 600 || true
           fi
           if [ -f gametest.log ]; then
             echo "--- gametests ---"
@@ -73,11 +79,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       - name: Cache Gradle and ForgeGradle (client)
         uses: actions/cache@v4
@@ -85,10 +91,10 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-client-${{ runner.os }}-${{ hashFiles('build.gradle', 'settings.gradle', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
+          key: gradle121-client-${{ runner.os }}-${{ hashFiles('build.gradle', 'settings.gradle', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
-            gradle-client-${{ runner.os }}-
-            gradle-${{ runner.os }}-
+            gradle121-client-${{ runner.os }}-
+            gradle121-${{ runner.os }}-
 
       - name: Install virtual display
         run: |

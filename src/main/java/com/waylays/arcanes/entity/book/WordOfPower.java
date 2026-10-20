@@ -105,7 +105,7 @@ public class WordOfPower extends SpellEffectEntity {
             }
             float falloff = (float) Mth.clamp(1.2 - dist / WordOfPowerSpell.RANGE * .5, .6, 1);
             if (DamageSources.applyDamage(e, damage * falloff, SpellUtil.damageSource(ModSpells.WORD_OF_POWER.get(), this, owner))) {
-                e.setSecondsOnFire(3);
+                e.igniteForSeconds(3);
                 Vec3 push = dir.multiply(1, 0, 1).normalize().scale(.9 * falloff);
                 e.push(push.x, .35, push.z);
                 e.hurtMarked = true;

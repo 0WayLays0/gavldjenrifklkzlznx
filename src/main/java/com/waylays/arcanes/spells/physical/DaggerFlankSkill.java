@@ -113,7 +113,7 @@ public class DaggerFlankSkill extends PhysicalSkill {
                 Vec3 c = prey.getBoundingBox().getCenter();
                 SpellUtil.particles(level, ParticleTypes.CRIT, c.x, c.y, c.z, 16, .3, .4, .3, .5);
                 level.playSound(null, c.x, c.y, c.z, SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.PLAYERS, 1.3f, .9f);
-                prey.addEffect(new MobEffectInstance(ModEffects.BLEEDING.get(), 80, 0, false, true, true));
+                prey.addEffect(new MobEffectInstance(ModEffects.BLEEDING, 80, 0, false, true, true));
             }
             level.playSound(null, prey.getX(), prey.getY(), prey.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, SoundSource.PLAYERS, 1f, 1.3f);
         }

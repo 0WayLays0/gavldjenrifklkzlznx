@@ -79,10 +79,10 @@ public class Missile extends AbstractArrow {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_KIND, 0);
-        this.entityData.define(DATA_ITEM, ItemStack.EMPTY);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_KIND, 0);
+        builder.define(DATA_ITEM, ItemStack.EMPTY);
     }
 
     public Kind getKind() {
@@ -215,7 +215,7 @@ public class Missile extends AbstractArrow {
     }
 
     @Override
-    protected ItemStack getPickupItem() {
+    protected ItemStack getDefaultPickupItem() {
         return ItemStack.EMPTY;
     }
 

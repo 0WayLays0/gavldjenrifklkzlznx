@@ -36,8 +36,8 @@ public class RewriteAura extends SpellEffectEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_TARGET, -1);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_TARGET, -1);
     }
 
     @Nullable

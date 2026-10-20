@@ -51,7 +51,7 @@ public class BowVolleySkill extends PhysicalSkill implements MissileSkill {
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         SkillTimeline.after(entity, SHOT_TICK, archer -> {
-            float damage = getStrength(spellLevel, archer) * .55f * enchantBonus(archer, Enchantments.POWER_ARROWS, .1f);
+            float damage = getStrength(spellLevel, archer) * .55f * enchantBonus(archer, Enchantments.POWER, .1f);
             Vec3 look = archer.getLookAngle();
             for (int i = 0; i < ARROWS; i++) {
                 float yaw = -FAN / 2 + FAN * i / (ARROWS - 1);

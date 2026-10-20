@@ -9,8 +9,6 @@ import io.redspace.ironsspellbooks.damage.DamageSources;
 import io.redspace.ironsspellbooks.entity.mobs.AntiMagicSusceptible;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -25,10 +23,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * Page Storm: a whirlwind of runic pages that follows its target and slashes it every {@link #CUT_INTERVAL} ticks.
@@ -63,10 +60,10 @@ public class PageStorm extends Entity implements AntiMagicSusceptible {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_TARGET, -1);
-        this.entityData.define(DATA_PAGES, 10);
-        this.entityData.define(DATA_DURATION, 60);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_TARGET, -1);
+        builder.define(DATA_PAGES, 10);
+        builder.define(DATA_DURATION, 60);
     }
 
     @Nullable
@@ -182,10 +179,5 @@ public class PageStorm extends Entity implements AntiMagicSusceptible {
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

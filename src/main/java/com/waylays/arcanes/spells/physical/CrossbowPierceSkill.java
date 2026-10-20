@@ -11,7 +11,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 
@@ -49,7 +48,7 @@ public class CrossbowPierceSkill extends PhysicalSkill implements MissileSkill {
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         SkillTimeline.after(entity, SHOT_TICK, shooter -> {
-            int pierce = PIERCE + EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PIERCING, shooter.getMainHandItem());
+            int pierce = PIERCE + enchantLevel(shooter, Enchantments.PIERCING);
             Missile.shoot(shooter, Missile.Kind.BOLT, this, spellLevel, getStrength(spellLevel, shooter), Missile.launchPoint(shooter), shooter.getLookAngle(),
                     SPEED, 0).withPierce(pierce);
             level.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.2f, .8f);

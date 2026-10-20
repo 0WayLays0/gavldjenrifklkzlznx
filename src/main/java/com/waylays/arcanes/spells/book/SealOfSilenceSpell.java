@@ -95,7 +95,7 @@ public class SealOfSilenceSpell extends AbstractSpell {
 
     /** Silences {@code target} and puts the seal on it. */
     public static void seal(Level level, LivingEntity caster, LivingEntity target, int duration) {
-        target.addEffect(new MobEffectInstance(ModEffects.SILENCE.get(), duration, 0, false, true, true), caster);
+        target.addEffect(new MobEffectInstance(ModEffects.SILENCE, duration, 0, false, true, true), caster);
         // A fresh seal replaces the old one
         for (SilenceSeal old : level.getEntitiesOfClass(SilenceSeal.class, target.getBoundingBox().inflate(2), s -> s.getTarget() == target)) {
             old.discard();

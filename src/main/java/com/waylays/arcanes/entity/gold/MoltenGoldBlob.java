@@ -49,7 +49,7 @@ public class MoltenGoldBlob extends SpellProjectile {
         if (hit instanceof EntityHitResult entityHit) {
             Entity target = entityHit.getEntity();
             if (!SpellUtil.isAlly(owner, target) && DamageSources.applyDamage(target, getDamage(), SpellUtil.damageSource(ModSpells.MOLTEN_TORRENT.get(), this, owner))) {
-                target.setSecondsOnFire(3);
+                target.igniteForSeconds(3);
             }
             at = target.position();
         } else if (hit instanceof BlockHitResult blockHit && blockHit.getDirection() == Direction.UP) {

@@ -4,8 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
 
 /**
  * Small vertex helpers for spell renderers (entity vertex format: position, color, uv, overlay, light, normal).
@@ -15,15 +13,12 @@ public final class RenderHelper {
 
     public static void vertex(VertexConsumer consumer, PoseStack.Pose pose, float x, float y, float z, float u, float v,
                               int argb, int light, float nx, float ny, float nz) {
-        Matrix4f matrix = pose.pose();
-        Matrix3f normal = pose.normal();
-        consumer.vertex(matrix, x, y, z)
-                .color((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF, (argb >>> 24) & 0xFF)
-                .uv(u, v)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(normal, nx, ny, nz)
-                .endVertex();
+        consumer.addVertex(pose, x, y, z)
+                .setColor((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF, (argb >>> 24) & 0xFF)
+                .setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(light)
+                .setNormal(pose, nx, ny, nz);
     }
 
     /** Square in the XY plane centred on the origin, facing +Z. */

@@ -20,17 +20,17 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 /**
  * Volatile Brand: a glowing mark burnt into the victim. Every hit it takes (from anyone) adds a charge and makes the
  * mark burn brighter; at {@link #MAX_CHARGES} it explodes. If it runs out first it fizzles harmlessly.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public class VolatileBrandEffect extends MobEffect {
     public static final int MAX_CHARGES = 5;
     /** Several hits within this many ticks (multi-hit spells, sweeping) count as one charge. */
@@ -49,7 +49,7 @@ public class VolatileBrandEffect extends MobEffect {
         tag.putInt("Charges", 0);
         tag.putLong("LastCharge", -100);
         victim.getPersistentData().put(TAG, tag);
-        victim.addEffect(new MobEffectInstance(ModEffects.VOLATILE_BRAND.get(), duration, spellLevel - 1, false, true, true));
+        victim.addEffect(new MobEffectInstance(ModEffects.VOLATILE_BRAND, duration, spellLevel - 1, false, true, true));
     }
 
     public static int charges(LivingEntity entity) {
@@ -57,15 +57,15 @@ public class VolatileBrandEffect extends MobEffect {
     }
 
     @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return duration % 2 == 0;
     }
 
     /** The mark circles the victim's chest, brighter and faster with every charge. */
     @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         if (entity.level().isClientSide) {
-            return;
+            return true;
         }
         int charges = charges(entity);
         float w = entity.getBbWidth() * .7f;
@@ -79,12 +79,13 @@ public class VolatileBrandEffect extends MobEffect {
         if (charges >= 3 && entity.tickCount % 4 == 0) {
             SpellUtil.particles(entity.level(), ExplosionFx.sparks(), entity.getX(), y, entity.getZ(), charges - 1, w * .4, .2, w * .4, .12);
         }
+        return true;
     }
 
     @SubscribeEvent
-    public static void onHurt(LivingHurtEvent event) {
+    public static void onHurt(LivingDamageEvent.Pre event) {
         LivingEntity victim = event.getEntity();
-        if (victim.level().isClientSide || !victim.hasEffect(ModEffects.VOLATILE_BRAND.get())) {
+        if (victim.level().isClientSide || !victim.hasEffect(ModEffects.VOLATILE_BRAND)) {
             return;
         }
         // Only real hits charge it: not burning, poison and other damage nobody dealt, nor the brand's own blast
@@ -112,13 +113,15 @@ public class VolatileBrandEffect extends MobEffect {
     }
 
     @SubscribeEvent
-    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity victim = event.getEntity();
-        if (victim.level() instanceof ServerLevel level && victim.hasEffect(ModEffects.VOLATILE_BRAND.get())
+    public static void onLivingTick(EntityTickEvent.Pre event) {
+        if (!(event.getEntity() instanceof LivingEntity victim)) {
+            return;
+        }
+        if (victim.level() instanceof ServerLevel level && victim.hasEffect(ModEffects.VOLATILE_BRAND)
                 && victim.getPersistentData().getCompound(TAG).getBoolean("Primed")) {
             CompoundTag tag = victim.getPersistentData().getCompound(TAG);
             victim.getPersistentData().remove(TAG);
-            victim.removeEffect(ModEffects.VOLATILE_BRAND.get());
+            victim.removeEffect(ModEffects.VOLATILE_BRAND);
             Entity caster = tag.hasUUID("Caster") ? level.getEntity(tag.getUUID("Caster")) : null;
             float damage = tag.contains("Damage") ? tag.getFloat("Damage") : VolatileBrandSpell.FALLBACK_DAMAGE;
             // The hit that primed it just gave the victim hurt immunity; the blast goes through it
@@ -133,7 +136,7 @@ public class VolatileBrandEffect extends MobEffect {
     public static void onExpired(MobEffectEvent.Expired event) {
         MobEffectInstance instance = event.getEffectInstance();
         LivingEntity victim = event.getEntity();
-        if (instance == null || instance.getEffect() != ModEffects.VOLATILE_BRAND.get() || victim.level().isClientSide) {
+        if (instance == null || !instance.getEffect().is(ModEffects.VOLATILE_BRAND.getKey()) || victim.level().isClientSide) {
             return;
         }
         victim.getPersistentData().remove(TAG);

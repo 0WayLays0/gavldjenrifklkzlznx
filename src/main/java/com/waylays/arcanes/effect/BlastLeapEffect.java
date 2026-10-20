@@ -18,16 +18,16 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 /**
  * Blast Leap in flight: the caster trails fire, dives at {@link #DIVE_TICK} and blows up where it lands. No fall
  * damage during the leap. Timed on the server clock, since the server does not know a player's real velocity.
  */
-@Mod.EventBusSubscriber(modid = ArcanesOublies.MODID)
+@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public class BlastLeapEffect extends MobEffect {
     public static final int DIVE_TICK = 12;
     public static final int MAX_TICKS = 100;
@@ -45,18 +45,20 @@ public class BlastLeapEffect extends MobEffect {
         tag.putDouble("DirX", direction.x);
         tag.putDouble("DirZ", direction.z);
         entity.getPersistentData().put(TAG, tag);
-        entity.addEffect(new MobEffectInstance(ModEffects.BLAST_LEAP.get(), MAX_TICKS, 0, false, false, true));
+        entity.addEffect(new MobEffectInstance(ModEffects.BLAST_LEAP, MAX_TICKS, 0, false, false, true));
     }
 
     @SubscribeEvent
-    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity entity = event.getEntity();
-        if (!(entity.level() instanceof ServerLevel level) || !entity.hasEffect(ModEffects.BLAST_LEAP.get())) {
+    public static void onLivingTick(EntityTickEvent.Pre event) {
+        if (!(event.getEntity() instanceof LivingEntity entity)) {
+            return;
+        }
+        if (!(entity.level() instanceof ServerLevel level) || !entity.hasEffect(ModEffects.BLAST_LEAP)) {
             return;
         }
         CompoundTag tag = entity.getPersistentData().getCompound(TAG);
         if (!tag.contains("Start")) {
-            entity.removeEffect(ModEffects.BLAST_LEAP.get());
+            entity.removeEffect(ModEffects.BLAST_LEAP);
             return;
         }
         long age = level.getGameTime() - tag.getLong("Start");
@@ -81,7 +83,7 @@ public class BlastLeapEffect extends MobEffect {
 
     private static void land(ServerLevel level, LivingEntity entity, CompoundTag tag) {
         entity.getPersistentData().remove(TAG);
-        entity.removeEffect(ModEffects.BLAST_LEAP.get());
+        entity.removeEffect(ModEffects.BLAST_LEAP);
         entity.fallDistance = 0;
         if (entity.isInWater()) {
             return;
@@ -94,7 +96,7 @@ public class BlastLeapEffect extends MobEffect {
     /** The leap never hurts its caster: no fall damage while the effect is on. */
     @SubscribeEvent
     public static void onFall(LivingFallEvent event) {
-        if (event.getEntity().hasEffect(ModEffects.BLAST_LEAP.get())) {
+        if (event.getEntity().hasEffect(ModEffects.BLAST_LEAP)) {
             event.setCanceled(true);
         }
     }

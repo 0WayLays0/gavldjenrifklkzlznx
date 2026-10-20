@@ -63,11 +63,11 @@ public class AxeSunderSkill extends PhysicalSkill {
             if (!Combat.hit(this, fighter, target, blow(spellLevel, fighter, target, .6f, 1f), .2)) {
                 return;
             }
-            target.addEffect(new MobEffectInstance(ModEffects.SUNDERED.get(), getSunderTicks(spellLevel), getSunderLevel(spellLevel), false, true, true));
+            target.addEffect(new MobEffectInstance(ModEffects.SUNDERED, getSunderTicks(spellLevel), getSunderLevel(spellLevel), false, true, true));
             for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
                 ItemStack piece = target.getItemBySlot(slot);
                 if (piece.isDamageableItem()) {
-                    piece.hurtAndBreak(2 + spellLevel, target, wearer -> wearer.broadcastBreakEvent(slot));
+                    piece.hurtAndBreak(2 + spellLevel, target, slot);
                 }
             }
             level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, SoundSource.PLAYERS, .7f, 1.2f);

@@ -27,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
  * arrow trailing its rope back to the hand of whoever shot it.
  */
 public class MissileRenderer extends ArrowRenderer<Missile> {
-    private static final ResourceLocation ARROW = new ResourceLocation("textures/entity/projectiles/arrow.png");
+    private static final ResourceLocation ARROW = ResourceLocation.parse("textures/entity/projectiles/arrow.png");
     private static final ResourceLocation KNIFE = ArcanesOublies.id("textures/entity/throwing_knife.png");
     private static final ResourceLocation JAVELIN = ArcanesOublies.id("textures/entity/javelin.png");
     private static final int ROPE = 0xFF8A6A3E;
@@ -119,10 +119,9 @@ public class MissileRenderer extends ArrowRenderer<Missile> {
             float t = i / (float) ROPE_SEGMENTS;
             Vec3 p = d.scale(t).subtract(0, Math.sin(Math.PI * t) * sag, 0);
             Vec3 n = prev == null ? d.normalize() : p.subtract(prev).normalize();
-            consumer.vertex(pose.pose(), (float) p.x, (float) p.y, (float) p.z)
-                    .color((ROPE >> 16) & 0xFF, (ROPE >> 8) & 0xFF, ROPE & 0xFF, 255)
-                    .normal(pose.normal(), (float) n.x, (float) n.y, (float) n.z)
-                    .endVertex();
+            consumer.addVertex(pose, (float) p.x, (float) p.y, (float) p.z)
+                    .setColor((ROPE >> 16) & 0xFF, (ROPE >> 8) & 0xFF, ROPE & 0xFF, 255)
+                    .setNormal(pose, (float) n.x, (float) n.y, (float) n.z);
             prev = p;
         }
     }

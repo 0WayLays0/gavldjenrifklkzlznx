@@ -10,11 +10,10 @@ import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 
 /**
@@ -28,8 +27,7 @@ public class ArcanesOublies {
     public static final String MODID = "arcanes_oublies";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public ArcanesOublies() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public ArcanesOublies(IEventBus modBus, ModContainer container) {
         ModAttributes.ATTRIBUTES.register(modBus);
         ModSchools.SCHOOLS.register(modBus);
         ModSpells.SPELLS.register(modBus);
@@ -37,11 +35,11 @@ public class ArcanesOublies {
         ModEntities.ENTITIES.register(modBus);
         ModEffects.EFFECTS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ArcanesConfig.SPEC);
-        ArcanesNetwork.register();
+        container.registerConfig(ModConfig.Type.SERVER, ArcanesConfig.SPEC);
+        modBus.addListener(ArcanesNetwork::register);
     }
 
     public static ResourceLocation id(String path) {
-        return new ResourceLocation(MODID, path);
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 }

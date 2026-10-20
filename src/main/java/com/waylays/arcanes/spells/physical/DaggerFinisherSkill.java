@@ -83,7 +83,7 @@ public class DaggerFinisherSkill extends PhysicalSkill {
         if (target.getHealth() < target.getMaxHealth() * LOW_HEALTH) {
             return EXECUTE;
         }
-        if (target.hasEffect(ModEffects.BLEEDING.get()) || target.hasEffect(ModEffects.PINNED.get()) || target.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+        if (target.hasEffect(ModEffects.BLEEDING) || target.hasEffect(ModEffects.PINNED) || target.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
             return WOUNDED;
         }
         return 1;
