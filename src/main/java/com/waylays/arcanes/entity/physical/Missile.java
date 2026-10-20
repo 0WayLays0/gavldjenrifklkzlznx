@@ -189,11 +189,13 @@ public class Missile extends AbstractArrow {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
+        Entity hit = result.getEntity();
+        // On both sides: a piercing arrow looks again for what it hits until it finds nothing new (an endless loop on
+        // the client if what it went through is not set aside there too)
+        struck.add(hit.getId());
         if (level().isClientSide) {
             return;
         }
-        Entity hit = result.getEntity();
-        struck.add(hit.getId());
         MissileSkill skill = skill();
         if (hit instanceof LivingEntity target && skill != null) {
             skill.onMissileHit(this, target);
