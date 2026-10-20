@@ -28,6 +28,8 @@ public final class ModAttributes {
     /** Physical Prowess: how hard the fighter's moves hit, and how well they shrug off others' moves. */
     public static final DeferredHolder<Attribute, Attribute> PHYSICAL_SPELL_POWER = powerAttribute("physical");
     public static final DeferredHolder<Attribute, Attribute> PHYSICAL_MAGIC_RESIST = resistanceAttribute("physical");
+    public static final DeferredHolder<Attribute, Attribute> BOSS_SPELL_POWER = powerAttribute("boss");
+    public static final DeferredHolder<Attribute, Attribute> BOSS_MAGIC_RESIST = resistanceAttribute("boss");
 
     private ModAttributes() {}
 

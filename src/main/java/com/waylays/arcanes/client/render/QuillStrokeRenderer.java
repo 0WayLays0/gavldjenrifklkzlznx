@@ -76,7 +76,6 @@ public class QuillStrokeRenderer extends EntityRenderer<QuillStroke> {
 
         // Rune pillars bursting out one after the other along the line
         if (age >= QuillStroke.ERUPT_TICK) {
-            VertexConsumer pillar = buffer.getBuffer(RenderType.eyes(PILLAR));
             int count = entity.pillarCount();
             for (int i = 0; i < count; i++) {
                 float t = Mth.clamp((age - QuillStroke.ERUPT_TICK - i * .35f) / 4f, 0f, 1f);
@@ -91,6 +90,8 @@ public class QuillStrokeRenderer extends EntityRenderer<QuillStroke> {
                 poseStack.pushPose();
                 poseStack.translate(0, 0, Math.min(length, i * QuillStroke.PILLAR_SPACING));
                 poseStack.mulPose(Axis.YP.rotationDegrees(i * 37f + age * 3f));
+                // Asked for again each time: the ring below switches the buffer away
+                VertexConsumer pillar = buffer.getBuffer(RenderType.eyes(PILLAR));
                 for (int k = 0; k < 2; k++) {
                     poseStack.pushPose();
                     poseStack.mulPose(Axis.YP.rotationDegrees(k * 90f));

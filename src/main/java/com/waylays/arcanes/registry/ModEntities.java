@@ -20,6 +20,11 @@ import com.waylays.arcanes.entity.book.RewriteAura;
 import com.waylays.arcanes.entity.book.SilenceSeal;
 import com.waylays.arcanes.entity.book.TomeOfJudgment;
 import com.waylays.arcanes.entity.book.WordOfPower;
+import com.waylays.arcanes.entity.boss.AnnihilationBeam;
+import com.waylays.arcanes.entity.boss.BossProp;
+import com.waylays.arcanes.entity.boss.BossTelegraph;
+import com.waylays.arcanes.entity.boss.RuneWall;
+import com.waylays.arcanes.entity.boss.VoidOrb;
 import com.waylays.arcanes.entity.errethys.ManaCamel;
 import com.waylays.arcanes.entity.errethys.ManaCrow;
 import com.waylays.arcanes.entity.errethys.ManaRat;
@@ -198,6 +203,18 @@ public final class ModEntities {
     // Updated every tick, unlike vanilla arrows: guided arrows turn in flight
     public static final DeferredHolder<EntityType<?>, EntityType<Missile>> MISSILE = register("missile",
             EntityType.Builder.<Missile>of(Missile::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(1));
+
+    // Boss Magic: warnings, scenery and the attacks that outlive their cast (tracked far, drawn big)
+    public static final DeferredHolder<EntityType<?>, EntityType<BossTelegraph>> BOSS_TELEGRAPH = register("boss_telegraph",
+            EntityType.Builder.<BossTelegraph>of(BossTelegraph::new, MobCategory.MISC).sized(1f, .2f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BossProp>> BOSS_PROP = register("boss_prop",
+            EntityType.Builder.<BossProp>of(BossProp::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<AnnihilationBeam>> ANNIHILATION_BEAM = register("annihilation_beam",
+            EntityType.Builder.<AnnihilationBeam>of(AnnihilationBeam::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<VoidOrb>> VOID_ORB = register("void_orb",
+            EntityType.Builder.<VoidOrb>of(VoidOrb::new, MobCategory.MISC).sized(2.8f, 2.8f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RuneWall>> RUNE_WALL = register("rune_wall",
+            EntityType.Builder.<RuneWall>of(RuneWall::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
 
     private ModEntities() {}
 

@@ -34,6 +34,8 @@ public final class ModCreativeTabs {
             () -> scroll(ModSpells.MANA_DROMEDARY.get(), 1), List.of());
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> PHYSICAL = schoolTab("physical", ERRETHYS, ModSchools.PHYSICAL,
             () -> scroll(ModSpells.PUNCH.get(), 1), List.of());
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> BOSS = schoolTab("boss", PHYSICAL, ModSchools.BOSS,
+            () -> new ItemStack(ModItems.TYRANTS_CODEX.get()), List.of(ModItems.TYRANTS_CODEX));
 
     private ModCreativeTabs() {}
 

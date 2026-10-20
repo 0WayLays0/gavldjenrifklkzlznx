@@ -107,6 +107,25 @@ public final class ModSchools {
             PHYSICAL_STRIKE
     ));
 
+    /**
+     * Boss Magic: attacks worthy of a final boss (meteors, giant blades, beams, waves of runes). Each one is announced
+     * by runes on the ground a few seconds before it lands, so those in its way can get out.
+     */
+    public static final ResourceLocation BOSS_RESOURCE = ArcanesOublies.id("boss");
+    public static final TagKey<Item> BOSS_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("boss_focus"));
+    public static final ResourceKey<DamageType> BOSS_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("boss_magic"));
+    public static final int BOSS_COLOR = 0xE0283C;
+
+    public static final DeferredHolder<SchoolType, SchoolType> BOSS = SCHOOLS.register(BOSS_RESOURCE.getPath(), () -> new SchoolType(
+            BOSS_RESOURCE,
+            BOSS_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".boss").withStyle(Style.EMPTY.withColor(BOSS_COLOR)),
+            ModAttributes.BOSS_SPELL_POWER,
+            ModAttributes.BOSS_MAGIC_RESIST,
+            sound(SoundEvents.RESPAWN_ANCHOR_CHARGE),
+            BOSS_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

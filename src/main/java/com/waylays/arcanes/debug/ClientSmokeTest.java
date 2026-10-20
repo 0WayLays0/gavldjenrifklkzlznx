@@ -5,6 +5,8 @@ import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SummoningSpell;
+import com.waylays.arcanes.spells.boss.BossAnimations;
+import com.waylays.arcanes.spells.boss.BossSpell;
 import com.waylays.arcanes.spells.physical.LongswordParrySkill;
 import com.waylays.arcanes.spells.physical.PhysicalAnimations;
 import com.waylays.arcanes.spells.physical.PhysicalSkill;
@@ -171,7 +173,7 @@ public final class ClientSmokeTest {
             AbstractSpell spell = spells.get(spellIndex++).get();
             java.util.UUID id = mc.player.getUUID();
             server.execute(() -> castOnServer(server, id, spell));
-            if (spell instanceof PhysicalSkill) {
+            if (spell instanceof PhysicalSkill || spell instanceof BossSpell) {
                 // Play the move's body animation on the real player, as Iron's does when it starts a cast
                 try {
                     ClientSpellCastHelper.handleClientBoundOnCastStarted(id, spell.getSpellId(), SPELL_LEVEL);
@@ -205,7 +207,8 @@ public final class ClientSmokeTest {
             boolean fighting = school.equals(ModSchools.PHYSICAL_RESOURCE);
             // Fighting moves are done sword in hand (its damage counts), close to the dummy
             var book = fighting ? Items.IRON_SWORD : school.equals(ModSchools.EXPLOSION_RESOURCE) ? ModItems.DETONATION_CODEX.get()
-                    : school.equals(ModSchools.BOOK_RESOURCE) ? ModItems.LIVING_GRIMOIRE.get() : ModItems.GOLDEN_GRIMOIRE.get();
+                    : school.equals(ModSchools.BOOK_RESOURCE) ? ModItems.LIVING_GRIMOIRE.get()
+                    : school.equals(ModSchools.BOSS_RESOURCE) ? ModItems.TYRANTS_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get();
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(book));
             // A sturdy target dummy 6 blocks in front of the player, at eye level of the raycast
             Vec3 forward = Vec3.directionFromRotation(0, player.getYRot());
@@ -311,7 +314,7 @@ public final class ClientSmokeTest {
     private static void finish(Minecraft mc) {
         stage = Stage.DONE;
         // Every body animation the fighting moves use must have loaded (a missing one would leave the move unanimated)
-        for (var animation : PhysicalAnimations.ALL) {
+        for (var animation : java.util.stream.Stream.concat(PhysicalAnimations.ALL.stream(), BossAnimations.ALL.stream()).toList()) {
             animation.getForPlayer().ifPresent(id -> {
                 if (PlayerAnimationRegistry.getAnimation(id) == null) {
                     failures.incrementAndGet();

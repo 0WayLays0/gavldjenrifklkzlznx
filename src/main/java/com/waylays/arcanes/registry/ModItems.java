@@ -28,6 +28,10 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> LIVING_GRIMOIRE = ITEMS.register("living_grimoire",
             () -> spellbook(12, ModAttributes.BOOK_SPELL_POWER));
 
+    /** Boss Magic spellbook: 10 slots, +10% Boss Spell Power, +200 max mana. */
+    public static final DeferredHolder<Item, Item> TYRANTS_CODEX = ITEMS.register("tyrants_codex",
+            () -> spellbook(10, ModAttributes.BOSS_SPELL_POWER));
+
     private ModItems() {}
 
     /** A legendary school spellbook, like Iron's own: +10% power in its school and +200 max mana. */

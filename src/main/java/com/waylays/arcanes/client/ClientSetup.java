@@ -5,9 +5,12 @@ import com.waylays.arcanes.client.model.ManaCrowModel;
 import com.waylays.arcanes.client.model.ManaRatModel;
 import com.waylays.arcanes.client.model.ManaSerpentModel;
 import com.waylays.arcanes.client.render.AegisPagesRenderer;
+import com.waylays.arcanes.client.render.AnnihilationBeamRenderer;
 import com.waylays.arcanes.client.render.AurumBladeRenderer;
 import com.waylays.arcanes.client.render.BlastEffectRenderer;
 import com.waylays.arcanes.client.render.BookmarkRenderer;
+import com.waylays.arcanes.client.render.BossPropRenderer;
+import com.waylays.arcanes.client.render.BossTelegraphRenderer;
 import com.waylays.arcanes.client.render.CataclysmRenderer;
 import com.waylays.arcanes.client.render.ChapterRuneRenderer;
 import com.waylays.arcanes.client.render.EldoradoSunRenderer;
@@ -35,10 +38,12 @@ import com.waylays.arcanes.client.render.QuillStrokeRenderer;
 import com.waylays.arcanes.client.render.RazorPageRenderer;
 import com.waylays.arcanes.client.render.RewriteAuraRenderer;
 import com.waylays.arcanes.client.render.RuinSigilRenderer;
+import com.waylays.arcanes.client.render.RuneWallRenderer;
 import com.waylays.arcanes.client.render.ShieldBubbleRenderer;
 import com.waylays.arcanes.client.render.SilenceSealRenderer;
 import com.waylays.arcanes.client.render.StrikeTrailRenderer;
 import com.waylays.arcanes.client.render.TomeOfJudgmentRenderer;
+import com.waylays.arcanes.client.render.VoidOrbRenderer;
 import com.waylays.arcanes.client.render.WordOfPowerRenderer;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModItems;
@@ -105,6 +110,12 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.STRIKE_TRAIL.get(), StrikeTrailRenderer::new);
         event.registerEntityRenderer(ModEntities.MISSILE.get(), MissileRenderer::new);
 
+        event.registerEntityRenderer(ModEntities.BOSS_TELEGRAPH.get(), BossTelegraphRenderer::new);
+        event.registerEntityRenderer(ModEntities.BOSS_PROP.get(), BossPropRenderer::new);
+        event.registerEntityRenderer(ModEntities.ANNIHILATION_BEAM.get(), AnnihilationBeamRenderer::new);
+        event.registerEntityRenderer(ModEntities.VOID_ORB.get(), VoidOrbRenderer::new);
+        event.registerEntityRenderer(ModEntities.RUNE_WALL.get(), RuneWallRenderer::new);
+
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));
         event.registerEntityRenderer(ModEntities.MANA_SERPENT.get(),
@@ -129,6 +140,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.GOLDEN_GRIMOIRE.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.DETONATION_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.LIVING_GRIMOIRE.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.TYRANTS_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }

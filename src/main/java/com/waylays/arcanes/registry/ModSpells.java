@@ -17,6 +17,16 @@ import com.waylays.arcanes.spells.book.RewriteSpell;
 import com.waylays.arcanes.spells.book.SealOfSilenceSpell;
 import com.waylays.arcanes.spells.book.TomeOfJudgmentSpell;
 import com.waylays.arcanes.spells.book.WordOfPowerSpell;
+import com.waylays.arcanes.spells.boss.AnnihilationBeamSpell;
+import com.waylays.arcanes.spells.boss.CrossOfLightSpell;
+import com.waylays.arcanes.spells.boss.CrushingMeteorSpell;
+import com.waylays.arcanes.spells.boss.JudgmentBladeSpell;
+import com.waylays.arcanes.spells.boss.LastJudgmentSpell;
+import com.waylays.arcanes.spells.boss.RunePrisonSpell;
+import com.waylays.arcanes.spells.boss.SeismicRiftSpell;
+import com.waylays.arcanes.spells.boss.StarfallSpell;
+import com.waylays.arcanes.spells.boss.TripleNovaSpell;
+import com.waylays.arcanes.spells.boss.VoidOrbSpell;
 import com.waylays.arcanes.spells.errethys.ManaCrowsSpell;
 import com.waylays.arcanes.spells.errethys.ManaDromedarySpell;
 import com.waylays.arcanes.spells.errethys.ManaRatsSpell;
@@ -178,6 +188,19 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> KNIFE_THROW = register(new KnifeThrowSkill());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> KNIFE_FAN = register(new KnifeFanSkill());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> KNIFE_PIN = register(new KnifePinSkill());
+
+
+    // Boss Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CRUSHING_METEOR = register(new CrushingMeteorSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> JUDGMENT_BLADE = register(new JudgmentBladeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ANNIHILATION_BEAM = register(new AnnihilationBeamSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TRIPLE_NOVA = register(new TripleNovaSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> STARFALL = register(new StarfallSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SEISMIC_RIFT = register(new SeismicRiftSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> VOID_ORB = register(new VoidOrbSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CROSS_OF_LIGHT = register(new CrossOfLightSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RUNE_PRISON = register(new RunePrisonSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LAST_JUDGMENT = register(new LastJudgmentSpell());
 
     private ModSpells() {}
 
