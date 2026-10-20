@@ -77,7 +77,7 @@ public final class BookGameTests {
                 + ", last hit " + (last == null ? "none" : last.getMsgId() + " by " + last.getDirectEntity());
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
     public static void bookSchoolIsRegistered(GameTestHelper helper) {
         SchoolType book = SchoolRegistry.getSchool(ModSchools.BOOK_RESOURCE);
         helper.assertTrue(book != null, "Book school missing from Iron's school registry");
@@ -95,7 +95,7 @@ public final class BookGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 100)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 100)
     public static void pageStormSlashesItsTarget(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.0, 2, 1.0));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
@@ -111,7 +111,7 @@ public final class BookGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 100)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 100)
     public static void livingInkSeizesAndBlinds(GameTestHelper helper) {
         // A witch with no AI looks south (+Z), the wave runs that way
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
@@ -135,7 +135,7 @@ public final class BookGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_ultimate", timeoutTicks = 220)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_ultimate", timeoutTicks = 220)
     public static void finalChapterMarksThenDetonates(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(7.5, 2, 7.5));
@@ -160,7 +160,7 @@ public final class BookGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_razor", timeoutTicks = 60)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_razor", timeoutTicks = 60)
     public static void razorPagesCutThroughALine(GameTestHelper helper) {
         // A witch with no AI looks south (+Z): the middle page flies straight through both husks
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
@@ -174,7 +174,7 @@ public final class BookGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_judgment", timeoutTicks = 120)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_judgment", timeoutTicks = 120)
     public static void tomeOfJudgmentClapsShut(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(2.5, 2, 4.5));
         IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(4.5, 2, 4.5));
@@ -192,11 +192,12 @@ public final class BookGameTests {
         helper.succeedWhen(() -> helper.assertTrue(tome.isRemoved(), "the book is still there"));
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 60)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 60)
     public static void bookmarkBringsTheCasterBack(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Vec3 home = caster.position();
-        MagicData magicData = new MagicData(true);
+        // Iron's keeps no recasts for mobs' cast data: the caster's data is a player's
+        MagicData magicData = new MagicData(false);
         String spellId = ModSpells.BOOKMARK.get().getSpellId();
         ModSpells.BOOKMARK.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, magicData);
         List<BookmarkMarker> markers = helper.getLevel().getEntitiesOfClass(BookmarkMarker.class, caster.getBoundingBox().inflate(2));
@@ -212,7 +213,7 @@ public final class BookGameTests {
         helper.succeedWhen(() -> helper.assertTrue(markers.get(0).isRemoved(), "the used bookmark did not fade"));
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 100)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 100)
     public static void sealOfSilenceStopsCasting(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(5.5, 2, 5.5));
@@ -234,7 +235,7 @@ public final class BookGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_library", timeoutTicks = 300)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_library", timeoutTicks = 300)
     public static void forbiddenLibraryGrimoiresFight(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Husk husk = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(6.5, 2, 6.5));
@@ -253,7 +254,7 @@ public final class BookGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_word", timeoutTicks = 60)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_word", timeoutTicks = 60)
     public static void wordOfPowerExplodesForward(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(4.5, 2, 7.5));
@@ -271,7 +272,7 @@ public final class BookGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
     public static void rewriteErasesHarmAndHeals(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         caster.setHealth(10);
@@ -285,7 +286,7 @@ public final class BookGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_cranes", timeoutTicks = 140)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_cranes", timeoutTicks = 140)
     public static void paperCranesDiveOnTheirTarget(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(4.5, 2, 7.5));
@@ -296,7 +297,7 @@ public final class BookGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_quill", timeoutTicks = 80)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_quill", timeoutTicks = 80)
     public static void quillOfFateEruptsAlongTheLine(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, .5));
         Pig onLine = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 5.5));
@@ -312,7 +313,7 @@ public final class BookGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 80)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 80)
     public static void parchmentAegisCatchesAndStrikesBack(GameTestHelper helper) {
         Witch bearer = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         Husk attacker = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(4.5, 2, 1.5));
@@ -337,7 +338,7 @@ public final class BookGameTests {
         helper.succeedWhen(() -> helper.assertTrue(attacker.getHealth() < attacker.getMaxHealth(), "no page flew back at the attacker [" + describe(helper, attacker) + "]"));
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_tempest", timeoutTicks = 100)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_tempest", timeoutTicks = 100)
     public static void paperTempestCutsAndBlindsWhatItCatches(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(6.5, 2, 5.5));
@@ -353,7 +354,7 @@ public final class BookGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_stack")
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_stack")
     public static void flyingStackCarriesOnlyItsSummoner(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         ModSpells.FLYING_STACK.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
@@ -369,7 +370,7 @@ public final class BookGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_stack", timeoutTicks = FlyingStack.RIDERLESS_TICKS + 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_stack", timeoutTicks = FlyingStack.RIDERLESS_TICKS + 40)
     public static void anEmptyFlyingStackScattersAndItsRiderFloatsDown(GameTestHelper helper) {
         Player rider = helper.makeMockPlayer(GameType.SURVIVAL);
         FlyingStack stack = ModEntities.FLYING_STACK.get().create(helper.getLevel());
@@ -385,7 +386,7 @@ public final class BookGameTests {
         helper.succeedWhen(() -> helper.assertTrue(stack.isRemoved(), "the empty stack never scattered"));
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "book_dragon", timeoutTicks = 300)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_dragon", timeoutTicks = 300)
     public static void origamiDragonHuntsWhatItsSummonerFights(GameTestHelper helper) {
         // The dragon circles 8 blocks out, past the platform's chunk: keep the chunks around ticking or it freezes there
         List<ChunkPos> forced = forceChunksAround(helper, 1);

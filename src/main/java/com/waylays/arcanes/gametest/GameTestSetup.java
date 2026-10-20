@@ -14,7 +14,8 @@ final class GameTestSetup {
     /**
      * Ticks between a test's platform being placed and the test starting. Entities added in the very tick the
      * platform's chunks are loaded land where the level cannot see them yet (searches miss them, a summon cannot find
-     * its summoner), which made tests fail at random.
+     * its summoner), which made tests fail at random. Tests also ask for sky access: without it, a roof of barriers
+     * caps the platform a few blocks up, under which nothing could leap or fall from the sky.
      */
     static final long TICKS = 5;
 

@@ -64,7 +64,7 @@ public final class PhysicalGameTests {
         spell.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
     public static void physicalSchoolIsRegistered(GameTestHelper helper) {
         SchoolType physical = SchoolRegistry.getSchool(ModSchools.PHYSICAL_RESOURCE);
         helper.assertTrue(physical != null, "Physical Prowess missing from Iron's school registry");
@@ -81,7 +81,7 @@ public final class PhysicalGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 40)
     public static void punchHitsOnlyTheNearestInFront(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         IronGolem near = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(4.5, 2, 3.5));
@@ -96,7 +96,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 60)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 60)
     public static void punchFlurryHitsAgainAndAgain(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(4.5, 2, 3.5));
@@ -108,7 +108,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 40)
     public static void slashCutsEveryoneInTheArc(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         Pig left = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6, 2, 3.5));
@@ -122,7 +122,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "physical_moves", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_moves", timeoutTicks = 40)
     public static void dashCoversThreeBlocksAndStops(GameTestHelper helper) {
         ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 2, .5));
         double[] start = new double[1];
@@ -137,7 +137,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "physical_moves", timeoutTicks = 50)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_moves", timeoutTicks = 50)
     public static void leapGoesAboutTwiceAsHigh(GameTestHelper helper) {
         ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 2, 4.5));
         double[] heights = {0, 0};
@@ -156,7 +156,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
     public static void leapNeedsTheGround(GameTestHelper helper) {
         ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 5, 4.5));
         stand.setNoGravity(true);
@@ -164,7 +164,7 @@ public final class PhysicalGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "physical_scythe", timeoutTicks = 60)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_scythe", timeoutTicks = 60)
     public static void scytheReapCutsTheLegsInAWideArc(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 2.5));
         IronGolem front = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(4.5, 2, 5.5));
@@ -179,7 +179,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "physical_scythe", timeoutTicks = 80)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_scythe", timeoutTicks = 80)
     public static void scytheDanceSpinsAllAround(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         Pig behind = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 1.5));
@@ -191,7 +191,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "physical_sword", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_sword", timeoutTicks = 40)
     public static void risingCutLiftsItsVictim(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         Pig pig = helper.spawn(EntityType.PIG, new Vec3(4.5, 2, 3.5));
@@ -206,7 +206,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "physical_sword", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_sword", timeoutTicks = 40)
     public static void lungeDrivesThroughTheWholeLine(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, .5));
         IronGolem first = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(4.5, 2, 2.5));
@@ -218,7 +218,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "physical_dagger", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_dagger", timeoutTicks = 40)
     public static void quickStabsLeaveItBleeding(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(4.5, 2, 3.5));
@@ -233,7 +233,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "physical_dagger", timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_dagger", timeoutTicks = 40)
     public static void flankGetsBehindAndBackstabs(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(4.5, 2, 4.5));
@@ -251,7 +251,7 @@ public final class PhysicalGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
     public static void silenceDoesNotStopFightingMoves(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.addEffect(new MobEffectInstance(ModEffects.SILENCE, 200));

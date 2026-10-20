@@ -60,7 +60,7 @@ public final class GoldGameTests {
 
     private GoldGameTests() {}
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
     public static void goldSchoolIsRegistered(GameTestHelper helper) {
         SchoolType gold = SchoolRegistry.getSchool(ModSchools.GOLD_RESOURCE);
         helper.assertTrue(gold != null, "Gold school missing from Iron's school registry");
@@ -82,7 +82,7 @@ public final class GoldGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 100)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 100)
     public static void goldBoltHitsAndShatters(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 6.5));
@@ -107,7 +107,7 @@ public final class GoldGameTests {
                 + ", last hit " + (last == null ? "none" : last.getMsgId() + " by " + last.getDirectEntity());
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 200)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 200)
     public static void gildedChainsPinTargetThenBreak(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 5.5));
@@ -128,7 +128,7 @@ public final class GoldGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 120)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 120)
     public static void goldfallIngotCrushesTheArea(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
@@ -144,7 +144,7 @@ public final class GoldGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 40)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 40)
     public static void goldfallDropsOneIngotPerCount(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         GoldfallSpell spell = (GoldfallSpell) ModSpells.GOLDFALL.get();
@@ -157,7 +157,7 @@ public final class GoldGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 80)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 80)
     public static void goldenSpikesHitInFrontOfTheCaster(GameTestHelper helper) {
         // A witch with no AI looks south (+Z), the spikes run that way
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
@@ -170,7 +170,7 @@ public final class GoldGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 100)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 100)
     public static void midasCurseSlowsThenShatters(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
@@ -185,7 +185,7 @@ public final class GoldGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 100)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 100)
     public static void aurumBladeStrikesItsTarget(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
@@ -198,7 +198,7 @@ public final class GoldGameTests {
         helper.succeedWhen(() -> helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 5f, "the blade did not strike [" + describe(helper, target) + "]"));
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 100)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 100)
     public static void moltenGoldBurnsAndPools(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 5.5));
@@ -220,7 +220,7 @@ public final class GoldGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, timeoutTicks = 60)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 60)
     public static void gildedArmorReflectsDamage(GameTestHelper helper) {
         Witch attacker = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         Pig wearer = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
@@ -232,7 +232,7 @@ public final class GoldGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "summons", timeoutTicks = 300)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "summons", timeoutTicks = 300)
     public static void goldenSentinelsFightForTheirSummoner(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         Husk enemy = helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(8.0, 2, 8.0));
@@ -256,7 +256,7 @@ public final class GoldGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, batch = "ultimate", timeoutTicks = 260)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "ultimate", timeoutTicks = 260)
     public static void sunOfEldoradoBurnsThenExplodes(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         IronGolem enemy = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(7.5, 2, 7.5));
