@@ -89,6 +89,16 @@ import com.waylays.arcanes.spells.physical.SpearThrustSkill;
 import com.waylays.arcanes.spells.physical.SwordDisarmSkill;
 import com.waylays.arcanes.spells.physical.SwordLungeSkill;
 import com.waylays.arcanes.spells.physical.SwordRisingCutSkill;
+import com.waylays.arcanes.spells.rune.CircleOfEldersSpell;
+import com.waylays.arcanes.spells.rune.EdgeRuneSpell;
+import com.waylays.arcanes.spells.rune.MendingRunestoneSpell;
+import com.waylays.arcanes.spells.rune.MenhirSurgeSpell;
+import com.waylays.arcanes.spells.rune.PetrifyingRuneSpell;
+import com.waylays.arcanes.spells.rune.RuneShardsSpell;
+import com.waylays.arcanes.spells.rune.RunicBulwarkSpell;
+import com.waylays.arcanes.spells.rune.RunicPathSpell;
+import com.waylays.arcanes.spells.rune.SnareRuneSpell;
+import com.waylays.arcanes.spells.rune.WardRuneSpell;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -201,6 +211,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> CROSS_OF_LIGHT = register(new CrossOfLightSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUNE_PRISON = register(new RunePrisonSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> LAST_JUDGMENT = register(new LastJudgmentSpell());
+
+    // Rune Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> WARD_RUNE = register(new WardRuneSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MENDING_RUNESTONE = register(new MendingRunestoneSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> EDGE_RUNE = register(new EdgeRuneSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RUNIC_PATH = register(new RunicPathSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RUNIC_BULWARK = register(new RunicBulwarkSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SNARE_RUNE = register(new SnareRuneSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RUNE_SHARDS = register(new RuneShardsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PETRIFYING_RUNE = register(new PetrifyingRuneSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MENHIR_SURGE = register(new MenhirSurgeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CIRCLE_OF_ELDERS = register(new CircleOfEldersSpell());
 
     private ModSpells() {}
 

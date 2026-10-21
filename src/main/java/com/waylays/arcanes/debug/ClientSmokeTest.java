@@ -22,11 +22,11 @@ import io.redspace.ironsspellbooks.player.ClientSpellCastHelper;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -79,7 +79,7 @@ import javax.imageio.ImageIO;
  * A client crash ends the run with a crash report; a spell that throws is logged as {@code [SmokeTest] FAIL}.
  * The run ends with {@code [SmokeTest] PASS} or {@code [SmokeTest] FAIL ...} and stops the client.
  * A watchdog halts the JVM (exit code 3) if the whole run takes too long.
- * With {@code -Darcanes.shots=a,b,prefix_*} the casts of those spells are also photographed a few times, each picture
+ * With {@code -Darcanes.shots=a,b,prefix_*,school:x} the casts of those spells are also photographed a few times, each picture
  * logged as base64 JPEG lines {@code [SmokeShot] name part/parts data}, so CI shows what they look like.
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID, value = Dist.CLIENT)
@@ -205,7 +205,9 @@ public final class ClientSmokeTest {
         if (spellIndex < spells.size() && ticks % TICKS_PER_SPELL == 1) {
             AbstractSpell spell = spells.get(spellIndex++).get();
             String name = spell.getSpellId().substring(spell.getSpellId().indexOf(':') + 1);
-            shotName = SHOTS.stream().anyMatch(s -> s.endsWith("*") ? name.startsWith(s.substring(0, s.length() - 1)) : s.equals(name)) ? name : null;
+            String school = "school:" + spell.getSchoolType().getId().getPath();
+            shotName = SHOTS.stream().anyMatch(s -> s.endsWith("*") ? name.startsWith(s.substring(0, s.length() - 1)) : s.equals(name) || s.equals(school))
+                    ? name : null;
             shotCastTick = ticks;
             java.util.UUID id = mc.player.getUUID();
             server.execute(() -> castOnServer(server, id, spell));
@@ -220,6 +222,11 @@ public final class ClientSmokeTest {
             }
         }
         if (shotName != null) {
+            // The last picture looks up a little, for what happens over the caster's head
+            if (ticks - shotCastTick == SHOT_DELAYS[SHOT_DELAYS.length - 1] - 2 && mc.player != null) {
+                mc.player.setXRot(-25);
+                mc.player.xRotO = -25;
+            }
             for (int k = 0; k < SHOT_DELAYS.length; k++) {
                 if (ticks - shotCastTick == SHOT_DELAYS[k]) {
                     screenshot(mc, shotName + "_" + (k + 1));
@@ -251,7 +258,8 @@ public final class ClientSmokeTest {
             // Fighting moves are done sword in hand (its damage counts), close to the dummy
             var book = fighting ? Items.IRON_SWORD : school.equals(ModSchools.EXPLOSION_RESOURCE) ? ModItems.DETONATION_CODEX.get()
                     : school.equals(ModSchools.BOOK_RESOURCE) ? ModItems.LIVING_GRIMOIRE.get()
-                    : school.equals(ModSchools.BOSS_RESOURCE) ? ModItems.TYRANTS_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get();
+                    : school.equals(ModSchools.BOSS_RESOURCE) ? ModItems.TYRANTS_CODEX.get()
+                    : school.equals(ModSchools.RUNE_RESOURCE) ? ModItems.ELDER_RUNE_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get();
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(book));
             // A sturdy target dummy 6 blocks in front of the player, at eye level of the raycast
             Vec3 forward = Vec3.directionFromRotation(0, player.getYRot());

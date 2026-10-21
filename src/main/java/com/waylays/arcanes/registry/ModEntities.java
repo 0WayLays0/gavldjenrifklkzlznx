@@ -51,6 +51,13 @@ import com.waylays.arcanes.entity.gold.MoltenGoldBlob;
 import com.waylays.arcanes.entity.gold.MoltenPool;
 import com.waylays.arcanes.entity.physical.Missile;
 import com.waylays.arcanes.entity.physical.StrikeTrail;
+import com.waylays.arcanes.entity.rune.EdgeGlyphs;
+import com.waylays.arcanes.entity.rune.ElderCircle;
+import com.waylays.arcanes.entity.rune.PetrifyBind;
+import com.waylays.arcanes.entity.rune.RuneBulwark;
+import com.waylays.arcanes.entity.rune.RuneShard;
+import com.waylays.arcanes.entity.rune.RuneSigil;
+import com.waylays.arcanes.entity.rune.Runestone;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -215,6 +222,23 @@ public final class ModEntities {
             EntityType.Builder.<VoidOrb>of(VoidOrb::new, MobCategory.MISC).sized(2.8f, 2.8f).clientTrackingRange(12).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<RuneWall>> RUNE_WALL = register("rune_wall",
             EntityType.Builder.<RuneWall>of(RuneWall::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+
+    // Rune Magic: carved runes, standing stones and the shards
+    public static final DeferredHolder<EntityType<?>, EntityType<RuneSigil>> RUNE_SIGIL = register("rune_sigil",
+            EntityType.Builder.<RuneSigil>of(RuneSigil::new, MobCategory.MISC).sized(1f, .2f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Runestone>> RUNESTONE = register("runestone",
+            EntityType.Builder.<Runestone>of(Runestone::new, MobCategory.MISC).sized(1f, 2.4f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    // Solid: as wide as it is drawn, so slabs side by side leave no gap
+    public static final DeferredHolder<EntityType<?>, EntityType<RuneBulwark>> RUNE_BULWARK = register("rune_bulwark",
+            EntityType.Builder.<RuneBulwark>of(RuneBulwark::new, MobCategory.MISC).sized(1.2f, 2.6f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RuneShard>> RUNE_SHARD = register("rune_shard",
+            EntityType.Builder.<RuneShard>of(RuneShard::new, MobCategory.MISC).sized(.4f, .4f).clientTrackingRange(8).updateInterval(1));
+    public static final DeferredHolder<EntityType<?>, EntityType<PetrifyBind>> PETRIFY_BIND = register("petrify_bind",
+            EntityType.Builder.<PetrifyBind>of(PetrifyBind::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(2).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<EdgeGlyphs>> EDGE_GLYPHS = register("edge_glyphs",
+            EntityType.Builder.<EdgeGlyphs>of(EdgeGlyphs::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(2).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<ElderCircle>> ELDER_CIRCLE = register("elder_circle",
+            EntityType.Builder.<ElderCircle>of(ElderCircle::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
 
     private ModEntities() {}
 

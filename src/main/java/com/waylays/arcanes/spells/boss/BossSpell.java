@@ -17,9 +17,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -82,15 +80,7 @@ public abstract class BossSpell extends AbstractSpell implements BossAttack {
 
     /** The ground the caster is aiming at, at most {@code range} away (straight down from the end of the aim if it is in the air). */
     protected static Vec3 aimedGround(Level level, LivingEntity caster, double range) {
-        Vec3 eye = caster.getEyePosition();
-        Vec3 end = eye.add(caster.getLookAngle().scale(range));
-        HitResult hit = level.clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
-        Vec3 at = hit.getType() == HitResult.Type.MISS ? end : hit.getLocation();
-        HitResult down = level.clip(new ClipContext(at.add(0, .5, 0), at.add(0, -40, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, caster));
-        if (down.getType() != HitResult.Type.MISS) {
-            return down.getLocation();
-        }
-        return SpellUtil.groundAt(level, at, 8, 1);
+        return SpellUtil.aimedGround(level, caster, range);
     }
 
     /** The ground under {@code entity}. */

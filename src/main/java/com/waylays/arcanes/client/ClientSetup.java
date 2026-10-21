@@ -13,6 +13,8 @@ import com.waylays.arcanes.client.render.BossPropRenderer;
 import com.waylays.arcanes.client.render.BossTelegraphRenderer;
 import com.waylays.arcanes.client.render.CataclysmRenderer;
 import com.waylays.arcanes.client.render.ChapterRuneRenderer;
+import com.waylays.arcanes.client.render.EdgeGlyphsRenderer;
+import com.waylays.arcanes.client.render.ElderCircleRenderer;
 import com.waylays.arcanes.client.render.EldoradoSunRenderer;
 import com.waylays.arcanes.client.render.FinalChapterRenderer;
 import com.waylays.arcanes.client.render.FlyingGrimoireRenderer;
@@ -34,11 +36,16 @@ import com.waylays.arcanes.client.render.OrigamiDragonRenderer;
 import com.waylays.arcanes.client.render.PageStormRenderer;
 import com.waylays.arcanes.client.render.PaperCraneRenderer;
 import com.waylays.arcanes.client.render.PaperTempestRenderer;
+import com.waylays.arcanes.client.render.PetrifyBindRenderer;
 import com.waylays.arcanes.client.render.QuillStrokeRenderer;
 import com.waylays.arcanes.client.render.RazorPageRenderer;
 import com.waylays.arcanes.client.render.RewriteAuraRenderer;
 import com.waylays.arcanes.client.render.RuinSigilRenderer;
+import com.waylays.arcanes.client.render.RuneBulwarkRenderer;
+import com.waylays.arcanes.client.render.RuneShardRenderer;
+import com.waylays.arcanes.client.render.RuneSigilRenderer;
 import com.waylays.arcanes.client.render.RuneWallRenderer;
+import com.waylays.arcanes.client.render.RunestoneRenderer;
 import com.waylays.arcanes.client.render.ShieldBubbleRenderer;
 import com.waylays.arcanes.client.render.SilenceSealRenderer;
 import com.waylays.arcanes.client.render.StrikeTrailRenderer;
@@ -116,6 +123,14 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.VOID_ORB.get(), VoidOrbRenderer::new);
         event.registerEntityRenderer(ModEntities.RUNE_WALL.get(), RuneWallRenderer::new);
 
+        event.registerEntityRenderer(ModEntities.RUNE_SIGIL.get(), RuneSigilRenderer::new);
+        event.registerEntityRenderer(ModEntities.RUNESTONE.get(), RunestoneRenderer::new);
+        event.registerEntityRenderer(ModEntities.RUNE_BULWARK.get(), RuneBulwarkRenderer::new);
+        event.registerEntityRenderer(ModEntities.RUNE_SHARD.get(), RuneShardRenderer::new);
+        event.registerEntityRenderer(ModEntities.PETRIFY_BIND.get(), PetrifyBindRenderer::new);
+        event.registerEntityRenderer(ModEntities.EDGE_GLYPHS.get(), EdgeGlyphsRenderer::new);
+        event.registerEntityRenderer(ModEntities.ELDER_CIRCLE.get(), ElderCircleRenderer::new);
+
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));
         event.registerEntityRenderer(ModEntities.MANA_SERPENT.get(),
@@ -141,6 +156,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.DETONATION_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.LIVING_GRIMOIRE.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.TYRANTS_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.ELDER_RUNE_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }

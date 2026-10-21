@@ -127,6 +127,25 @@ public final class ModSchools {
             BOSS_MAGIC
     ));
 
+    /**
+     * Rune Magic: runes carved into the ground, into stone and into weapons. Set down ahead of the fight, they keep
+     * working for a while: half of them shield and heal, half of them strike.
+     */
+    public static final ResourceLocation RUNE_RESOURCE = ArcanesOublies.id("rune");
+    public static final TagKey<Item> RUNE_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("rune_focus"));
+    public static final ResourceKey<DamageType> RUNE_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("rune_magic"));
+    public static final int RUNE_COLOR = 0x8FD8FF;
+
+    public static final DeferredHolder<SchoolType, SchoolType> RUNE = SCHOOLS.register(RUNE_RESOURCE.getPath(), () -> new SchoolType(
+            RUNE_RESOURCE,
+            RUNE_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".rune").withStyle(Style.EMPTY.withColor(RUNE_COLOR)),
+            ModAttributes.RUNE_SPELL_POWER,
+            ModAttributes.RUNE_MAGIC_RESIST,
+            sound(SoundEvents.AMETHYST_BLOCK_RESONATE),
+            RUNE_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

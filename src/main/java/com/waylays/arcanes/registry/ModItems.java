@@ -32,6 +32,10 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> TYRANTS_CODEX = ITEMS.register("tyrants_codex",
             () -> spellbook(10, ModAttributes.BOSS_SPELL_POWER));
 
+    /** Rune Magic spellbook (bound between two carved stone plates): 10 slots, +10% Rune Spell Power, +200 max mana. */
+    public static final DeferredHolder<Item, Item> ELDER_RUNE_CODEX = ITEMS.register("elder_rune_codex",
+            () -> spellbook(10, ModAttributes.RUNE_SPELL_POWER));
+
     private ModItems() {}
 
     /** A legendary school spellbook, like Iron's own: +10% power in its school and +200 max mana. */

@@ -6,8 +6,10 @@ import com.waylays.arcanes.effect.BleedingEffect;
 import com.waylays.arcanes.effect.GildedArmorEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.effect.ParchmentAegisEffect;
+import com.waylays.arcanes.effect.PetrifiedEffect;
 import com.waylays.arcanes.effect.PinnedEffect;
 import com.waylays.arcanes.effect.ReactiveShieldEffect;
+import com.waylays.arcanes.effect.RuneEdgeEffect;
 import com.waylays.arcanes.effect.SilenceEffect;
 import com.waylays.arcanes.effect.SunderedEffect;
 import com.waylays.arcanes.effect.VolatileBrandEffect;
@@ -29,6 +31,8 @@ public final class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> BLEEDING = EFFECTS.register("bleeding", BleedingEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> SUNDERED = EFFECTS.register("sundered", SunderedEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> PINNED = EFFECTS.register("pinned", PinnedEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> PETRIFIED = EFFECTS.register("petrified", PetrifiedEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> RUNE_EDGE = EFFECTS.register("rune_edge", RuneEdgeEffect::new);
 
     private ModEffects() {}
 }
