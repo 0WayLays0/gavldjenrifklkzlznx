@@ -1,0 +1,19 @@
+{
+  "sources": [
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "irons_spellbooks:item/scroll"
+      ],
+      "palette_key": "arcanes_oublies:item/scroll_palettes/key",
+      "permutations": {
+        "arcanes_gold": "arcanes_oublies:item/scroll_palettes/gold",
+        "arcanes_explosion": "arcanes_oublies:item/scroll_palettes/explosion",
+        "arcanes_book": "arcanes_oublies:item/scroll_palettes/book",
+        "arcanes_errethys": "arcanes_oublies:item/scroll_palettes/errethys",
+        "arcanes_physical": "arcanes_oublies:item/scroll_palettes/physical",
+        "arcanes_boss": "arcanes_oublies:item/scroll_palettes/boss"
+      }
+    }
+  ]
+}

@@ -21,7 +21,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 /**
  * Schools of magic added to Iron's school registry. Each school needs, besides this entry: a damage type json,
  * a focus item tag, power/resistance attributes, and the item/scroll_{@code <school>} and
- * item/affinity_ring_{@code <school>} models that Iron's looks up by school id.
+ * item/affinity_ring_{@code <school>} models that Iron's looks up by school id. The scroll model shows Iron's own scroll
+ * recoloured by the game with the school's palette (tools/scroll_assets.py).
  */
 public final class ModSchools {
     public static final DeferredRegister<SchoolType> SCHOOLS = DeferredRegister.create(SchoolRegistry.SCHOOL_REGISTRY_KEY, ArcanesOublies.MODID);

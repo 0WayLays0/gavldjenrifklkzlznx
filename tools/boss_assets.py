@@ -456,28 +456,6 @@ def last_judgment_icon():
 
 # ---------------------------------------------------------------- items
 
-def scroll_boss():
-    return g.from_grid([
-        "................",
-        "..........oo....",
-        ".........ohlo...",
-        "........oclllo..",
-        ".......occcbso..",
-        "......occcccoo..",
-        ".....occcrcco...",
-        "....occcryrco...",
-        "...occcxrrxo....",
-        "..occccxxxo.....",
-        ".oohccccxo......",
-        "ohllocccco......",
-        "olbbsocco.......",
-        ".osssoco........",
-        "..ooo.o.........",
-        "................",
-    ], {"o": NIGHT, "h": GOLD, "l": CRIMSON, "b": BLOOD, "s": BLOOD_DARK,
-        "c": g.CREAM, "x": g.CREAM_SHADE, "r": CRIMSON, "y": GOLD})
-
-
 def affinity_ring_boss():
     return g.from_grid([
         "................",
@@ -616,11 +594,9 @@ def main():
                        ("cross_of_light", cross_of_light_icon), ("rune_prison", rune_prison_icon),
                        ("last_judgment", last_judgment_icon)):
         g.save(icon(), f"textures/gui/spell_icons/{name}.png")
-    g.save(scroll_boss(), "textures/item/scroll_boss.png")
     g.save(affinity_ring_boss(), "textures/item/affinity_ring_boss.png")
     g.save(tyrants_codex_icon(), "textures/item/tyrants_codex.png")
     g.save(tyrants_codex_model_texture(), "textures/item/tyrants_codex_3d.png")
-    g.write_json("models/item/scroll_boss.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/scroll_boss"}})
     g.write_json("models/item/affinity_ring_boss.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_boss"}})
     g.book_models("tyrants_codex")
     import boss_animations

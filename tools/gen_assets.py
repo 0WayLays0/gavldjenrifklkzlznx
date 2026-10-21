@@ -4,7 +4,7 @@
 All art is original (Iron's Spells' license forbids reusing its assets). Run from the repository root:
     python3 tools/gen_assets.py
 Needs Pillow. Re-running overwrites the files it writes (see main() here and in explosion_assets.py, book_assets.py,
-errethys_assets.py, physical_assets.py and boss_assets.py) and nothing else.
+errethys_assets.py, physical_assets.py, boss_assets.py and scroll_assets.py) and nothing else.
 """
 import json
 import math
@@ -179,28 +179,6 @@ def gilded_chains_icon():
 
 
 # ---------------------------------------------------------------- items
-
-def scroll_gold():
-    return from_grid([
-        "................",
-        "..........oo....",
-        ".........ohlo...",
-        "........oclllo..",
-        ".......occcbso..",
-        "......occcccoo..",
-        ".....occccxco...",
-        "....occcxxcco...",
-        "...occcxggxo....",
-        "..occccxggo.....",
-        ".oohccccxo......",
-        "ohllocccco......",
-        "olbbsocco.......",
-        ".osssoco........",
-        "..ooo.o.........",
-        "................",
-    ], {"o": OUTLINE, "h": HIGH, "l": LIGHT, "b": BASE, "s": SHADOW,
-        "c": CREAM, "x": CREAM_SHADE, "g": TOPAZ})
-
 
 def affinity_ring_gold():
     return from_grid([
@@ -707,7 +685,6 @@ def golden_sentinel_eyes():
 # ---------------------------------------------------------------- models
 
 def item_models():
-    write_json("models/item/scroll_gold.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/scroll_gold"}})
     write_json("models/item/affinity_ring_gold.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_gold"}})
     book_models("golden_grimoire")
 
@@ -789,7 +766,6 @@ def book_models(name):
 def main():
     save(gold_bolt_icon(), "textures/gui/spell_icons/gold_bolt.png")
     save(gilded_chains_icon(), "textures/gui/spell_icons/gilded_chains.png")
-    save(scroll_gold(), "textures/item/scroll_gold.png")
     save(affinity_ring_gold(), "textures/item/affinity_ring_gold.png")
     save(golden_grimoire_icon(), "textures/item/golden_grimoire.png")
     save(golden_grimoire_model_texture(), "textures/item/golden_grimoire_3d.png")
@@ -823,6 +799,8 @@ def main():
     physical_assets.main()
     import boss_assets
     boss_assets.main()
+    import scroll_assets
+    scroll_assets.main()
 
 
 if __name__ == "__main__":

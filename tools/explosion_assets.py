@@ -479,28 +479,6 @@ def reactive_shield_effect_icon():
 
 # ---------------------------------------------------------------- items
 
-def scroll_explosion():
-    return g.from_grid([
-        "................",
-        "..........oo....",
-        ".........ohlo...",
-        "........oclllo..",
-        ".......occcbso..",
-        "......occcccoo..",
-        ".....occccxco...",
-        "....occcxxcco...",
-        "...occcxggxo....",
-        "..occccxggo.....",
-        ".oohccccxo......",
-        "ohllocccco......",
-        "olbbsocco.......",
-        ".osssoco........",
-        "..ooo.o.........",
-        "................",
-    ], {"o": CHAR, "h": FLAME, "l": FIRE, "b": EMBER, "s": (110, 24, 8),
-        "c": g.CREAM, "x": g.CREAM_SHADE, "g": ARCANE})
-
-
 def affinity_ring_explosion():
     return g.from_grid([
         "................",
@@ -659,10 +637,8 @@ def main():
     g.save(volatile_brand_effect_icon(), "textures/mob_effect/volatile_brand.png")
     g.save(blast_leap_effect_icon(), "textures/mob_effect/blast_leap.png")
     g.save(reactive_shield_effect_icon(), "textures/mob_effect/reactive_shield.png")
-    g.save(scroll_explosion(), "textures/item/scroll_explosion.png")
     g.save(affinity_ring_explosion(), "textures/item/affinity_ring_explosion.png")
     g.save(detonation_codex_icon(), "textures/item/detonation_codex.png")
     g.save(detonation_codex_model_texture(), "textures/item/detonation_codex_3d.png")
-    g.write_json("models/item/scroll_explosion.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/scroll_explosion"}})
     g.write_json("models/item/affinity_ring_explosion.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_explosion"}})
     g.book_models("detonation_codex")

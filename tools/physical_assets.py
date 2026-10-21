@@ -356,28 +356,6 @@ def dagger_flank_icon():
 
 # ---------------------------------------------------------------- scroll and ring
 
-def scroll_physical():
-    return g.from_grid([
-        "................",
-        "..........oo....",
-        ".........ohlo...",
-        "........oclllo..",
-        ".......occcbso..",
-        "......occcccoo..",
-        ".....occccxco...",
-        "....occcxxcco...",
-        "...occcxggxo....",
-        "..occccxggo.....",
-        ".oohccccxo......",
-        "ohllocccco......",
-        "olbbsocco.......",
-        ".osssoco........",
-        "..ooo.o.........",
-        "................",
-    ], {"o": OUTLINE, "h": (230, 190, 150), "l": LEATHER, "b": (140, 88, 54), "s": (90, 54, 32),
-        "c": g.CREAM, "x": g.CREAM_SHADE, "g": (200, 120, 70)})
-
-
 def affinity_ring_physical():
     return g.from_grid([
         "................",
@@ -408,9 +386,7 @@ def main():
                      ("sword_rising_cut", sword_rising_cut_icon), ("sword_lunge", sword_lunge_icon),
                      ("dagger_stabs", dagger_stabs_icon), ("dagger_flank", dagger_flank_icon)):
         g.save(fn(), f"textures/gui/spell_icons/{name}.png")
-    g.save(scroll_physical(), "textures/item/scroll_physical.png")
     g.save(affinity_ring_physical(), "textures/item/affinity_ring_physical.png")
-    g.write_json("models/item/scroll_physical.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/scroll_physical"}})
     g.write_json("models/item/affinity_ring_physical.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_physical"}})
     g.save(sundered_effect_icon(), "textures/mob_effect/sundered.png")
     g.save(pinned_effect_icon(), "textures/mob_effect/pinned.png")

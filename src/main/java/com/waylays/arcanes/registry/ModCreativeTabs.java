@@ -15,54 +15,59 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.List;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 
 /**
- * One creative tab per school, side by side, so a spell is found without scrolling through all of them: the school's
- * spellbook first, then a scroll of each of its spells at every level, in the order they were added (Physical Prowess
- * goes style by style: bare hands, sword, dagger, scythe and so on).
+ * One creative tab for the whole addon, laid out school by school (its spellbook first, then a scroll of each of its
+ * spells at every level, in the order they were added). The school buttons beside the tab (client/CreativeTabFilter)
+ * show one school at a time.
  */
 public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ArcanesOublies.MODID);
 
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> GOLD = schoolTab("gold", null, ModSchools.GOLD,
-            () -> new ItemStack(ModItems.GOLDEN_GRIMOIRE.get()), List.of(ModItems.GOLDEN_GRIMOIRE));
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXPLOSION = schoolTab("explosion", GOLD, ModSchools.EXPLOSION,
-            () -> new ItemStack(ModItems.DETONATION_CODEX.get()), List.of(ModItems.DETONATION_CODEX));
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> BOOK = schoolTab("book", EXPLOSION, ModSchools.BOOK,
-            () -> new ItemStack(ModItems.LIVING_GRIMOIRE.get()), List.of(ModItems.LIVING_GRIMOIRE));
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> ERRETHYS = schoolTab("errethys", BOOK, ModSchools.ERRETHYS,
-            () -> scroll(ModSpells.MANA_DROMEDARY.get(), 1), List.of());
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> PHYSICAL = schoolTab("physical", ERRETHYS, ModSchools.PHYSICAL,
-            () -> scroll(ModSpells.PUNCH.get(), 1), List.of());
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> BOSS = schoolTab("boss", PHYSICAL, ModSchools.BOSS,
-            () -> new ItemStack(ModItems.TYRANTS_CODEX.get()), List.of(ModItems.TYRANTS_CODEX));
+    /** A school's part of the tab: its spellbooks, then its scrolls. */
+    public record Section(Supplier<SchoolType> school, Supplier<ItemStack> icon, List<Supplier<? extends Item>> books) {}
+
+    public static final List<Section> SECTIONS = List.of(
+            new Section(ModSchools.GOLD, () -> new ItemStack(ModItems.GOLDEN_GRIMOIRE.get()), List.of(ModItems.GOLDEN_GRIMOIRE)),
+            new Section(ModSchools.EXPLOSION, () -> new ItemStack(ModItems.DETONATION_CODEX.get()), List.of(ModItems.DETONATION_CODEX)),
+            new Section(ModSchools.BOOK, () -> new ItemStack(ModItems.LIVING_GRIMOIRE.get()), List.of(ModItems.LIVING_GRIMOIRE)),
+            new Section(ModSchools.ERRETHYS, () -> scroll(ModSpells.MANA_DROMEDARY.get(), 1), List.of()),
+            new Section(ModSchools.PHYSICAL, () -> scroll(ModSpells.PUNCH.get(), 1), List.of()),
+            new Section(ModSchools.BOSS, () -> new ItemStack(ModItems.TYRANTS_CODEX.get()), List.of(ModItems.TYRANTS_CODEX)));
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup." + ArcanesOublies.MODID))
+            .icon(() -> new ItemStack(ModItems.GOLDEN_GRIMOIRE.get()))
+            .displayItems((parameters, output) -> {
+                for (Section section : SECTIONS) {
+                    section.books().forEach(book -> output.accept(book.get()));
+                    for (var entry : ModSpells.SPELLS.getEntries()) {
+                        AbstractSpell spell = entry.get();
+                        if (!spell.isEnabled() || spell.getSchoolType() != section.school().get()) {
+                            continue;
+                        }
+                        for (int level = spell.getMinLevel(); level <= spell.getMaxLevel(); level++) {
+                            output.accept(scroll(spell, level));
+                        }
+                    }
+                }
+            })
+            .build());
 
     private ModCreativeTabs() {}
 
-    private static DeferredHolder<CreativeModeTab, CreativeModeTab> schoolTab(String name, DeferredHolder<CreativeModeTab, CreativeModeTab> after,
-                                                                              Supplier<SchoolType> school, Supplier<ItemStack> icon,
-                                                                              List<Supplier<? extends Item>> books) {
-        return TABS.register(name, () -> {
-            CreativeModeTab.Builder builder = CreativeModeTab.builder()
-                    .title(Component.translatable("itemGroup." + ArcanesOublies.MODID + "." + name))
-                    .icon(icon)
-                    .displayItems((parameters, output) -> {
-                        books.forEach(book -> output.accept(book.get()));
-                        for (var entry : ModSpells.SPELLS.getEntries()) {
-                            AbstractSpell spell = entry.get();
-                            if (!spell.isEnabled() || spell.getSchoolType() != school.get()) {
-                                continue;
-                            }
-                            for (int level = spell.getMinLevel(); level <= spell.getMaxLevel(); level++) {
-                                output.accept(scroll(spell, level));
-                            }
-                        }
-                    });
-            if (after != null) {
-                builder.withTabsBefore(after.getKey());
+    /** The section a stack of the tab belongs to: a scroll by its spell's school, a spellbook by the section listing it. */
+    @Nullable
+    public static Section sectionOf(ItemStack stack) {
+        SchoolType school = stack.is(ItemRegistry.SCROLL.get()) && ISpellContainer.isSpellContainer(stack)
+                ? ISpellContainer.get(stack).getSpellAtIndex(0).getSpell().getSchoolType() : null;
+        for (Section section : SECTIONS) {
+            if (section.school().get() == school || section.books().stream().anyMatch(book -> stack.is(book.get()))) {
+                return section;
             }
-            return builder.build();
-        });
+        }
+        return null;
     }
 
     private static ItemStack scroll(AbstractSpell spell, int level) {

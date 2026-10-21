@@ -1172,28 +1172,6 @@ def parchment_aegis_effect_icon():
 
 # ---------------------------------------------------------------- items
 
-def scroll_book():
-    return g.from_grid([
-        "................",
-        "..........oo....",
-        ".........ohlo...",
-        "........oclllo..",
-        ".......occcbso..",
-        "......occcccoo..",
-        ".....occccxco...",
-        "....occcxxcco...",
-        "...occcxggxo....",
-        "..occccxggo.....",
-        ".oohccccxo......",
-        "ohllocccco......",
-        "olbbsocco.......",
-        ".osssoco........",
-        "..ooo.o.........",
-        "................",
-    ], {"o": (26, 10, 40), "h": VIOLET_LIGHT, "l": VIOLET, "b": (110, 60, 190), "s": VIOLET_DARK,
-        "c": g.CREAM, "x": g.CREAM_SHADE, "g": GILT})
-
-
 def affinity_ring_book():
     return g.from_grid([
         "................",
@@ -1344,9 +1322,7 @@ def main():
     g.save(page_storm_icon(), "textures/gui/spell_icons/page_storm.png")
     g.save(living_ink_icon(), "textures/gui/spell_icons/living_ink.png")
     g.save(final_chapter_icon(), "textures/gui/spell_icons/the_final_chapter.png")
-    g.save(scroll_book(), "textures/item/scroll_book.png")
     g.save(affinity_ring_book(), "textures/item/affinity_ring_book.png")
-    g.write_json("models/item/scroll_book.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/scroll_book"}})
     g.write_json("models/item/affinity_ring_book.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_book"}})
     # Razor Pages, Word of Power, Tome of Judgment
     g.save(razor_edge(), "textures/entity/razor_edge.png")

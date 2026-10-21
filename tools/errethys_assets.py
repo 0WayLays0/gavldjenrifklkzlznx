@@ -183,28 +183,6 @@ def mana_crows_icon():
     ])
 
 
-def scroll_errethys():
-    return g.from_grid([
-        "................",
-        "..........oo....",
-        ".........ohlo...",
-        "........oclllo..",
-        ".......occcbso..",
-        "......occcccoo..",
-        ".....occccxco...",
-        "....occcxxcco...",
-        "...occcxggxo....",
-        "..occccxggo.....",
-        ".oohccccxo......",
-        "ohllocccco......",
-        "olbbsocco.......",
-        ".osssoco........",
-        "..ooo.o.........",
-        "................",
-    ], {"o": (10, 30, 50), "h": SKY_LIGHT, "l": SKY, "b": (90, 170, 210), "s": SKY_DEEP,
-        "c": g.CREAM, "x": g.CREAM_SHADE, "g": (150, 230, 255)})
-
-
 def affinity_ring_errethys():
     return g.from_grid([
         "................",
@@ -235,7 +213,5 @@ def main():
     for name, fn in (("mana_rats", mana_rats_icon), ("mana_salmon", mana_salmon_icon), ("mana_dromedary", mana_dromedary_icon),
                      ("mana_serpent", mana_serpent_icon), ("mana_crows", mana_crows_icon)):
         g.save(fn(), f"textures/gui/spell_icons/{name}.png")
-    g.save(scroll_errethys(), "textures/item/scroll_errethys.png")
     g.save(affinity_ring_errethys(), "textures/item/affinity_ring_errethys.png")
-    g.write_json("models/item/scroll_errethys.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/scroll_errethys"}})
     g.write_json("models/item/affinity_ring_errethys.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_errethys"}})

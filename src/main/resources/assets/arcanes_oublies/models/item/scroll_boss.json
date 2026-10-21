@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "arcanes_oublies:item/scroll_boss"
+    "layer0": "irons_spellbooks:item/scroll_arcanes_boss"
   }
 }

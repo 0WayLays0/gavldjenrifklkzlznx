@@ -2,6 +2,8 @@ package com.waylays.arcanes.debug;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.client.CreativeTabFilter;
+import com.waylays.arcanes.registry.ModCreativeTabs;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
@@ -20,9 +22,14 @@ import io.redspace.ironsspellbooks.player.ClientSpellCastHelper;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -31,6 +38,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Husk;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
@@ -50,9 +58,13 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.imageio.ImageIO;
 
@@ -161,11 +173,13 @@ public final class ClientSmokeTest {
             case CREATING -> {
                 if (mc.level != null && mc.player != null) {
                     log("joined the world");
+                    checkScrolls(mc);
                     stage = Stage.SETTLING;
                     ticks = 0;
                 }
             }
             case SETTLING -> {
+                creativeTab(mc);
                 if (ticks >= SETTLE_TICKS) {
                     mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
                     stage = Stage.CASTING;
@@ -311,6 +325,102 @@ public final class ClientSmokeTest {
         } catch (Throwable t) {
             failures.incrementAndGet();
             ArcanesOublies.LOGGER.error("[SmokeTest] FAIL casting {}", spell.getSpellId(), t);
+        }
+    }
+
+    /**
+     * Opens the creative inventory on the addon's tab and goes through its school buttons: a school's button must
+     * leave that school's items only. Photographed with {@code creative} in {@code arcanes.shots}.
+     */
+    private static void creativeTab(Minecraft mc) {
+        boolean shots = SHOTS.contains("creative");
+        try {
+            switch (ticks) {
+                case 20 -> mc.setScreen(new InventoryScreen(mc.player));
+                case 25 -> {
+                    if (mc.screen instanceof CreativeModeInventoryScreen screen) {
+                        screen.selectTab(ModCreativeTabs.MAIN.get());
+                    } else {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the creative inventory did not open ({})", mc.screen);
+                    }
+                }
+                case 30, 36, 42 -> {
+                    if (shots) {
+                        screenshot(mc, "creative_" + ticks);
+                    }
+                }
+                case 32, 38 -> {
+                    int index = ticks == 32 ? 1 : ModCreativeTabs.SECTIONS.size();
+                    CreativeTabFilter.press(index);
+                    ModCreativeTabs.Section section = ModCreativeTabs.SECTIONS.get(index - 1);
+                    if (mc.screen instanceof CreativeModeInventoryScreen screen) {
+                        var items = screen.getMenu().items;
+                        if (items.isEmpty() || items.stream().anyMatch(stack -> ModCreativeTabs.sectionOf(stack) != section)) {
+                            failures.incrementAndGet();
+                            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the {} button of the creative tab shows other items ({} items)",
+                                    section.school().get().getId(), items.size());
+                        } else {
+                            log("creative tab: the {} button shows its {} items", section.school().get().getId(), items.size());
+                        }
+                    }
+                }
+                case 46 -> {
+                    CreativeTabFilter.press(0);
+                    mc.setScreen(null);
+                }
+                default -> {
+                }
+            }
+        } catch (Throwable t) {
+            failures.incrementAndGet();
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL going through the creative tab", t);
+            mc.setScreen(null);
+        }
+    }
+
+    /**
+     * The addon's scrolls are Iron's scroll recoloured by the game (tools/scroll_assets.py): every colour of Iron's
+     * scroll must be in the palette key, or some of it keeps its old colour, and every school must get its scroll.
+     */
+    private static void checkScrolls(Minecraft mc) {
+        try {
+            Set<Integer> uncovered = colours(mc, ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "textures/item/scroll.png"));
+            uncovered.removeAll(colours(mc, ArcanesOublies.id("textures/item/scroll_palettes/key.png")));
+            if (!uncovered.isEmpty()) {
+                failures.incrementAndGet();
+                ArcanesOublies.LOGGER.error("[SmokeTest] FAIL Iron's scroll has colours the scroll palettes do not cover: {}",
+                        uncovered.stream().map(c -> String.format("%06x", c)).toList());
+            }
+            TextureAtlas atlas = mc.getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
+            for (var school : ModSchools.SCHOOLS.getEntries()) {
+                ResourceLocation sprite = ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "item/scroll_arcanes_" + school.getId().getPath());
+                if (atlas.getSprite(sprite).contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
+                    failures.incrementAndGet();
+                    ArcanesOublies.LOGGER.error("[SmokeTest] FAIL no recoloured scroll {} for the {} school", sprite, school.getId());
+                }
+            }
+            log("scrolls checked for {} schools", ModSchools.SCHOOLS.getEntries().size());
+        } catch (Throwable t) {
+            failures.incrementAndGet();
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL checking the scrolls", t);
+        }
+    }
+
+    /** The opaque colours of a picture, as RGB. */
+    private static Set<Integer> colours(Minecraft mc, ResourceLocation file) throws IOException {
+        try (InputStream in = mc.getResourceManager().open(file); NativeImage image = NativeImage.read(in)) {
+            Set<Integer> out = new HashSet<>();
+            for (int y = 0; y < image.getHeight(); y++) {
+                for (int x = 0; x < image.getWidth(); x++) {
+                    // ABGR
+                    int p = image.getPixelRGBA(x, y);
+                    if (p >>> 24 != 0) {
+                        out.add((p & 0xFF) << 16 | (p >> 8 & 0xFF) << 8 | (p >> 16 & 0xFF));
+                    }
+                }
+            }
+            return out;
         }
     }
 
