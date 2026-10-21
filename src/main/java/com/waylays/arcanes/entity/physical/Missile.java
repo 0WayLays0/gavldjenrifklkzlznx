@@ -18,6 +18,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -218,7 +219,8 @@ public class Missile extends AbstractArrow {
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return ItemStack.EMPTY;
+        // Never picked up (pickup is disallowed), but the arrow's save needs an item: an empty one cannot be written
+        return new ItemStack(Items.ARROW);
     }
 
     @Override

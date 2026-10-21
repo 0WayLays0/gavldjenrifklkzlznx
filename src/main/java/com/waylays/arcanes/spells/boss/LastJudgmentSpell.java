@@ -119,8 +119,11 @@ public class LastJudgmentSpell extends BossSpell {
         // Meteors while the sentence counts down, away from the shelters
         for (int k = 0; k < METEORS; k++) {
             Vec3 spot = meteorSpot(level, c, shelters);
+            if (spot == null) {
+                continue;
+            }
             BossTelegraph meteor = BossTelegraph.circle(level, entity, this, spellLevel, spot, METEOR_RADIUS)
-                    .style(BossTelegraph.Style.EARTH).delayed(k * METEOR_STEP).damage(damage * .35f).part("meteor").reachUp(6).spawn();
+                    .style(BossTelegraph.Style.EARTH).delayed(k * METEOR_STEP).damage(damage * .35f).part("meteor").reachUp(6).payload(payload).spawn();
             int hit = meteor.getFireTick();
             BossProp.spawn(level, BossProp.Kind.METEOR, BossTelegraph.Style.EARTH, 2.2f, hit - 22, hit,
                     spot.add(level.random.nextFloat() * 10 - 5, SKY_HEIGHT + 6, level.random.nextFloat() * 10 - 5), spot.add(0, .8, 0));
@@ -129,22 +132,19 @@ public class LastJudgmentSpell extends BossSpell {
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 
+    /** Somewhere in the arena whose impact zone stays clear of every shelter, or null if none is found. */
+    @Nullable
     private static Vec3 meteorSpot(Level level, Vec3 c, List<Vec3> shelters) {
-        Vec3 best = c;
-        for (int tries = 0; tries < 20; tries++) {
+        double clear = SAFE_RADIUS + METEOR_RADIUS + .5;
+        for (int tries = 0; tries < 40; tries++) {
             float a = level.random.nextFloat() * Mth.TWO_PI;
             float r = Mth.sqrt(level.random.nextFloat()) * (RADIUS - METEOR_RADIUS);
             Vec3 p = c.add(Mth.cos(a) * r, 0, Mth.sin(a) * r);
-            boolean clear = true;
-            for (Vec3 s : shelters) {
-                clear &= s.distanceToSqr(p.x, s.y, p.z) > (SAFE_RADIUS + METEOR_RADIUS + 1) * (SAFE_RADIUS + METEOR_RADIUS + 1);
-            }
-            best = p;
-            if (clear) {
-                break;
+            if (shelters.stream().allMatch(s -> s.distanceToSqr(p.x, s.y, p.z) > clear * clear)) {
+                return SpellUtil.groundAt(level, p, 6, 1);
             }
         }
-        return SpellUtil.groundAt(level, best, 6, 1);
+        return null;
     }
 
     @Override
@@ -153,6 +153,9 @@ public class LastJudgmentSpell extends BossSpell {
         switch (t.getPart()) {
             case "meteor" -> {
                 for (LivingEntity target : t.targetsInside()) {
+                    if (sheltered(t, target)) {
+                        continue;
+                    }
                     t.strike(target, t.getDamage());
                     target.igniteForSeconds(2);
                     knockAway(target, c, .7, .4);
@@ -166,17 +169,23 @@ public class LastJudgmentSpell extends BossSpell {
         }
     }
 
-    private void judgment(BossTelegraph t, ServerLevel level, Vec3 c) {
+    /** Whether {@code target} stands in one of the shelters listed in the zone's payload: nothing of the spell hits it there. */
+    private static boolean sheltered(BossTelegraph t, LivingEntity target) {
         ListTag shelters = t.getPayload().getList("Shelters", Tag.TAG_COMPOUND);
-        for (LivingEntity target : t.targetsInside()) {
-            boolean sheltered = false;
-            for (int i = 0; i < shelters.size(); i++) {
-                CompoundTag s = shelters.getCompound(i);
-                double dx = target.getX() - s.getDouble("X");
-                double dz = target.getZ() - s.getDouble("Z");
-                sheltered |= dx * dx + dz * dz <= (SAFE_RADIUS + .3) * (SAFE_RADIUS + .3);
+        for (int i = 0; i < shelters.size(); i++) {
+            CompoundTag s = shelters.getCompound(i);
+            double dx = target.getX() - s.getDouble("X");
+            double dz = target.getZ() - s.getDouble("Z");
+            if (dx * dx + dz * dz <= (SAFE_RADIUS + .3) * (SAFE_RADIUS + .3)) {
+                return true;
             }
-            if (!sheltered && t.strike(target, t.getDamage())) {
+        }
+        return false;
+    }
+
+    private void judgment(BossTelegraph t, ServerLevel level, Vec3 c) {
+        for (LivingEntity target : t.targetsInside()) {
+            if (!sheltered(t, target) && t.strike(target, t.getDamage())) {
                 target.setDeltaMovement(target.getDeltaMovement().add(0, .9, 0));
                 target.hurtMarked = true;
             }
