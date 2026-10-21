@@ -76,14 +76,14 @@ public class GlyphWaveRenderer extends EntityRenderer<GlyphWave> {
             float x0 = -Mth.sin(a0), z0 = Mth.cos(a0), x1 = -Mth.sin(a1), z1 = Mth.cos(a1);
             float u0 = t0 * tiles + scroll, u1 = t1 * tiles + scroll;
             float top0 = y0 + (y1 - y0) * (.3f + .7f * e0), top1 = y0 + (y1 - y0) * (.3f + .7f * e1);
-            RenderHelper.vertex(consumer, pose, x0 * r, y0, z0 * r, u0, 1, c0, GlyphRender.FULL, 0, 1);
-            RenderHelper.vertex(consumer, pose, x1 * r, y0, z1 * r, u1, 1, c1, GlyphRender.FULL, 0, 1);
-            RenderHelper.vertex(consumer, pose, x1 * topR, top1, z1 * topR, u1, 0, c1, GlyphRender.FULL, 0, 1);
-            RenderHelper.vertex(consumer, pose, x0 * topR, top0, z0 * topR, u0, 0, c0, GlyphRender.FULL, 0, 1);
-            RenderHelper.vertex(consumer, pose, x0 * topR, top0, z0 * topR, u0, 0, c0, GlyphRender.FULL, 0, 1);
-            RenderHelper.vertex(consumer, pose, x1 * topR, top1, z1 * topR, u1, 0, c1, GlyphRender.FULL, 0, 1);
-            RenderHelper.vertex(consumer, pose, x1 * r, y0, z1 * r, u1, 1, c1, GlyphRender.FULL, 0, 1);
-            RenderHelper.vertex(consumer, pose, x0 * r, y0, z0 * r, u0, 1, c0, GlyphRender.FULL, 0, 1);
+            RenderHelper.vertex(consumer, pose, x0 * r, y0, z0 * r, u0, 1, c0, GlyphRender.FULL, 0, 1, 0);
+            RenderHelper.vertex(consumer, pose, x1 * r, y0, z1 * r, u1, 1, c1, GlyphRender.FULL, 0, 1, 0);
+            RenderHelper.vertex(consumer, pose, x1 * topR, top1, z1 * topR, u1, 0, c1, GlyphRender.FULL, 0, 1, 0);
+            RenderHelper.vertex(consumer, pose, x0 * topR, top0, z0 * topR, u0, 0, c0, GlyphRender.FULL, 0, 1, 0);
+            RenderHelper.vertex(consumer, pose, x0 * topR, top0, z0 * topR, u0, 0, c0, GlyphRender.FULL, 0, 1, 0);
+            RenderHelper.vertex(consumer, pose, x1 * topR, top1, z1 * topR, u1, 0, c1, GlyphRender.FULL, 0, 1, 0);
+            RenderHelper.vertex(consumer, pose, x1 * r, y0, z1 * r, u1, 1, c1, GlyphRender.FULL, 0, 1, 0);
+            RenderHelper.vertex(consumer, pose, x0 * r, y0, z0 * r, u0, 1, c0, GlyphRender.FULL, 0, 1, 0);
         }
     }
 

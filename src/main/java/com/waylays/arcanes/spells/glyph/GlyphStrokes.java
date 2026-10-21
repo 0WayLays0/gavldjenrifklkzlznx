@@ -12,7 +12,7 @@ import java.util.List;
 public final class GlyphStrokes {
     private static final List<List<float[][]>> ELEMENTS = new ArrayList<>();
     /** The ring around the Primordial Glyph and the Seal. */
-    public static final List<float[][]> RING = List.of(arc(0, 0, 1, 0, Mth.TWO_PI, 40));
+    public static final List<float[][]> RING = List.<float[][]>of(arc(0, 0, 1, 0, Mth.TWO_PI, 40));
     /** The star of the Primordial Glyph, through its six element glyphs: two triangles and a small ring in the middle. */
     public static final List<float[][]> STAR = List.of(triangle(0), triangle(Mth.PI / 3), arc(0, 0, .3f, 0, Mth.TWO_PI, 20));
 
