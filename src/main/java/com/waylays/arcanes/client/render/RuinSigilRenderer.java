@@ -51,7 +51,6 @@ public class RuinSigilRenderer extends EntityRenderer<RuinSigil> {
             poseStack.pushPose();
             poseStack.translate(0, .5, 0);
             poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            poseStack.mulPose(Axis.YP.rotationDegrees(180f));
             BlastEffectRenderer.layer(buffer, BlastEffectRenderer.CORE, poseStack, 1.4f + Mth.sin(age * 2.1f) * .3f, 0, BlastEffectRenderer.rgb(1f, .7f, .4f));
             poseStack.popPose();
         }

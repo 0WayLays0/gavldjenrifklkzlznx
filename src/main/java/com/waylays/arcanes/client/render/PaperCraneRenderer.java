@@ -38,7 +38,6 @@ public class PaperCraneRenderer extends EntityRenderer<PaperCrane> {
         poseStack.translate(0, .15, 0);
         poseStack.pushPose();
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
         float pulse = .5f + .15f * Mth.sin(age * .5f);
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.CORE, poseStack, 1.3f, 0, BlastEffectRenderer.rgb(pulse * .6f, pulse * .36f, pulse));
         poseStack.popPose();

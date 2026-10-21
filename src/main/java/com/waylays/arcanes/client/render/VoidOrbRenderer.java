@@ -44,7 +44,6 @@ public class VoidOrbRenderer extends EntityRenderer<VoidOrb> {
                 BossTelegraphRenderer.additive(0xC070FF, .8f * open), LightTexture.FULL_BRIGHT);
         poseStack.popPose();
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
         BlastEffectRenderer.layer(buffer, SWIRL, poseStack, size * 1.9f, age * 9, BlastEffectRenderer.rgb(.7f * open, .25f * open, open));
         BlastEffectRenderer.layer(buffer, SWIRL, poseStack, size * 1.5f, -age * 14 + 60, BlastEffectRenderer.rgb(.45f * open, .15f * open, .85f * open));
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.RING, poseStack, size * 1.15f, 0, BlastEffectRenderer.rgb(.8f * open, .45f * open, open));

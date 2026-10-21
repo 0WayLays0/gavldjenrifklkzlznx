@@ -57,7 +57,6 @@ public class ChapterRuneRenderer extends EntityRenderer<ChapterRune> {
         // Glyph over the head
         poseStack.translate(0, target.getBbHeight() + .7f + Mth.sin(age * .15f) * .08f, 0);
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
         float size = 1.1f * appear * pulse;
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.CORE, poseStack, size * 1.6f, 0, BlastEffectRenderer.rgb(r * .5f * charge, g * .35f * charge, b * .5f * charge));
         BlastEffectRenderer.layer(buffer, GLYPH, poseStack, size, age * (1.5f + charge * 12f), BlastEffectRenderer.rgb(r, g, b));

@@ -1,7 +1,6 @@
 package com.waylays.arcanes.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.explosion.ShieldBubble;
 import net.minecraft.client.Minecraft;
@@ -53,7 +52,6 @@ public class ShieldBubbleRenderer extends EntityRenderer<ShieldBubble> {
         poseStack.pushPose();
         poseStack.translate(ownerPos.x - selfPos.x, ownerPos.y - selfPos.y + owner.getBbHeight() * .5f, ownerPos.z - selfPos.z);
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
         BlastEffectRenderer.layer(buffer, SHELL, poseStack, size, age * 3f, BlastEffectRenderer.rgb(r, g, b));
         BlastEffectRenderer.layer(buffer, SHELL, poseStack, size * .96f, -age * 5f + 30f, BlastEffectRenderer.rgb(r * .5f, g * .5f, b * .5f));
         if (flash > 0) {

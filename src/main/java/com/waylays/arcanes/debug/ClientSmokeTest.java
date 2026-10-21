@@ -1,5 +1,6 @@
 package com.waylays.arcanes.debug;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
@@ -18,6 +19,7 @@ import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.player.ClientSpellCastHelper;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
@@ -46,8 +48,13 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.imageio.ImageIO;
 
 /**
  * Automated client test, only with {@code -Darcanes.autotest=true} (CI job {@code client-smoke}, headless under xvfb).
@@ -60,6 +67,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * A client crash ends the run with a crash report; a spell that throws is logged as {@code [SmokeTest] FAIL}.
  * The run ends with {@code [SmokeTest] PASS} or {@code [SmokeTest] FAIL ...} and stops the client.
  * A watchdog halts the JVM (exit code 3) if the whole run takes too long.
+ * With {@code -Darcanes.shots=a,b,prefix_*} the casts of those spells are also photographed a few times, each picture
+ * logged as base64 JPEG lines {@code [SmokeShot] name part/parts data}, so CI shows what they look like.
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID, value = Dist.CLIENT)
 public final class ClientSmokeTest {
@@ -71,6 +80,13 @@ public final class ClientSmokeTest {
     /** Let the last spells (the ultimates, about 8 s) finish before stopping. */
     private static final int FINAL_TICKS = 220;
     private static final long WATCHDOG_SECONDS = 1200;
+    /** Spells (ids without the namespace, or prefixes ending in *) whose casts are photographed into the log. */
+    private static final List<String> SHOTS = Arrays.stream(System.getProperty("arcanes.shots", "").split(","))
+            .map(String::trim).filter(s -> !s.isEmpty()).toList();
+    /** Ticks after the cast each picture is taken. */
+    private static final int[] SHOT_DELAYS = {10, 25, 45};
+    private static final int SHOT_WIDTH = 640;
+    private static final int SHOT_CHUNK = 8000;
 
     private enum Stage { WAIT_TITLE, CREATING, SETTLING, CASTING, DONE }
 
@@ -82,6 +98,9 @@ public final class ClientSmokeTest {
     /** The last target dummy, cleared before the next one so they do not pile up in front of the camera. */
     private static Husk lastDummy;
     private static final AtomicInteger failures = new AtomicInteger();
+    /** The spell being photographed and the tick it was cast. */
+    private static String shotName;
+    private static int shotCastTick;
 
     static {
         if (ENABLED) {
@@ -171,6 +190,9 @@ public final class ClientSmokeTest {
         }
         if (spellIndex < spells.size() && ticks % TICKS_PER_SPELL == 1) {
             AbstractSpell spell = spells.get(spellIndex++).get();
+            String name = spell.getSpellId().substring(spell.getSpellId().indexOf(':') + 1);
+            shotName = SHOTS.stream().anyMatch(s -> s.endsWith("*") ? name.startsWith(s.substring(0, s.length() - 1)) : s.equals(name)) ? name : null;
+            shotCastTick = ticks;
             java.util.UUID id = mc.player.getUUID();
             server.execute(() -> castOnServer(server, id, spell));
             if (spell instanceof PhysicalSkill || spell instanceof BossSpell) {
@@ -180,6 +202,13 @@ public final class ClientSmokeTest {
                 } catch (Throwable t) {
                     failures.incrementAndGet();
                     ArcanesOublies.LOGGER.error("[SmokeTest] FAIL animating {}", spell.getSpellId(), t);
+                }
+            }
+        }
+        if (shotName != null) {
+            for (int k = 0; k < SHOT_DELAYS.length; k++) {
+                if (ticks - shotCastTick == SHOT_DELAYS[k]) {
+                    screenshot(mc, shotName + "_" + (k + 1));
                 }
             }
         }
@@ -260,8 +289,11 @@ public final class ClientSmokeTest {
             spell.onCast(level, SPELL_LEVEL, player, CastSource.COMMAND, magicData);
             log("cast {}", spell.getSpellId());
             if (spell == ModSpells.LONGSWORD_PARRY.get() && dummy != null) {
-                // The dummy swings at the player: the guard must catch it, and the riposte plays its animation
+                // The dummy swings at the player: the guard must catch it, and the riposte plays its animation. In
+                // survival for the blow: a creative player shrugs damage off before anything can parry it
+                player.setGameMode(GameType.SURVIVAL);
                 player.hurt(level.damageSources().mobAttack(dummy), 1);
+                player.setGameMode(GameType.CREATIVE);
                 if (LongswordParrySkill.isGuarding(player)) {
                     failures.incrementAndGet();
                     ArcanesOublies.LOGGER.error("[SmokeTest] FAIL longsword_parry: the guard did not catch the dummy's blow");
@@ -279,6 +311,42 @@ public final class ClientSmokeTest {
         } catch (Throwable t) {
             failures.incrementAndGet();
             ArcanesOublies.LOGGER.error("[SmokeTest] FAIL casting {}", spell.getSpellId(), t);
+        }
+    }
+
+    /** The last frame drawn, halved and logged as base64 JPEG lines (a picture never fails the run). */
+    private static void screenshot(Minecraft mc, String name) {
+        try (NativeImage shot = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
+            int f = Math.max(1, shot.getWidth() / SHOT_WIDTH);
+            int w = shot.getWidth() / f;
+            int h = shot.getHeight() / f;
+            BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+            for (int y = 0; y < h; y++) {
+                for (int x = 0; x < w; x++) {
+                    int r = 0, g = 0, b = 0;
+                    for (int dy = 0; dy < f; dy++) {
+                        for (int dx = 0; dx < f; dx++) {
+                            // ABGR
+                            int p = shot.getPixelRGBA(x * f + dx, y * f + dy);
+                            r += p & 0xFF;
+                            g += p >> 8 & 0xFF;
+                            b += p >> 16 & 0xFF;
+                        }
+                    }
+                    int n = f * f;
+                    out.setRGB(x, y, r / n << 16 | g / n << 8 | b / n);
+                }
+            }
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            ImageIO.write(out, "jpg", bytes);
+            String data = Base64.getEncoder().encodeToString(bytes.toByteArray());
+            int parts = (data.length() + SHOT_CHUNK - 1) / SHOT_CHUNK;
+            for (int i = 0; i < parts; i++) {
+                ArcanesOublies.LOGGER.info("[SmokeShot] {} {}/{} {}", name, i + 1, parts,
+                        data.substring(i * SHOT_CHUNK, Math.min(data.length(), (i + 1) * SHOT_CHUNK)));
+            }
+        } catch (Throwable t) {
+            ArcanesOublies.LOGGER.warn("[SmokeTest] could not photograph {}", name, t);
         }
     }
 

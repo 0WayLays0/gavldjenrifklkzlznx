@@ -44,7 +44,6 @@ public class BlastEffectRenderer extends EntityRenderer<BlastEffect> {
         poseStack.pushPose();
         poseStack.translate(0, size * .3f, 0);
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
 
         // Fireball: swells, darkens from yellow-white to deep red, burns out
         float fireFade = (float) Math.pow(fade, 1.4);

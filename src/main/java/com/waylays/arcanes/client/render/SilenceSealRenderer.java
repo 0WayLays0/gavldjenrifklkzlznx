@@ -48,7 +48,6 @@ public class SilenceSealRenderer extends EntityRenderer<SilenceSeal> {
             poseStack.pushPose();
             poseStack.translate(0, target.getBbHeight() + .4f + (1 - t * t) * 2.5f, 0);
             poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            poseStack.mulPose(Axis.YP.rotationDegrees(180f));
             poseStack.mulPose(Axis.ZP.rotationDegrees((1 - t) * 300f));
             float s = 1.3f * Mth.clamp(t * 3, 0f, 1f);
             RenderHelper.rect(buffer.getBuffer(RenderType.entityCutoutNoCull(WAX)), poseStack.last(), s, s, 0xFFFFFFFF, LightTexture.FULL_BRIGHT, false);

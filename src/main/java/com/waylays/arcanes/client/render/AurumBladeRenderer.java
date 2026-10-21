@@ -65,7 +65,6 @@ public class AurumBladeRenderer extends EntityRenderer<AurumBladeEntity> {
             // Halo around the blade
             poseStack.pushPose();
             poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            poseStack.mulPose(Axis.YP.rotationDegrees(180f));
             float halo = 5.5f * scale * (1 + Mth.sin(age * .6f) * .08f);
             poseStack.scale(halo, halo, halo);
             RenderHelper.billboard(buffer.getBuffer(RenderType.eyes(GLOW)), poseStack.last(), .5f, 0xB0B0B0B0, LightTexture.FULL_BRIGHT);

@@ -31,6 +31,10 @@ neoForge {
             if (project.hasProperty('arcanes.autotest')) {
                 systemProperty 'arcanes.autotest', project.property('arcanes.autotest').toString()
             }
+            // Spells whose casts it photographs into the log, e.g. -Parcanes.shots=cataclysm,rune_*
+            if (project.hasProperty('arcanes.shots')) {
+                systemProperty 'arcanes.shots', project.property('arcanes.shots').toString()
+            }
         }
 
         server {

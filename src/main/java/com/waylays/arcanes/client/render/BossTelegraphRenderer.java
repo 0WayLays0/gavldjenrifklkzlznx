@@ -108,7 +108,6 @@ public class BossTelegraphRenderer extends EntityRenderer<BossTelegraph> {
             poseStack.pushPose();
             poseStack.translate(at[0], y, at[1]);
             poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            poseStack.mulPose(Axis.YP.rotationDegrees(180f));
             float u0 = (glyph % 4) * .25f;
             float v0 = (glyph / 4) * .25f;
             RenderHelper.rectUv(c, poseStack.last(), .7f, .7f, u0, v0, u0 + .25f, v0 + .25f, additive(style.rune, alpha), LIGHT, false);

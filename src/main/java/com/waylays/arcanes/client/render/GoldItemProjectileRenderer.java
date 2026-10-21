@@ -47,7 +47,6 @@ public class GoldItemProjectileRenderer<T extends Entity> extends EntityRenderer
         if (glowSize > 0) {
             poseStack.pushPose();
             poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            poseStack.mulPose(Axis.YP.rotationDegrees(180f));
             float pulse = glowSize * (1f + Mth.sin(age * .8f) * .13f);
             poseStack.scale(pulse, pulse, pulse);
             RenderHelper.billboard(buffer.getBuffer(RenderType.eyes(GLOW)), poseStack.last(), .5f, 0xFFFFFFFF, LightTexture.FULL_BRIGHT);

@@ -66,7 +66,6 @@ public class BossPropRenderer extends EntityRenderer<BossProp> {
         // Halo of fire, trailing up behind the fall
         poseStack.pushPose();
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.FIRE, poseStack, size * 2.6f, age * 9, BlastEffectRenderer.rgb(1f, .55f, .2f));
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.FIRE, poseStack, size * 2f, -age * 13, BlastEffectRenderer.rgb(1f, .75f, .35f));
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.CORE, poseStack, size * 1.4f, 0, BlastEffectRenderer.rgb(1f, .85f, .6f));
@@ -102,7 +101,6 @@ public class BossPropRenderer extends EntityRenderer<BossProp> {
         VertexConsumer c = buffer.getBuffer(RenderType.eyes(BEAM));
         RenderHelper.strand(c, poseStack.last(), Vec3.ZERO, tail, size * .7f, 4 * size, BossTelegraphRenderer.additive(color, .8f), LIGHT);
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.CORE, poseStack, size * 2.2f, age * 20, BossTelegraphRenderer.additive(color, 1));
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.RING, poseStack, size * 1.4f, 0, BossTelegraphRenderer.additive(0xFFFFFF, .9f));
         poseStack.popPose();

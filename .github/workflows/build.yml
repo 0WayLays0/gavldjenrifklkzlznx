@@ -111,7 +111,9 @@ jobs:
           printf 'onboardAccessibility:false\nskipMultiplayerWarning:true\ntutorialStep:none\nnarrator:0\nsoundCategory_master:0.0\nrenderDistance:6\nsimulationDistance:6\npauseOnLostFocus:false\n' > run/options.txt
           export LIBGL_ALWAYS_SOFTWARE=1
           set +e
-          timeout --kill-after=30s 1800 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClient -Parcanes.autotest=true --console=plain > client.log 2>&1
+          # Spells photographed into the log (see ClientSmokeTest), for a look at how they render
+          SHOTS="sun_of_eldorado,cataclysm,reactive_shield,gold_bolt,crushing_meteor"
+          timeout --kill-after=30s 1800 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClient -Parcanes.autotest=true "-Parcanes.shots=$SHOTS" --console=plain > client.log 2>&1
           code=$?
           set -e
           echo "CLIENT_EXIT=$code" >> "$GITHUB_ENV"
@@ -123,6 +125,8 @@ jobs:
           LOG=run/logs/latest.log
           [ -f "$LOG" ] || LOG=client.log
           echo "client exit code: ${CLIENT_EXIT:-unknown}, log: $LOG"
+          echo "--- failures ---"
+          { grep -h '\[SmokeTest\] FAIL' "$LOG" || true; } | cut -c1-400 | head -n 40
           echo "::group::[SmokeTest] lines"
           { grep -h '\[SmokeTest\]' "$LOG" || true; } | cut -c1-400 | head -n 80
           echo "::endgroup::"
@@ -135,6 +139,9 @@ jobs:
             head -n 150 "$f" | cut -c1-300
             echo "::endgroup::"
           done
+          echo "::group::Screenshots (base64 JPEG)"
+          { grep -h '\[SmokeShot\]' "$LOG" || true; } | sed 's/.*\[SmokeShot\] /SHOT /'
+          echo "::endgroup::"
           echo "--- tail of client.log ---"
           tail -n 40 client.log | cut -c1-300 || true
 

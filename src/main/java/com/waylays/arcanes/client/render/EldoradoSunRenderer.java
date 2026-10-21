@@ -53,7 +53,6 @@ public class EldoradoSunRenderer extends EntityRenderer<EldoradoSun> {
         // Camera-facing layers
         poseStack.pushPose();
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
         layer(buffer.getBuffer(RenderType.eyes(GLOW)), poseStack, 8f * size, 0, 0xFF909090);
         layer(buffer.getBuffer(RenderType.eyes(SUN)), poseStack, 4.6f * size, age * 1.2f, 0xFFFFFFFF);
         layer(buffer.getBuffer(RenderType.eyes(SUN)), poseStack, 3.6f * size, -age * 2f + 22.5f, 0xFFC0C0C0);

@@ -1,7 +1,6 @@
 package com.waylays.arcanes.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.waylays.arcanes.ArcanesOublies;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -34,7 +33,6 @@ public class GlowOrbRenderer<T extends Entity> extends EntityRenderer<T> {
         poseStack.pushPose();
         poseStack.translate(0, entity.getBbHeight() * .5f, 0);
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.CORE, poseStack, size * 2.6f * flicker, 0, glowColor);
         BlastEffectRenderer.layer(buffer, ORB, poseStack, size * 1.5f, age * 25f, 0xFFFFFFFF);
         BlastEffectRenderer.layer(buffer, ORB, poseStack, size * 1.2f, -age * 40f + 45f, 0xFFC0C0C0);

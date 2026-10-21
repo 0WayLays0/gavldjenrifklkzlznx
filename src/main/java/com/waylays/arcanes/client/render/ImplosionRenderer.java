@@ -1,7 +1,6 @@
 package com.waylays.arcanes.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.explosion.ImplosionCore;
 import net.minecraft.client.renderer.LightTexture;
@@ -37,7 +36,6 @@ public class ImplosionRenderer extends EntityRenderer<ImplosionCore> {
         poseStack.pushPose();
         poseStack.translate(0, entity.getBbHeight() * .5f, 0);
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180f));
 
         // Violet accretion swirl (two arms turning opposite ways, faster as it contracts)
         float spin = age * (8f + (1 - contract) * 30f);
