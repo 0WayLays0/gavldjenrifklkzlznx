@@ -35,9 +35,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Husk;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -113,6 +115,7 @@ public final class ClientSmokeTest {
     /** The spell being photographed and the tick it was cast. */
     private static String shotName;
     private static int shotCastTick;
+    private static float shotYaw;
 
     static {
         if (ENABLED) {
@@ -210,7 +213,8 @@ public final class ClientSmokeTest {
                     ? name : null;
             shotCastTick = ticks;
             java.util.UUID id = mc.player.getUUID();
-            server.execute(() -> castOnServer(server, id, spell));
+            boolean alone = shotName != null;
+            server.execute(() -> castOnServer(server, id, spell, alone));
             if (spell instanceof PhysicalSkill || spell instanceof BossSpell) {
                 // Play the move's body animation on the real player, as Iron's does when it starts a cast
                 try {
@@ -221,11 +225,16 @@ public final class ClientSmokeTest {
                 }
             }
         }
-        if (shotName != null) {
-            // The last picture looks up a little, for what happens over the caster's head
-            if (ticks - shotCastTick == SHOT_DELAYS[SHOT_DELAYS.length - 1] - 2 && mc.player != null) {
-                mc.player.setXRot(-25);
-                mc.player.xRotO = -25;
+        if (shotName != null && mc.player != null) {
+            // Seen from a little to the right and looking down, then from the left, then looking up over the caster
+            int since = ticks - shotCastTick;
+            if (since == SHOT_DELAYS[0] - 2) {
+                shotYaw = mc.player.getYRot();
+                aim(mc, shotYaw + 32, 24);
+            } else if (since == SHOT_DELAYS[1] - 2) {
+                aim(mc, shotYaw - 32, 12);
+            } else if (since == SHOT_DELAYS[2] - 2) {
+                aim(mc, shotYaw, -25);
             }
             for (int k = 0; k < SHOT_DELAYS.length; k++) {
                 if (ticks - shotCastTick == SHOT_DELAYS[k]) {
@@ -242,7 +251,15 @@ public final class ClientSmokeTest {
         }
     }
 
-    private static void castOnServer(IntegratedServer server, java.util.UUID id, AbstractSpell spell) {
+    private static void aim(Minecraft mc, float yaw, float pitch) {
+        mc.player.setYRot(yaw);
+        mc.player.yRotO = yaw;
+        mc.player.setXRot(pitch);
+        mc.player.xRotO = pitch;
+    }
+
+    /** {@code alone}: everything earlier spells left around is cleared first, so its pictures show that spell only. */
+    private static void castOnServer(IntegratedServer server, java.util.UUID id, AbstractSpell spell, boolean alone) {
         ServerPlayer player = server.getPlayerList().getPlayer(id);
         if (player == null) {
             failures.incrementAndGet();
@@ -251,6 +268,12 @@ public final class ClientSmokeTest {
         }
         try {
             ServerLevel level = player.serverLevel();
+            if (alone) {
+                for (Entity e : level.getEntities((Entity) null, player.getBoundingBox().inflate(64), x -> !(x instanceof Player))) {
+                    e.discard();
+                }
+                lastDummy = null;
+            }
             // Off the Flying Stack, so every spell is cast from the ground
             player.stopRiding();
             var school = spell.getSchoolType().getId();

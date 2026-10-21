@@ -6,7 +6,11 @@ import com.mojang.math.Axis;
 import com.waylays.arcanes.ArcanesOublies;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
@@ -53,7 +57,12 @@ public final class RuneRender {
         }
         poseStack.scale(sx, sy, sz);
         poseStack.translate(-.5, 0, -.5);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(state, poseStack, buffer, light, OverlayTexture.NO_OVERLAY);
+        // Drawn with its own render type, not the shared block sheet (drawn last, it would paint over the runes laid on
+        // the stone, which write no depth); asking for the runes' buffer next sends the stone off first
+        BlockRenderDispatcher blocks = Minecraft.getInstance().getBlockRenderer();
+        BakedModel model = blocks.getBlockModel(state);
+        blocks.getModelRenderer().renderModel(poseStack.last(), buffer.getBuffer(RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS)),
+                state, model, 1, 1, 1, light, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 

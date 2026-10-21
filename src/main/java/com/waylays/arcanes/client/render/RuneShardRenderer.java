@@ -32,13 +32,8 @@ public class RuneShardRenderer extends EntityRenderer<RuneShard> {
         float pitch = (float) (Mth.atan2(v.y, v.horizontalDistance()) * Mth.RAD_TO_DEG);
         poseStack.pushPose();
         poseStack.translate(0, shard.getBbHeight() * .5f, 0);
-        // Glow and rune first, turned to the viewer
+        // The stone, along the flight, spinning (first: the glow over it writes no depth)
         poseStack.pushPose();
-        poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        RenderHelper.billboard(buffer.getBuffer(RenderType.eyes(RuneRender.GLOW)), poseStack.last(), .45f, RuneRender.additive(RuneFx.GLOW, .7f), FULL);
-        RuneRender.glyph(buffer.getBuffer(RenderType.eyes(RuneRender.GLYPHS)), poseStack.last(), shard.getId(), .38f, RuneRender.additive(RuneFx.SILVER, 1), FULL);
-        poseStack.popPose();
-        // Then the stone, along the flight, spinning
         poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
         poseStack.mulPose(Axis.XP.rotationDegrees(-pitch));
         poseStack.mulPose(Axis.ZP.rotationDegrees(age * 30));
@@ -47,6 +42,13 @@ public class RuneShardRenderer extends EntityRenderer<RuneShard> {
         poseStack.translate(0, .1f, .62f);
         poseStack.mulPose(Axis.ZP.rotationDegrees(45));
         RuneRender.block(STONE, poseStack, buffer, packedLight, 0, -.07f, 0, .14f, .14f, .2f, 0, 0);
+        poseStack.popPose();
+        // Then its glow and rune, turned to the viewer
+        poseStack.pushPose();
+        poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+        RenderHelper.billboard(buffer.getBuffer(RenderType.eyes(RuneRender.GLOW)), poseStack.last(), .45f, RuneRender.additive(RuneFx.GLOW, .7f), FULL);
+        RuneRender.glyph(buffer.getBuffer(RenderType.eyes(RuneRender.GLYPHS)), poseStack.last(), shard.getId(), .38f, RuneRender.additive(RuneFx.SILVER, 1), FULL);
+        poseStack.popPose();
         poseStack.popPose();
         super.render(shard, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
