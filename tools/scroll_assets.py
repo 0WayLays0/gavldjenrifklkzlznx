@@ -33,6 +33,8 @@ PALETTES = {
     "boss": ["2a1a1c", "352022", "45292c", "160d0e", "1f1314", "ff6a78", "e0283c", "a01428", "ffe08a", "e0a83a", "a06a14"],
     # Grey stone, the runes glowing ice blue, silver rod ends
     "rune": ["6e6a64", "807b74", "948f87", "46433f", "5a5752", "dff8ff", "8fdcff", "4aa8e0", "e6eaee", "b2b9c1", "737b85"],
+    # Ivory paper, the writing in three of the six inks (flame, tide, gale), gold rod ends
+    "glyph": ["d9cfb2", "ebe3cb", "f8f4e8", "a89d80", "c0b597", "ff8a3a", "3f9bff", "4fd49a", "ffe08a", "d8a840", "9a6c1c"],
 }
 
 

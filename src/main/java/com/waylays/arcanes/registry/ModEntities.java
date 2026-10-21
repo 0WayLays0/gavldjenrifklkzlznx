@@ -40,6 +40,14 @@ import com.waylays.arcanes.entity.explosion.ExplosiveOrb;
 import com.waylays.arcanes.entity.explosion.ImplosionCore;
 import com.waylays.arcanes.entity.explosion.RuinSigil;
 import com.waylays.arcanes.entity.explosion.ShieldBubble;
+import com.waylays.arcanes.entity.glyph.GlyphSign;
+import com.waylays.arcanes.entity.glyph.GlyphBolt;
+import com.waylays.arcanes.entity.glyph.GlyphWave;
+import com.waylays.arcanes.entity.glyph.GlyphArc;
+import com.waylays.arcanes.entity.glyph.GlyphMarkVisual;
+import com.waylays.arcanes.entity.glyph.GlyphZone;
+import com.waylays.arcanes.entity.glyph.GlyphSeal;
+import com.waylays.arcanes.entity.glyph.GlyphStorm;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
 import com.waylays.arcanes.entity.gold.GildedChainsEntity;
@@ -239,6 +247,24 @@ public final class ModEntities {
             EntityType.Builder.<EdgeGlyphs>of(EdgeGlyphs::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(2).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<ElderCircle>> ELDER_CIRCLE = register("elder_circle",
             EntityType.Builder.<ElderCircle>of(ElderCircle::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+
+    // Glyph Magic: glyphs written in light, their bolts, waves and arcs, the marks and the reactions' zones
+    public static final DeferredHolder<EntityType<?>, EntityType<GlyphSign>> GLYPH_SIGN = register("glyph_sign",
+            EntityType.Builder.<GlyphSign>of(GlyphSign::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GlyphBolt>> GLYPH_BOLT = register("glyph_bolt",
+            EntityType.Builder.<GlyphBolt>of(GlyphBolt::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(1));
+    public static final DeferredHolder<EntityType<?>, EntityType<GlyphWave>> GLYPH_WAVE = register("glyph_wave",
+            EntityType.Builder.<GlyphWave>of(GlyphWave::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GlyphArc>> GLYPH_ARC = register("glyph_arc",
+            EntityType.Builder.<GlyphArc>of(GlyphArc::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GlyphMarkVisual>> GLYPH_MARK = register("glyph_mark",
+            EntityType.Builder.<GlyphMarkVisual>of(GlyphMarkVisual::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(5).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GlyphZone>> GLYPH_ZONE = register("glyph_zone",
+            EntityType.Builder.<GlyphZone>of(GlyphZone::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GlyphSeal>> GLYPH_SEAL = register("glyph_seal",
+            EntityType.Builder.<GlyphSeal>of(GlyphSeal::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(5).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GlyphStorm>> GLYPH_STORM = register("glyph_storm",
+            EntityType.Builder.<GlyphStorm>of(GlyphStorm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
 
     private ModEntities() {}
 

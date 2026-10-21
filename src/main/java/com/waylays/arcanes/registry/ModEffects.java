@@ -4,6 +4,8 @@ import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.effect.BlastLeapEffect;
 import com.waylays.arcanes.effect.BleedingEffect;
 import com.waylays.arcanes.effect.GildedArmorEffect;
+import com.waylays.arcanes.effect.GlyphFrozenEffect;
+import com.waylays.arcanes.effect.GlyphMarkEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.effect.ParchmentAegisEffect;
 import com.waylays.arcanes.effect.PetrifiedEffect;
@@ -13,10 +15,14 @@ import com.waylays.arcanes.effect.RuneEdgeEffect;
 import com.waylays.arcanes.effect.SilenceEffect;
 import com.waylays.arcanes.effect.SunderedEffect;
 import com.waylays.arcanes.effect.VolatileBrandEffect;
+import com.waylays.arcanes.spells.glyph.GlyphElement;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.Arrays;
+import java.util.List;
 
 public final class ModEffects {
     public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, ArcanesOublies.MODID);
@@ -33,6 +39,10 @@ public final class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> PINNED = EFFECTS.register("pinned", PinnedEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> PETRIFIED = EFFECTS.register("petrified", PetrifiedEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> RUNE_EDGE = EFFECTS.register("rune_edge", RuneEdgeEffect::new);
+    /** Glyph Magic: an element's glyph inscribed on a creature, one effect per element (in {@link GlyphElement} order). */
+    public static final List<DeferredHolder<MobEffect, MobEffect>> GLYPH_MARKS = Arrays.stream(GlyphElement.values())
+            .map(element -> EFFECTS.register("glyph_" + element.id, () -> (MobEffect) new GlyphMarkEffect(element))).toList();
+    public static final DeferredHolder<MobEffect, MobEffect> GLYPH_FROZEN = EFFECTS.register("glyph_frozen", GlyphFrozenEffect::new);
 
     private ModEffects() {}
 }

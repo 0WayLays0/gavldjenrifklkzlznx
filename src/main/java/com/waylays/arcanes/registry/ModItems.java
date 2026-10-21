@@ -36,6 +36,10 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> ELDER_RUNE_CODEX = ITEMS.register("elder_rune_codex",
             () -> spellbook(10, ModAttributes.RUNE_SPELL_POWER));
 
+    /** Glyph Magic spellbook (six inks set in its cover): 10 slots, +10% Glyph Spell Power, +200 max mana. */
+    public static final DeferredHolder<Item, Item> SIX_INKS_CODEX = ITEMS.register("six_inks_codex",
+            () -> spellbook(10, ModAttributes.GLYPH_SPELL_POWER));
+
     private ModItems() {}
 
     /** A legendary school spellbook, like Iron's own: +10% power in its school and +200 max mana. */

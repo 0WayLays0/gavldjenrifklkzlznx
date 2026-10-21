@@ -15,6 +15,14 @@ import com.waylays.arcanes.client.render.CataclysmRenderer;
 import com.waylays.arcanes.client.render.ChapterRuneRenderer;
 import com.waylays.arcanes.client.render.EdgeGlyphsRenderer;
 import com.waylays.arcanes.client.render.ElderCircleRenderer;
+import com.waylays.arcanes.client.render.GlyphArcRenderer;
+import com.waylays.arcanes.client.render.GlyphBoltRenderer;
+import com.waylays.arcanes.client.render.GlyphMarkRenderer;
+import com.waylays.arcanes.client.render.GlyphSealRenderer;
+import com.waylays.arcanes.client.render.GlyphSignRenderer;
+import com.waylays.arcanes.client.render.GlyphStormRenderer;
+import com.waylays.arcanes.client.render.GlyphWaveRenderer;
+import com.waylays.arcanes.client.render.GlyphZoneRenderer;
 import com.waylays.arcanes.client.render.EldoradoSunRenderer;
 import com.waylays.arcanes.client.render.FinalChapterRenderer;
 import com.waylays.arcanes.client.render.FlyingGrimoireRenderer;
@@ -130,6 +138,14 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.PETRIFY_BIND.get(), PetrifyBindRenderer::new);
         event.registerEntityRenderer(ModEntities.EDGE_GLYPHS.get(), EdgeGlyphsRenderer::new);
         event.registerEntityRenderer(ModEntities.ELDER_CIRCLE.get(), ElderCircleRenderer::new);
+        event.registerEntityRenderer(ModEntities.GLYPH_SIGN.get(), GlyphSignRenderer::new);
+        event.registerEntityRenderer(ModEntities.GLYPH_BOLT.get(), GlyphBoltRenderer::new);
+        event.registerEntityRenderer(ModEntities.GLYPH_WAVE.get(), GlyphWaveRenderer::new);
+        event.registerEntityRenderer(ModEntities.GLYPH_ARC.get(), GlyphArcRenderer::new);
+        event.registerEntityRenderer(ModEntities.GLYPH_MARK.get(), GlyphMarkRenderer::new);
+        event.registerEntityRenderer(ModEntities.GLYPH_ZONE.get(), GlyphZoneRenderer::new);
+        event.registerEntityRenderer(ModEntities.GLYPH_SEAL.get(), GlyphSealRenderer::new);
+        event.registerEntityRenderer(ModEntities.GLYPH_STORM.get(), GlyphStormRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));
@@ -157,6 +173,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.LIVING_GRIMOIRE.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.TYRANTS_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.ELDER_RUNE_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.SIX_INKS_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }

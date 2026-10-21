@@ -31,7 +31,8 @@ Ordre de développement :
  12. Magie de Boss (attaques de boss annoncées au sol) - demandée en plus
  13. Magie Runique (runes gravées, moitié soutien, moitié dégâts) - demandée
      en plus
- 14. Magie de Glyphe (glyphes élémentaires tracés dans l'air) - prévue
+ 14. Magie de Glyphe (glyphes élémentaires tracés dans l'air) - demandée
+     en plus
 
 
 ================================================================================
@@ -592,3 +593,29 @@ Runes Anciennes. Focus : briques de pierre sculptées.
 10. Circle of Elders   [~] ULTIME - Huit pierres runiques en cercle : soin et
                            protection des alliés, éclairs runiques sur les
                            ennemis à l'intérieur.
+
+
+================================================================================
+14. MAGIE DE GLYPHE (glyphes élémentaires)                       [~] EN TEST
+================================================================================
+Des glyphes élémentaires écrits dans la lumière, tracés dans l'air en temps
+réel, instantanés. Six éléments : Feu, Givre, Orage, Marée, Vent, Pierre.
+Chaque coup inscrit la marque de son élément ; un autre élément qui frappe la
+marque déclenche leur réaction (15 réactions : Fonte, Surcharge, Vapeur,
+Tempête de feu, Magma, Supraconduction, Gel, Blizzard, Brisure,
+Électrocution, Orage, Magnétisme, Typhon, Bourbier, Tempête de sable).
+Livre : Codex des Six Encres. Focus : plume.
+
+ 1. Fire Glyph         [~] Comètes de feu lancées l'une après l'autre.
+ 2. Frost Glyph        [~] Éventail d'aiguilles de glace qui traversent.
+ 3. Storm Glyph        [~] Foudre qui bondit d'ennemi en ennemi.
+ 4. Tide Glyph         [~] Mur d'eau en arc qui repousse.
+ 5. Gale Glyph         [~] Bourrasque qui projette en l'air.
+ 6. Stone Glyph        [~] Rocher lancé en cloche qui éclate à l'impact.
+ 7. Elemental Seal     [~] Les six glyphes tournent autour du lanceur et
+                           tirent tour à tour sur l'ennemi le plus proche.
+ 8. Elemental Script   [~] Ligne de glyphes au sol, un élément chacun, qui
+                           entrent en éruption l'un après l'autre.
+ 9. Glyph Resonance    [~] Toutes les marques autour éclatent à la fois.
+10. Primordial Glyph   [~] ULTIME - Grand glyphe écrit dans le ciel ; ses six
+                           éléments s'abattent à tour de rôle sur les ennemis.

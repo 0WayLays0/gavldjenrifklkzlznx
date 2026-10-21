@@ -89,6 +89,16 @@ import com.waylays.arcanes.spells.physical.SpearThrustSkill;
 import com.waylays.arcanes.spells.physical.SwordDisarmSkill;
 import com.waylays.arcanes.spells.physical.SwordLungeSkill;
 import com.waylays.arcanes.spells.physical.SwordRisingCutSkill;
+import com.waylays.arcanes.spells.glyph.FireGlyphSpell;
+import com.waylays.arcanes.spells.glyph.FrostGlyphSpell;
+import com.waylays.arcanes.spells.glyph.StormGlyphSpell;
+import com.waylays.arcanes.spells.glyph.TideGlyphSpell;
+import com.waylays.arcanes.spells.glyph.GaleGlyphSpell;
+import com.waylays.arcanes.spells.glyph.StoneGlyphSpell;
+import com.waylays.arcanes.spells.glyph.ElementalSealSpell;
+import com.waylays.arcanes.spells.glyph.ElementalScriptSpell;
+import com.waylays.arcanes.spells.glyph.GlyphResonanceSpell;
+import com.waylays.arcanes.spells.glyph.PrimordialGlyphSpell;
 import com.waylays.arcanes.spells.rune.CircleOfEldersSpell;
 import com.waylays.arcanes.spells.rune.EdgeRuneSpell;
 import com.waylays.arcanes.spells.rune.MendingRunestoneSpell;
@@ -223,6 +233,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> PETRIFYING_RUNE = register(new PetrifyingRuneSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MENHIR_SURGE = register(new MenhirSurgeSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> CIRCLE_OF_ELDERS = register(new CircleOfEldersSpell());
+
+    // Glyph Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> FIRE_GLYPH = register(new FireGlyphSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> FROST_GLYPH = register(new FrostGlyphSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> STORM_GLYPH = register(new StormGlyphSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TIDE_GLYPH = register(new TideGlyphSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GALE_GLYPH = register(new GaleGlyphSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> STONE_GLYPH = register(new StoneGlyphSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ELEMENTAL_SEAL = register(new ElementalSealSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ELEMENTAL_SCRIPT = register(new ElementalScriptSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GLYPH_RESONANCE = register(new GlyphResonanceSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PRIMORDIAL_GLYPH = register(new PrimordialGlyphSpell());
 
     private ModSpells() {}
 

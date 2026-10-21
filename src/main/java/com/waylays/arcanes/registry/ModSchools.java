@@ -146,6 +146,26 @@ public final class ModSchools {
             RUNE_MAGIC
     ));
 
+    /**
+     * Glyph Magic: elemental glyphs written in light, in the air or on the ground (fire, frost, storm, tide, gale and
+     * stone). Each glyph inscribes its element on what it strikes; another element striking the mark sets off their
+     * reaction.
+     */
+    public static final ResourceLocation GLYPH_RESOURCE = ArcanesOublies.id("glyph");
+    public static final TagKey<Item> GLYPH_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("glyph_focus"));
+    public static final ResourceKey<DamageType> GLYPH_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("glyph_magic"));
+    public static final int GLYPH_COLOR = 0xFFD27A;
+
+    public static final DeferredHolder<SchoolType, SchoolType> GLYPH = SCHOOLS.register(GLYPH_RESOURCE.getPath(), () -> new SchoolType(
+            GLYPH_RESOURCE,
+            GLYPH_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".glyph").withStyle(Style.EMPTY.withColor(GLYPH_COLOR)),
+            ModAttributes.GLYPH_SPELL_POWER,
+            ModAttributes.GLYPH_MAGIC_RESIST,
+            sound(SoundEvents.AMETHYST_BLOCK_CHIME),
+            GLYPH_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

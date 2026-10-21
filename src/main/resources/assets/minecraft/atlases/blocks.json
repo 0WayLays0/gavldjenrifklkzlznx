@@ -13,7 +13,8 @@
         "arcanes_errethys": "arcanes_oublies:item/scroll_palettes/errethys",
         "arcanes_physical": "arcanes_oublies:item/scroll_palettes/physical",
         "arcanes_boss": "arcanes_oublies:item/scroll_palettes/boss",
-        "arcanes_rune": "arcanes_oublies:item/scroll_palettes/rune"
+        "arcanes_rune": "arcanes_oublies:item/scroll_palettes/rune",
+        "arcanes_glyph": "arcanes_oublies:item/scroll_palettes/glyph"
       }
     }
   ]

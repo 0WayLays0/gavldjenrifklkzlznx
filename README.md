@@ -4,7 +4,7 @@ Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.21.1, NeoForge 21.1.221+
 La dernière version pour Minecraft 1.20.1 (Forge) est la 0.9.0 (commit `6359b13` de l'historique).
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss et Magie Runique
+## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss, Magie Runique et Magie de Glyphe
 
 Quatre nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
@@ -224,10 +224,57 @@ Livre : **Codex des Runes Anciennes** (couvertures de pierre grise gravée, cerc
 gemme bleu glacier). Focus de l'école : briques de pierre sculptées. Les runes sont dessinées pour l'addon (aucun
 alphabet réel).
 
+### Magie de Glyphe
+
+Des glyphes **élémentaires écrits dans la lumière**, en temps réel : le lanceur trace le glyphe dans l'air devant lui
+(on voit la plume de lumière dessiner chaque trait), et le sort part dès que le glyphe est terminé. Six éléments, six
+glyphes dessinés pour l'addon : **Feu**, **Givre**, **Orage**, **Marée**, **Vent** et **Pierre**. Rien de gravé, rien
+qui dure dans le sol comme la Magie Runique : ici tout est instantané, élémentaire, et se combine.
+
+**Marques et réactions** : chaque coup inscrit la marque de son élément sur la victime (son glyphe flotte au-dessus de
+sa tête pendant 6 s). Un glyphe d'un **autre** élément qui la frappe efface la marque et déclenche la réaction des
+deux éléments (son nom s'affiche à l'écran du lanceur) :
+
+| Réaction | Éléments | Effet |
+|---|---|---|
+| **Fonte** | Feu + Givre | Le coup fait 60 % de dégâts en plus. |
+| **Surcharge** | Feu + Orage | Explosion autour de la victime : dégâts et projection. |
+| **Vapeur** | Feu + Marée | Colonne de vapeur 4 s : dégâts et Cécité. |
+| **Tempête de feu** | Feu + Vent | Tornade de flammes 4 s : dégâts, brûlure, aspiration. |
+| **Magma** | Feu + Pierre | Mare de lave 4 s : dégâts, brûlure, ralentissement. |
+| **Supraconduction** | Givre + Orage | Décharge glacée autour : dégâts et Faiblesse II. |
+| **Gel** | Givre + Marée | La victime est prise dans un bloc de glace 2,5 s (ni marche ni saut). |
+| **Blizzard** | Givre + Vent | Tourbillon de neige 4 s : dégâts, ralentissement, gel. |
+| **Brisure** | Givre + Pierre | Le coup fait le double de dégâts (brise aussi le Gel). |
+| **Électrocution** | Orage + Marée | La foudre saute sur les ennemis autour (4 blocs) et les immobilise. |
+| **Orage** | Orage + Vent | Nuage d'orage 4 s : un éclair toutes les 0,5 s sur un ennemi dedans. |
+| **Magnétisme** | Orage + Pierre | Les ennemis autour (6 blocs) sont attirés sur la victime. |
+| **Typhon** | Marée + Vent | Trombe d'eau 4 s qui aspire et soulève les ennemis. |
+| **Bourbier** | Marée + Pierre | Mare de boue 4 s : ralentissement IV et Faiblesse. |
+| **Tempête de sable** | Vent + Pierre | Tourbillon de sable 4 s : dégâts et Cécité. |
+
+| Sort | Effet |
+|---|---|
+| **Glyphe du Feu** (Fire Glyph) | Le glyphe de la flamme lance 3 à 6 comètes de feu l'une après l'autre ; elles embrasent ce qu'elles touchent. |
+| **Glyphe du Givre** (Frost Glyph) | Le flocon éclate en un éventail de 5 à 8 aiguilles de glace qui traversent chacune un ennemi et le ralentissent. |
+| **Glyphe de l'Orage** (Storm Glyph) | La foudre jaillit vers l'ennemi visé puis bondit d'ennemi en ennemi (3 à 5). |
+| **Glyphe de la Marée** (Tide Glyph) | Un mur d'eau roule devant le lanceur en un large arc (8 à 12 blocs), repousse les ennemis et éteint les flammes. |
+| **Glyphe du Vent** (Gale Glyph) | Une bourrasque en arc étroit (11 blocs) projette les ennemis en l'air. |
+| **Glyphe de la Pierre** (Stone Glyph) | Un rocher lancé en cloche, qui éclate à l'impact (2,5 blocs). |
+| **Sceau élémentaire** (Elemental Seal) | Les six glyphes tournent autour du lanceur (12 à 22 s) et lancent tour à tour leur trait sur l'ennemi le plus proche : les réactions s'enchaînent toutes seules. |
+| **Écriture élémentaire** (Elemental Script) | Une ligne de 4 à 6 glyphes s'écrit au sol, chacun dans l'élément suivant, et chacun entre en éruption dès qu'il est écrit. |
+| **Résonance des glyphes** (Glyph Resonance) | Toutes les marques des ennemis autour (16 blocs) éclatent à la fois ; leur élément rejaillit sur les voisins et déclenche leurs propres marques. |
+| **Glyphe Primordial** (Primordial Glyph, ultime) | Un grand glyphe s'écrit dans le ciel : anneau d'or, les six glyphes, l'étoile qui les relie ; puis chaque élément abat son trait à tour de rôle sur les ennemis en dessous (14 blocs), toutes les 0,2 s. |
+
+Livre : **Codex des Six Encres** (cuir bleu nuit, étoile du Glyphe Primordial dorée à la feuille sur la couverture,
+une goutte de chaque encre, opale). Focus de l'école : plume. Les glyphes sont dessinés pour l'addon : le jeu et les
+icônes (`tools/glyph_assets.py`) utilisent les mêmes tracés.
+
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
 (`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre, `tools/errethys_assets.py`
 pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` pour Caractéristique Physique,
-`tools/boss_assets.py` pour la Magie de Boss, `tools/rune_assets.py` pour la Magie Runique).
+`tools/boss_assets.py` pour la Magie de Boss, `tools/rune_assets.py` pour la Magie Runique, `tools/glyph_assets.py`
+pour la Magie de Glyphe).
 
 ## Récupérer le mod
 
@@ -248,7 +295,8 @@ Dans le dossier `mods` (client et serveur), à côté de :
 
 - Le code est dans `src/main/java/com/waylays/arcanes`.
 - Textures, modèles d'objets et animations des techniques : modifier `tools/gen_assets.py` (ou `explosion_assets.py`,
-  `book_assets.py`, `errethys_assets.py`, `physical_assets.py`, `boss_assets.py`) puis lancer
+  `book_assets.py`, `errethys_assets.py`, `physical_assets.py`, `boss_assets.py`, `rune_assets.py`, `glyph_assets.py`)
+  puis lancer
   `python3 tools/gen_assets.py` (Pillow).
   Une texture faite à la main peut aussi remplacer directement le PNG du même nom.
 - Animations des techniques et des lanceurs de Magie de Boss : `tools/physical_animations.py` et
