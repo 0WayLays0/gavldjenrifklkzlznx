@@ -4,17 +4,21 @@ Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.21.1, NeoForge 21.1.221+
 La dernière version pour Minecraft 1.20.1 (Forge) est la 0.9.0 (commit `6359b13` de l'historique).
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique et Magie de Boss
+## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss et Magie Runique
 
 Quatre nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
 12 pour le Grimoire Vivant), plus l'école d'invocation Errethys (5 sorts, pas encore de livre) et les techniques de
 combat de Caractéristique Physique (37 techniques pour 9 styles d'armes, ce n'est pas de la magie).
 
-**Onglets créatifs** : un onglet par école (« Arcanes Oubliés : Or », « … : Explosion », « … : Livre »,
-« … : Errethys », « … : Caractéristique Physique », « … : Magie de Boss »), côte à côte. Chacun contient le livre de
-l'école puis le parchemin de chacun de ses sorts à tous les niveaux, dans l'ordre (style par style pour
-Caractéristique Physique).
+**Onglet créatif** : un seul onglet « Arcanes Oubliés », rangé école par école (le livre de l'école puis le parchemin
+de chacun de ses sorts à tous les niveaux, dans l'ordre ; style par style pour Caractéristique Physique). Une colonne de
+boutons à gauche de l'inventaire (toutes les écoles, puis une par école) n'affiche qu'une école à la fois.
+
+**Parchemins** : ce sont les parchemins d'Iron's Spells, seule la couleur change d'une école à l'autre (comme les
+parchemins de feu, de glace, etc. d'Iron's). La licence d'Iron's interdit de reprendre ses images : l'addon ne
+contient que les palettes de couleurs, et le jeu recolore lui-même le parchemin d'Iron's au chargement
+(`tools/scroll_assets.py`).
 
 **Invocations** (Sentinelles d'Or, Bibliothèque Interdite, Pile Volante, Dragon d'Origami et tous les sorts
 d'Errethys) : relancer le sort renvoie ses invocations (relance d'Iron's, instantanée et gratuite, visible sur
@@ -196,10 +200,34 @@ poings au sol, mains en avant pour le rayon, bras écartés pour la prison).
 **Option staff** : la durée d'avertissement se règle dans `<monde>/serverconfig/arcanes_oublies-server.toml`,
 section `[boss]`, `warningTicks` (70 ticks = 3,5 s par défaut, de 40 à 200).
 
+### Magie Runique
+
+Des runes **gravées** dans le sol, dans la pierre et dans les armes. On les pose à l'avance et elles agissent dans la
+durée : la moitié protège et soigne, l'autre moitié frappe. Les runes brillent en bleu glacier dans de la deepslate
+taillée (de vrais blocs de Minecraft assemblés en pierres levées et en murs). Rien à voir avec la Magie de Boss : ce
+sont des sorts de joueur, sans compte à rebours.
+
+| Sort | Effet |
+|---|---|
+| **Rune de Garde** (Ward Rune, soutien) | Un cercle de runes gravé aux pieds du lanceur, sous un rideau de lumière ; ses alliés à l'intérieur ont Résistance (II au niveau 4) pendant 8 à 14 s. |
+| **Pierre de Guérison** (Mending Runestone, soutien) | Une pierre levée aux runes vert d'eau surgit à l'endroit visé ; toutes les 2 s elle soigne les alliés autour d'elle (5,5 blocs). Une seule par lanceur. |
+| **Rune Tranchante** (Edge Rune, soutien) | Une rune gravée sur l'arme du lanceur et des alliés proches (6 blocs) : chaque coup au corps à corps (arme, poing, technique de combat) fait des dégâts en plus, 24 à 40 s. |
+| **Sentier Runique** (Runic Path, soutien) | Un chemin de dalles runiques qui s'allument en vague devant le lanceur (10 à 16 blocs) : Vitesse II (III au niveau 5) et Saut pour les alliés dessus. |
+| **Mur Runique** (Runic Bulwark, soutien) | Un arc de dalles de pierre gravées jaillit du sol devant le lanceur : solide, il arrête les passants, les flèches et les sorts, puis s'effondre (7 à 11 s). |
+| **Rune Piège** (Snare Rune) | Une petite rune qui brille à peine, posée à l'endroit visé ; le premier ennemi qui marche dessus la fait éclater en pics de pierre (dégâts, ralentissement, projection). Trois au plus à la fois. |
+| **Éclats Runiques** (Rune Shards) | Un éventail de 3 à 5 éclats de pierre gravés ; chacun traverse un ennemi avant de se briser. |
+| **Rune de Pétrification** (Petrifying Rune) | La pierre monte le long des jambes de la cible : ni marche ni saut pendant 3 à 5 s, la pierre la broie, puis vole en éclats en la blessant une dernière fois. |
+| **Éruption de Menhirs** (Menhir Surge) | Une ligne de menhirs gravés jaillit du sol l'un après l'autre droit devant le lanceur, projetant et blessant ce qui se trouve dessus. Un mur ou une falaise arrête la ligne. |
+| **Cercle des Anciens** (Circle of the Elders, ultime) | Huit grandes pierres runiques s'élèvent en cercle autour du lanceur (8 blocs) : chaque seconde, ses alliés à l'intérieur sont soignés et protégés, et des éclairs runiques frappent jusqu'à 6 ennemis à l'intérieur. |
+
+Livre : **Codex des Runes Anciennes** (couvertures de pierre grise gravée, cercle de runes lumineux, coins de fer,
+gemme bleu glacier). Focus de l'école : briques de pierre sculptées. Les runes sont dessinées pour l'addon (aucun
+alphabet réel).
+
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
 (`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre, `tools/errethys_assets.py`
 pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` pour Caractéristique Physique,
-`tools/boss_assets.py` pour la Magie de Boss).
+`tools/boss_assets.py` pour la Magie de Boss, `tools/rune_assets.py` pour la Magie Runique).
 
 ## Récupérer le mod
 

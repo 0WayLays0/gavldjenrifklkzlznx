@@ -29,6 +29,9 @@ Ordre de développement :
  11. Caractéristique Physique (techniques de combat, pas de la magie) -
      demandée en plus
  12. Magie de Boss (attaques de boss annoncées au sol) - demandée en plus
+ 13. Magie Runique (runes gravées, moitié soutien, moitié dégâts) - demandée
+     en plus
+ 14. Magie de Glyphe (glyphes élémentaires tracés dans l'air) - prévue
 
 
 ================================================================================
@@ -559,3 +562,33 @@ addons connus. À vérifier avant de se lancer.
 
 La liste peut changer : si un sort ne te plaît pas, on le remplace ici
 avant de le coder.
+
+
+================================================================================
+13. MAGIE RUNIQUE (runes gravées)                                [~] EN TEST
+================================================================================
+Des runes gravées dans le sol, la pierre et les armes, posées à l'avance et
+qui agissent dans la durée. Moitié soutien, moitié dégâts. Livre : Codex des
+Runes Anciennes. Focus : briques de pierre sculptées.
+
+ 1. Ward Rune          [~] SOUTIEN - Cercle gravé sous un rideau de lumière :
+                           Résistance pour les alliés à l'intérieur.
+ 2. Mending Runestone  [~] SOUTIEN - Pierre levée qui soigne les alliés autour
+                           d'elle toutes les 2 s.
+ 3. Edge Rune          [~] SOUTIEN - Rune sur les armes du lanceur et des
+                           alliés proches : dégâts en plus au corps à corps.
+ 4. Runic Path         [~] SOUTIEN - Chemin de dalles runiques : Vitesse et
+                           Saut pour les alliés qui marchent dessus.
+ 5. Runic Bulwark      [~] SOUTIEN - Arc de dalles de pierre solides qui
+                           arrête passants, flèches et sorts.
+ 6. Snare Rune         [~] Rune piège : pics de pierre sous le premier ennemi
+                           qui marche dessus (3 à la fois).
+ 7. Rune Shards        [~] Éventail d'éclats de pierre gravés qui traversent
+                           un ennemi chacun.
+ 8. Petrifying Rune    [~] La pierre monte aux jambes de la cible (immobile),
+                           puis vole en éclats en la blessant.
+ 9. Menhir Surge       [~] Ligne de menhirs qui jaillissent l'un après l'autre
+                           et projettent ce qui est dessus.
+10. Circle of Elders   [~] ULTIME - Huit pierres runiques en cercle : soin et
+                           protection des alliés, éclairs runiques sur les
+                           ennemis à l'intérieur.
