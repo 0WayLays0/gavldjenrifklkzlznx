@@ -112,6 +112,8 @@ public final class ClientSmokeTest {
     /** The last target dummy, cleared before the next one so they do not pile up in front of the camera. */
     private static Husk lastDummy;
     private static final AtomicInteger failures = new AtomicInteger();
+    /** A held (continuous) spell being photographed: it is held on until the last picture. */
+    private static volatile AbstractSpell held;
     /** The spell being photographed and the tick it was cast. */
     private static String shotName;
     /** Where the photographed spells are cast, once it is built. */
@@ -217,6 +219,8 @@ public final class ClientSmokeTest {
             java.util.UUID id = mc.player.getUUID();
             boolean alone = shotName != null;
             server.execute(() -> castOnServer(server, id, spell, alone));
+            // A held spell photographed is held on until the last picture, as a player would
+            held = alone && spell.getCastType() == CastType.CONTINUOUS ? spell : null;
             if (spell instanceof PhysicalSkill || spell instanceof BossSpell) {
                 // Play the move's body animation on the real player, as Iron's does when it starts a cast
                 try {
@@ -226,6 +230,16 @@ public final class ClientSmokeTest {
                     ArcanesOublies.LOGGER.error("[SmokeTest] FAIL animating {}", spell.getSpellId(), t);
                 }
             }
+        }
+        AbstractSpell holding = held;
+        if (holding != null && ticks - shotCastTick <= SHOT_DELAYS[SHOT_DELAYS.length - 1]) {
+            java.util.UUID id = mc.player.getUUID();
+            server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayer(id);
+                if (player != null) {
+                    holding.onServerCastTick(player.serverLevel(), SPELL_LEVEL, player, MagicData.getPlayerMagicData(player));
+                }
+            });
         }
         if (shotName != null && mc.player != null) {
             // Seen from a little to the right and looking down, then from the left, then looking up over the caster

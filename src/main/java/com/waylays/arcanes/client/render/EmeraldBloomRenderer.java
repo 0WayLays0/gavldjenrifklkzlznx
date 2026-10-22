@@ -42,7 +42,7 @@ public class EmeraldBloomRenderer extends EntityRenderer<EmeraldBloom> {
             poseStack.popPose();
         }
         // The heart
-        Vec3 heart = new Vec3(0, .6f + 1.1f * open + .1f * Mth.sin(age * .1f), 0);
+        Vec3 heart = new Vec3(0, .4f + 2.3f * open + .1f * Mth.sin(age * .1f), 0);
         poseStack.pushPose();
         poseStack.translate(heart.x, heart.y, heart.z);
         poseStack.mulPose(Axis.YP.rotationDegrees(age * 2));
