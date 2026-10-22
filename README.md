@@ -4,7 +4,7 @@ Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.21.1, NeoForge 21.1.221+
 La dernière version pour Minecraft 1.20.1 (Forge) est la 0.9.0 (commit `6359b13` de l'historique).
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss, Magie Runique, Magie de Glyphe, Magie des Jetons, Magie de Mousse, Cuivre et Rouille et Magie des Murs
+## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss, Magie Runique, Magie de Glyphe, Magie des Jetons, Magie de Mousse, Cuivre et Rouille, Magie des Murs et Magie des Pierres Précieuses
 
 Quatre nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
@@ -345,6 +345,31 @@ construction ni là où le lanceur n'a pas le droit de construire, et à la fin 
 
 Livre : **Codex des Remparts**. Focus : les trois briques de pierre.
 
+### Magie des Pierres Précieuses
+
+Cinq gemmes taillées, chacune avec sa nature : le **rubis** brûle (la lumière concentrée), le **lapis** scelle (le
+ciel nocturne et ses étoiles d'or), le **diamant** réfracte et endure, l'**améthyste** résonne, l'**émeraude**
+soigne. Les gemmes sont de vrais solides taillés dessinés en verre translucide (brillant, taille émeraude, pointes de
+cristal) dont les facettes s'allument tour à tour, avec un cœur lumineux et des éclats qui scintillent ; chaque sort
+s'appelle avec le **sceau du joaillier** (le plan d'une pierre taillée) qui brûle au sol dans la couleur de sa gemme.
+Le rubis et le diamant se combinent : un Rayon de Rubis visé à travers un Prisme de Diamant se divise en trois.
+
+| Sort | Effet |
+|---|---|
+| **Rayon de Rubis** (Ruby Ray) | Maintenu : un rubis tourne devant la main et déverse un rayon rouge (24 blocs) qui traverse et brûle tout ce qui est sur sa ligne. À travers un Prisme de Diamant, il se divise en trois rayons qui cherchent les ennemis autour du prisme. |
+| **Cœur Ardent** (Burning Heart) | Un rubis lancé se plante dans l'ennemi (ou le sol), bat trois fois en brûlant autour de lui, puis éclate en éclats en fusion (4,5 blocs). |
+| **Sceau de Lapis** (Lapis Seal) | Quatre tablettes de lapis à runes d'or entourent l'ennemi visé et l'enchaînent de lumière dorée : ni sort ni mouvement (4 à 9 s), puis le sceau éclate. |
+| **Constellation de Lapis** (Lapis Constellation) | Sept étoiles de lapis tournent autour du lanceur, reliées comme une constellation ; chacune fond sur un ennemi qui approche (8 blocs). |
+| **Prisme de Diamant** (Diamond Prism) | Un grand diamant flotte au-dessus de l'endroit visé et frappe chaque seconde jusqu'à trois ennemis de rayons arc-en-ciel ; il divise le Rayon de Rubis (deux prismes à la fois). |
+| **Carapace de Diamant** (Diamond Shell) | Douze plaques de diamant autour du lanceur : chaque coup perd 60 % de sa force sur une plaque, qui file frapper l'agresseur ; à la fin le reste éclate sur les ennemis. |
+| **Résonance d'Améthyste** (Amethyst Resonance) | Des grappes d'améthyste jaillissent en cercle et sonnent trois fois : chaque onde blesse et étourdit les ennemis (8 blocs) et brise leurs tirs. |
+| **Géode** (Geode) | Une géode (basalte, calcite, améthyste) se referme autour de l'ennemi visé, ouverte côté lanceur ; ses cristaux poussent vers l'intérieur et le transpercent, puis elle éclate. |
+| **Floraison d'Émeraude** (Emerald Bloom) | Une fleur d'émeraudes soigne chaque seconde le lanceur et ses alliés (8 blocs) et retire un mal à chacun ; à la fin, Régénération et Absorption. |
+| **Couronne des Cinq Joyaux** (Crown of the Five Gems, ultime) | Un pentagramme et cinq grandes gemmes autour du lanceur : pendant 8 s le rubis brûle, le lapis scelle, le diamant protège, l'améthyste résonne, l'émeraude soigne ; puis elles fusionnent en une gemme prismatique qui **foudroie l'endroit visé** d'un rayon de toutes les couleurs. |
+
+Livre : **Codex du Joaillier** (cuir violet, cinq gemmes serties). Focus : diamant, émeraude, éclat d'améthyste,
+lapis-lazuli.
+
 ### Rituels (sorts de groupe)
 
 Ce n'est pas une école : des rituels à plusieurs, lents et spectaculaires. Ils se font avec la **Craie rituelle**
@@ -382,7 +407,7 @@ Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par 
 pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` pour Caractéristique Physique,
 `tools/boss_assets.py` pour la Magie de Boss, `tools/rune_assets.py` pour la Magie Runique, `tools/glyph_assets.py`
 pour la Magie de Glyphe, `tools/token_assets.py` pour la Magie des Jetons à partir de `tools/models/soul_token.bbmodel`,
-`tools/verdigris_assets.py` pour la Magie de Mousse, Cuivre et Rouille, `tools/wall_assets.py` pour la Magie des Murs).
+`tools/verdigris_assets.py` pour la Magie de Mousse, Cuivre et Rouille, `tools/wall_assets.py` pour la Magie des Murs, `tools/gem_assets.py` pour la Magie des Pierres Précieuses).
 
 ## Récupérer le mod
 

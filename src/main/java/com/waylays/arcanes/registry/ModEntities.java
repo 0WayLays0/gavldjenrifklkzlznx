@@ -69,6 +69,19 @@ import com.waylays.arcanes.entity.ritual.Meteor;
 import com.waylays.arcanes.entity.ritual.RitualDome;
 import com.waylays.arcanes.entity.ritual.RitualPortal;
 import com.waylays.arcanes.entity.ritual.StormCloud;
+import com.waylays.arcanes.entity.gem.GemSigil;
+import com.waylays.arcanes.entity.gem.GemShatter;
+import com.waylays.arcanes.entity.gem.RubyRay;
+import com.waylays.arcanes.entity.gem.RubyHeart;
+import com.waylays.arcanes.entity.gem.GemShard;
+import com.waylays.arcanes.entity.gem.DiamondPrism;
+import com.waylays.arcanes.entity.gem.DiamondShell;
+import com.waylays.arcanes.entity.gem.LapisSeal;
+import com.waylays.arcanes.entity.gem.LapisConstellation;
+import com.waylays.arcanes.entity.gem.AmethystResonance;
+import com.waylays.arcanes.entity.gem.AmethystGeode;
+import com.waylays.arcanes.entity.gem.EmeraldBloom;
+import com.waylays.arcanes.entity.gem.GemCrown;
 import com.waylays.arcanes.entity.wall.BrickBolt;
 import com.waylays.arcanes.entity.wall.BrickStorm;
 import com.waylays.arcanes.ritual.RitualCircle;
@@ -340,6 +353,32 @@ public final class ModEntities {
             EntityType.Builder.<WallPiece>of(WallPiece::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<Citadel>> CITADEL = register("citadel",
             EntityType.Builder.<Citadel>of(Citadel::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GemSigil>> GEM_SIGIL = register("gem_sigil",
+            EntityType.Builder.<GemSigil>of(GemSigil::new, MobCategory.MISC).sized(.5f, .1f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GemShatter>> GEM_SHATTER = register("gem_shatter",
+            EntityType.Builder.<GemShatter>of(GemShatter::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RubyRay>> RUBY_RAY = register("ruby_ray",
+            EntityType.Builder.<RubyRay>of(RubyRay::new, MobCategory.MISC).sized(.4f, .4f).clientTrackingRange(12).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RubyHeart>> RUBY_HEART = register("ruby_heart",
+            EntityType.Builder.<RubyHeart>of(RubyHeart::new, MobCategory.MISC).sized(.4f, .4f).clientTrackingRange(10).updateInterval(1));
+    public static final DeferredHolder<EntityType<?>, EntityType<GemShard>> GEM_SHARD = register("gem_shard",
+            EntityType.Builder.<GemShard>of(GemShard::new, MobCategory.MISC).sized(.3f, .3f).clientTrackingRange(10).updateInterval(1));
+    public static final DeferredHolder<EntityType<?>, EntityType<DiamondPrism>> DIAMOND_PRISM = register("diamond_prism",
+            EntityType.Builder.<DiamondPrism>of(DiamondPrism::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<DiamondShell>> DIAMOND_SHELL = register("diamond_shell",
+            EntityType.Builder.<DiamondShell>of(DiamondShell::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(2).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<LapisSeal>> LAPIS_SEAL = register("lapis_seal",
+            EntityType.Builder.<LapisSeal>of(LapisSeal::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<LapisConstellation>> LAPIS_CONSTELLATION = register("lapis_constellation",
+            EntityType.Builder.<LapisConstellation>of(LapisConstellation::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(2).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<AmethystResonance>> AMETHYST_RESONANCE = register("amethyst_resonance",
+            EntityType.Builder.<AmethystResonance>of(AmethystResonance::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<AmethystGeode>> AMETHYST_GEODE = register("amethyst_geode",
+            EntityType.Builder.<AmethystGeode>of(AmethystGeode::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<EmeraldBloom>> EMERALD_BLOOM = register("emerald_bloom",
+            EntityType.Builder.<EmeraldBloom>of(EmeraldBloom::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GemCrown>> GEM_CROWN = register("gem_crown",
+            EntityType.Builder.<GemCrown>of(GemCrown::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<Rampart>> RAMPART = register("rampart",
             EntityType.Builder.<Rampart>of(Rampart::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<BrickStorm>> BRICK_STORM = register("brick_storm",

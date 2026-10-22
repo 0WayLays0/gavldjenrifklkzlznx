@@ -41,6 +41,8 @@ PALETTES = {
     "verdigris": ["5fa88a", "74bf9f", "9ad8bc", "3d7a62", "4e8f74", "d8814a", "a0451e", "6a2a10", "f6b278", "d8814a", "8a4a22"],
     # Grey stone paper, the writing in moss green, stone brick rod ends
     "wall": ["8e8d8e", "a3a2a3", "bcbbbc", "626162", "777677", "9cc05a", "5c7834", "3a4e20", "c9c8c9", "8a898a", "4e4d4e"],
+    # Deep violet paper, the writing in ruby, gold rod ends
+    "gem": ["5a3a78", "6e4a90", "8a64aa", "3a2450", "4a3064", "e01848", "a01034", "60081c", "f2c33c", "c4961e", "7a5a10"],
 }
 
 

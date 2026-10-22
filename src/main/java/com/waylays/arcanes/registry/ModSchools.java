@@ -223,6 +223,26 @@ public final class ModSchools {
             WALL_MAGIC
     ));
 
+    /**
+     * Gem Magic: five cut gems, each with its own nature. The ruby burns (focused light), the lapis seals (the night
+     * sky and its golden stars), the diamond refracts and endures, the amethyst resonates, the emerald heals; the
+     * crown of the five unites them.
+     */
+    public static final ResourceLocation GEM_RESOURCE = ArcanesOublies.id("gem");
+    public static final TagKey<Item> GEM_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("gem_focus"));
+    public static final ResourceKey<DamageType> GEM_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("gem_magic"));
+    public static final int GEM_COLOR = 0xE0457B;
+
+    public static final DeferredHolder<SchoolType, SchoolType> GEM = SCHOOLS.register(GEM_RESOURCE.getPath(), () -> new SchoolType(
+            GEM_RESOURCE,
+            GEM_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".gem").withStyle(Style.EMPTY.withColor(GEM_COLOR)),
+            ModAttributes.GEM_SPELL_POWER,
+            ModAttributes.GEM_MAGIC_RESIST,
+            sound(SoundEvents.AMETHYST_BLOCK_RESONATE),
+            GEM_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

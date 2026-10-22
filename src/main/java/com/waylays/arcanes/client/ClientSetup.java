@@ -41,6 +41,19 @@ import com.waylays.arcanes.client.render.RitualDomeRenderer;
 import com.waylays.arcanes.client.render.RitualPortalRenderer;
 import com.waylays.arcanes.client.render.StormCloudRenderer;
 import com.waylays.arcanes.client.render.CitadelRenderer;
+import com.waylays.arcanes.client.render.GemSigilRenderer;
+import com.waylays.arcanes.client.render.GemShatterRenderer;
+import com.waylays.arcanes.client.render.RubyRayRenderer;
+import com.waylays.arcanes.client.render.RubyHeartRenderer;
+import com.waylays.arcanes.client.render.GemShardRenderer;
+import com.waylays.arcanes.client.render.DiamondPrismRenderer;
+import com.waylays.arcanes.client.render.DiamondShellRenderer;
+import com.waylays.arcanes.client.render.LapisSealRenderer;
+import com.waylays.arcanes.client.render.LapisConstellationRenderer;
+import com.waylays.arcanes.client.render.AmethystResonanceRenderer;
+import com.waylays.arcanes.client.render.AmethystGeodeRenderer;
+import com.waylays.arcanes.client.render.EmeraldBloomRenderer;
+import com.waylays.arcanes.client.render.GemCrownRenderer;
 import com.waylays.arcanes.client.render.RampartRenderer;
 import com.waylays.arcanes.client.render.WallImpactRenderer;
 import com.waylays.arcanes.client.render.WallPieceRenderer;
@@ -200,6 +213,19 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.BRICK_STORM.get(), BrickStormRenderer::new);
         event.registerEntityRenderer(ModEntities.WALL_SIGIL.get(), WallSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.WALL_IMPACT.get(), WallImpactRenderer::new);
+        event.registerEntityRenderer(ModEntities.GEM_SIGIL.get(), GemSigilRenderer::new);
+        event.registerEntityRenderer(ModEntities.GEM_SHATTER.get(), GemShatterRenderer::new);
+        event.registerEntityRenderer(ModEntities.RUBY_RAY.get(), RubyRayRenderer::new);
+        event.registerEntityRenderer(ModEntities.RUBY_HEART.get(), RubyHeartRenderer::new);
+        event.registerEntityRenderer(ModEntities.GEM_SHARD.get(), GemShardRenderer::new);
+        event.registerEntityRenderer(ModEntities.DIAMOND_PRISM.get(), DiamondPrismRenderer::new);
+        event.registerEntityRenderer(ModEntities.DIAMOND_SHELL.get(), DiamondShellRenderer::new);
+        event.registerEntityRenderer(ModEntities.LAPIS_SEAL.get(), LapisSealRenderer::new);
+        event.registerEntityRenderer(ModEntities.LAPIS_CONSTELLATION.get(), LapisConstellationRenderer::new);
+        event.registerEntityRenderer(ModEntities.AMETHYST_RESONANCE.get(), AmethystResonanceRenderer::new);
+        event.registerEntityRenderer(ModEntities.AMETHYST_GEODE.get(), AmethystGeodeRenderer::new);
+        event.registerEntityRenderer(ModEntities.EMERALD_BLOOM.get(), EmeraldBloomRenderer::new);
+        event.registerEntityRenderer(ModEntities.GEM_CROWN.get(), GemCrownRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_CIRCLE.get(), RitualCircleRenderer::new);
         event.registerEntityRenderer(ModEntities.METEOR.get(), MeteorRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_DOME.get(), RitualDomeRenderer::new);
@@ -237,6 +263,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.SOUL_LEDGER.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.RUSTED_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.RAMPART_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.JEWELLERS_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }

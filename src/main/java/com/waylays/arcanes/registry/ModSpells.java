@@ -120,6 +120,16 @@ import com.waylays.arcanes.spells.verdigris.RustSpell;
 import com.waylays.arcanes.spells.verdigris.StranglingVinesSpell;
 import com.waylays.arcanes.spells.verdigris.SunkenTempleSpell;
 import com.waylays.arcanes.spells.verdigris.TopplingWallSpell;
+import com.waylays.arcanes.spells.gem.RubyRaySpell;
+import com.waylays.arcanes.spells.gem.RubyHeartSpell;
+import com.waylays.arcanes.spells.gem.LapisSealSpell;
+import com.waylays.arcanes.spells.gem.LapisConstellationSpell;
+import com.waylays.arcanes.spells.gem.DiamondPrismSpell;
+import com.waylays.arcanes.spells.gem.DiamondShellSpell;
+import com.waylays.arcanes.spells.gem.AmethystResonanceSpell;
+import com.waylays.arcanes.spells.gem.AmethystGeodeSpell;
+import com.waylays.arcanes.spells.gem.EmeraldBloomSpell;
+import com.waylays.arcanes.spells.gem.CrownOfGemsSpell;
 import com.waylays.arcanes.spells.wall.BastionSpell;
 import com.waylays.arcanes.spells.wall.BrickBoltSpell;
 import com.waylays.arcanes.spells.wall.BrickCageSpell;
@@ -313,6 +323,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RAMPART_CHARGE = register(new RampartChargeSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> BASTION = register(new BastionSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> FALLEN_CITADEL = register(new CitadelSpell());
+
+    // Gem Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_HEART = register(new RubyHeartSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LAPIS_SEAL = register(new LapisSealSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LAPIS_CONSTELLATION = register(new LapisConstellationSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> DIAMOND_PRISM = register(new DiamondPrismSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> DIAMOND_SHELL = register(new DiamondShellSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> AMETHYST_RESONANCE = register(new AmethystResonanceSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> AMETHYST_GEODE = register(new AmethystGeodeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> EMERALD_BLOOM = register(new EmeraldBloomSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CROWN_OF_GEMS = register(new CrownOfGemsSpell());
 
     private ModSpells() {}
 

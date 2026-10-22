@@ -620,6 +620,30 @@ Livre : Codex des Remparts. Focus : les trois briques.
 
 
 ================================================================================
+18. MAGIE DES PIERRES PRÉCIEUSES (rubis, lapis, diamant, améthyste,
+    émeraude)                                                     [~] EN TEST
+================================================================================
+Gemmes taillées en vrai relief (facettes translucides qui s'allument,
+cœur lumineux, éclats qui scintillent) ; sceau du joaillier au sol dans la
+couleur de la gemme. Livre : Codex du Joaillier. Focus : diamant, émeraude,
+éclat d'améthyste, lapis-lazuli.
+
+ 1. Ruby Ray           [~] Rayon maintenu qui traverse et brûle ; se divise
+                           en trois à travers un Prisme de Diamant.
+ 2. Burning Heart      [~] Rubis planté dans l'ennemi, bat 3 fois, éclate.
+ 3. Lapis Seal         [~] Tablettes et chaînes d'or : ni sort ni mouvement.
+ 4. Lapis Constellation[~] Sept étoiles de lapis qui fondent sur les ennemis.
+ 5. Diamond Prism      [~] Diamant flottant à rayons arc-en-ciel.
+ 6. Diamond Shell      [~] Douze plaques qui encaissent et renvoient.
+ 7. Amethyst Resonance [~] Trois ondes sonores qui blessent, étourdissent et
+                           brisent les tirs.
+ 8. Geode              [~] Géode qui enferme et transperce, puis éclate.
+ 9. Emerald Bloom      [~] Fleur d'émeraudes qui soigne et purifie.
+10. Crown of the Five  [~] ULTIME - Cinq gemmes agissent 8 s puis fusionnent
+    Gems                   et foudroient l'endroit visé.
+
+
+================================================================================
 17. RITUELS (sorts de groupe)                                     [~] EN TEST
 ================================================================================
 Pas une école : une Craie rituelle (calcite + poudre d'os + éclat
