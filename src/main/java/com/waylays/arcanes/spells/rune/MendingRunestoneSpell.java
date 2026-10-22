@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Mending Runestone: a standing stone carved with sea-green runes rises where the caster points. Every two seconds its
+ * Mending Runestone: a standing stone carved with orchid runes rises where the caster points. Every two seconds its
  * runes pulse and heal the caster's allies around it. One stone per caster: a new one sends the old one back down.
  */
 @AutoSpellConfig

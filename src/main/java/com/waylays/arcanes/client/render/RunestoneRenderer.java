@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Standing stones carved with runes, built from deepslate: the smooth Mending Runestone, its sea-green runes pulsing
+ * Standing stones carved with runes, built from deepslate: the smooth Mending Runestone, its orchid runes pulsing
  * with every heal and a crown of glyphs turning over it, and the rough menhirs of the Menhir Surge, their runes
  * flaring as they burst out.
  */

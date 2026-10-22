@@ -31,8 +31,8 @@ PALETTES = {
     "physical": ["8a5a36", "9c6a42", "b07c50", "5e3a20", "74492a", "f2dcc0", "d9b48a", "b88a5a", "e0e4e8", "a8b0b8", "6c757e"],
     # Black vellum, crimson writing, gold rod ends
     "boss": ["2a1a1c", "352022", "45292c", "160d0e", "1f1314", "ff6a78", "e0283c", "a01428", "ffe08a", "e0a83a", "a06a14"],
-    # Grey stone, the runes glowing ice blue, silver rod ends
-    "rune": ["6e6a64", "807b74", "948f87", "46433f", "5a5752", "dff8ff", "8fdcff", "4aa8e0", "e6eaee", "b2b9c1", "737b85"],
+    # Grey stone, the runes glowing violet, silver rod ends
+    "rune": ["6e6a64", "807b74", "948f87", "46433f", "5a5752", "f2e6ff", "b57bff", "7a3fd8", "e6eaee", "b2b9c1", "737b85"],
     # Ivory paper, the writing in three of the six inks (flame, tide, gale), gold rod ends
     "glyph": ["d9cfb2", "ebe3cb", "f8f4e8", "a89d80", "c0b597", "ff8a3a", "3f9bff", "4fd49a", "ffe08a", "d8a840", "9a6c1c"],
 }

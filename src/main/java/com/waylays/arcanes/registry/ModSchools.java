@@ -134,7 +134,7 @@ public final class ModSchools {
     public static final ResourceLocation RUNE_RESOURCE = ArcanesOublies.id("rune");
     public static final TagKey<Item> RUNE_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("rune_focus"));
     public static final ResourceKey<DamageType> RUNE_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("rune_magic"));
-    public static final int RUNE_COLOR = 0x8FD8FF;
+    public static final int RUNE_COLOR = 0xB57BFF;
 
     public static final DeferredHolder<SchoolType, SchoolType> RUNE = SCHOOLS.register(RUNE_RESOURCE.getPath(), () -> new SchoolType(
             RUNE_RESOURCE,

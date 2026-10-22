@@ -235,9 +235,9 @@
   "spell.arcanes_oublies.slash_flurry": "Slash Flurry",
   "spell.arcanes_oublies.slash_flurry.guide": "Three cuts back and forth, then a wide level cut that pushes everyone back, all in a second. A blade adds part of its damage. Not magic.",
   "spell.arcanes_oublies.dash": "Dash",
-  "spell.arcanes_oublies.dash.guide": "A quick burst of 3 to 4 blocks the way you are already moving (back or sideways to dodge), else straight ahead. It stops dead, so it never carries further. Not magic.",
+  "spell.arcanes_oublies.dash.guide": "A quick burst of 4 to 5 blocks the way you are already moving (back or sideways to dodge), else straight ahead. It stops dead, so it never carries further. Not magic.",
   "spell.arcanes_oublies.leap": "Leap",
-  "spell.arcanes_oublies.leap.guide": "A jump from both legs, about twice as high as a normal one (2.4 to 3 blocks), keeping your run-up. Feet on the ground only. Not magic.",
+  "spell.arcanes_oublies.leap.guide": "A jump from both legs, 3 blocks high (6 at the highest level), keeping your run-up. Landing from it does not hurt. Feet on the ground only. Not magic.",
   "spell.arcanes_oublies.scythe_reap": "Scythe 1: Reap",
   "spell.arcanes_oublies.scythe_reap.guide": "Wind the scythe back, then sweep it low through everything in a wide half-circle in front of you (4.5 blocks), cutting at the legs: the victims are slowed. Long reach, slow wind-up. Hits with your weapon's damage.",
   "spell.arcanes_oublies.scythe_dance": "Scythe 2: Reaper's Dance",
@@ -280,6 +280,8 @@
   "entity.arcanes_oublies.strike_trail": "Strike Trail",
   "spell.arcanes_oublies.evade": "Evade",
   "spell.arcanes_oublies.evade.guide": "A big leap backward to get out of a fight: 6 to 8 blocks straight back from where you face, in a low arc, landing without a fall. Feet on the ground only. Not magic.",
+  "spell.arcanes_oublies.rush": "Rush",
+  "spell.arcanes_oublies.rush.guide": "Run at the enemy you are looking at (10 to 14 blocks away), steering after it as it moves, and stop right in front of it with a shoulder blow that staggers it. With no one in sight, a long low run straight ahead (7 blocks) that stops dead. Not magic.",
   "spell.arcanes_oublies.scythe_hook": "Scythe 3: Reaper's Hook",
   "spell.arcanes_oublies.scythe_hook.guide": "You bring the scythe down far in front of you so the blade hooks behind whoever stands there (up to 5.5 blocks away, a narrow cone), then drag it back: they are cut and pulled to your feet, a little slowed. Strikes with your weapon's damage.",
   "spell.arcanes_oublies.sword_disarm": "Sword 3: Disarm",
@@ -438,7 +440,7 @@
   "spell.arcanes_oublies.ward_rune": "Ward Rune",
   "spell.arcanes_oublies.ward_rune.guide": "Carve a circle of runes into the ground at your feet. A curtain of light rises from it, and your allies standing inside are shielded (Resistance) for as long as it glows.",
   "spell.arcanes_oublies.mending_runestone": "Mending Runestone",
-  "spell.arcanes_oublies.mending_runestone.guide": "A standing stone carved with sea-green runes rises where you point. Every two seconds its runes pulse and heal your allies around it. Casting it again sends the old stone back into the ground.",
+  "spell.arcanes_oublies.mending_runestone.guide": "A standing stone carved with orchid runes rises where you point. Every two seconds its runes pulse and heal your allies around it. Casting it again sends the old stone back into the ground.",
   "spell.arcanes_oublies.edge_rune": "Edge Rune",
   "spell.arcanes_oublies.edge_rune.guide": "Carve a rune into your weapon and into those of the allies around you: for a while, every blow struck in close combat deals the rune's damage on top.",
   "spell.arcanes_oublies.runic_path": "Runic Path",
@@ -547,5 +549,6 @@
   "ui.arcanes_oublies.reaction.magnetize": "Magnetize!",
   "ui.arcanes_oublies.reaction.typhoon": "Typhoon!",
   "ui.arcanes_oublies.reaction.mire": "Mire!",
-  "ui.arcanes_oublies.reaction.sandstorm": "Sandstorm!"
+  "ui.arcanes_oublies.reaction.sandstorm": "Sandstorm!",
+  "death.attack.arcanes_oublies.rush": "%1$s was run down by %2$s"
 }

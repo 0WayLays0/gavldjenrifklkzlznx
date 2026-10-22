@@ -9,7 +9,7 @@ La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt
 Quatre nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
 12 pour le Grimoire Vivant), plus l'école d'invocation Errethys (5 sorts, pas encore de livre) et les techniques de
-combat de Caractéristique Physique (37 techniques pour 9 styles d'armes, ce n'est pas de la magie).
+combat de Caractéristique Physique (38 techniques pour 9 styles d'armes, ce n'est pas de la magie).
 
 **Onglet créatif** : un seul onglet « Arcanes Oubliés », rangé école par école (le livre de l'école puis le parchemin
 de chacun de ses sorts à tous les niveaux, dans l'ordre ; style par style pour Caractéristique Physique). Une colonne de
@@ -127,9 +127,10 @@ projectiles qu'on ne peut pas ramasser et qui ne touchent jamais les alliés. Co
 | **Rafale de Coups de Poing** (Punch Flurry) | Pieds plantés, 7 directs gauche-droite depuis la garde sur tout ce qui est devant, puis un direct armé qui repousse. |
 | **Tranche** (Slash) | Une entaille en diagonale à travers tout un arc devant (3,2 blocs), à la lame ou au tranchant de la main. |
 | **Rafale de Tranches** (Slash Flurry) | Trois entailles en aller-retour puis une grande taille horizontale qui repousse, en une seconde. |
-| **Dash** | 3 à 4 blocs d'un coup dans le sens où l'on se déplace déjà (en arrière ou de côté pour esquiver), sinon droit devant ; s'arrête net. |
-| **Saut** (Leap) | Un saut environ deux fois plus haut qu'un saut normal (2,4 à 3 blocs, jamais de dégâts de chute en retombant au même niveau), en gardant l'élan ; pieds au sol seulement. |
+| **Dash** | 4 à 5 blocs d'un coup dans le sens où l'on se déplace déjà (en arrière ou de côté pour esquiver), sinon droit devant ; s'arrête net. |
+| **Saut** (Leap) | Un saut de 3 blocs de haut (6 au niveau 3), en gardant l'élan ; la retombée ne fait pas de dégâts (seule une chute plus profonde que le saut en fait) ; pieds au sol seulement. |
 | **Esquive** (Evade) | Un grand bond en arrière pour sortir d'un combat : 6 à 8 blocs, en arc bas, sans dégâts de chute ; pieds au sol seulement. |
+| **Ruée** (Rush) | Contrairement au Dash, on fonce sur l'ennemi qu'on regarde (10 à 14 blocs) en le suivant s'il bouge, et on s'arrête juste devant lui d'un coup d'épaule qui le fait chanceler. Sans personne en vue : une longue course basse droit devant (7 blocs). |
 | **Faux 1 : Fauchage** (Scythe 1: Reap) | Armé lent puis balayage au ras du sol à travers un grand demi-cercle (4,5 blocs) : ralentit les victimes. |
 | **Faux 2 : Danse de la Faucheuse** (Scythe 2: Reaper's Dance) | Une taille devant, puis un tour complet qui fauche tout autour (4,5 blocs) et projette. |
 | **Faux 3 : Crochet de la Faucheuse** (Scythe 3: Reaper's Hook) | La lame accroche les ennemis loin devant (5,5 blocs, cône étroit) et les traîne jusqu'à tes pieds. |
@@ -203,14 +204,14 @@ section `[boss]`, `warningTicks` (70 ticks = 3,5 s par défaut, de 40 à 200).
 ### Magie Runique
 
 Des runes **gravées** dans le sol, dans la pierre et dans les armes. On les pose à l'avance et elles agissent dans la
-durée : la moitié protège et soigne, l'autre moitié frappe. Les runes brillent en bleu glacier dans de la deepslate
+durée : la moitié protège et soigne, l'autre moitié frappe. Les runes brillent en violet dans de la deepslate
 taillée (de vrais blocs de Minecraft assemblés en pierres levées et en murs). Rien à voir avec la Magie de Boss : ce
 sont des sorts de joueur, sans compte à rebours.
 
 | Sort | Effet |
 |---|---|
 | **Rune de Garde** (Ward Rune, soutien) | Un cercle de runes gravé aux pieds du lanceur, sous un rideau de lumière ; ses alliés à l'intérieur ont Résistance (II au niveau 4) pendant 8 à 14 s. |
-| **Pierre de Guérison** (Mending Runestone, soutien) | Une pierre levée aux runes vert d'eau surgit à l'endroit visé ; toutes les 2 s elle soigne les alliés autour d'elle (5,5 blocs). Une seule par lanceur. |
+| **Pierre de Guérison** (Mending Runestone, soutien) | Une pierre levée aux runes orchidée surgit à l'endroit visé ; toutes les 2 s elle soigne les alliés autour d'elle (5,5 blocs). Une seule par lanceur. |
 | **Rune Tranchante** (Edge Rune, soutien) | Une rune gravée sur l'arme du lanceur et des alliés proches (6 blocs) : chaque coup au corps à corps (arme, poing, technique de combat) fait des dégâts en plus, 24 à 40 s. |
 | **Sentier Runique** (Runic Path, soutien) | Un chemin de dalles runiques qui s'allument en vague devant le lanceur (10 à 16 blocs) : Vitesse II (III au niveau 5) et Saut pour les alliés dessus. |
 | **Mur Runique** (Runic Bulwark, soutien) | Un arc de dalles de pierre gravées jaillit du sol devant le lanceur : solide, il arrête les passants, les flèches et les sorts, puis s'effondre (7 à 11 s). |
@@ -221,7 +222,7 @@ sont des sorts de joueur, sans compte à rebours.
 | **Cercle des Anciens** (Circle of the Elders, ultime) | Huit grandes pierres runiques s'élèvent en cercle autour du lanceur (8 blocs) : chaque seconde, ses alliés à l'intérieur sont soignés et protégés, et des éclairs runiques frappent jusqu'à 6 ennemis à l'intérieur. |
 
 Livre : **Codex des Runes Anciennes** (couvertures de pierre grise gravée, cercle de runes lumineux, coins de fer,
-gemme bleu glacier). Focus de l'école : briques de pierre sculptées. Les runes sont dessinées pour l'addon (aucun
+gemme violette). Focus de l'école : briques de pierre sculptées. Les runes sont dessinées pour l'addon (aucun
 alphabet réel).
 
 ### Magie de Glyphe

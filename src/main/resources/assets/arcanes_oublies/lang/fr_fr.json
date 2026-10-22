@@ -235,9 +235,9 @@
   "spell.arcanes_oublies.slash_flurry": "Rafale de Tranches",
   "spell.arcanes_oublies.slash_flurry.guide": "Trois entailles en aller-retour, puis une grande taille à l'horizontale qui repousse tout le monde, le tout en une seconde. Une lame ajoute une part de ses dégâts. Ce n'est pas de la magie.",
   "spell.arcanes_oublies.dash": "Dash",
-  "spell.arcanes_oublies.dash.guide": "Un bond rapide de 3 à 4 blocs dans le sens où tu te déplaces déjà (en arrière ou de côté pour esquiver), sinon droit devant. Il s'arrête net, il ne t'emporte jamais plus loin. Ce n'est pas de la magie.",
+  "spell.arcanes_oublies.dash.guide": "Un bond rapide de 4 à 5 blocs dans le sens où tu te déplaces déjà (en arrière ou de côté pour esquiver), sinon droit devant. Il s'arrête net, il ne t'emporte jamais plus loin. Ce n'est pas de la magie.",
   "spell.arcanes_oublies.leap": "Saut",
-  "spell.arcanes_oublies.leap.guide": "Un saut des deux jambes, environ deux fois plus haut qu'un saut normal (2,4 à 3 blocs), en gardant ton élan. Seulement les pieds au sol. Ce n'est pas de la magie.",
+  "spell.arcanes_oublies.leap.guide": "Un saut des deux jambes, 3 blocs de haut (6 au plus haut niveau), en gardant ton élan. La retombée ne fait pas de dégâts. Seulement les pieds au sol. Ce n'est pas de la magie.",
   "spell.arcanes_oublies.scythe_reap": "Faux 1 : Fauchage",
   "spell.arcanes_oublies.scythe_reap.guide": "Tu armes la faux en arrière puis tu la balaies au ras du sol à travers tout ce qui est dans un grand demi-cercle devant toi (4,5 blocs), en fauchant les jambes : les victimes sont ralenties. Grande portée, armé lent. Frappe avec les dégâts de ton arme.",
   "spell.arcanes_oublies.scythe_dance": "Faux 2 : Danse de la Faucheuse",
@@ -280,6 +280,8 @@
   "entity.arcanes_oublies.strike_trail": "Traînée de coup",
   "spell.arcanes_oublies.evade": "Esquive",
   "spell.arcanes_oublies.evade.guide": "Un grand bond en arrière pour sortir d'un combat : 6 à 8 blocs droit derrière toi, en arc bas, sans dégâts de chute à la réception. Seulement les pieds au sol. Ce n'est pas de la magie.",
+  "spell.arcanes_oublies.rush": "Ruée",
+  "spell.arcanes_oublies.rush.guide": "Fonce sur l'ennemi que tu regardes (10 à 14 blocs), en le suivant s'il bouge, et arrête-toi juste devant lui d'un coup d'épaule qui le fait chanceler. Sans personne en vue, une longue course basse droit devant (7 blocs) qui s'arrête net. Ce n'est pas de la magie.",
   "spell.arcanes_oublies.scythe_hook": "Faux 3 : Crochet de la Faucheuse",
   "spell.arcanes_oublies.scythe_hook.guide": "Tu abats la faux loin devant toi pour que la lame accroche ceux qui s'y trouvent (jusqu'à 5,5 blocs, dans un cône étroit), puis tu la ramènes : ils sont entaillés et traînés jusqu'à tes pieds, un peu ralentis. Frappe avec les dégâts de ton arme.",
   "spell.arcanes_oublies.sword_disarm": "Épée 3 : Désarmement",
@@ -438,7 +440,7 @@
   "spell.arcanes_oublies.ward_rune": "Rune de Garde",
   "spell.arcanes_oublies.ward_rune.guide": "Grave un cercle de runes dans le sol à tes pieds. Un rideau de lumière s'en élève, et tes alliés qui s'y tiennent sont protégés (Résistance) tant qu'il brille.",
   "spell.arcanes_oublies.mending_runestone": "Pierre de Guérison",
-  "spell.arcanes_oublies.mending_runestone.guide": "Une pierre levée gravée de runes vert d'eau surgit là où tu vises. Toutes les deux secondes, ses runes pulsent et soignent tes alliés autour d'elle. La relancer renvoie l'ancienne pierre sous terre.",
+  "spell.arcanes_oublies.mending_runestone.guide": "Une pierre levée gravée de runes orchidée surgit là où tu vises. Toutes les deux secondes, ses runes pulsent et soignent tes alliés autour d'elle. La relancer renvoie l'ancienne pierre sous terre.",
   "spell.arcanes_oublies.edge_rune": "Rune Tranchante",
   "spell.arcanes_oublies.edge_rune.guide": "Grave une rune sur ton arme et sur celles des alliés autour de toi : pendant un moment, chaque coup porté au corps à corps inflige en plus les dégâts de la rune.",
   "spell.arcanes_oublies.runic_path": "Sentier Runique",
@@ -547,5 +549,6 @@
   "ui.arcanes_oublies.reaction.magnetize": "Magnétisme !",
   "ui.arcanes_oublies.reaction.typhoon": "Typhon !",
   "ui.arcanes_oublies.reaction.mire": "Bourbier !",
-  "ui.arcanes_oublies.reaction.sandstorm": "Tempête de sable !"
+  "ui.arcanes_oublies.reaction.sandstorm": "Tempête de sable !",
+  "death.attack.arcanes_oublies.rush": "%1$s a été renversé par la ruée de %2$s"
 }

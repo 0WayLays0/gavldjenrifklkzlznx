@@ -46,6 +46,28 @@ def evade_icon():
     ])
 
 
+def rush_icon():
+    """Pixel art: an arrow running right at a target, speed lines behind it, dust kicked up."""
+    return _icon([
+        "................",
+        "...........ooo..",
+        "..........owwwo.",
+        "..........ow.wo.",
+        "..........owwwo.",
+        "...........ooo..",
+        "........o.......",
+        "dd......owo.....",
+        "....ooooowwo....",
+        "ddd.owwwwwwwo...",
+        "....ooooowwo....",
+        "dd......owo.....",
+        "........o.......",
+        "..dd.dd.dd......",
+        ".dddddddddd.....",
+        "................",
+    ])
+
+
 def scythe_hook_icon():
     """Pixel art: a scythe, an arrow inside its hook pulling toward the handle."""
     pull = [
@@ -575,7 +597,7 @@ def knife_pin_icon():
     ])
 
 
-ICONS = {"evade": evade_icon, "scythe_hook": scythe_hook_icon, "sword_disarm": sword_disarm_icon,
+ICONS = {"evade": evade_icon, "rush": rush_icon, "scythe_hook": scythe_hook_icon, "sword_disarm": sword_disarm_icon,
          "dagger_finisher": dagger_finisher_icon, "hammer_concussion": hammer_concussion_icon,
          "hammer_quake": hammer_quake_icon, "hammer_ram": hammer_ram_icon, "axe_cleave": axe_cleave_icon,
          "axe_throw": axe_throw_icon, "axe_sunder": axe_sunder_icon, "spear_thrust": spear_thrust_icon,

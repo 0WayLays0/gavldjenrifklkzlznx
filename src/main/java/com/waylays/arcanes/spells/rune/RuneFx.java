@@ -19,11 +19,11 @@ import javax.annotation.Nullable;
 
 /** Shared look and rules of Rune Magic: the runes' colours, glyphs and stone chips, and who a support rune helps. */
 public final class RuneFx {
-    /** The glow of the runes: ice blue, its deep shade, silver for the bright core, sea green for the healing ones. */
-    public static final int GLOW = 0x8FD8FF;
-    public static final int DEEP = 0x2F80C8;
-    public static final int SILVER = 0xE8F2FA;
-    public static final int MEND = 0x7CF5C4;
+    /** The glow of the runes: violet, its deep shade, pale lilac for the bright core, orchid for the healing ones. */
+    public static final int GLOW = 0xB57BFF;
+    public static final int DEEP = 0x6A2FC8;
+    public static final int SILVER = 0xF2E6FF;
+    public static final int MEND = 0xF29CFF;
     public static final DustParticleOptions GLOW_DUST = dust(GLOW, 1.1f);
     public static final DustParticleOptions MEND_DUST = dust(MEND, 1.1f);
 

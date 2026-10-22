@@ -19,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 /**
- * Dash: a burst of a few steps, 3 to 4 blocks, the way the fighter is already moving (so a step back or to the side
+ * Dash: a burst of a few steps, 4 to 5 blocks, the way the fighter is already moving (so a step back or to the side
  * dodges), else straight ahead. It lasts a quarter of a second and stops dead, so it never carries further.
  */
 @AutoSpellConfig
@@ -69,8 +69,8 @@ public class DashSkill extends PhysicalSkill {
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 
-    /** 3 blocks, +0.5 per level. */
+    /** 4 blocks, +0.5 per level (5 at level 3). */
     public double getDistance(int spellLevel) {
-        return 3 + (spellLevel - 1) * .5;
+        return 4 + (spellLevel - 1) * .5;
     }
 }

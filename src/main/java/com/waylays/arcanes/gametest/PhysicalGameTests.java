@@ -7,6 +7,7 @@ import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.physical.DaggerStabsSkill;
 import com.waylays.arcanes.spells.physical.DashSkill;
 import com.waylays.arcanes.spells.physical.LeapSkill;
+import com.waylays.arcanes.spells.physical.RushSkill;
 import com.waylays.arcanes.spells.physical.PunchSkill;
 import com.waylays.arcanes.spells.physical.ScytheDanceSkill;
 import com.waylays.arcanes.spells.physical.ScytheReapSkill;
@@ -123,7 +124,7 @@ public final class PhysicalGameTests {
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_moves", timeoutTicks = 40)
-    public static void dashCoversThreeBlocksAndStops(GameTestHelper helper) {
+    public static void dashCoversFourBlocksAndStops(GameTestHelper helper) {
         ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 2, .5));
         double[] start = new double[1];
         helper.runAfterDelay(4, () -> {
@@ -132,13 +133,13 @@ public final class PhysicalGameTests {
         });
         helper.runAfterDelay(4 + DashSkill.STEPS + 10, () -> {
             double moved = stand.getZ() - start[0];
-            helper.assertTrue(moved >= 2.3 && moved <= 4.5, "the dash went " + moved + " blocks instead of about 3");
+            helper.assertTrue(moved >= 3.2 && moved <= 5.5, "the dash went " + moved + " blocks instead of about 4");
             helper.succeed();
         });
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_moves", timeoutTicks = 50)
-    public static void leapGoesAboutTwiceAsHigh(GameTestHelper helper) {
+    public static void leapGoesThreeBlocksHigh(GameTestHelper helper) {
         ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 2, 4.5));
         double[] heights = {0, 0};
         helper.runAfterDelay(4, () -> {
@@ -150,8 +151,29 @@ public final class PhysicalGameTests {
         helper.onEachTick(() -> heights[1] = Math.max(heights[1], stand.getY()));
         helper.runAfterDelay(30, () -> {
             double rise = heights[1] - heights[0];
-            helper.assertTrue(rise >= 1.8 && rise <= 3.2, "the leap rose " + rise + " blocks instead of about 2.4");
-            helper.assertTrue(Math.abs(((LeapSkill) ModSpells.LEAP.get()).getHeight(1) - 2.37) < .1, "the leap height shown is off");
+            helper.assertTrue(rise >= 2.4 && rise <= 3.6, "the leap rose " + rise + " blocks instead of about 3");
+            helper.assertTrue(((LeapSkill) ModSpells.LEAP.get()).getHeight(3) == 6, "the leap at level 3 should go 6 blocks high");
+            helper.succeed();
+        });
+    }
+
+    /** The rush runs at the creature ahead, stops in front of it and shoulders it. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "physical_moves", timeoutTicks = 50)
+    public static void rushRunsAtTheEnemyAndShouldersIt(GameTestHelper helper) {
+        ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(4.5, 2, .5));
+        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 7.5));
+        double[] start = new double[1];
+        helper.runAfterDelay(4, () -> {
+            stand.setYRot(0);
+            stand.setYHeadRot(0);
+            start[0] = stand.getZ();
+            cast(helper, ModSpells.RUSH, stand);
+        });
+        helper.runAfterDelay(4 + RushSkill.MAX_TICKS + 6, () -> {
+            double moved = stand.getZ() - start[0];
+            helper.assertTrue(moved >= 4.5, "the rush only went " + moved + " blocks towards the pig 7 blocks away");
+            helper.assertTrue(stand.distanceTo(pig) < 3, "the rush did not stop in front of the pig");
+            helper.assertTrue(hurt(pig), "the pig was not shouldered");
             helper.succeed();
         });
     }

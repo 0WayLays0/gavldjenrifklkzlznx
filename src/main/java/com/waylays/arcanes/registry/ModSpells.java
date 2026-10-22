@@ -78,6 +78,7 @@ import com.waylays.arcanes.spells.physical.LongswordParrySkill;
 import com.waylays.arcanes.spells.physical.LongswordSweepSkill;
 import com.waylays.arcanes.spells.physical.PunchFlurrySkill;
 import com.waylays.arcanes.spells.physical.PunchSkill;
+import com.waylays.arcanes.spells.physical.RushSkill;
 import com.waylays.arcanes.spells.physical.ScytheDanceSkill;
 import com.waylays.arcanes.spells.physical.ScytheHookSkill;
 import com.waylays.arcanes.spells.physical.ScytheReapSkill;
@@ -184,6 +185,7 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> DAGGER_STABS = register(new DaggerStabsSkill());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> DAGGER_FLANK = register(new DaggerFlankSkill());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> EVADE = register(new EvadeSkill());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RUSH = register(new RushSkill());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SCYTHE_HOOK = register(new ScytheHookSkill());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SWORD_DISARM = register(new SwordDisarmSkill());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> DAGGER_FINISHER = register(new DaggerFinisherSkill());

@@ -400,8 +400,9 @@ Couleur : cuir / bronze, traînées pâles, poussière
     Poing
  3. Tranche              [~] Une entaille en diagonale dans un large arc.
  4. Rafale de Tranches   [~] Trois entailles puis une grande taille.
- 5. Dash                 [~] 3 à 4 blocs d'un coup, pour esquiver ou foncer.
- 6. Saut                 [~] Environ deux fois plus haut qu'un saut normal.
+ 5. Dash                 [~] 4 à 5 blocs d'un coup, pour esquiver ou foncer.
+ 6. Saut                 [~] 3 blocs de haut (6 au niveau 3), sans dégâts
+                             de chute.
  Par arme (au choix de l'équipe RP) :
  7. Faux 1 : Fauchage    [~] Balayage bas en demi-cercle, ralentit.
  8. Faux 2 : Danse de la [~] Une taille puis un tour complet.
@@ -427,6 +428,8 @@ Couleur : cuir / bronze, traînées pâles, poussière
 29-31. Arc 1-3           [~] Flèche Téléguidée, Volée, Pluie de Flèches.
 32-34. Arbalète 1-3      [~] Carreau Perforant, Rafale, Harpon.
 35-37. Couteaux 1-3      [~] Lancer Précis, Éventail de Lames, Clouage.
+38. Ruée                 [~] Fonce sur l'ennemi visé (10 à 14 blocs) et
+                             s'arrête devant lui d'un coup d'épaule.
 
 Livre : pas encore demandé [ ]
 

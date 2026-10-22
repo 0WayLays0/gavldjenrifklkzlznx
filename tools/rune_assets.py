@@ -16,17 +16,17 @@ import gen_assets as g
 from explosion_assets import bloom, fbm
 
 # Rune palette
-NIGHT = (10, 14, 22)
+NIGHT = (16, 10, 24)
 STONE_DARK = (58, 62, 70)
 STONE = (104, 108, 116)
 STONE_LIGHT = (150, 154, 162)
 STONE_HIGH = (190, 194, 200)
-GLOW = (143, 216, 255)
-GLOW_DEEP = (47, 128, 200)
-GLOW_WHITE = (226, 248, 255)
-MEND = (124, 245, 196)
-MEND_DARK = (40, 150, 110)
-MEND_WHITE = (210, 255, 236)
+GLOW = (181, 123, 255)
+GLOW_DEEP = (106, 47, 200)
+GLOW_WHITE = (242, 230, 255)
+MEND = (242, 156, 255)
+MEND_DARK = (150, 60, 170)
+MEND_WHITE = (255, 222, 255)
 STEEL = (222, 228, 236)
 STEEL_DARK = (130, 138, 150)
 HILT = (112, 74, 44)
@@ -232,7 +232,7 @@ def _grid(img, rows, legend, ox=0, oy=0):
 
 def ward_rune_icon():
     """A ring of light on stone with a shield of runes in it."""
-    img = _icon_base((40, 72, 104), NIGHT)
+    img = _icon_base((72, 40, 104), NIGHT)
     d = ImageDraw.Draw(img)
     d.ellipse((1, 3, 14, 14), outline=GLOW_DEEP + (255,))
     d.ellipse((2, 4, 13, 13), outline=GLOW + (255,))
@@ -250,8 +250,8 @@ def ward_rune_icon():
 
 
 def mending_runestone_icon():
-    """A standing stone, sea-green runes glowing down its face, a spark of healing over it."""
-    img = _icon_base((34, 84, 70), NIGHT, 8, 9)
+    """A standing stone, orchid runes glowing down its face, a spark of healing over it."""
+    img = _icon_base((84, 34, 90), NIGHT, 8, 9)
     return _grid(img, [
         "...........m....",
         "..........mMm...",
@@ -269,12 +269,12 @@ def mending_runestone_icon():
         "..ddddddddddd...",
         "................",
         "................",
-    ], {"o": NIGHT, "H": STONE_HIGH, "L": STONE_LIGHT, "s": STONE_DARK, "m": MEND, "M": MEND_WHITE, "d": (30, 40, 36)}, 0, 1)
+    ], {"o": NIGHT, "H": STONE_HIGH, "L": STONE_LIGHT, "s": STONE_DARK, "m": MEND, "M": MEND_WHITE, "d": (36, 30, 40)}, 0, 1)
 
 
 def edge_rune_icon():
     """A sword, a rune glowing on its blade."""
-    img = _icon_base((36, 66, 96), NIGHT, 9, 7)
+    img = _icon_base((66, 36, 96), NIGHT, 9, 7)
     return _grid(img, [
         "..............o.",
         ".............oWo",
@@ -297,7 +297,7 @@ def edge_rune_icon():
 
 def runic_path_icon():
     """Rune tiles leading away to the upper right, each lit, light streaming along them."""
-    img = _icon_base((30, 60, 90), NIGHT, 6, 10)
+    img = _icon_base((60, 30, 90), NIGHT, 6, 10)
     d = ImageDraw.Draw(img)
     for i, (x, y, r) in enumerate(((3.5, 12.5, 3), (7.5, 8.5, 2.5), (11, 5, 2), (13.5, 2.5, 1.5))):
         pts = [(x, y - r), (x + r, y), (x, y + r), (x - r, y)]
@@ -313,7 +313,7 @@ def runic_path_icon():
 
 def runic_bulwark_icon():
     """A wall of carved slabs, a great rune on it, an arrow glancing off."""
-    img = _icon_base((34, 60, 86), NIGHT, 8, 10)
+    img = _icon_base((60, 34, 86), NIGHT, 8, 10)
     return _grid(img, [
         "..............w.",
         ".............w..",
@@ -336,7 +336,7 @@ def runic_bulwark_icon():
 
 def snare_rune_icon():
     """Stone spikes bursting out of a rune on the ground."""
-    img = _icon_base((40, 60, 84), NIGHT, 8, 11)
+    img = _icon_base((60, 40, 84), NIGHT, 8, 11)
     d = ImageDraw.Draw(img)
     d.ellipse((1, 10, 14, 15), outline=GLOW + (255,))
     return _grid(img, [
@@ -354,7 +354,7 @@ def snare_rune_icon():
 
 def rune_shards_icon():
     """Three carved shards flying, each trailing light."""
-    img = _icon_base((34, 64, 96), NIGHT, 6, 10)
+    img = _icon_base((64, 34, 96), NIGHT, 6, 10)
     d = ImageDraw.Draw(img)
     for (x, y) in ((10, 3), (12, 8), (8, 11)):
         for k in range(1, 6):
@@ -367,7 +367,7 @@ def rune_shards_icon():
 
 def petrifying_rune_icon():
     """A figure turned to stone up to the waist, a rune glowing under its feet."""
-    img = _icon_base((40, 60, 80), NIGHT, 8, 12)
+    img = _icon_base((60, 40, 80), NIGHT, 8, 12)
     d = ImageDraw.Draw(img)
     d.ellipse((2, 12, 13, 15), outline=GLOW + (255,))
     return _grid(img, [
@@ -389,7 +389,7 @@ def petrifying_rune_icon():
 
 def menhir_surge_icon():
     """A line of menhirs bursting out of the ground, each taller than the last."""
-    img = _icon_base((40, 64, 90), NIGHT, 10, 8)
+    img = _icon_base((64, 40, 90), NIGHT, 10, 8)
     return _grid(img, [
         "............oo..",
         "...........oLLo.",
@@ -410,7 +410,7 @@ def menhir_surge_icon():
 
 def circle_of_elders_icon():
     """A ring of standing stones seen from above, lightning leaping in it."""
-    img = _icon_base((50, 90, 130), NIGHT)
+    img = _icon_base((90, 50, 130), NIGHT)
     d = ImageDraw.Draw(img)
     d.ellipse((2, 2, 13, 13), outline=GLOW_DEEP + (255,))
     for k in range(8):
@@ -470,7 +470,7 @@ def elder_rune_codex_icon():
 
 def elder_rune_codex_model_texture():
     """64x64 texture of the 3D codex, laid out like the other books: covers of carved grey stone with a glowing rune
-    circle, iron corners, old pages, an ice-blue gem."""
+    circle, iron corners, old pages, a violet gem."""
     s = 4
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -536,7 +536,7 @@ def elder_rune_codex_model_texture():
     # Fittings: iron
     box(12, 9, 14, 11, STEEL_DARK)
     d.line((12 * s + 1, 9 * s + 1, 14 * s - 2, 9 * s + 1), fill=STEEL + (255,))
-    # Ice-blue gem
+    # Violet gem
     for y in range(9 * s, 11 * s):
         for x in range(14 * s, 16 * s):
             t = math.hypot(x - 14.8 * s, y - 9.8 * s) / (1.4 * s)
