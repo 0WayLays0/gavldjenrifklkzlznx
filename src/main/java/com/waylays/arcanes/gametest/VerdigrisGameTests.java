@@ -24,6 +24,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Husk;
+import net.minecraft.world.entity.monster.Vindicator;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -152,15 +153,15 @@ public final class VerdigrisGameTests {
         helper.succeedWhen(() -> helper.assertTrue(hurt(husk), "the vines never squeezed the husk"));
     }
 
-    /** The moss spreads under the husk and its spores choke it. */
+    /** The moss spreads under the enemy and its spores choke it (a vindicator: undead husks cannot be poisoned). */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "verdigris_spores", timeoutTicks = 60)
     public static void sporesPoisonTheEnemy(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, 1.5);
-        Husk husk = husk(helper, 4.5, 5.5);
+        Vindicator enemy = helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(4.5, 2, 5.5));
         cast(helper, ModSpells.MOSS_SPORES, caster);
         helper.succeedWhen(() -> {
-            helper.assertTrue(hurt(husk), "the spores did not hurt the husk");
-            helper.assertTrue(husk.hasEffect(MobEffects.POISON), "the husk is not poisoned");
+            helper.assertTrue(hurt(enemy), "the spores did not hurt the vindicator");
+            helper.assertTrue(enemy.hasEffect(MobEffects.POISON), "the vindicator is not poisoned");
         });
     }
 
