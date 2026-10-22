@@ -24,13 +24,18 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
 
 /**
- * Token Wave: a wave of soul tokens surging out of the ground and rolling ahead in a band, its crest of tokens
- * flipping over as it goes. Each enemy it rolls over is struck once and thrown up.
+ * Token Wave: a breaking wave of soul tokens surging out of the ground and rolling ahead in a band. Tokens ride up its
+ * back, over the crest and down its curling lip, spraying off the front; at the end of its run it crashes and
+ * scatters. Each enemy it rolls over is struck once and thrown up.
  */
 public class TokenWave extends SpellEffectEntity {
-    public static final float SPEED = .8f;
+    /** Its top speed (blocks per tick), reached smoothly over the first few ticks (SURGE). */
+    public static final float SPEED = .7f;
+    public static final float SURGE = 3;
     public static final float WIDTH = 3.2f;
-    public static final int FADE_TICKS = 10;
+    /** Ticks it takes to rise to its full height, and to crash at the end of its run. */
+    public static final int RISE_TICKS = 7;
+    public static final int FADE_TICKS = 12;
 
     private static final EntityDataAccessor<Float> DATA_RANGE = SynchedEntityData.defineId(TokenWave.class, EntityDataSerializers.FLOAT);
 
@@ -62,14 +67,29 @@ public class TokenWave extends SpellEffectEntity {
         return this.entityData.get(DATA_RANGE);
     }
 
+    /** How far it has rolled after {@code age} ticks: it surges off slowly and runs on at full speed. */
+    private static float distance(float age) {
+        return SPEED * (age - SURGE * (1 - (float) Math.exp(-age / SURGE)));
+    }
+
     /** How far the crest has rolled. */
     public float front(float partialTicks) {
-        return Math.min(getRange(), (tickCount + partialTicks) * SPEED);
+        return Math.min(getRange(), distance(tickCount + partialTicks));
     }
 
     /** Ticks it takes to roll its whole way. */
     public int duration() {
-        return Mth.ceil(getRange() / SPEED);
+        int ticks = 0;
+        while (distance(ticks) < getRange() && ticks < 200) {
+            ticks++;
+        }
+        return ticks;
+    }
+
+    /** How far it has risen out of the ground (0 to 1). */
+    public float grown(float partialTicks) {
+        float t = Mth.clamp((tickCount + partialTicks) / RISE_TICKS, 0, 1);
+        return t * t * (3 - 2 * t);
     }
 
     /** Fades as it breaks at the end. */
@@ -109,7 +129,9 @@ public class TokenWave extends SpellEffectEntity {
             Vec3 d = e.position().subtract(c);
             double along = d.dot(f);
             double across = Math.abs(d.dot(side));
-            if (along < front - 1.4 || along > front + .5 || across > WIDTH * .5 + e.getBbWidth() * .5 || e.getY() < c.y - 1.5 || e.getY() > c.y + 2.5) {
+            // Under its face, from halfway up its back to its curling lip (further ahead in the middle)
+            double lip = front + .9 + .45 * (1 - Math.min(1, across * across / (WIDTH * WIDTH * .25)));
+            if (along < front - 1.8 || along > lip || across > WIDTH * .5 + e.getBbWidth() * .5 || e.getY() < c.y - 1.5 || e.getY() > c.y + 2.5) {
                 continue;
             }
             hit.add(e.getId());
