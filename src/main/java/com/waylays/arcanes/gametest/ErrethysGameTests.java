@@ -49,13 +49,16 @@ import java.util.List;
 /**
  * Server-side checks run by CI for Errethys, the school of summoned mana creatures: each spell brings one creature,
  * on the caster's side, sending summons away takes only that spell's, the summoner can ride the dromedary, and each
- * kind of creature fights (the serpent's bite poisons). Fights run in batches of their
+ * kind of creature stays peaceful until its summoner fights, then fights (the serpent's bite poisons). Fights run in batches of their
  * own, and every test sends its creatures away at the end, so they never go after another test's mobs.
  */
 @GameTestHolder(ArcanesOublies.MODID)
 @PrefixGameTestTemplate(false)
 public final class ErrethysGameTests {
     // Test coordinates: y=1 is the platform's floor block, entities stand at y=2
+
+    /** Ticks the creatures are left with the vindicator before anyone fights: they must leave it alone. */
+    private static final int PEACE_TICKS = 60;
 
     private ErrethysGameTests() {}
 
@@ -193,17 +196,33 @@ public final class ErrethysGameTests {
     }
 
     /**
-     * A villager casts {@code spell} near a vindicator (a monster that poison works on) and the test waits for the
-     * creatures to hurt it, and for {@code extra}.
+     * A villager casts {@code spell} near a vindicator (a monster that poison works on): the creatures leave it alone
+     * while nobody fights; then the villager strikes it ({@code defend} false) or is struck by it ({@code defend} true),
+     * and the test waits for the creatures to hurt it, and for {@code extra}.
      */
-    private static void fight(GameTestHelper helper, DeferredHolder<AbstractSpell, ? extends AbstractSpell> spell, Runnable extra, Vindicator[] foe) {
+    private static void fight(GameTestHelper helper, DeferredHolder<AbstractSpell, ? extends AbstractSpell> spell, Runnable extra, Vindicator[] foe,
+                              boolean defend) {
         Villager caster = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(4.5, 2, 1.5));
         foe[0] = helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(4.5, 2, 6.5));
         Vindicator target = foe[0];
         spell.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        float[] afterStrike = {-1};
+        helper.runAfterDelay(PEACE_TICKS, () -> {
+            helper.assertTrue(target.getHealth() == target.getMaxHealth(), "the creatures attacked a monster nobody was fighting");
+            if (defend) {
+                caster.hurt(helper.getLevel().damageSources().mobAttack(target), 1);
+            } else {
+                target.hurt(helper.getLevel().damageSources().mobAttack(caster), 1);
+            }
+            afterStrike[0] = target.getHealth();
+        });
         helper.succeedWhen(() -> {
-            helper.assertTrue(target.getHealth() < target.getMaxHealth(), "the creatures left the vindicator alone (health " + target.getHealth() + ")");
-            helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "a creature turned on its summoner");
+            helper.assertTrue(afterStrike[0] >= 0, "the summoner has not fought yet");
+            helper.assertTrue(target.getHealth() < afterStrike[0], "the creatures left the vindicator alone (health " + target.getHealth() + ")");
+            for (LivingEntity e : around(helper, LivingEntity.class, caster)) {
+                helper.assertTrue(!(e instanceof OwnedSummon) || !(e instanceof net.minecraft.world.entity.Mob mob) || mob.getTarget() != caster,
+                        "a creature turned on its summoner");
+            }
             extra.run();
             dismissAll(helper, caster);
         });
@@ -211,14 +230,14 @@ public final class ErrethysGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_rats", timeoutTicks = 300)
     public static void manaRatsBite(GameTestHelper helper) {
-        fight(helper, ModSpells.MANA_RATS, () -> {}, new Vindicator[1]);
+        fight(helper, ModSpells.MANA_RATS, () -> {}, new Vindicator[1], false);
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_salmon", timeoutTicks = 300)
     public static void manaSalmonRam(GameTestHelper helper) {
         // The vindicator stands in a pool the salmon can reach it through
         pool(helper, 3, 5, 5, 7);
-        fight(helper, ModSpells.MANA_SALMON, () -> {}, new Vindicator[1]);
+        fight(helper, ModSpells.MANA_SALMON, () -> {}, new Vindicator[1], false);
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_dry", timeoutTicks = ManaSalmon.DRY_TICKS + 40)
@@ -240,11 +259,11 @@ public final class ErrethysGameTests {
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_serpent", timeoutTicks = 300)
     public static void manaSerpentPoisons(GameTestHelper helper) {
         Vindicator[] foe = new Vindicator[1];
-        fight(helper, ModSpells.MANA_SERPENT, () -> helper.assertTrue(foe[0].hasEffect(MobEffects.POISON), "the bite did not poison"), foe);
+        fight(helper, ModSpells.MANA_SERPENT, () -> helper.assertTrue(foe[0].hasEffect(MobEffects.POISON), "the bite did not poison"), foe, true);
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_crows", timeoutTicks = 300)
     public static void manaCrowsPeck(GameTestHelper helper) {
-        fight(helper, ModSpells.MANA_CROWS, () -> {}, new Vindicator[1]);
+        fight(helper, ModSpells.MANA_CROWS, () -> {}, new Vindicator[1], true);
     }
 }

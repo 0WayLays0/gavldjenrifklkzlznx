@@ -91,9 +91,10 @@ regarde autour de lui et cligne, des pages qui bougent toutes seules. Focus de l
 
 ### Errethys (invocations de créatures de mana)
 
-Des animaux de mana bleu ciel transparent, aux veines de lumière qui brillent de l'intérieur. Ils se battent pour
-le lanceur (ce qu'il attaque, ce qui l'attaque, et les monstres proches), ne touchent jamais ses alliés, ne laissent
-rien en mourant et se dissolvent en étincelles quand leur temps est écoulé.
+Des animaux de mana bleu ciel transparent, aux veines de lumière qui brillent de l'intérieur. Ils restent **paisibles**
+tant que le lanceur ne se bat pas, même à côté d'un monstre : ils n'attaquent que **ce que le lanceur frappe** (au
+corps à corps, à l'arc ou avec un sort) et **ce qui attaque le lanceur**. Ils ne touchent jamais ses alliés, ne
+laissent rien en mourant et se dissolvent en étincelles quand leur temps est écoulé.
 
 | Sort | Effet |
 |---|---|

@@ -388,7 +388,8 @@ Sons : carillons d'améthyste, cris des animaux adoucis
                            au-dessus du lanceur et pique sur les ennemis.
 
 Une seule créature par sort ; relancer le sort la renvoie (comme pour toutes
-les invocations de l'addon).
+les invocations de l'addon). Les créatures restent paisibles : elles
+n'attaquent que ce que le lanceur frappe et ce qui attaque le lanceur.
 
 Livre : pas encore demandé [ ]
 

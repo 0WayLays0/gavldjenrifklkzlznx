@@ -12,20 +12,17 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
- * A creature of Errethys mana: it fights for its summoner (what the summoner attacks, what attacks the summoner, and
- * monsters nearby), sparkles as it moves, and comes apart into motes of light when its time is up or when it dies.
+ * A creature of Errethys mana: peaceful until its summoner fights, it then goes after what attacks its summoner and
+ * what its summoner strikes (in melee, with a shot or with a spell), and leaves everything else alone, monsters
+ * included. It sparkles as it moves, and comes apart into motes of light when its time is up or when it dies.
  * No drops, no experience. Subclasses add their own way of moving in {@link #registerMoveGoals()}.
  */
 public abstract class ManaSummon extends PathfinderMob implements OwnedSummon {
@@ -76,11 +73,9 @@ public abstract class ManaSummon extends PathfinderMob implements OwnedSummon {
     @Override
     protected final void registerGoals() {
         registerMoveGoals();
+        // Peaceful until its summoner fights: it goes only after what attacks its summoner and what its summoner strikes
         this.targetSelector.addGoal(1, new OwnerTargetGoal(this, true));
         this.targetSelector.addGoal(2, new OwnerTargetGoal(this, false));
-        this.targetSelector.addGoal(3, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Mob.class, 5, true, false,
-                e -> e instanceof Enemy && !SpellUtil.isAlly(getSummoner(), e)));
     }
 
     /** Movement and attack goals (called from the constructor, before subclass fields are set). */
