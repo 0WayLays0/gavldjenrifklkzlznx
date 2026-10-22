@@ -114,6 +114,8 @@ public final class ClientSmokeTest {
     private static final AtomicInteger failures = new AtomicInteger();
     /** The spell being photographed and the tick it was cast. */
     private static String shotName;
+    /** Where the photographed spells are cast, once it is built. */
+    private static BlockPos stage;
     private static int shotCastTick;
     private static float shotYaw;
 
@@ -258,6 +260,25 @@ public final class ClientSmokeTest {
         mc.player.xRotO = pitch;
     }
 
+    /**
+     * Photographed spells are cast on a floor of stone high in the open air, at noon, the caster back in its middle each
+     * time: no tree, pool or hill of the test world hides them, and they are seen against the sky.
+     */
+    private static void stage(ServerLevel level, ServerPlayer player) {
+        if (stage == null) {
+            BlockPos center = BlockPos.containing(player.getX(), Math.min(level.getMaxBuildHeight() - 40, player.getY() + 60), player.getZ());
+            for (BlockPos pos : BlockPos.betweenClosed(center.offset(-14, -1, -14), center.offset(14, -1, 14))) {
+                level.setBlockAndUpdate(pos, Blocks.SMOOTH_STONE.defaultBlockState());
+            }
+            stage = center;
+            log("photographs are taken on a stone floor at {}", center);
+        }
+        level.setDayTime(6000);
+        level.setWeatherParameters(6000, 0, false, false);
+        player.connection.teleport(stage.getX() + .5, stage.getY(), stage.getZ() + .5, player.getYRot(), player.getXRot());
+        player.resetFallDistance();
+    }
+
     /** {@code alone}: everything earlier spells left around is cleared first, so its pictures show that spell only. */
     private static void castOnServer(IntegratedServer server, java.util.UUID id, AbstractSpell spell, boolean alone) {
         ServerPlayer player = server.getPlayerList().getPlayer(id);
@@ -269,6 +290,7 @@ public final class ClientSmokeTest {
         try {
             ServerLevel level = player.serverLevel();
             if (alone) {
+                stage(level, player);
                 for (Entity e : level.getEntities((Entity) null, player.getBoundingBox().inflate(64), x -> !(x instanceof Player))) {
                     e.discard();
                 }
