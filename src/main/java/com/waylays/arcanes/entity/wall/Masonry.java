@@ -55,8 +55,9 @@ public final class Masonry {
     }
 
     /**
-     * Lays {@code state} at {@code pos} if it may go there, pushing out of the way whoever stands in it (away from
-     * {@code from}). Returns whether it was laid.
+     * Lays {@code state} at {@code pos} if it may go there, pushing whoever stands in it out of the block on the side
+     * they are on (so a prisoner is pushed in, not out; dead in the middle, away from {@code from}). Returns whether it
+     * was laid.
      */
     public boolean lay(ServerLevel level, BlockPos pos, BlockState state, @Nullable Entity caster, Vec3 from) {
         BlockState before = level.getBlockState(pos);
@@ -67,11 +68,23 @@ public final class Masonry {
             return false;
         }
         AABB cell = new AABB(pos);
+        Vec3 middle = Vec3.atBottomCenterOf(pos);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, cell)) {
-            Vec3 away = e.position().subtract(from).multiply(1, 0, 1);
-            away = away.lengthSqr() < 1.0E-4 ? new Vec3(1, 0, 0) : away.normalize();
-            e.setPos(e.getX() + away.x * .8, e.getY(), e.getZ() + away.z * .8);
-            e.setDeltaMovement(away.scale(.4).add(0, .2, 0));
+            Vec3 away = e.position().subtract(middle).multiply(1, 0, 1);
+            if (away.lengthSqr() < 1.0E-4) {
+                away = e.position().subtract(from).multiply(1, 0, 1);
+            }
+            if (away.lengthSqr() < 1.0E-4) {
+                away = new Vec3(1, 0, 0);
+            }
+            // Out along the side it leans to, just clear of the block
+            double clear = .5 + e.getBbWidth() * .5 + .02;
+            if (Math.abs(away.x) >= Math.abs(away.z)) {
+                e.teleportTo(middle.x + Math.signum(away.x) * clear, e.getY(), e.getZ());
+            } else {
+                e.teleportTo(e.getX(), e.getY(), middle.z + Math.signum(away.z) * clear);
+            }
+            e.setDeltaMovement(0, Math.max(0, e.getDeltaMovement().y), 0);
             e.hurtMarked = true;
         }
         level.setBlock(pos, state, Block.UPDATE_ALL);

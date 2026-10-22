@@ -21,18 +21,18 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Mana Salmon: a salmon of mana that lives only in water. It takes shape in the water the caster looks at, else in the
- * nearest water around them; with no water nearby the spell fails.
+ * Mana Piranha: a piranha of mana that lives only in water and bites in a frenzy. It takes shape in the water the
+ * caster looks at, else in the nearest water around them; with no water nearby the spell fails.
  */
 @AutoSpellConfig
-public class ManaSalmonSpell extends ManaSummonSpell {
+public class ManaPiranhaSpell extends ManaSummonSpell {
     /** How far the caster can look for the water. */
     public static final double LOOK_RANGE = 12;
     /** How far around the caster the nearest water is searched for. */
     public static final int SEARCH_RADIUS = 6;
 
-    public ManaSalmonSpell() {
-        super("mana_salmon", SpellRarity.UNCOMMON, 6, 25);
+    public ManaPiranhaSpell() {
+        super("mana_piranha", SpellRarity.UNCOMMON, 6, 25);
         this.manaCostPerLevel = 6;
         this.baseSpellPower = 4;
         this.spellPowerPerLevel = 2;
@@ -42,10 +42,10 @@ public class ManaSalmonSpell extends ManaSummonSpell {
 
     @Override
     protected EntityType<? extends ManaSummon> summonType() {
-        return ModEntities.MANA_SALMON.get();
+        return ModEntities.MANA_PIRANHA.get();
     }
 
-    /** No water, no salmon (sending one away always works). */
+    /** No water, no piranha (sending one away always works). */
     @Override
     public boolean checkPreCastConditions(Level level, int spellLevel, LivingEntity entity, MagicData playerMagicData) {
         if (hasOpenRecast(entity) || findWater(level, entity) != null) {

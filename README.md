@@ -99,7 +99,7 @@ laissent rien en mourant et se dissolvent en étincelles quand leur temps est é
 | Sort | Effet |
 |---|---|
 | **Rat de Mana** (Mana Rat) | Un rat rapide (queue qui ondule) qui suit le lanceur et mord ses ennemis, 30 s ou plus. |
-| **Saumon de Mana** (Mana Salmon) | Un saumon qui ne vit que dans l'eau : il apparaît dans l'eau que regarde le lanceur (ou la plus proche, 6 blocs ; sinon le sort échoue), y nage comme un saumon, suit le lanceur le long de l'eau et percute les ennemis dans l'eau ou au bord. Échoué sur la terre ferme, il se débat puis se dissout au bout de 3 s. |
+| **Piranha de Mana** (Mana Piranha) | Un piranha qui ne vit que dans l'eau : il apparaît dans l'eau que regarde le lanceur (ou la plus proche, 6 blocs ; sinon le sort échoue), y file comme une flèche, suit le lanceur le long de l'eau et mord les ennemis dans l'eau ou au bord, deux fois plus vite que les autres créatures, ses dents de lumière étincelantes. **Frénésie** : chaque morsure d'affilée sur la même proie (en moins de 3 s) mord 25 % plus fort, jusqu'au double. Échoué sur la terre ferme, il se débat puis se dissout au bout de 3 s. |
 | **Dromadaire de Mana** (Mana Dromedary) | Un dromadaire sellé : clic droit pour le monter, avec la ruée du chameau ; un second joueur peut monter derrière le lanceur. 2 à 4 min. |
 | **Serpent de Mana** (Mana Serpent) | Un serpent qui ondule en S ; sa morsure empoisonne (Poison II au niveau 4) et ralentit. |
 | **Corbeau de Mana** (Mana Crow) | Un corbeau qui vole comme un oiseau : battements d'ailes, vol plané en descente, cercles au-dessus du lanceur, piqués sur les ennemis. |

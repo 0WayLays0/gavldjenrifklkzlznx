@@ -379,8 +379,10 @@ Ambiance : animaux de mana translucides qui se battent pour le lanceur
 Sons : carillons d'améthyste, cris des animaux adoucis
 
  1. Rat de Mana        [~] Un rat rapide qui mord les ennemis.
- 2. Saumon de Mana     [~] Un saumon qui ne vit que dans l'eau, y nage
-                           comme un saumon et percute les ennemis.
+ 2. Piranha de Mana    [~] Un piranha (mâchoire en avant, dents de
+                           lumière) qui ne vit que dans l'eau et mord en
+                           frénésie : +25 % par morsure d'affilée, jusqu'au
+                           double. Remplace le saumon.
  3. Dromadaire de Mana [~] Un dromadaire sellé que le lanceur peut monter
                            (ruée, 2 places).
  4. Serpent de Mana    [~] Un serpent qui ondule ; sa morsure empoisonne.

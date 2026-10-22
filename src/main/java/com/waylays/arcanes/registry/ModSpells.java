@@ -30,7 +30,7 @@ import com.waylays.arcanes.spells.boss.VoidOrbSpell;
 import com.waylays.arcanes.spells.errethys.ManaCrowsSpell;
 import com.waylays.arcanes.spells.errethys.ManaDromedarySpell;
 import com.waylays.arcanes.spells.errethys.ManaRatsSpell;
-import com.waylays.arcanes.spells.errethys.ManaSalmonSpell;
+import com.waylays.arcanes.spells.errethys.ManaPiranhaSpell;
 import com.waylays.arcanes.spells.errethys.ManaSerpentSpell;
 import com.waylays.arcanes.spells.explosion.BlastLeapSpell;
 import com.waylays.arcanes.spells.explosion.BlastOrbSpell;
@@ -196,7 +196,7 @@ public final class ModSpells {
 
     // Errethys school: summoned creatures of mana
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_RATS = register(new ManaRatsSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_SALMON = register(new ManaSalmonSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_PIRANHA = register(new ManaPiranhaSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_DROMEDARY = register(new ManaDromedarySpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_SERPENT = register(new ManaSerpentSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_CROWS = register(new ManaCrowsSpell());

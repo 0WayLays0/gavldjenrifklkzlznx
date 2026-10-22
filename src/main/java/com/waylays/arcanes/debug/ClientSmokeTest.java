@@ -339,8 +339,8 @@ public final class ClientSmokeTest {
                 player.setXRot(pitch);
                 player.setYHeadRot(yaw);
             }
-            if (spell == ModSpells.MANA_SALMON.get()) {
-                // The salmon lives only in water: dig a pool in front of the player
+            if (spell == ModSpells.MANA_PIRANHA.get()) {
+                // The piranha lives only in water: dig a pool in front of the player
                 Vec3 pool = player.position().add(Vec3.directionFromRotation(0, player.getYRot()).scale(3));
                 BlockPos center = BlockPos.containing(pool.x, player.getY() - 1, pool.z);
                 for (BlockPos pos : BlockPos.betweenClosed(center.offset(-1, 0, -1), center.offset(1, 0, 1))) {

@@ -2,6 +2,7 @@ package com.waylays.arcanes.client;
 
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.client.model.ManaCrowModel;
+import com.waylays.arcanes.client.model.ManaPiranhaModel;
 import com.waylays.arcanes.client.model.ManaRatModel;
 import com.waylays.arcanes.client.model.ManaSerpentModel;
 import com.waylays.arcanes.client.render.AegisPagesRenderer;
@@ -66,7 +67,7 @@ import com.waylays.arcanes.client.render.InkHandsRenderer;
 import com.waylays.arcanes.client.render.InkWaveRenderer;
 import com.waylays.arcanes.client.render.ManaCamelRenderer;
 import com.waylays.arcanes.client.render.ManaCreatureRenderer;
-import com.waylays.arcanes.client.render.ManaSalmonRenderer;
+import com.waylays.arcanes.client.render.ManaPiranhaRenderer;
 import com.waylays.arcanes.client.render.MissileRenderer;
 import com.waylays.arcanes.client.render.MoltenPoolRenderer;
 import com.waylays.arcanes.client.render.OrigamiDragonRenderer;
@@ -211,7 +212,7 @@ public final class ClientSetup {
                 context -> new ManaCreatureRenderer<>(context, new ManaSerpentModel(context.bakeLayer(ManaSerpentModel.LAYER)), .35f, 1.1f, true));
         event.registerEntityRenderer(ModEntities.MANA_CROW.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaCrowModel(context.bakeLayer(ManaCrowModel.LAYER)), .25f, 1.25f, true));
-        event.registerEntityRenderer(ModEntities.MANA_SALMON.get(), ManaSalmonRenderer::new);
+        event.registerEntityRenderer(ModEntities.MANA_PIRANHA.get(), ManaPiranhaRenderer::new);
         event.registerEntityRenderer(ModEntities.MANA_DROMEDARY.get(), ManaCamelRenderer::new);
     }
 
@@ -220,6 +221,7 @@ public final class ClientSetup {
         event.registerLayerDefinition(ManaRatModel.LAYER, ManaRatModel::createBodyLayer);
         event.registerLayerDefinition(ManaSerpentModel.LAYER, ManaSerpentModel::createBodyLayer);
         event.registerLayerDefinition(ManaCrowModel.LAYER, ManaCrowModel::createBodyLayer);
+        event.registerLayerDefinition(ManaPiranhaModel.LAYER, ManaPiranhaModel::createBodyLayer);
     }
 
     @SubscribeEvent

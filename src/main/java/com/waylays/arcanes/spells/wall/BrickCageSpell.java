@@ -71,15 +71,16 @@ public class BrickCageSpell extends WallSpell {
     public void cage(Level level, LivingEntity caster, LivingEntity target, int life, float damage) {
         // The cell rises round the block the target stands in, wide and high enough to hold it: the target is set in
         // the middle of it first, so the walls close round it and do not push it out
+        // (the blow first: its knockback must not carry the target out before the walls are up)
+        target.invulnerableTime = 0;
+        io.redspace.ironsspellbooks.damage.DamageSources.applyDamage(target, damage, SpellUtil.damageSource(this, caster, caster));
         int half = Mth.clamp(Mth.ceil((target.getBbWidth() + 1) * .5f), 1, 3);
         int height = Mth.clamp(Mth.ceil(target.getBbHeight() + .2f), 2, 6);
         BlockPos cell = BlockPos.containing(target.position());
         target.teleportTo(cell.getX() + .5, target.getY(), cell.getZ() + .5);
-        Rampart.raise(level, caster, Rampart.Shape.CAGE, target.position(), 0, half, height, life);
         target.setDeltaMovement(0, Math.min(0, target.getDeltaMovement().y), 0);
         target.hurtMarked = true;
-        target.invulnerableTime = 0;
-        io.redspace.ironsspellbooks.damage.DamageSources.applyDamage(target, damage, SpellUtil.damageSource(this, caster, caster));
+        Rampart.raise(level, caster, Rampart.Shape.CAGE, target.position(), 0, half, height, life);
         target.addEffect(new MobEffectInstance(MobEffects.DARKNESS, life, 0));
         target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2));
     }

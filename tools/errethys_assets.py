@@ -99,23 +99,24 @@ def mana_rats_icon():
     ])
 
 
-def mana_salmon_icon():
+def mana_piranha_icon():
+    """A piranha: deep body, forked tail, the lower jaw jutting out, teeth of light."""
     return _icon([
         "................",
         "................",
-        "................",
-        "................",
-        "................",
-        ".......bb.......",
-        "......bLLb......",
-        "t...bbLLLLbbb...",
-        "tt.bLLLLLLLLLbb.",
-        "tttLLLLLLLLLeLLb",
-        "tt.bLLLLLLLLLLb.",
-        "t...bbLLLLLbbb..",
+        "......bbb.......",
+        ".....bLLLb......",
+        "....bLLLLLbbb...",
+        "t..bLLLLLLLLLb..",
+        "tbbLLLLLLLLLeLb.",
+        ".tLLLLLLLLLLLLLb",
+        "..LLLLLLLLLLLLLb",
+        ".tLLLLLLLLLLbe.e",
+        "tbbLLLLLLLLLb.e.",
+        "t..bLLLLLLLLLLLL",
+        "....bLLLLLLLLbb.",
+        ".....bbLLbbb....",
         "......bLb.......",
-        "................",
-        "................",
         "................",
     ])
 
@@ -210,7 +211,7 @@ def main():
     g.save(mana_skin(True), "textures/entity/mana_skin_eyes.png")
     g.save(mana_glow(False), "textures/entity/mana_glow.png")
     g.save(mana_glow(True), "textures/entity/mana_glow_eyes.png")
-    for name, fn in (("mana_rats", mana_rats_icon), ("mana_salmon", mana_salmon_icon), ("mana_dromedary", mana_dromedary_icon),
+    for name, fn in (("mana_rats", mana_rats_icon), ("mana_piranha", mana_piranha_icon), ("mana_dromedary", mana_dromedary_icon),
                      ("mana_serpent", mana_serpent_icon), ("mana_crows", mana_crows_icon)):
         g.save(fn(), f"textures/gui/spell_icons/{name}.png")
     g.save(affinity_ring_errethys(), "textures/item/affinity_ring_errethys.png")

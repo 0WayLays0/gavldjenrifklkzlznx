@@ -6,7 +6,7 @@ import com.waylays.arcanes.entity.book.FlyingGrimoire;
 import com.waylays.arcanes.entity.errethys.ManaCamel;
 import com.waylays.arcanes.entity.errethys.ManaCrow;
 import com.waylays.arcanes.entity.errethys.ManaRat;
-import com.waylays.arcanes.entity.errethys.ManaSalmon;
+import com.waylays.arcanes.entity.errethys.ManaPiranha;
 import com.waylays.arcanes.entity.errethys.ManaSerpent;
 import com.waylays.arcanes.entity.errethys.ManaSummon;
 import com.waylays.arcanes.entity.gold.GoldenSentinel;
@@ -15,7 +15,7 @@ import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.SummoningSpell;
-import com.waylays.arcanes.spells.errethys.ManaSalmonSpell;
+import com.waylays.arcanes.spells.errethys.ManaPiranhaSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
@@ -105,16 +105,16 @@ public final class ErrethysGameTests {
     public static void eachSpellSummonsOneCreature(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 4.5));
         MagicData magicData = new MagicData(true);
-        // The salmon needs water
+        // The piranha needs water
         pool(helper, 4, 7, 4, 7);
         ModSpells.MANA_RATS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
-        ModSpells.MANA_SALMON.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_PIRANHA.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_SERPENT.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_CROWS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         // Casting again replaces the creature instead of adding one
         ModSpells.MANA_RATS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         helper.assertTrue(around(helper, ManaRat.class, caster).size() == 1, "expected 1 rat, got " + around(helper, ManaRat.class, caster).size());
-        helper.assertTrue(around(helper, ManaSalmon.class, caster).size() == 1, "expected 1 salmon, got " + around(helper, ManaSalmon.class, caster).size());
+        helper.assertTrue(around(helper, ManaPiranha.class, caster).size() == 1, "expected 1 piranha, got " + around(helper, ManaPiranha.class, caster).size());
         helper.assertTrue(around(helper, ManaSerpent.class, caster).size() == 1, "expected 1 serpent, got " + around(helper, ManaSerpent.class, caster).size());
         helper.assertTrue(around(helper, ManaCrow.class, caster).size() == 1, "expected 1 crow, got " + around(helper, ManaCrow.class, caster).size());
         for (ManaSummon summon : around(helper, ManaSummon.class, caster)) {
@@ -233,27 +233,32 @@ public final class ErrethysGameTests {
         fight(helper, ModSpells.MANA_RATS, () -> {}, new Vindicator[1], false);
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_salmon", timeoutTicks = 300)
-    public static void manaSalmonRam(GameTestHelper helper) {
-        // The vindicator stands in a pool the salmon can reach it through
+    /** The piranha bites, and goes on biting the same prey in a frenzy. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_piranha", timeoutTicks = 300)
+    public static void manaPiranhaBitesInAFrenzy(GameTestHelper helper) {
+        // The vindicator stands in a pool the piranha can reach it through
         pool(helper, 3, 5, 5, 7);
-        fight(helper, ModSpells.MANA_SALMON, () -> {}, new Vindicator[1], false);
+        Vindicator[] foe = new Vindicator[1];
+        fight(helper, ModSpells.MANA_PIRANHA, () -> {
+            List<ManaPiranha> piranhas = helper.getLevel().getEntitiesOfClass(ManaPiranha.class, foe[0].getBoundingBox().inflate(8));
+            helper.assertTrue(!piranhas.isEmpty() && piranhas.get(0).getFrenzy() >= 1, "the piranha did not bite again in a frenzy");
+        }, foe, false);
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_dry", timeoutTicks = ManaSalmon.DRY_TICKS + 40)
-    public static void theSalmonNeedsWater(GameTestHelper helper) {
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_dry", timeoutTicks = ManaPiranha.DRY_TICKS + 40)
+    public static void thePiranhaNeedsWater(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
-        helper.assertTrue(ManaSalmonSpell.findWater(helper.getLevel(), caster) == null, "found water on a dry platform");
-        ModSpells.MANA_SALMON.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
-        helper.assertTrue(around(helper, ManaSalmon.class, caster).isEmpty(), "a salmon came with no water around");
+        helper.assertTrue(ManaPiranhaSpell.findWater(helper.getLevel(), caster) == null, "found water on a dry platform");
+        ModSpells.MANA_PIRANHA.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        helper.assertTrue(around(helper, ManaPiranha.class, caster).isEmpty(), "a piranha came with no water around");
         // One stranded on land comes apart
-        ManaSalmon salmon = ModEntities.MANA_SALMON.get().create(helper.getLevel());
-        helper.assertTrue(salmon != null, "no salmon");
+        ManaPiranha piranha = ModEntities.MANA_PIRANHA.get().create(helper.getLevel());
+        helper.assertTrue(piranha != null, "no piranha");
         Vec3 at = helper.absoluteVec(new Vec3(4.5, 2, 4.5));
-        salmon.moveTo(at.x, at.y, at.z, 0, 0);
-        salmon.setup(caster, 1200, 10, 2);
-        helper.getLevel().addFreshEntity(salmon);
-        helper.succeedWhen(() -> helper.assertTrue(salmon.isRemoved(), "the stranded salmon did not fade"));
+        piranha.moveTo(at.x, at.y, at.z, 0, 0);
+        piranha.setup(caster, 1200, 10, 2);
+        helper.getLevel().addFreshEntity(piranha);
+        helper.succeedWhen(() -> helper.assertTrue(piranha.isRemoved(), "the stranded piranha did not fade"));
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_serpent", timeoutTicks = 300)

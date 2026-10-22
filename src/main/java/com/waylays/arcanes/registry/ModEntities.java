@@ -28,7 +28,7 @@ import com.waylays.arcanes.entity.boss.VoidOrb;
 import com.waylays.arcanes.entity.errethys.ManaCamel;
 import com.waylays.arcanes.entity.errethys.ManaCrow;
 import com.waylays.arcanes.entity.errethys.ManaRat;
-import com.waylays.arcanes.entity.errethys.ManaSalmon;
+import com.waylays.arcanes.entity.errethys.ManaPiranha;
 import com.waylays.arcanes.entity.errethys.ManaSerpent;
 import com.waylays.arcanes.entity.explosion.BlastEffect;
 import com.waylays.arcanes.entity.explosion.CataclysmCore;
@@ -229,8 +229,8 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<ManaRat>> MANA_RAT = register("mana_rat",
             EntityType.Builder.<ManaRat>of(ManaRat::new, MobCategory.MISC).sized(.5f, .4f).clientTrackingRange(10));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<ManaSalmon>> MANA_SALMON = register("mana_salmon",
-            EntityType.Builder.<ManaSalmon>of(ManaSalmon::new, MobCategory.MISC).sized(.7f, .4f).clientTrackingRange(10));
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaPiranha>> MANA_PIRANHA = register("mana_piranha",
+            EntityType.Builder.<ManaPiranha>of(ManaPiranha::new, MobCategory.MISC).sized(.6f, .6f).clientTrackingRange(10));
 
     public static final DeferredHolder<EntityType<?>, EntityType<ManaSerpent>> MANA_SERPENT = register("mana_serpent",
             EntityType.Builder.<ManaSerpent>of(ManaSerpent::new, MobCategory.MISC).sized(.7f, .4f).clientTrackingRange(10));
@@ -373,7 +373,7 @@ public final class ModEntities {
         event.put(FLYING_GRIMOIRE.get(), FlyingGrimoire.createAttributes().build());
         event.put(FLYING_STACK.get(), FlyingStack.createAttributes().build());
         event.put(MANA_RAT.get(), ManaRat.createAttributes().build());
-        event.put(MANA_SALMON.get(), ManaSalmon.createAttributes().build());
+        event.put(MANA_PIRANHA.get(), ManaPiranha.createAttributes().build());
         event.put(MANA_SERPENT.get(), ManaSerpent.createAttributes().build());
         event.put(MANA_CROW.get(), ManaCrow.createAttributes().build());
         event.put(MANA_DROMEDARY.get(), ManaCamel.createAttributes().build());
