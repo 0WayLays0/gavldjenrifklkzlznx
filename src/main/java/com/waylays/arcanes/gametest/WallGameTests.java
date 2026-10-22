@@ -232,8 +232,8 @@ public final class WallGameTests {
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(400);
         husk.setHealth(400);
         Citadel citadel = Citadel.raise(helper.getLevel(), caster, ModSpells.FALLEN_CITADEL.get(), husk.position(), 8);
-        // Towers on the diagonals: they stand 6.5 blocks out, and only on the diagonals is that inside the barrier walls
-        // around the test (bricks lobbed from outside them would hit the barriers)
+        // Towers on the diagonals: only there are their battlements inside the barrier walls around the test (bricks
+        // lobbed from outside them would hit the barriers; in play there are none)
         citadel.setYRot(45);
         float[] before = {0};
         helper.runAfterDelay(Citadel.IMPACT - 2, () -> {

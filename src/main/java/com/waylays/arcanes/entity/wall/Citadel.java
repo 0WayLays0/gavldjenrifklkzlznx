@@ -132,7 +132,8 @@ public class Citadel extends SpellEffectEntity {
         }
         var inside = SpellUtil.enemiesAround(level, position().add(0, 1, 0), RADIUS, getOwner(), this::inside);
         for (int t = 0; t < WALLS; t += 2) {
-            Vec3 from = position().add(corner(t)).add(0, TOWER_HEIGHT + .5, 0);
+            // Lobbed from the inner edge of the tower's battlements
+            Vec3 from = position().add(corner(t).scale((RADIUS - 1.6) / RADIUS)).add(0, TOWER_HEIGHT + .5, 0);
             Vec3 to = inside.isEmpty() ? position().add((random.nextDouble() - .5) * RADIUS, 0, (random.nextDouble() - .5) * RADIUS)
                     : inside.get(random.nextInt(inside.size())).position();
             int ticks = 14;
