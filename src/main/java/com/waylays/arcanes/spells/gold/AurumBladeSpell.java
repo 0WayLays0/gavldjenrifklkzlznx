@@ -18,17 +18,20 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Aurum Blade: a giant golden sword forms in the sky above the target and plunges into it.
+ * Aurum Blade: a giant golden sword is forged from molten gold in the sky above the target and plunges into it,
+ * gilding all around, then rings out an aftershock (see {@link AurumBladeEntity}).
  */
 @AutoSpellConfig
 public class AurumBladeSpell extends AbstractSpell {
@@ -56,7 +59,9 @@ public class AurumBladeSpell extends AbstractSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2)),
-                Component.translatable("ui.irons_spellbooks.radius", Utils.stringTruncation(RADIUS, 1))
+                Component.translatable("ui.irons_spellbooks.radius", Utils.stringTruncation(RADIUS, 1)),
+                Component.translatable("ui.arcanes_oublies.aftershock", Utils.stringTruncation(getDamage(spellLevel, caster) * AurumBladeEntity.AFTERSHOCK, 2)),
+                Component.translatable("ui.arcanes_oublies.gilds", 2)
         );
     }
 
@@ -97,6 +102,12 @@ public class AurumBladeSpell extends AbstractSpell {
         Vec3 ground = SpellUtil.groundAt(level, at, 4, 1);
         AurumBladeEntity blade = new AurumBladeEntity(level, entity, getDamage(spellLevel, entity));
         blade.moveTo(ground.x, ground.y, ground.z, entity.getYRot(), 0);
+        // Under a roof the sword is forged lower, its pommel under the ceiling
+        Vec3 up = ground.add(0, 1, 0);
+        HitResult roof = level.clip(new ClipContext(up, up.add(0, AurumBladeEntity.HOVER_HEIGHT + 7, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+        if (roof.getType() != HitResult.Type.MISS) {
+            blade.setHover((float) Math.max(.5, Math.min(AurumBladeEntity.HOVER_HEIGHT, roof.getLocation().y - ground.y - 6.4)));
+        }
         level.addFreshEntity(blade);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }

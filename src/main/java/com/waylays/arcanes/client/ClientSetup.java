@@ -76,6 +76,7 @@ import com.waylays.arcanes.client.render.FlyingStackRenderer;
 import com.waylays.arcanes.client.render.GildedChainsRenderer;
 import com.waylays.arcanes.client.render.GlowOrbRenderer;
 import com.waylays.arcanes.client.render.GoldItemProjectileRenderer;
+import com.waylays.arcanes.client.render.GoldfallIngotRenderer;
 import com.waylays.arcanes.client.render.GoldSpikeRenderer;
 import com.waylays.arcanes.client.render.GoldenSentinelRenderer;
 import com.waylays.arcanes.client.render.ImplosionRenderer;
@@ -130,8 +131,7 @@ public final class ClientSetup {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.GOLD_BOLT.get(), GoldBoltRenderer::new);
-        event.registerEntityRenderer(ModEntities.GOLDFALL_INGOT.get(),
-                context -> new GoldItemProjectileRenderer<>(context, new ItemStack(Items.GOLD_INGOT), 2.6f, 2.2f, 8f));
+        event.registerEntityRenderer(ModEntities.GOLDFALL_INGOT.get(), GoldfallIngotRenderer::new);
         event.registerEntityRenderer(ModEntities.MOLTEN_GOLD_BLOB.get(),
                 context -> new GoldItemProjectileRenderer<>(context, new ItemStack(Items.GOLD_NUGGET), .45f, .8f, 50f));
         event.registerEntityRenderer(ModEntities.GILDED_CHAINS.get(), GildedChainsRenderer::new);

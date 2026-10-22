@@ -31,20 +31,23 @@ public final class Solid {
             return tri(a, b, c).tri(a, c, d);
         }
 
-        /** The side between two rings of the same number of points. */
+        /**
+         * The side between two rings of the same number of points, facing out when the rings turn as {@link #ring}'s
+         * do (from +X toward +Z) and {@code upper} is above {@code lower}.
+         */
         public Builder band(float[][] lower, float[][] upper) {
             int n = lower.length;
             for (int i = 0; i < n; i++) {
-                quad(lower[i], lower[(i + 1) % n], upper[(i + 1) % n], upper[i]);
+                quad(lower[i], upper[i], upper[(i + 1) % n], lower[(i + 1) % n]);
             }
             return this;
         }
 
-        /** A ring closed by a point. */
+        /** A ring closed by a point: facing out when the ring turns as {@link #ring}'s do and the point is above it. */
         public Builder fan(float[][] ring, float[] tip) {
             int n = ring.length;
             for (int i = 0; i < n; i++) {
-                tri(ring[i], ring[(i + 1) % n], tip);
+                tri(ring[(i + 1) % n], ring[i], tip);
             }
             return this;
         }
@@ -54,8 +57,8 @@ public final class Solid {
             float[][] lo = {{x0, y0, z0}, {x1, y0, z0}, {x1, y0, z1}, {x0, y0, z1}};
             float[][] hi = {{x0, y1, z0}, {x1, y1, z0}, {x1, y1, z1}, {x0, y1, z1}};
             band(lo, hi);
-            quad(hi[0], hi[1], hi[2], hi[3]);
-            quad(lo[3], lo[2], lo[1], lo[0]);
+            quad(hi[3], hi[2], hi[1], hi[0]);
+            quad(lo[0], lo[1], lo[2], lo[3]);
             return this;
         }
 

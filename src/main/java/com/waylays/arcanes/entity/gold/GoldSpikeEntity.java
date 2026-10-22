@@ -25,16 +25,21 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 /**
- * One gold crystal spike of Golden Spikes. Waits {@code warmup} ticks, bursts out of the ground (hurting and tossing
- * whatever stands on it), stays a moment, then sinks back.
+ * One cluster of gold crystals of Golden Spikes. Waits {@code warmup} ticks while the ground glows, bursts out of the
+ * ground white-hot (hurting, gilding and tossing whatever stands on it), stays a moment cooling, then sinks back. The
+ * last of a wave is a crown of spikes: wider, higher, and it throws out a spray of coins.
  */
 public class GoldSpikeEntity extends Entity implements AntiMagicSusceptible {
     private static final EntityDataAccessor<Integer> DATA_WARMUP = SynchedEntityData.defineId(GoldSpikeEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DATA_CROWN = SynchedEntityData.defineId(GoldSpikeEntity.class, EntityDataSerializers.BOOLEAN);
 
     /** Ticks the spike stays out after erupting, sinking included. */
     public static final int OUT_TICKS = 24;
     public static final int RISE_TICKS = 3;
     public static final int SINK_TICKS = 6;
+    /** Reach of a spike cluster, and of the crown that ends the wave. */
+    public static final float RADIUS = .6f;
+    public static final float CROWN_RADIUS = 1.8f;
 
     private float damage;
     @Nullable
@@ -55,6 +60,15 @@ public class GoldSpikeEntity extends Entity implements AntiMagicSusceptible {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_WARMUP, 0);
+        builder.define(DATA_CROWN, false);
+    }
+
+    public boolean isCrown() {
+        return this.entityData.get(DATA_CROWN);
+    }
+
+    public void setCrown(boolean crown) {
+        this.entityData.set(DATA_CROWN, crown);
     }
 
     public int getWarmup() {
@@ -91,20 +105,36 @@ public class GoldSpikeEntity extends Entity implements AntiMagicSusceptible {
 
     private void erupt() {
         Entity owner = getOwner();
-        AABB area = new AABB(getX() - .6, getY(), getZ() - .6, getX() + .6, getY() + 1.8, getZ() + .6);
+        boolean crown = isCrown();
+        float radius = crown ? CROWN_RADIUS : RADIUS;
+        AABB area = new AABB(getX() - radius, getY(), getZ() - radius, getX() + radius, getY() + (crown ? 2.6 : 1.8), getZ() + radius);
         for (LivingEntity victim : level().getEntitiesOfClass(LivingEntity.class, area)) {
             if (victim.isAlive() && !SpellUtil.isAlly(owner, victim)
-                    && DamageSources.applyDamage(victim, damage, SpellUtil.damageSource(ModSpells.GOLDEN_SPIKES.get(), this, owner))) {
+                    && DamageSources.applyDamage(victim, damage * (crown ? 1.5f : 1), SpellUtil.damageSource(ModSpells.GOLDEN_SPIKES.get(), this, owner))) {
+                GoldFx.gild(victim, crown ? 2 : 1);
                 Vec3 v = victim.getDeltaMovement();
-                victim.setDeltaMovement(v.x, Math.max(v.y, .55), v.z);
+                victim.setDeltaMovement(v.x, Math.max(v.y, crown ? .8 : .55), v.z);
                 victim.hurtMarked = true;
             }
         }
-        SpellUtil.particles(level(), GoldFx.nuggetShards(), getX(), getY() + .3, getZ(), 8, .25, .1, .25, .2);
-        SpellUtil.particles(level(), GoldFx.sparks(), getX(), getY() + .5, getZ(), 6, .2, .4, .2, .3);
-        SpellUtil.particles(level(), GoldFx.DEEP_DUST, getX(), getY() + .1, getZ(), 6, .4, .05, .4, .02);
-        level().playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.NEUTRAL, 1.2f, .7f + random.nextFloat() * .3f);
-        level().playSound(null, getX(), getY(), getZ(), SoundEvents.ARMOR_EQUIP_GOLD, SoundSource.NEUTRAL, 1f, .6f);
+        Level level = level();
+        SpellUtil.particles(level, GoldFx.nuggetShards(), getX(), getY() + .3, getZ(), crown ? 20 : 8, radius * .4, .1, radius * .4, .2);
+        SpellUtil.particles(level, GoldFx.sparks(), getX(), getY() + .5, getZ(), crown ? 16 : 6, radius * .35, .4, radius * .35, .3);
+        SpellUtil.particles(level, GoldFx.DEEP_DUST, getX(), getY() + .1, getZ(), crown ? 20 : 6, radius * .7, .05, radius * .7, .02);
+        level.playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.NEUTRAL, 1.2f, .7f + random.nextFloat() * .3f);
+        level.playSound(null, getX(), getY(), getZ(), SoundEvents.ARMOR_EQUIP_GOLD, SoundSource.NEUTRAL, 1f, .6f);
+        if (crown) {
+            GoldFx.coins(level, position().add(0, 1.2, 0), 14, .4f);
+            SpellUtil.cameraShake(level, position(), 8, 10);
+            level.playSound(null, getX(), getY(), getZ(), SoundEvents.ANVIL_LAND, SoundSource.NEUTRAL, 1.2f, .7f);
+            level.playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.NEUTRAL, 2f, .6f);
+        }
+    }
+
+    /** A crown spreads well outside this one-block box. */
+    @Override
+    public AABB getBoundingBoxForCulling() {
+        return isCrown() ? getBoundingBox().inflate(1.5, 1, 1.5) : getBoundingBox().inflate(.5);
     }
 
     @Override
@@ -126,6 +156,7 @@ public class GoldSpikeEntity extends Entity implements AntiMagicSusceptible {
     protected void addAdditionalSaveData(CompoundTag tag) {
         tag.putInt("Age", tickCount);
         tag.putInt("Warmup", getWarmup());
+        tag.putBoolean("Crown", isCrown());
         tag.putFloat("Damage", damage);
         if (ownerUUID != null) {
             tag.putUUID("Owner", ownerUUID);
@@ -136,6 +167,7 @@ public class GoldSpikeEntity extends Entity implements AntiMagicSusceptible {
     protected void readAdditionalSaveData(CompoundTag tag) {
         tickCount = tag.getInt("Age");
         setWarmup(tag.getInt("Warmup"));
+        setCrown(tag.getBoolean("Crown"));
         damage = tag.getFloat("Damage");
         if (tag.hasUUID("Owner")) {
             ownerUUID = tag.getUUID("Owner");

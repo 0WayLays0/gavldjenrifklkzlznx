@@ -25,17 +25,22 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Gilded Chains: golden chains burst out of the ground around the target and pin it in place.
- * Works like Iron's Root: the target rides an immobile {@link GildedChainsEntity} it cannot dismount.
+ * Gilded Chains: golden chains burst out of the ground around the target, pin it in place and lay two coats of gold on
+ * it, then one more every two seconds it stays bound. Works like Iron's Root: the target rides an immobile
+ * {@link GildedChainsEntity} it cannot dismount.
  */
 @AutoSpellConfig
 public class GildedChainsSpell extends AbstractSpell {
+    /** Coats of gold the chains lay as they bind. */
+    public static final int GILDS = 2;
+
     private final ResourceLocation spellId = ArcanesOublies.id("gilded_chains");
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
@@ -57,7 +62,9 @@ public class GildedChainsSpell extends AbstractSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.effect_length", Utils.timeFromTicks(getDuration(spellLevel, caster), 1)),
-                Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2))
+                Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2)),
+                Component.translatable("ui.arcanes_oublies.gilds", GILDS),
+                Component.translatable("ui.arcanes_oublies.gild_every", Utils.timeFromTicks(GildedChainsEntity.GILD_EVERY, 1))
         );
     }
 
@@ -110,11 +117,14 @@ public class GildedChainsSpell extends AbstractSpell {
             if (target != null && !target.getType().is(ModTags.CANT_ROOT)) {
                 GildedChainsEntity chains = new GildedChainsEntity(level, entity);
                 chains.setDuration(getDuration(spellLevel, entity));
-                chains.moveTo(target.position());
+                // Facing the caster, so the padlock hangs on the caster's side
+                Vec3 toCaster = entity.position().subtract(target.position());
+                chains.moveTo(target.getX(), target.getY(), target.getZ(), (float) (Mth.atan2(toCaster.z, toCaster.x) * Mth.RAD_TO_DEG) - 90, 0);
                 level.addFreshEntity(chains);
                 target.stopRiding();
                 target.startRiding(chains, true);
                 DamageSources.applyDamage(target, getDamage(spellLevel, entity), ModSpells.GILDED_CHAINS.get().getDamageSource(chains, entity));
+                GoldFx.gild(target, GILDS);
             }
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);

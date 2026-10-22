@@ -28,7 +28,8 @@ import javax.annotation.Nullable;
 
 /**
  * Invisible anchor for Gilded Chains: the bound target rides it and cannot dismount (Iron's {@link PreventDismount}),
- * so it stays pinned until the chains break. The chains themselves are drawn by the client renderer.
+ * so it stays pinned until the chains break. The chains are gold: every two seconds they lay another coat of gold on
+ * their prisoner. The chains themselves are drawn by the client renderer.
  */
 public class GildedChainsEntity extends Entity implements PreventDismount, AntiMagicSusceptible {
     private static final EntityDataAccessor<Integer> DATA_DURATION = SynchedEntityData.defineId(GildedChainsEntity.class, EntityDataSerializers.INT);
@@ -37,6 +38,8 @@ public class GildedChainsEntity extends Entity implements PreventDismount, AntiM
     public static final int CHAIN_COUNT = 4;
     /** Ticks the chains take to burst out of the ground. */
     public static final int EMERGE_TICKS = 6;
+    /** Ticks between two coats of gold laid on the prisoner. */
+    public static final int GILD_EVERY = 40;
 
     @Nullable
     private UUID ownerUUID;
@@ -98,7 +101,18 @@ public class GildedChainsEntity extends Entity implements PreventDismount, AntiM
         Entity bound = getFirstPassenger();
         if (tickCount > getDuration() || bound == null || !bound.isAlive()) {
             breakChains();
+        } else if (tickCount % GILD_EVERY == 0 && bound instanceof LivingEntity prisoner) {
+            tighten(prisoner);
         }
+    }
+
+    /** The chains draw tight and gild their prisoner a little more. */
+    private void tighten(LivingEntity prisoner) {
+        GoldFx.gild(prisoner, 1);
+        Level level = level();
+        level.playSound(null, getX(), getY(), getZ(), SoundEvents.CHAIN_HIT, SoundSource.NEUTRAL, 1.2f, .7f);
+        level.playSound(null, getX(), getY(), getZ(), SoundEvents.ARMOR_EQUIP_GOLD.value(), SoundSource.NEUTRAL, 1f, .7f);
+        SpellUtil.particles(level, GoldFx.PALE_DUST, getX(), getY() + boundHeight() * .5, getZ(), 14, boundWidth() * .5, boundHeight() * .3, boundWidth() * .5, .02);
     }
 
     private float boundWidth() {
@@ -151,6 +165,7 @@ public class GildedChainsEntity extends Entity implements PreventDismount, AntiM
         if (!level.isClientSide) {
             double y = getY() + boundHeight() * .5;
             GoldFx.shatterBurst(level, getX(), y, getZ(), .8f);
+            GoldFx.coins(level, new Vec3(getX(), y, getZ()), 12, .35f);
             SpellUtil.particles(level, GoldFx.chainShards(), getX(), y, getZ(), 16, boundWidth() * .5, boundHeight() * .3, boundWidth() * .5, .2);
             level.playSound(null, getX(), getY(), getZ(), SoundEvents.CHAIN_BREAK, SoundSource.NEUTRAL, 2f, .7f);
             level.playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.NEUTRAL, 1.5f, .9f);

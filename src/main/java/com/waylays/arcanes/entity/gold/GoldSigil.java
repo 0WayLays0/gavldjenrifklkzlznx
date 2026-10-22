@@ -8,12 +8,17 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-/** The incantation of Gold magic: the Sun Stone of Eldorado burning on the ground for a moment, its rings turning. */
+/**
+ * The incantation of Gold magic: the Sun Stone of Eldorado burning on the ground for a moment, its rings turning; or,
+ * as a vault, burning face down in the sky.
+ */
 public class GoldSigil extends SpellEffectEntity {
     private static final EntityDataAccessor<Float> DATA_RADIUS = SynchedEntityData.defineId(GoldSigil.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> DATA_LIFE = SynchedEntityData.defineId(GoldSigil.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DATA_VAULT = SynchedEntityData.defineId(GoldSigil.class, EntityDataSerializers.BOOLEAN);
 
     public GoldSigil(EntityType<? extends GoldSigil> entityType, Level level) {
         super(entityType, level);
@@ -28,10 +33,26 @@ public class GoldSigil extends SpellEffectEntity {
         return sigil;
     }
 
+    /** The sun stone opening face down in the sky at {@code at}. */
+    public static GoldSigil vault(Level level, Vec3 at, float radius, int life) {
+        GoldSigil sigil = new GoldSigil(ModEntities.GOLD_SIGIL.get(), level);
+        sigil.moveTo(at.x, at.y, at.z, level.random.nextFloat() * 360, 0);
+        sigil.entityData.set(DATA_RADIUS, radius);
+        sigil.entityData.set(DATA_LIFE, life);
+        sigil.entityData.set(DATA_VAULT, true);
+        level.addFreshEntity(sigil);
+        return sigil;
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_RADIUS, 2f);
         builder.define(DATA_LIFE, 30);
+        builder.define(DATA_VAULT, false);
+    }
+
+    public boolean isVault() {
+        return this.entityData.get(DATA_VAULT);
     }
 
     public float getRadius() {
@@ -49,6 +70,11 @@ public class GoldSigil extends SpellEffectEntity {
         if (!level().isClientSide && tickCount > this.entityData.get(DATA_LIFE)) {
             discard();
         }
+    }
+
+    @Override
+    public AABB getBoundingBoxForCulling() {
+        return getBoundingBox().inflate(getRadius(), .5, getRadius());
     }
 
     @Override

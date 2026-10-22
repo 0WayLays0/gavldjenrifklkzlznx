@@ -17,6 +17,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -26,7 +27,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Golden Spikes: a wave of gold crystal spikes bursts out of the ground in a line in front of the caster.
+ * Golden Spikes: a wave of gold crystal clusters bursts out of the ground in a line in front of the caster, each one
+ * gilding and tossing what it strikes, and the wave breaks in a crown of spikes at its end (see {@link GoldSpikeEntity}).
  */
 @AutoSpellConfig
 public class GoldenSpikesSpell extends AbstractSpell {
@@ -54,7 +56,8 @@ public class GoldenSpikesSpell extends AbstractSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2)),
-                Component.translatable("ui.arcanes_oublies.length", Utils.stringTruncation(getSpikeCount(spellLevel) * SPACING, 1))
+                Component.translatable("ui.arcanes_oublies.length", Utils.stringTruncation(getSpikeCount(spellLevel) * SPACING, 1)),
+                Component.translatable("ui.arcanes_oublies.gilds", 1)
         );
     }
 
@@ -86,12 +89,16 @@ public class GoldenSpikesSpell extends AbstractSpell {
         float damage = getDamage(spellLevel, entity);
         int count = getSpikeCount(spellLevel);
         for (int i = 0; i < count; i++) {
-            Vec3 at = entity.position().add(forward.scale(1.5 + i * SPACING));
+            // The wave wavers a little from side to side
+            Vec3 side = new Vec3(-forward.z, 0, forward.x).scale(Mth.nextDouble(entity.getRandom(), -.35, .35));
+            Vec3 at = entity.position().add(forward.scale(1.5 + i * SPACING)).add(side);
             Vec3 ground = SpellUtil.groundAt(level, at, 4, 1);
             GoldSpikeEntity spike = new GoldSpikeEntity(level, entity, damage, 2 + i * TICKS_BETWEEN_SPIKES);
-            spike.moveTo(ground.x, ground.y, ground.z);
+            spike.moveTo(ground.x, ground.y, ground.z, entity.getRandom().nextFloat() * 360, 0);
+            spike.setCrown(i == count - 1);
             level.addFreshEntity(spike);
         }
+        GoldFx.sigil(level, entity.position(), 1.4f, 20);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 

@@ -15,6 +15,7 @@ import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.gold.GildedChainsSpell;
 import com.waylays.arcanes.spells.gold.GoldenSentinelsSpell;
 import com.waylays.arcanes.spells.gold.GoldfallSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -121,6 +122,7 @@ public final class GoldGameTests {
         helper.assertTrue(target.getVehicle() instanceof GildedChainsEntity, "target is not bound by the chains");
         GildedChainsEntity chains = (GildedChainsEntity) target.getVehicle();
         helper.assertTrue(target.getHealth() < target.getMaxHealth(), "binding did not hurt the target");
+        helper.assertTrue(GildedEffect.coats(target) == GildedChainsSpell.GILDS, "binding did not gild the target (" + GildedEffect.coats(target) + " coats)");
         target.stopRiding();
         helper.assertTrue(target.getVehicle() == chains, "target slipped out of the chains");
 
@@ -141,8 +143,9 @@ public final class GoldGameTests {
         ingot.setDamage(5f);
         helper.getLevel().addFreshEntity(ingot);
         helper.succeedWhen(() -> {
-            helper.assertTrue(ingot.isRemoved(), "ingot is still falling");
+            helper.assertTrue(ingot.isRemoved(), "ingot has not melted away (planted: " + ingot.isPlanted() + ")");
             helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 4f, "impact did not hurt the target [" + describe(helper, target) + "]");
+            helper.assertTrue(GildedEffect.coats(target) >= 1, "the impact did not gild the target");
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the caster was hurt by its own ingot");
         });
     }
@@ -200,7 +203,10 @@ public final class GoldGameTests {
         helper.getLevel().addFreshEntity(blade);
         helper.runAfterDelay(AurumBladeEntity.STRIKE_TICK - 4, () ->
                 helper.assertTrue(target.getHealth() == target.getMaxHealth(), "the blade struck before plunging"));
-        helper.succeedWhen(() -> helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 5f, "the blade did not strike [" + describe(helper, target) + "]"));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 5f, "the blade did not strike [" + describe(helper, target) + "]");
+            helper.assertTrue(GildedEffect.coats(target) >= 2, "the blade did not lay two coats of gold on its target");
+        });
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 100)
