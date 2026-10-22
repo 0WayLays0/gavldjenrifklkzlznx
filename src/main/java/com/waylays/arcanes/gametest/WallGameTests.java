@@ -111,7 +111,7 @@ public final class WallGameTests {
         helper.assertTrue(count == 10, "expected 10 Wall spells, found " + count);
         helper.assertTrue(new ItemStack(ModItems.RAMPART_CODEX.get()).getItem() instanceof SpellBook, "the Rampart Codex is not a spellbook");
         helper.assertTrue(new ItemStack(Items.STONE_BRICKS).is(ModSchools.WALL_FOCUS), "stone bricks are not the school's focus");
-        cleanUp(helper);
+        // No clean-up here: this test raises nothing, and it runs alongside other schools' tests whose shots it would take
         helper.succeed();
     }
 
@@ -230,8 +230,9 @@ public final class WallGameTests {
                     helper.assertTrue(brick(helper, 4 + dx, 5, 4 + dz), "the lid has a gap at " + (4 + dx) + " 5 " + (4 + dz));
                 }
             }
-            BlockPos in = helper.relativePos(husk.blockPosition());
-            helper.assertTrue(in.getX() == 4 && in.getZ() == 4 && husk.isAlive(), "the husk is not in its cell");
+            Vec3 in = helper.relativeVec(husk.position());
+            helper.assertTrue(husk.isAlive() && in.x > 4 && in.x < 5 && in.z > 4 && in.z < 5,
+                    "the husk is not in its cell: at " + in + ", alive " + husk.isAlive());
             helper.assertTrue(husk.hasEffect(MobEffects.DARKNESS), "the husk is not in the dark");
             cleanUp(helper);
             helper.succeed();
