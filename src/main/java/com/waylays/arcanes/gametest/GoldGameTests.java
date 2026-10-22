@@ -149,7 +149,9 @@ public final class GoldGameTests {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         GoldfallSpell spell = (GoldfallSpell) ModSpells.GOLDFALL.get();
         spell.onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
-        List<GoldfallIngot> ingots = helper.getLevel().getEntitiesOfClass(GoldfallIngot.class, caster.getBoundingBox().inflate(40, 60, 40));
+        // Only this caster's ingots: another test's may be falling within reach
+        List<GoldfallIngot> ingots = helper.getLevel().getEntitiesOfClass(GoldfallIngot.class, caster.getBoundingBox().inflate(40, 60, 40),
+                ingot -> ingot.getOwner() == caster);
         int count = ingots.size();
         // They would land 32 blocks away, possibly on another test: clear them
         ingots.forEach(GoldfallIngot::discard);
