@@ -4,7 +4,7 @@ Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.21.1, NeoForge 21.1.221+
 La dernière version pour Minecraft 1.20.1 (Forge) est la 0.9.0 (commit `6359b13` de l'historique).
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss, Magie Runique, Magie de Glyphe et Magie des Jetons
+## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss, Magie Runique, Magie de Glyphe, Magie des Jetons et Magie de Mousse, Cuivre et Rouille
 
 Quatre nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
@@ -294,11 +294,36 @@ Livre : **Registre des Âmes** (cuir bleu nuit, un cercle de jetons serti dans l
 Focus de l'école : le **Jeton d'Âme**, un objet à part entière (4 jetons = 1 cristal de prismarine + 1 pépite d'or +
 1 sable des âmes, sans forme).
 
+### Magie de Mousse, Cuivre et Rouille
+
+La magie des temples engloutis, **offensive** de bout en bout (elle remplace l'école « Mousse et Flore » prévue au
+départ, qui faisait surtout du soin). Des pics, des piliers et des murs de **vieux cuivre vert-de-gris** jaillissent du
+sol dans un style antique, couverts de mousse, des **lianes** pendues en décor ; la rouille ronge les armures. Tout est
+construit avec les blocs du jeu (cuivre oxydé, coupé et ciselé, briques de pierre moussues, mousse, lianes) mis à
+l'échelle, pas de textures inventées.
+
+| Sort | Effet |
+|---|---|
+| **Pics de Cuivre** (Copper Spikes) | Tu frappes le sol : un coin de pics de cuivre jaillit devant toi, rangée après rangée (8 à 14 blocs), empale et projette en l'air les ennemis, qui saignent 3 s. |
+| **Pilier Antique** (Ancient Pillar) | Un pilier moussu jaillit sous l'ennemi visé (ou là où tu vises, jusqu'à 20 blocs) et le projette haut. |
+| **Mur Basculant** (Toppling Wall) | Un pan de rempart crénelé (5 blocs de large, 3,5 de haut) surgit devant toi, vacille et s'abat vers l'avant : il écrase et ralentit fort tout ce qui est dessous. |
+| **Rouille** (Rust) | Un caillot de rouille : la cible perd 15 % d'armure et de robustesse par niveau (10 à 18 s) et ses pièces d'armure s'usent toutes les 2 s. |
+| **Lianes Étrangleuses** (Strangling Vines) | Des lianes escaladent l'ennemi visé : il ne peut plus marcher ni sauter (3,5 à 6 s) et elles le serrent chaque seconde. Dès le niveau 3, elles saisissent aussi ses voisins. |
+| **Spores de Mousse** (Moss Spores) | Un tapis de mousse fleurie (3,5 blocs) s'étend là où tu vises : toutes les demi-secondes, les ennemis dessus sont blessés, empoisonnés et ralentis. |
+| **Colonnade** (Colonnade) | Huit colonnes jaillissent en cercle autour de toi : les ennemis proches sont blessés et repoussés. |
+| **Paratonnerre Antique** (Ancient Lightning Rod) | Une haute colonne couronnée d'un paratonnerre s'élève là où tu vises (9,5 à 17 s) : toutes les 1,5 s la foudre tombe dessus et saute sur l'ennemi le plus proche (8 blocs). |
+| **Cloche Antique** (Ancient Bell) | Une grande cloche verdie tombe du ciel sur l'ennemi visé : écrasé et étourdi dessous, blessé et repoussé autour (5 blocs). |
+| **Temple Englouti** (Sunken Temple, ultime) | Les ruines d'un temple s'élèvent autour de l'ennemi visé : huit colonnes de 6 blocs, reliées par des linteaux, l'enferment (ceux qui approchent du bord sont repoussés dedans) sous une pluie de gravats, puis **s'effondrent toutes vers l'intérieur** et ensevelissent tout. |
+
+Livre : **Codex Rouillé** (plaques de cuivre vert-de-gris rivetées, rouille sur les bords, mousse sur le dos).
+Focus de l'école : le **lingot de cuivre**.
+
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
 (`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre, `tools/errethys_assets.py`
 pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` pour Caractéristique Physique,
 `tools/boss_assets.py` pour la Magie de Boss, `tools/rune_assets.py` pour la Magie Runique, `tools/glyph_assets.py`
-pour la Magie de Glyphe, `tools/token_assets.py` pour la Magie des Jetons à partir de `tools/models/soul_token.bbmodel`).
+pour la Magie de Glyphe, `tools/token_assets.py` pour la Magie des Jetons à partir de `tools/models/soul_token.bbmodel`,
+`tools/verdigris_assets.py` pour la Magie de Mousse, Cuivre et Rouille).
 
 ## Récupérer le mod
 

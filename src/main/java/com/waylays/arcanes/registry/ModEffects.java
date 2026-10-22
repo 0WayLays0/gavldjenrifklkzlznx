@@ -3,6 +3,7 @@ package com.waylays.arcanes.registry;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.effect.BlastLeapEffect;
 import com.waylays.arcanes.effect.BleedingEffect;
+import com.waylays.arcanes.effect.EntangledEffect;
 import com.waylays.arcanes.effect.GildedArmorEffect;
 import com.waylays.arcanes.effect.GlyphFrozenEffect;
 import com.waylays.arcanes.effect.GlyphMarkEffect;
@@ -12,6 +13,7 @@ import com.waylays.arcanes.effect.PetrifiedEffect;
 import com.waylays.arcanes.effect.PinnedEffect;
 import com.waylays.arcanes.effect.ReactiveShieldEffect;
 import com.waylays.arcanes.effect.RuneEdgeEffect;
+import com.waylays.arcanes.effect.RustedEffect;
 import com.waylays.arcanes.effect.SilenceEffect;
 import com.waylays.arcanes.effect.SunderedEffect;
 import com.waylays.arcanes.effect.VolatileBrandEffect;
@@ -43,6 +45,9 @@ public final class ModEffects {
     public static final List<DeferredHolder<MobEffect, MobEffect>> GLYPH_MARKS = Arrays.stream(GlyphElement.values())
             .map(element -> EFFECTS.register("glyph_" + element.id, () -> (MobEffect) new GlyphMarkEffect(element))).toList();
     public static final DeferredHolder<MobEffect, MobEffect> GLYPH_FROZEN = EFFECTS.register("glyph_frozen", GlyphFrozenEffect::new);
+    /** Moss, Copper and Rust: rusted armour (protects less, wears away), and vines holding a creature in place. */
+    public static final DeferredHolder<MobEffect, MobEffect> RUSTED = EFFECTS.register("rusted", RustedEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> ENTANGLED = EFFECTS.register("entangled", EntangledEffect::new);
 
     private ModEffects() {}
 }

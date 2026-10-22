@@ -21,7 +21,8 @@ Ordre de développement :
   3. Explosion
   4. Livre
   5. Chewing-Gum
-  6. Mousse et Flore
+  6. Mousse, Cuivre et Rouille (refaite à la demande : offensive, style
+     ancien ; remplace « Mousse et Flore »)
   7. Néant / Vide
   8. Miroirs
   9. Cosmos / Étoiles
@@ -240,38 +241,40 @@ Livre : Bubblegum Spellbook (couverture qui gonfle) [ ]
 
 
 ================================================================================
- 6. MAGIE DE LA MOUSSE ET DE LA FLORE (Moss & Flora / Sylvestre) [ ] À FAIRE
+ 6. MAGIE DE MOUSSE, CUIVRE ET ROUILLE (Moss, Copper & Rust)      [~] EN TEST
 ================================================================================
-Couleur : vert émeraude lumineux / rose fleur
-Ambiance : forêt ancienne, esprits sylvestres, lucioles, bioluminescence
-Sons : bruissements, craquements de bois, éclosions, chants de forêt
+Refaite à la demande (offensive, style ancien) : elle remplace l'ancienne
+liste « Mousse et Flore » (soins, esprits, pollen), abandonnée.
+Couleur : vert-de-gris (le vert du vieux cuivre), cuivre et rouille.
+Ambiance : temple englouti ; piliers, pics et murs de cuivre verdi qui
+jaillissent du sol, mousse et lianes en décor, rouille qui ronge.
+Les visuels sont faits avec les blocs du jeu (cuivre oxydé, ciselé, pierre
+moussue, mousse, lianes) mis à l'échelle. Livre : Codex Rouillé. Focus :
+lingot de cuivre.
 
-Attention : Iron's Spells a déjà une école Nature (Root, Oakskin, Blight,
-Poison Arrow...). Les sorts ci-dessous sont pensés pour ne pas faire doublon,
-à vérifier au moment du développement.
+ 1. Copper Spikes      [~] Coin de pics de cuivre qui jaillissent devant le
+                           lanceur, rangée après rangée ; saignement.
+ 2. Ancient Pillar     [~] Pilier moussu qui jaillit sous l'ennemi visé et le
+                           projette en l'air.
+ 3. Toppling Wall      [~] Pan de rempart (5 blocs) qui surgit, vacille et
+                           s'abat vers l'avant ; écrase et ralentit.
+ 4. Rust               [~] Caillot de rouille : l'armure de la cible protège
+                           moins et s'use.
+ 5. Strangling Vines   [~] Lianes qui immobilisent et serrent l'ennemi visé
+                           (et ses voisins dès le niveau 3).
+ 6. Moss Spores        [~] Tapis de mousse fleurie qui empoisonne et ralentit
+                           les ennemis dessus.
+ 7. Colonnade          [~] Cercle de colonnes autour du lanceur, repousse les
+                           ennemis proches.
+ 8. Ancient Lightning  [~] Colonne-paratonnerre qui attire la foudre sur
+    Rod                    l'ennemi le plus proche.
+ 9. Ancient Bell       [~] Grande cloche verdie qui tombe du ciel : écrase et
+                           étourdit dessous, repousse autour.
+10. Sunken Temple      [~] ULTIME - Un temple en ruine s'élève autour de
+                           l'ennemi, l'enferme sous les gravats puis ses
+                           colonnes s'effondrent vers l'intérieur.
 
- 1. Thorn Volley       [ ] Une salve d'épines lumineuses qui font saigner la
-                           cible.
- 2. Strangling Vines   [ ] Des lianes vivantes jaillissent du sol, enserrent
-                           la cible et l'étouffent.
- 3. Sacred Grove       [ ] Un cercle de mousse lumineuse se répand et soigne
-                           les alliés qui se tiennent dessus.
- 4. Spore Bloom        [ ] Des champignons géants poussent et libèrent un
-                           nuage de spores toxiques.
- 5. Petal Storm        [ ] Une tempête de pétales tranchants tourbillonne
-                           autour du lanceur.
- 6. Vine Lash          [ ] Un fouet de lianes épineuses frappe et attire la
-                           cible.
- 7. Ancient Bark       [ ] Le lanceur se couvre d'écorce millénaire couverte
-                           de mousse : il absorbe les dégâts et se régénère.
- 8. Forest Spirit      [ ] Invoque un esprit de la forêt (cerf de mousse et de
-                           lumière) qui combat pour le lanceur.
- 9. Dream Pollen       [ ] Un nuage de pollen doré endort les ennemis touchés.
-10. Heart of the Forest[ ] ULTIME - Un arbre-monde géant surgit du sol ; ses
-                           racines écrasent les ennemis, ses fleurs soignent
-                           les alliés.
-
-Livre : Mossbound Spellbook (couvert de mousse et de fleurs) [ ]
+Livre : Codex Rouillé (Rusted Codex) [~]
 
 
 ================================================================================

@@ -48,6 +48,10 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> SOUL_TOKEN = ITEMS.register("soul_token",
             () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
 
+    /** Moss, Copper and Rust spellbook (bound in verdigrised copper, overgrown): 10 slots, +10% power, +200 max mana. */
+    public static final DeferredHolder<Item, Item> RUSTED_CODEX = ITEMS.register("rusted_codex",
+            () -> spellbook(10, ModAttributes.VERDIGRIS_SPELL_POWER));
+
     private ModItems() {}
 
     /** A legendary school spellbook, like Iron's own: +10% power in its school and +200 max mana. */

@@ -57,6 +57,14 @@ import com.waylays.arcanes.entity.token.TokenMine;
 import com.waylays.arcanes.entity.token.TokenMote;
 import com.waylays.arcanes.entity.token.TokenStorm;
 import com.waylays.arcanes.entity.token.TokenWave;
+import com.waylays.arcanes.entity.verdigris.AncientBell;
+import com.waylays.arcanes.entity.verdigris.AncientPillar;
+import com.waylays.arcanes.entity.verdigris.CopperSpikes;
+import com.waylays.arcanes.entity.verdigris.RustBolt;
+import com.waylays.arcanes.entity.verdigris.SporePatch;
+import com.waylays.arcanes.entity.verdigris.SunkenTemple;
+import com.waylays.arcanes.entity.verdigris.ToppleWall;
+import com.waylays.arcanes.entity.verdigris.VineSnare;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
 import com.waylays.arcanes.entity.gold.GildedChainsEntity;
@@ -294,6 +302,24 @@ public final class ModEntities {
             EntityType.Builder.<TokenWave>of(TokenWave::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<TokenHand>> TOKEN_HAND = register("token_hand",
             EntityType.Builder.<TokenHand>of(TokenHand::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
+
+    // Moss, Copper and Rust: ancient copper risen from the ground, rust and moss
+    public static final DeferredHolder<EntityType<?>, EntityType<RustBolt>> RUST_BOLT = register("rust_bolt",
+            EntityType.Builder.<RustBolt>of(RustBolt::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(1));
+    public static final DeferredHolder<EntityType<?>, EntityType<AncientPillar>> ANCIENT_PILLAR = register("ancient_pillar",
+            EntityType.Builder.<AncientPillar>of(AncientPillar::new, MobCategory.MISC).sized(1.2f, 3.6f).clientTrackingRange(12).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<CopperSpikes>> COPPER_SPIKES = register("copper_spikes",
+            EntityType.Builder.<CopperSpikes>of(CopperSpikes::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<ToppleWall>> TOPPLE_WALL = register("toppling_wall",
+            EntityType.Builder.<ToppleWall>of(ToppleWall::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<AncientBell>> ANCIENT_BELL = register("ancient_bell",
+            EntityType.Builder.<AncientBell>of(AncientBell::new, MobCategory.MISC).sized(2.4f, 2.4f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<VineSnare>> VINE_SNARE = register("vine_snare",
+            EntityType.Builder.<VineSnare>of(VineSnare::new, MobCategory.MISC).sized(.6f, .6f).clientTrackingRange(8).updateInterval(5).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<SporePatch>> SPORE_PATCH = register("spore_patch",
+            EntityType.Builder.<SporePatch>of(SporePatch::new, MobCategory.MISC).sized(1f, .2f).clientTrackingRange(8).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<SunkenTemple>> SUNKEN_TEMPLE = register("sunken_temple",
+            EntityType.Builder.<SunkenTemple>of(SunkenTemple::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(14).updateInterval(20).fireImmune());
 
     private ModEntities() {}
 

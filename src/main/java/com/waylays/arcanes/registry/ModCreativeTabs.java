@@ -37,7 +37,8 @@ public final class ModCreativeTabs {
             new Section(ModSchools.BOSS, () -> new ItemStack(ModItems.TYRANTS_CODEX.get()), List.of(ModItems.TYRANTS_CODEX)),
             new Section(ModSchools.RUNE, () -> new ItemStack(ModItems.ELDER_RUNE_CODEX.get()), List.of(ModItems.ELDER_RUNE_CODEX)),
             new Section(ModSchools.GLYPH, () -> new ItemStack(ModItems.SIX_INKS_CODEX.get()), List.of(ModItems.SIX_INKS_CODEX)),
-            new Section(ModSchools.TOKEN, () -> new ItemStack(ModItems.SOUL_LEDGER.get()), List.of(ModItems.SOUL_LEDGER, ModItems.SOUL_TOKEN)));
+            new Section(ModSchools.TOKEN, () -> new ItemStack(ModItems.SOUL_LEDGER.get()), List.of(ModItems.SOUL_LEDGER, ModItems.SOUL_TOKEN)),
+            new Section(ModSchools.VERDIGRIS, () -> new ItemStack(ModItems.RUSTED_CODEX.get()), List.of(ModItems.RUSTED_CODEX)));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup." + ArcanesOublies.MODID))

@@ -185,6 +185,25 @@ public final class ModSchools {
             TOKEN_MAGIC
     ));
 
+    /**
+     * Moss, Copper and Rust: the ancient magic of drowned temples. Copper spikes, pillars and walls burst out of the
+     * ground, green with verdigris and hung with vines; rust eats armour and moss chokes. Offensive throughout.
+     */
+    public static final ResourceLocation VERDIGRIS_RESOURCE = ArcanesOublies.id("verdigris");
+    public static final TagKey<Item> VERDIGRIS_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("verdigris_focus"));
+    public static final ResourceKey<DamageType> VERDIGRIS_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("verdigris_magic"));
+    public static final int VERDIGRIS_COLOR = 0x4FBF96;
+
+    public static final DeferredHolder<SchoolType, SchoolType> VERDIGRIS = SCHOOLS.register(VERDIGRIS_RESOURCE.getPath(), () -> new SchoolType(
+            VERDIGRIS_RESOURCE,
+            VERDIGRIS_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".verdigris").withStyle(Style.EMPTY.withColor(VERDIGRIS_COLOR)),
+            ModAttributes.VERDIGRIS_SPELL_POWER,
+            ModAttributes.VERDIGRIS_MAGIC_RESIST,
+            sound(SoundEvents.COPPER_PLACE),
+            VERDIGRIS_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

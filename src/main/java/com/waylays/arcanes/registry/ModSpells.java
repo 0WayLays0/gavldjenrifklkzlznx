@@ -110,6 +110,16 @@ import com.waylays.arcanes.spells.token.TokenRicochetSpell;
 import com.waylays.arcanes.spells.token.TokenStormSpell;
 import com.waylays.arcanes.spells.token.TokenThrowSpell;
 import com.waylays.arcanes.spells.token.TokenWaveSpell;
+import com.waylays.arcanes.spells.verdigris.AncientBellSpell;
+import com.waylays.arcanes.spells.verdigris.AncientPillarSpell;
+import com.waylays.arcanes.spells.verdigris.ColonnadeSpell;
+import com.waylays.arcanes.spells.verdigris.CopperSpikesSpell;
+import com.waylays.arcanes.spells.verdigris.LightningRodSpell;
+import com.waylays.arcanes.spells.verdigris.MossSporesSpell;
+import com.waylays.arcanes.spells.verdigris.RustSpell;
+import com.waylays.arcanes.spells.verdigris.StranglingVinesSpell;
+import com.waylays.arcanes.spells.verdigris.SunkenTempleSpell;
+import com.waylays.arcanes.spells.verdigris.TopplingWallSpell;
 import com.waylays.arcanes.spells.rune.CircleOfEldersSpell;
 import com.waylays.arcanes.spells.rune.EdgeRuneSpell;
 import com.waylays.arcanes.spells.rune.MendingRunestoneSpell;
@@ -269,6 +279,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> TOKEN_MINES = register(new TokenMinesSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SOUL_TRIBUTE = register(new SoulTributeSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> TOKEN_HAND = register(new TokenHandSpell());
+
+    // Moss, Copper and Rust
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> COPPER_SPIKES = register(new CopperSpikesSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ANCIENT_PILLAR = register(new AncientPillarSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TOPPLING_WALL = register(new TopplingWallSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RUST = register(new RustSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> STRANGLING_VINES = register(new StranglingVinesSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MOSS_SPORES = register(new MossSporesSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> COLONNADE = register(new ColonnadeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ANCIENT_LIGHTNING_ROD = register(new LightningRodSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ANCIENT_BELL = register(new AncientBellSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SUNKEN_TEMPLE = register(new SunkenTempleSpell());
 
     private ModSpells() {}
 

@@ -34,9 +34,11 @@ PALETTES = {
     # Grey stone, the runes glowing violet, silver rod ends
     "rune": ["6e6a64", "807b74", "948f87", "46433f", "5a5752", "f2e6ff", "b57bff", "7a3fd8", "e6eaee", "b2b9c1", "737b85"],
     # Ivory paper, the writing in three of the six inks (flame, tide, gale), gold rod ends
+    "glyph": ["d9cfb2", "ebe3cb", "f8f4e8", "a89d80", "c0b597", "ff8a3a", "3f9bff", "4fd49a", "ffe08a", "d8a840", "9a6c1c"],
     # Pale ledger paper, the writing in cyan soul ink, silver rod ends
     "token": ["a9c4cc", "c4dce2", "e2f1f4", "7d98a1", "92afb8", "4fe4ff", "1aa9d6", "0e6f96", "e6f6fa", "a8d4de", "5f8e9a"],
-    "glyph": ["d9cfb2", "ebe3cb", "f8f4e8", "a89d80", "c0b597", "ff8a3a", "3f9bff", "4fd49a", "ffe08a", "d8a840", "9a6c1c"],
+    # A sheet of green copper foil, the writing in rust, bright copper rod ends
+    "verdigris": ["5fa88a", "74bf9f", "9ad8bc", "3d7a62", "4e8f74", "d8814a", "a0451e", "6a2a10", "f6b278", "d8814a", "8a4a22"],
 }
 
 
