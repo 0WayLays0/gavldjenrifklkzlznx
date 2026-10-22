@@ -231,7 +231,10 @@ public final class WallGameTests {
         Husk husk = husk(helper, 4.5, 4.5);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(400);
         husk.setHealth(400);
-        Citadel.raise(helper.getLevel(), caster, ModSpells.FALLEN_CITADEL.get(), husk.position(), 8);
+        Citadel citadel = Citadel.raise(helper.getLevel(), caster, ModSpells.FALLEN_CITADEL.get(), husk.position(), 8);
+        // Towers on the diagonals: they stand 6.5 blocks out, and only on the diagonals is that inside the barrier walls
+        // around the test (bricks lobbed from outside them would hit the barriers)
+        citadel.setYRot(45);
         float[] before = {0};
         helper.runAfterDelay(Citadel.IMPACT - 2, () -> {
             helper.assertTrue(hurt(husk), "no brick from the towers hit the husk");
