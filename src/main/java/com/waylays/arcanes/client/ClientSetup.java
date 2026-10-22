@@ -23,6 +23,15 @@ import com.waylays.arcanes.client.render.GlyphSignRenderer;
 import com.waylays.arcanes.client.render.GlyphStormRenderer;
 import com.waylays.arcanes.client.render.GlyphWaveRenderer;
 import com.waylays.arcanes.client.render.GlyphZoneRenderer;
+import com.waylays.arcanes.client.render.TokenAegisRenderer;
+import com.waylays.arcanes.client.render.TokenBoltRenderer;
+import com.waylays.arcanes.client.render.TokenFlipRenderer;
+import com.waylays.arcanes.client.render.TokenHandRenderer;
+import com.waylays.arcanes.client.render.TokenMarkerRenderer;
+import com.waylays.arcanes.client.render.TokenMineRenderer;
+import com.waylays.arcanes.client.render.TokenMoteRenderer;
+import com.waylays.arcanes.client.render.TokenStormRenderer;
+import com.waylays.arcanes.client.render.TokenWaveRenderer;
 import com.waylays.arcanes.client.render.EldoradoSunRenderer;
 import com.waylays.arcanes.client.render.FinalChapterRenderer;
 import com.waylays.arcanes.client.render.FlyingGrimoireRenderer;
@@ -146,6 +155,15 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.GLYPH_ZONE.get(), GlyphZoneRenderer::new);
         event.registerEntityRenderer(ModEntities.GLYPH_SEAL.get(), GlyphSealRenderer::new);
         event.registerEntityRenderer(ModEntities.GLYPH_STORM.get(), GlyphStormRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOKEN_BOLT.get(), TokenBoltRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOKEN_MARKER.get(), TokenMarkerRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOKEN_MINE.get(), TokenMineRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOKEN_MOTE.get(), TokenMoteRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOKEN_FLIP.get(), TokenFlipRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOKEN_AEGIS.get(), TokenAegisRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOKEN_STORM.get(), TokenStormRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOKEN_WAVE.get(), TokenWaveRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOKEN_HAND.get(), TokenHandRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));
@@ -174,6 +192,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.TYRANTS_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.ELDER_RUNE_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.SIX_INKS_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.SOUL_LEDGER.get(), SpellBookCurioRenderer::new);
         });
     }
 }

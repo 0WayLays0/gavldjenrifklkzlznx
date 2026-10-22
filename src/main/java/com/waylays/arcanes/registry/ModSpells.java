@@ -100,6 +100,16 @@ import com.waylays.arcanes.spells.glyph.ElementalSealSpell;
 import com.waylays.arcanes.spells.glyph.ElementalScriptSpell;
 import com.waylays.arcanes.spells.glyph.GlyphResonanceSpell;
 import com.waylays.arcanes.spells.glyph.PrimordialGlyphSpell;
+import com.waylays.arcanes.spells.token.CoinFlipSpell;
+import com.waylays.arcanes.spells.token.SoulTributeSpell;
+import com.waylays.arcanes.spells.token.TokenAegisSpell;
+import com.waylays.arcanes.spells.token.TokenHandSpell;
+import com.waylays.arcanes.spells.token.TokenMinesSpell;
+import com.waylays.arcanes.spells.token.TokenRainSpell;
+import com.waylays.arcanes.spells.token.TokenRicochetSpell;
+import com.waylays.arcanes.spells.token.TokenStormSpell;
+import com.waylays.arcanes.spells.token.TokenThrowSpell;
+import com.waylays.arcanes.spells.token.TokenWaveSpell;
 import com.waylays.arcanes.spells.rune.CircleOfEldersSpell;
 import com.waylays.arcanes.spells.rune.EdgeRuneSpell;
 import com.waylays.arcanes.spells.rune.MendingRunestoneSpell;
@@ -247,6 +257,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> ELEMENTAL_SCRIPT = register(new ElementalScriptSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> GLYPH_RESONANCE = register(new GlyphResonanceSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> PRIMORDIAL_GLYPH = register(new PrimordialGlyphSpell());
+
+    // Token Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TOKEN_THROW = register(new TokenThrowSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TOKEN_WAVE = register(new TokenWaveSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TOKEN_STORM = register(new TokenStormSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TOKEN_RICOCHET = register(new TokenRicochetSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> COIN_FLIP = register(new CoinFlipSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TOKEN_AEGIS = register(new TokenAegisSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TOKEN_RAIN = register(new TokenRainSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TOKEN_MINES = register(new TokenMinesSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SOUL_TRIBUTE = register(new SoulTributeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TOKEN_HAND = register(new TokenHandSpell());
 
     private ModSpells() {}
 

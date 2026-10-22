@@ -283,7 +283,8 @@ public final class ClientSmokeTest {
                     : school.equals(ModSchools.BOOK_RESOURCE) ? ModItems.LIVING_GRIMOIRE.get()
                     : school.equals(ModSchools.BOSS_RESOURCE) ? ModItems.TYRANTS_CODEX.get()
                     : school.equals(ModSchools.RUNE_RESOURCE) ? ModItems.ELDER_RUNE_CODEX.get()
-                    : school.equals(ModSchools.GLYPH_RESOURCE) ? ModItems.SIX_INKS_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get();
+                    : school.equals(ModSchools.GLYPH_RESOURCE) ? ModItems.SIX_INKS_CODEX.get()
+                    : school.equals(ModSchools.TOKEN_RESOURCE) ? ModItems.SOUL_LEDGER.get() : ModItems.GOLDEN_GRIMOIRE.get();
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(book));
             // A sturdy target dummy 6 blocks in front of the player, at eye level of the raycast
             Vec3 forward = Vec3.directionFromRotation(0, player.getYRot());

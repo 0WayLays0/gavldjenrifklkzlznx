@@ -40,6 +40,14 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> SIX_INKS_CODEX = ITEMS.register("six_inks_codex",
             () -> spellbook(10, ModAttributes.GLYPH_SPELL_POWER));
 
+    /** Token Magic spellbook (a ledger set with soul tokens): 10 slots, +10% Token Spell Power, +200 max mana. */
+    public static final DeferredHolder<Item, Item> SOUL_LEDGER = ITEMS.register("soul_ledger",
+            () -> spellbook(10, ModAttributes.TOKEN_SPELL_POWER));
+
+    /** A Soul Token (the server team's own model): the Token Magic focus, crafted from prismarine, gold and soul sand. */
+    public static final DeferredHolder<Item, Item> SOUL_TOKEN = ITEMS.register("soul_token",
+            () -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+
     private ModItems() {}
 
     /** A legendary school spellbook, like Iron's own: +10% power in its school and +200 max mana. */

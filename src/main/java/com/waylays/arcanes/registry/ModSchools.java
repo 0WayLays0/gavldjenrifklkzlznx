@@ -166,6 +166,25 @@ public final class ModSchools {
             GLYPH_MAGIC
     ));
 
+    /**
+     * Token Magic: soul tokens, cyan-blue coins holding a soul's spark. Thrown, scattered, whirled or gathered into a
+     * giant hand; one thrown token is a door the caster can step through.
+     */
+    public static final ResourceLocation TOKEN_RESOURCE = ArcanesOublies.id("token");
+    public static final TagKey<Item> TOKEN_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("token_focus"));
+    public static final ResourceKey<DamageType> TOKEN_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("token_magic"));
+    public static final int TOKEN_COLOR = 0x33D6FF;
+
+    public static final DeferredHolder<SchoolType, SchoolType> TOKEN = SCHOOLS.register(TOKEN_RESOURCE.getPath(), () -> new SchoolType(
+            TOKEN_RESOURCE,
+            TOKEN_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".token").withStyle(Style.EMPTY.withColor(TOKEN_COLOR)),
+            ModAttributes.TOKEN_SPELL_POWER,
+            ModAttributes.TOKEN_MAGIC_RESIST,
+            sound(SoundEvents.CHAIN_PLACE),
+            TOKEN_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

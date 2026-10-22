@@ -33,6 +33,7 @@ Ordre de développement :
      en plus
  14. Magie de Glyphe (glyphes élémentaires tracés dans l'air) - demandée
      en plus
+ 15. Magie des Jetons (jetons d'âme bleu cyan) - demandée en plus
 
 
 ================================================================================
@@ -622,3 +623,28 @@ Livre : Codex des Six Encres. Focus : plume.
  9. Glyph Resonance    [~] Toutes les marques autour éclatent à la fois.
 10. Primordial Glyph   [~] ULTIME - Grand glyphe écrit dans le ciel ; ses six
                            éléments s'abattent à tour de rôle sur les ennemis.
+
+
+================================================================================
+15. MAGIE DES JETONS (jetons d'âme)                              [~] EN TEST
+================================================================================
+Des jetons d'âme bleu cyan (modèle « Jeton d'Âme » de l'équipe). On les lance,
+on les sème, on les fait tourbillonner ; un jeton lancé est une porte. Livre :
+Registre des Âmes. Focus : Jeton d'Âme (objet craftable).
+
+ 1. Token Throw        [~] Jeton lancé qui reste où il tombe ; relancer le
+                           sort téléporte sur le jeton.
+ 2. Token Wave         [~] Vague de jetons qui roule et projette en l'air.
+ 3. Token Storm        [~] Tourbillon de jetons autour du lanceur, abat les
+                           tirs ennemis.
+ 4. Ricochet           [~] Jeton qui rebondit d'ennemi en ennemi.
+ 5. Coin Flip          [~] Pile ou face : frappe double, ou soin et
+                           Absorption.
+ 6. Token Aegis        [~] Jetons en orbite qui arrêtent chacun un coup et
+                           le renvoient.
+ 7. Token Rain         [~] Pluie de jetons sur une zone.
+ 8. Trap Tokens        [~] Jetons semés au sol qui éclatent à l'approche.
+ 9. Soul Tribute       [~] Arrache un jeton à chaque ennemi proche, les
+                           jetons soignent le lanceur.
+10. Hand of Souls      [~] ULTIME - Les jetons forment une main géante qui
+                           saisit, écrase et fracasse l'ennemi au sol.

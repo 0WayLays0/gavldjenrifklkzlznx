@@ -48,6 +48,15 @@ import com.waylays.arcanes.entity.glyph.GlyphMarkVisual;
 import com.waylays.arcanes.entity.glyph.GlyphZone;
 import com.waylays.arcanes.entity.glyph.GlyphSeal;
 import com.waylays.arcanes.entity.glyph.GlyphStorm;
+import com.waylays.arcanes.entity.token.TokenAegis;
+import com.waylays.arcanes.entity.token.TokenBolt;
+import com.waylays.arcanes.entity.token.TokenFlip;
+import com.waylays.arcanes.entity.token.TokenHand;
+import com.waylays.arcanes.entity.token.TokenMarker;
+import com.waylays.arcanes.entity.token.TokenMine;
+import com.waylays.arcanes.entity.token.TokenMote;
+import com.waylays.arcanes.entity.token.TokenStorm;
+import com.waylays.arcanes.entity.token.TokenWave;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
 import com.waylays.arcanes.entity.gold.GildedChainsEntity;
@@ -265,6 +274,26 @@ public final class ModEntities {
             EntityType.Builder.<GlyphSeal>of(GlyphSeal::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(5).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<GlyphStorm>> GLYPH_STORM = register("glyph_storm",
             EntityType.Builder.<GlyphStorm>of(GlyphStorm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+
+    // Token Magic: soul tokens flung, laid, whirled and gathered into a hand
+    public static final DeferredHolder<EntityType<?>, EntityType<TokenBolt>> TOKEN_BOLT = register("token_bolt",
+            EntityType.Builder.<TokenBolt>of(TokenBolt::new, MobCategory.MISC).sized(.4f, .4f).clientTrackingRange(8).updateInterval(1));
+    public static final DeferredHolder<EntityType<?>, EntityType<TokenMarker>> TOKEN_MARKER = register("token_marker",
+            EntityType.Builder.<TokenMarker>of(TokenMarker::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TokenMine>> TOKEN_MINE = register("token_mine",
+            EntityType.Builder.<TokenMine>of(TokenMine::new, MobCategory.MISC).sized(.5f, .2f).clientTrackingRange(8).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TokenMote>> TOKEN_MOTE = register("token_mote",
+            EntityType.Builder.<TokenMote>of(TokenMote::new, MobCategory.MISC).sized(.3f, .3f).clientTrackingRange(8).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TokenFlip>> TOKEN_FLIP = register("token_flip",
+            EntityType.Builder.<TokenFlip>of(TokenFlip::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(10).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TokenAegis>> TOKEN_AEGIS = register("token_aegis",
+            EntityType.Builder.<TokenAegis>of(TokenAegis::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(10).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TokenStorm>> TOKEN_STORM = register("token_storm",
+            EntityType.Builder.<TokenStorm>of(TokenStorm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(10).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TokenWave>> TOKEN_WAVE = register("token_wave",
+            EntityType.Builder.<TokenWave>of(TokenWave::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TokenHand>> TOKEN_HAND = register("token_hand",
+            EntityType.Builder.<TokenHand>of(TokenHand::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
 
     private ModEntities() {}
 

@@ -14,6 +14,7 @@
         "arcanes_physical": "arcanes_oublies:item/scroll_palettes/physical",
         "arcanes_boss": "arcanes_oublies:item/scroll_palettes/boss",
         "arcanes_rune": "arcanes_oublies:item/scroll_palettes/rune",
+        "arcanes_token": "arcanes_oublies:item/scroll_palettes/token",
         "arcanes_glyph": "arcanes_oublies:item/scroll_palettes/glyph"
       }
     }

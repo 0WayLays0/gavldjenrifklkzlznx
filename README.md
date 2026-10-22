@@ -4,7 +4,7 @@ Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.21.1, NeoForge 21.1.221+
 La dernière version pour Minecraft 1.20.1 (Forge) est la 0.9.0 (commit `6359b13` de l'historique).
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss, Magie Runique et Magie de Glyphe
+## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss, Magie Runique, Magie de Glyphe et Magie des Jetons
 
 Quatre nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
@@ -271,11 +271,34 @@ Livre : **Codex des Six Encres** (cuir bleu nuit, étoile du Glyphe Primordial d
 une goutte de chaque encre, opale). Focus de l'école : plume. Les glyphes sont dessinés pour l'addon : le jeu et les
 icônes (`tools/glyph_assets.py`) utilisent les mêmes tracés.
 
+### Magie des Jetons
+
+Des **jetons d'âme** bleu cyan : de petites pièces carrées qui gardent une étincelle d'âme (le modèle 3D est le
+**Jeton d'Âme** de l'équipe du serveur, fait sous Blockbench, passé du turquoise au bleu cyan). On les lance, on les
+sème, on les fait tourbillonner, et un jeton lancé est une porte : le lanceur peut s'y téléporter.
+
+| Sort | Effet |
+|---|---|
+| **Lancer de Jeton** (Token Throw) | Un jeton lancé là où tu regardes : il blesse ce qu'il touche et reste là où il tombe (8 à 18 s, un fil de lumière le signale). **Relancer le sort** (instantané et gratuit, relance d'Iron's) te téléporte sur le jeton. |
+| **Vague de Jetons** (Token Wave) | Une vague de jetons jaillit du sol et roule devant toi (11 à 18 blocs, 3 de large) : chaque ennemi touché est frappé et projeté en l'air. |
+| **Tempête de Jetons** (Token Storm) | Un tourbillon de 24 jetons autour de toi qui te suit (3,5 blocs, 7 à 12 s) : il taillade les ennemis à l'intérieur toutes les demi-secondes et abat en plein vol les tirs ennemis qui y entrent. |
+| **Ricochet** (Token Ricochet) | Un jeton tiré sur un ennemi rebondit sur le suivant, puis encore (3 à 6 ennemis, 8 blocs entre deux). |
+| **Pile ou Face** (Coin Flip) | Un jeton lancé en l'air décide. **Face** (doré) : il file sur l'ennemi visé et frappe deux fois plus fort (sans personne en vue : Force 10 s). **Pile** (cyan) : il te soigne et te donne Absorption 10 s. |
+| **Égide de Jetons** (Token Aegis) | 3 à 6 jetons tournent autour de toi (20 s) : chacun arrête un coup ou un tir qui t'était destiné (aucun dégât) et repart frapper l'attaquant. Les chutes et le feu passent. |
+| **Pluie de Jetons** (Token Rain) | Des jetons pleuvent 2 à 4 s sur l'endroit visé (cercle de 4 blocs, jusqu'à 24 blocs), chacun éclate à l'impact. |
+| **Jetons Piégés** (Trap Tokens) | Un éventail de 3 à 5 jetons semés au sol devant toi ; armés au bout d'une seconde, ils éclatent quand un ennemi approche (dégâts et ralentissement autour). Neuf au plus à la fois, 45 s. |
+| **Tribut des Âmes** (Soul Tribute) | Arrache un jeton à chaque ennemi autour de toi (10 blocs, 8 au plus), ce qui le blesse ; les jetons volent jusqu'à toi et te soignent en arrivant. |
+| **Main des Âmes** (Hand of Souls, ultime) | Des dizaines de jetons arrivent de toutes parts et forment une **main géante** au-dessus de l'ennemi visé : elle le saisit, le soulève de 3 blocs en l'écrasant pendant 2 s, puis le fracasse au sol (projection et dégâts à 4 blocs autour). Sans personne en vue, la main ouverte frappe l'endroit visé. |
+
+Livre : **Registre des Âmes** (cuir bleu nuit, un cercle de jetons serti dans la couverture, coins d'argent).
+Focus de l'école : le **Jeton d'Âme**, un objet à part entière (4 jetons = 1 cristal de prismarine + 1 pépite d'or +
+1 sable des âmes, sans forme).
+
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
 (`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre, `tools/errethys_assets.py`
 pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` pour Caractéristique Physique,
 `tools/boss_assets.py` pour la Magie de Boss, `tools/rune_assets.py` pour la Magie Runique, `tools/glyph_assets.py`
-pour la Magie de Glyphe).
+pour la Magie de Glyphe, `tools/token_assets.py` pour la Magie des Jetons à partir de `tools/models/soul_token.bbmodel`).
 
 ## Récupérer le mod
 
@@ -296,8 +319,8 @@ Dans le dossier `mods` (client et serveur), à côté de :
 
 - Le code est dans `src/main/java/com/waylays/arcanes`.
 - Textures, modèles d'objets et animations des techniques : modifier `tools/gen_assets.py` (ou `explosion_assets.py`,
-  `book_assets.py`, `errethys_assets.py`, `physical_assets.py`, `boss_assets.py`, `rune_assets.py`, `glyph_assets.py`)
-  puis lancer
+  `book_assets.py`, `errethys_assets.py`, `physical_assets.py`, `boss_assets.py`, `rune_assets.py`, `glyph_assets.py`,
+  `token_assets.py`) puis lancer
   `python3 tools/gen_assets.py` (Pillow).
   Une texture faite à la main peut aussi remplacer directement le PNG du même nom.
 - Animations des techniques et des lanceurs de Magie de Boss : `tools/physical_animations.py` et

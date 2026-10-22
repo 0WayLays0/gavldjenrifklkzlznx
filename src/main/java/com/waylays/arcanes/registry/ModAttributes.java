@@ -34,6 +34,8 @@ public final class ModAttributes {
     public static final DeferredHolder<Attribute, Attribute> RUNE_MAGIC_RESIST = resistanceAttribute("rune");
     public static final DeferredHolder<Attribute, Attribute> GLYPH_SPELL_POWER = powerAttribute("glyph");
     public static final DeferredHolder<Attribute, Attribute> GLYPH_MAGIC_RESIST = resistanceAttribute("glyph");
+    public static final DeferredHolder<Attribute, Attribute> TOKEN_SPELL_POWER = powerAttribute("token");
+    public static final DeferredHolder<Attribute, Attribute> TOKEN_MAGIC_RESIST = resistanceAttribute("token");
 
     private ModAttributes() {}
 
