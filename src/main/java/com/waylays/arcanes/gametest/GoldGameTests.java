@@ -336,8 +336,7 @@ public final class GoldGameTests {
             helper.assertTrue(GildedEffect.coats(golem) >= 1, "the dragon did not gild its prey");
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the dragon hurt its summoner");
             dragon.dismissSummon();
-            helper.assertTrue(dragon.getDuration() <= dragon.tickCount + GoldenDragon.MELT_TICKS, "sent away, the dragon does not melt");
-            dragon.discard();
+            helper.assertTrue(dragon.isRemoved(), "the dragon is still there after being sent away");
             forced.forEach(chunk -> helper.getLevel().setChunkForced(chunk.x, chunk.z, false));
         });
     }

@@ -39,6 +39,8 @@ public class GoldenDragonRenderer extends EntityRenderer<GoldenDragon> {
     private static final int RING = 10;
     /** Points of the spine before the flown path: the neck, ahead of the chest. */
     private static final int NECK = 3;
+    /** Size of the head, against the shapes it is built of. */
+    private static final float HEAD = 1.3f;
 
     private static final int GOLD = GoldRender.GOLD;
     private static final int BELLY = 0xFFE9A8;
@@ -92,7 +94,7 @@ public class GoldenDragonRenderer extends EntityRenderer<GoldenDragon> {
         float melt = Mth.clamp((duration - age) / GoldenDragon.MELT_TICKS, 0, 1);
         Vec3 origin = dragon.getPosition(partialTicks);
         Vec3 heading = dragon.getHeading(partialTicks);
-        int light = LightTexture.pack(Math.max(12, LightTexture.block(packedLight)), LightTexture.sky(packedLight));
+        int light = LightTexture.pack(Math.max(14, LightTexture.block(packedLight)), LightTexture.sky(packedLight));
 
         buildSpine(dragon, origin, heading, age);
         int n = spine.size();
@@ -111,7 +113,7 @@ public class GoldenDragonRenderer extends EntityRenderer<GoldenDragon> {
             right[i] = safeRight(tangent[i], i > 0 ? right[i - 1] : null);
             up[i] = right[i].cross(tangent[i]).normalize();
             float f = i / (float) (n - 1);
-            radius[i] = f < .12f ? .42f + f / .12f * .12f : .54f - .44f * (float) Math.pow((f - .12f) / .88f, 1.2);
+            radius[i] = f < .12f ? .55f + f / .12f * .17f : .72f - .58f * (float) Math.pow((f - .12f) / .88f, 1.2);
         }
 
         body(buffer.getBuffer(RenderType.entityCutoutNoCull(SCALES)), poseStack.last(), tangent, right, up, radius, shown, shown < n, age, melt, light);
@@ -124,10 +126,11 @@ public class GoldenDragonRenderer extends EntityRenderer<GoldenDragon> {
         }
         Vec3 headRight = safeRight(heading, null);
         Vec3 headUp = headRight.cross(heading).normalize();
-        Vec3 skull = heading.scale(1.05);
+        Vec3 skull = heading.scale(1.1);
         float open = dragon.isBreathing() ? 24 + Mth.sin(age * .9f) * 4 : 4 + Mth.sin(age * .15f) * 3;
         poseStack.pushPose();
         basis(poseStack, skull, headRight, heading);
+        poseStack.scale(HEAD, HEAD, HEAD);
         head(metal, poseStack, buffer, open, age, light);
         poseStack.popPose();
 
@@ -137,7 +140,7 @@ public class GoldenDragonRenderer extends EntityRenderer<GoldenDragon> {
             whisker(poseStack, buffer, skull, headRight, heading, headUp, side, age);
         }
         if (melt > .5f) {
-            Vec3 pearl = skull.add(heading.scale(2.2)).add(headUp.scale(.3 + Mth.sin(age * .1f) * .25)).add(headRight.scale(Mth.cos(age * .07f) * .6));
+            Vec3 pearl = skull.add(heading.scale(2.2 * HEAD)).add(headUp.scale(.3 + Mth.sin(age * .1f) * .25)).add(headRight.scale(Mth.cos(age * .07f) * .6));
             GemRender.glow(poseStack, buffer, pearl, GoldRender.MOLTEN, 1.3f + Mth.sin(age * .5f) * .15f, .8f);
             GemRender.glow(poseStack, buffer, pearl, GoldRender.GOLD, 2.4f, .5f);
             poseStack.pushPose();
@@ -237,7 +240,7 @@ public class GoldenDragonRenderer extends EntityRenderer<GoldenDragon> {
                 int base = GoldRender.lerp(GOLD, BELLY, belly);
                 base = GoldRender.lerp(base, GoldRender.MOLTEN, Math.min(1, heat));
                 float lit = (float) (n.x * LIGHT.x() + n.y * LIGHT.y() + n.z * LIGHT.z());
-                float shade = .6f + .4f * Math.max(0, lit);
+                float shade = .78f + .22f * Math.max(0, lit);
                 int r = (int) Mth.lerp(sheen, ((base >> 16) & 0xFF) * shade, 255);
                 int g = (int) Mth.lerp(sheen, ((base >> 8) & 0xFF) * shade, 255);
                 int b = (int) Mth.lerp(sheen, (base & 0xFF) * shade, 255);
@@ -295,15 +298,15 @@ public class GoldenDragonRenderer extends EntityRenderer<GoldenDragon> {
                 Vec3 dir = up[i].scale(-.8).add(right[i].scale(side * .5)).add(tangent[i].scale(swing * .45)).normalize();
                 poseStack.pushPose();
                 basis(poseStack, shoulder, tangent[i], dir);
-                poseStack.scale(.26f, .85f, .26f);
+                poseStack.scale(.34f, 1.05f, .34f);
                 Solid.draw(metal, poseStack.last(), GoldRender.CRYSTAL, GOLD, 255, age + i, .7f, light);
                 poseStack.popPose();
-                Vec3 foot = shoulder.add(dir.scale(.75));
+                Vec3 foot = shoulder.add(dir.scale(.95));
                 for (int c = -1; c <= 1; c++) {
                     Vec3 claw = tangent[i].scale(.8).subtract(up[i].scale(.5)).add(right[i].scale(c * .45 + side * .2)).normalize();
                     poseStack.pushPose();
                     basis(poseStack, foot, right[i], claw);
-                    poseStack.scale(.12f, .32f, .12f);
+                    poseStack.scale(.15f, .42f, .15f);
                     Solid.draw(metal, poseStack.last(), GoldRender.NEEDLE, IVORY, 255, age + c * 5, .5f, light);
                     poseStack.popPose();
                 }
@@ -422,7 +425,7 @@ public class GoldenDragonRenderer extends EntityRenderer<GoldenDragon> {
 
     /** A point of the head's space, relative to the chest. */
     private static Vec3 local(Vec3 origin, Vec3 right, Vec3 forward, Vec3 up, float x, float y, float z) {
-        return origin.add(right.scale(x)).add(forward.scale(y)).add(up.scale(z));
+        return origin.add(right.scale(x * HEAD)).add(forward.scale(y * HEAD)).add(up.scale(z * HEAD));
     }
 
     /**

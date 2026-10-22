@@ -39,8 +39,8 @@ import java.util.UUID;
  * summoner (see {@link DragonSun}) and hunts what they fight (or the monsters around them). It circles its prey, then either breathes a
  * stream of molten gold at it or coils round it, climbing in a tight spiral that holds it fast and gilds it before a
  * roar throws everything back; then it dives through its prey and climbs again. Everything it hurts it gilds. At the
- * end it melts away into a cascade of coins, tail first. It cannot be hurt; anti-magic or casting the spell again
- * sends it away.
+ * end of its time it melts away into a cascade of coins, tail first; sent away (casting the spell again), it bursts
+ * into coins at once. It cannot be hurt; anti-magic sends it away too.
  * <p>
  * The server flies it; the client keeps the path it flew so that its long body follows it like a ribbon.
  */
@@ -50,7 +50,7 @@ public class GoldenDragon extends SpellEffectEntity implements OwnedSummon {
     public static final int TRAIL = 160;
     public static final double BREATH_RANGE = 11;
     /** Distance from its chest (the entity's position) to its jaws. */
-    public static final double HEAD_REACH = 2.1;
+    public static final double HEAD_REACH = 2.4;
     public static final double COIL_RADIUS = 2.3;
     public static final int COIL_TICKS = 50;
     public static final double ROAR_RADIUS = 5;
@@ -148,11 +148,20 @@ public class GoldenDragon extends SpellEffectEntity implements OwnedSummon {
         return ModSpells.GOLDEN_DRAGON.get();
     }
 
+    /** Sent away, it bursts at once into a cascade of coins along its body. */
     @Override
     public void dismissSummon() {
-        if (!level().isClientSide && tickCount < getDuration() - MELT_TICKS) {
-            this.entityData.set(DATA_DURATION, tickCount + MELT_TICKS);
+        if (!level().isClientSide) {
+            Vec3 c = position();
+            Vec3 back = velocity.lengthSqr() < 1.0E-4 ? getHeading(1).scale(-1) : velocity.normalize().scale(-1);
+            for (int k = 0; k < 4; k++) {
+                GoldFx.coins(level(), c.add(back.scale(k * 3)), 10, .4f);
+            }
+            GoldFx.shatterBurst(level(), c.x, c.y, c.z, 2f);
+            level().playSound(null, c.x, c.y, c.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS, 2.5f, .6f);
+            level().playSound(null, c.x, c.y, c.z, SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 2f, .5f);
         }
+        discard();
     }
 
     // ---------------------------------------------------------------- flight
