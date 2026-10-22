@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "arcanes_oublies:item/ritual_chalk"
+  }
+}

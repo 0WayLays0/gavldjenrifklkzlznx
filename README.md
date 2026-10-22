@@ -339,6 +339,38 @@ lancées, tirées en cloche ou pleuvent.
 
 Livre : **Codex des Remparts**. Focus : les trois briques de pierre.
 
+### Rituels (sorts de groupe)
+
+Ce n'est pas une école : des rituels à plusieurs, lents et spectaculaires. Ils se font avec la **Craie rituelle**
+(calcite + poudre d'os + éclat d'améthyste, sans forme ; elle trace 32 cercles).
+
+1. **Choisir le rituel** : accroupi + clic dans le vide avec la craie.
+2. **Tracer le cercle** : clic sur le sol. Le cercle se dessine à la craie en 3 secondes ; celui qui le trace mène le
+   rituel.
+3. **Tenir les points** : chaque participant s'agenouille (accroupi) sur un point du cercle. Quand tous les points
+   sont tenus, l'incantation commence.
+4. **L'incantation**, très lente (20 à 60 secondes) : les douze runes s'allument une à une, des rayons montent de
+   chaque participant vers le centre, un pilier de lumière monte dans le ciel, puis un anneau de runes s'ouvre
+   au-dessus et tourne de plus en plus vite. Chaque participant donne 75 de mana au fil de l'incantation.
+5. **La rupture** : si un point reste vide plus de 2 secondes (quelqu'un se relève ou part) ou si quelqu'un n'a plus
+   de mana, le rituel est rompu : le cercle vire au rouge et explose sur les participants.
+
+Les joueurs agenouillés dans le cercle mais hors des points forment le **chœur** : +20 % de puissance chacun (jusqu'à
+deux fois plus fort). Pour une scène RP, le staff peut donner le tag `arcanes_oublies_ritualist` à un PNJ
+(`/tag <pnj> add arcanes_oublies_ritualist`) pour qu'il tienne un point à la place d'un joueur.
+
+| Rituel | Participants | Incantation | Effet |
+|---|---|---|---|
+| **Météore guidé** | 3 | 30 s | Un météore tombe lentement du ciel là où regarde le meneur (64 blocs) : explosion de feu sur les créatures hostiles (aucun bloc cassé). |
+| **Dôme de protection** | 4 | 40 s | Un dôme de lumière de 16 blocs pendant 5 min : les créatures hostiles ne peuvent pas entrer, leurs tirs se brisent dessus, les joueurs dessous résistent aux dégâts. |
+| **Appel de la tempête** | 3 | 30 s | Un orage d'une minute au-dessus du lieu (24 blocs) : la foudre frappe une créature hostile toutes les 1,5 s. |
+| **Portail** | 2 | 20 s | Un portail d'une minute vers l'ancre marquée avec la craie du meneur (accroupi + clic sur le sol, même dans une autre dimension), et son jumeau pour revenir. |
+| **Bénédiction des anciens** | 4 | 45 s | Chaque joueur à 24 blocs est soigné, purifié et renforcé 5 min (Régénération, Absorption, Résistance, Force). |
+| **Éveil du colosse** | 5 | 60 s | Un colosse géant (golem 2,5 fois plus grand, 300 PV) s'éveille et combat pour le groupe pendant 3 min. |
+
+Les rituels n'épargnent que leurs participants et ne visent que les créatures hostiles : ils ne blessent jamais les
+autres joueurs.
+
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
 (`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre, `tools/errethys_assets.py`
 pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` pour Caractéristique Physique,

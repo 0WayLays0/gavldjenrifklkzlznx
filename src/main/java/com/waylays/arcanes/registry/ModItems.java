@@ -56,6 +56,10 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> RAMPART_CODEX = ITEMS.register("rampart_codex",
             () -> spellbook(10, ModAttributes.WALL_SPELL_POWER));
 
+    /** Ritual Chalk: chooses a group ritual and draws its circle on the ground (32 circles). */
+    public static final DeferredHolder<Item, Item> RITUAL_CHALK = ITEMS.register("ritual_chalk",
+            () -> new com.waylays.arcanes.ritual.RitualChalkItem(new Item.Properties().stacksTo(1).durability(32).rarity(Rarity.UNCOMMON)));
+
     private ModItems() {}
 
     /** A legendary school spellbook, like Iron's own: +10% power in its school and +200 max mana. */

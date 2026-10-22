@@ -33,6 +33,11 @@ import com.waylays.arcanes.client.render.TokenMoteRenderer;
 import com.waylays.arcanes.client.render.TokenStormRenderer;
 import com.waylays.arcanes.client.render.TokenWaveRenderer;
 import com.waylays.arcanes.client.render.BrickBoltRenderer;
+import com.waylays.arcanes.client.render.MeteorRenderer;
+import com.waylays.arcanes.client.render.RitualCircleRenderer;
+import com.waylays.arcanes.client.render.RitualDomeRenderer;
+import com.waylays.arcanes.client.render.RitualPortalRenderer;
+import com.waylays.arcanes.client.render.StormCloudRenderer;
 import com.waylays.arcanes.client.render.CitadelRenderer;
 import com.waylays.arcanes.client.render.WallPieceRenderer;
 import com.waylays.arcanes.client.render.AncientBellRenderer;
@@ -186,6 +191,11 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.BRICK_BOLT.get(), BrickBoltRenderer::new);
         event.registerEntityRenderer(ModEntities.WALL_PIECE.get(), WallPieceRenderer::new);
         event.registerEntityRenderer(ModEntities.CITADEL.get(), CitadelRenderer::new);
+        event.registerEntityRenderer(ModEntities.RITUAL_CIRCLE.get(), RitualCircleRenderer::new);
+        event.registerEntityRenderer(ModEntities.METEOR.get(), MeteorRenderer::new);
+        event.registerEntityRenderer(ModEntities.RITUAL_DOME.get(), RitualDomeRenderer::new);
+        event.registerEntityRenderer(ModEntities.STORM_CLOUD.get(), StormCloudRenderer::new);
+        event.registerEntityRenderer(ModEntities.RITUAL_PORTAL.get(), RitualPortalRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));

@@ -5,7 +5,7 @@ All art is original (Iron's Spells' license forbids reusing its assets). Run fro
     python3 tools/gen_assets.py
 Needs Pillow. Re-running overwrites the files it writes (see main() here and in explosion_assets.py, book_assets.py,
 errethys_assets.py, physical_assets.py, boss_assets.py, rune_assets.py, glyph_assets.py,
-token_assets.py, verdigris_assets.py, wall_assets.py and scroll_assets.py) and nothing else.
+token_assets.py, verdigris_assets.py, wall_assets.py, ritual_assets.py and scroll_assets.py) and nothing else.
 """
 import json
 import math
@@ -840,6 +840,8 @@ def main():
     verdigris_assets.main()
     import wall_assets
     wall_assets.main()
+    import ritual_assets
+    ritual_assets.main()
     import scroll_assets
     scroll_assets.main()
 

@@ -65,7 +65,12 @@ import com.waylays.arcanes.entity.verdigris.SporePatch;
 import com.waylays.arcanes.entity.verdigris.SunkenTemple;
 import com.waylays.arcanes.entity.verdigris.ToppleWall;
 import com.waylays.arcanes.entity.verdigris.VineSnare;
+import com.waylays.arcanes.entity.ritual.Meteor;
+import com.waylays.arcanes.entity.ritual.RitualDome;
+import com.waylays.arcanes.entity.ritual.RitualPortal;
+import com.waylays.arcanes.entity.ritual.StormCloud;
 import com.waylays.arcanes.entity.wall.BrickBolt;
+import com.waylays.arcanes.ritual.RitualCircle;
 import com.waylays.arcanes.entity.wall.Citadel;
 import com.waylays.arcanes.entity.wall.WallPiece;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
@@ -331,6 +336,18 @@ public final class ModEntities {
             EntityType.Builder.<WallPiece>of(WallPiece::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<Citadel>> CITADEL = register("citadel",
             EntityType.Builder.<Citadel>of(Citadel::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(20).fireImmune());
+
+    // Rituals: the chalk circle and what the rituals leave in the world
+    public static final DeferredHolder<EntityType<?>, EntityType<RitualCircle>> RITUAL_CIRCLE = register("ritual_circle",
+            EntityType.Builder.<RitualCircle>of(RitualCircle::new, MobCategory.MISC).sized(1f, .1f).clientTrackingRange(16).updateInterval(10).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Meteor>> METEOR = register("meteor",
+            EntityType.Builder.<Meteor>of(Meteor::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(20).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RitualDome>> RITUAL_DOME = register("ritual_dome",
+            EntityType.Builder.<RitualDome>of(RitualDome::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(20).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<StormCloud>> STORM_CLOUD = register("storm_cloud",
+            EntityType.Builder.<StormCloud>of(StormCloud::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(20).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RitualPortal>> RITUAL_PORTAL = register("ritual_portal",
+            EntityType.Builder.<RitualPortal>of(RitualPortal::new, MobCategory.MISC).sized(1.4f, 2.8f).clientTrackingRange(12).updateInterval(40).fireImmune());
 
     private ModEntities() {}
 

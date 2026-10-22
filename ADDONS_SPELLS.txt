@@ -607,3 +607,34 @@ Livre : Codex des Remparts. Focus : les trois briques.
 10. Fallen Citadel     [~] ULTIME - Une forteresse s'élève autour de
                            l'ennemi, ses tours lancent des briques, puis
                            tous les murs s'effondrent vers l'intérieur.
+
+
+================================================================================
+17. RITUELS (sorts de groupe)                                     [~] EN TEST
+================================================================================
+Pas une école : une Craie rituelle (calcite + poudre d'os + éclat
+d'améthyste). Accroupi + clic dans le vide pour choisir le rituel, clic sur
+le sol pour tracer le cercle (celui qui trace mène le rituel). Les
+participants s'agenouillent (accroupis) sur les points du cercle ; quand
+tous les points sont tenus, l'incantation commence, très lente : les runes
+s'allument une à une, des rayons montent vers le centre, un pilier de
+lumière monte au ciel, un anneau s'ouvre au-dessus. Chaque participant
+donne 75 de mana pendant l'incantation. Si un point reste vide plus de
+2 secondes ou si quelqu'un n'a plus de mana, le rituel est rompu et explose
+sur les participants. Les joueurs agenouillés dans le cercle hors des
+points forment le chœur : +20 % de puissance chacun (jusqu'à x2). Le staff
+peut donner le tag arcanes_oublies_ritualist à un PNJ pour qu'il tienne un
+point.
+
+ 1. Météore guidé       [~] 3 participants, 30 s. Un météore tombe là où
+                            regarde le meneur.
+ 2. Dôme de protection  [~] 4 participants, 40 s. Dôme de 16 blocs pendant
+                            5 min : les hostiles ne peuvent pas entrer.
+ 3. Appel de la tempête [~] 3 participants, 30 s. Orage d'une minute, la
+                            foudre frappe les hostiles.
+ 4. Portail             [~] 2 participants, 20 s. Portail d'une minute vers
+                            l'ancre marquée avec la craie, et retour.
+ 5. Bénédiction des     [~] 4 participants, 45 s. Soin, purification et
+    anciens                 renforts de 5 min pour les joueurs autour.
+ 6. Éveil du colosse    [~] 5 participants, 60 s. Un colosse géant combat
+                            pour le groupe pendant 3 min.

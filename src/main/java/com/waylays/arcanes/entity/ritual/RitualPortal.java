@@ -1,0 +1,89 @@
+package com.waylays.arcanes.entity.ritual;
+
+import com.waylays.arcanes.registry.ModEntities;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+
+import javax.annotation.Nullable;
+import java.util.Set;
+
+/**
+ * The Portal: a swirling gate standing over the circle for a minute, and its twin at the anchor marked with the
+ * leader's chalk. A player who steps into one comes out of the other.
+ */
+public class RitualPortal extends RitualEntity {
+    public static final int LIFE = 20 * 60;
+    public static final int COOLDOWN = 60;
+    private static final String COOLDOWN_KEY = "arcanes_oublies.portal_cooldown";
+
+    private Vec3 target = Vec3.ZERO;
+    @Nullable
+    private ResourceKey<Level> targetLevel;
+
+    public RitualPortal(EntityType<? extends RitualPortal> entityType, Level level) {
+        super(entityType, level);
+    }
+
+    /** Opens a portal at {@code at} leading to {@code to} in {@code toLevel}, and its twin there leading back. */
+    public static void open(ServerLevel level, Vec3 at, ServerLevel toLevel, Vec3 to, int life) {
+        RitualPortal here = new RitualPortal(ModEntities.RITUAL_PORTAL.get(), level);
+        here.moveTo(at.x, at.y, at.z, 0, 0);
+        here.setup(life, 1, Set.of(), 1);
+        here.target = to;
+        here.targetLevel = toLevel.dimension();
+        level.addFreshEntity(here);
+        RitualPortal there = new RitualPortal(ModEntities.RITUAL_PORTAL.get(), toLevel);
+        there.moveTo(to.x, to.y, to.z, 0, 0);
+        there.setup(life, 1, Set.of(), 1);
+        there.target = at;
+        there.targetLevel = level.dimension();
+        toLevel.addFreshEntity(there);
+        level.playSound(null, at.x, at.y, at.z, SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 1.2f, 1.2f);
+        toLevel.playSound(null, to.x, to.y, to.z, SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 1.2f, 1.2f);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (level().isClientSide) {
+            if (random.nextInt(2) == 0) {
+                double a = random.nextDouble() * Math.PI * 2;
+                level().addParticle(ParticleTypes.PORTAL, getX() + Math.cos(a) * 1.2, getY() + 1.4 + Math.sin(a) * 1.6, getZ(), 0, 0, 0);
+            }
+            return;
+        }
+        if (tickCount < 30 || targetLevel == null || !(level() instanceof ServerLevel level)) {
+            return;
+        }
+        ServerLevel destination = level.getServer().getLevel(targetLevel);
+        if (destination == null) {
+            return;
+        }
+        long now = level.getGameTime();
+        if (tickCount % 40 == 0) {
+            level.playSound(null, getX(), getY(), getZ(), SoundEvents.PORTAL_AMBIENT, SoundSource.PLAYERS, .6f, 1.2f);
+        }
+        for (Player player : level.getEntitiesOfClass(Player.class, getBoundingBox().inflate(.6, 2, .6))) {
+            if (player.getPersistentData().getLong(COOLDOWN_KEY) > now) {
+                continue;
+            }
+            player.getPersistentData().putLong(COOLDOWN_KEY, now + COOLDOWN);
+            // Out a step beside the twin, so as not to walk straight back in
+            Vec3 out = target.add(1.6, 0, 0);
+            player.teleportTo(destination, out.x, out.y, out.z, Set.of(), player.getYRot(), player.getXRot());
+            destination.playSound(null, out.x, out.y, out.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, .8f);
+        }
+    }
+
+    @Override
+    public boolean shouldRenderAtSqrDistance(double distance) {
+        return distance < 128 * 128;
+    }
+}

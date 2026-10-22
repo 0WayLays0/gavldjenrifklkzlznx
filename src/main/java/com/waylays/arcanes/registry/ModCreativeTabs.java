@@ -45,6 +45,8 @@ public final class ModCreativeTabs {
             .title(Component.translatable("itemGroup." + ArcanesOublies.MODID))
             .icon(() -> new ItemStack(ModItems.GOLDEN_GRIMOIRE.get()))
             .displayItems((parameters, output) -> {
+                // The rituals are not a school: their chalk comes first
+                output.accept(ModItems.RITUAL_CHALK.get());
                 for (Section section : SECTIONS) {
                     section.books().forEach(book -> output.accept(book.get()));
                     for (var entry : ModSpells.SPELLS.getEntries()) {
