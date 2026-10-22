@@ -1,6 +1,7 @@
 package com.waylays.arcanes.gametest;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.entity.wall.BrickBolt;
 import com.waylays.arcanes.entity.wall.Citadel;
 import com.waylays.arcanes.entity.wall.WallPiece;
 import com.waylays.arcanes.registry.ModItems;
@@ -18,6 +19,7 @@ import io.redspace.ironsspellbooks.item.SpellBook;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -61,6 +63,15 @@ public final class WallGameTests {
         return helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, 2, z));
     }
 
+    /**
+     * Takes down what the test raised (walls, bricks, citadels): they outlast the test, and left standing they would
+     * stop the shots of the tests run next on the same spot.
+     */
+    private static void cleanUp(GameTestHelper helper) {
+        helper.getLevel().getEntitiesOfClass(Entity.class, helper.getBounds().inflate(16),
+                e -> e instanceof WallPiece || e instanceof Citadel || e instanceof BrickBolt).forEach(Entity::discard);
+    }
+
     private static void cast(GameTestHelper helper, DeferredHolder<AbstractSpell, AbstractSpell> spell, LivingEntity caster) {
         spell.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
     }
@@ -86,6 +97,7 @@ public final class WallGameTests {
         helper.assertTrue(count == 10, "expected 10 Wall spells, found " + count);
         helper.assertTrue(new ItemStack(ModItems.RAMPART_CODEX.get()).getItem() instanceof SpellBook, "the Rampart Codex is not a spellbook");
         helper.assertTrue(new ItemStack(Items.STONE_BRICKS).is(ModSchools.WALL_FOCUS), "stone bricks are not the school's focus");
+        cleanUp(helper);
         helper.succeed();
     }
 
@@ -94,7 +106,10 @@ public final class WallGameTests {
         Witch caster = caster(helper, 4.5, 1.5);
         Husk husk = husk(helper, 4.5, 6.5);
         cast(helper, ModSpells.BRICK_BOLT, caster);
-        helper.succeedWhen(() -> helper.assertTrue(hurt(husk), "the brick did not hit the husk"));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(hurt(husk), "the brick did not hit the husk");
+            cleanUp(helper);
+        });
     }
 
     /** A snowball thrown at the caster through the wall is stopped by it. */
@@ -111,6 +126,7 @@ public final class WallGameTests {
             helper.runAfterDelay(12, () -> {
                 helper.assertTrue(ball.isRemoved(), "the snowball went through the wall");
                 helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the snowball reached the caster");
+                cleanUp(helper);
                 helper.succeed();
             });
         });
@@ -121,7 +137,10 @@ public final class WallGameTests {
         Witch caster = caster(helper, 4.5, 1.5);
         Husk husk = husk(helper, 4.5, 6.5);
         cast(helper, ModSpells.BRICK_RAIN, caster);
-        helper.succeedWhen(() -> helper.assertTrue(hurt(husk), "no brick fell on the husk"));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(hurt(husk), "no brick fell on the husk");
+            cleanUp(helper);
+        });
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_burst", timeoutTicks = 50)
@@ -130,7 +149,10 @@ public final class WallGameTests {
         Husk husk = husk(helper, 4.5, 5.5);
         cast(helper, ModSpells.WALL_BURST, caster);
         helper.runAfterDelay(WallPiece.RISE + WallPiece.BURST_DELAY - 2, () -> helper.assertTrue(!hurt(husk), "the wall burst too early"));
-        helper.succeedWhen(() -> helper.assertTrue(hurt(husk), "the bursting wall did not hit the husk"));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(hurt(husk), "the bursting wall did not hit the husk");
+            cleanUp(helper);
+        });
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_mortar", timeoutTicks = 60)
@@ -138,7 +160,10 @@ public final class WallGameTests {
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 6.5);
         cast(helper, ModSpells.MORTAR, caster);
-        helper.succeedWhen(() -> helper.assertTrue(hurt(husk), "the mortar did not hurt the husk"));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(hurt(husk), "the mortar did not hurt the husk");
+            cleanUp(helper);
+        });
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_crush", timeoutTicks = 50)
@@ -149,6 +174,7 @@ public final class WallGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(hurt(husk), "the walls did not crush the husk");
             helper.assertTrue(husk.hasEffect(MobEffects.CONFUSION), "the husk is not dazed");
+            cleanUp(helper);
         });
     }
 
@@ -160,6 +186,7 @@ public final class WallGameTests {
         int bars = helper.getLevel().getEntitiesOfClass(WallPiece.class, husk.getBoundingBox().inflate(3)).size();
         helper.assertTrue(bars == 8, "expected 8 bars around the husk, found " + bars);
         helper.assertTrue(hurt(husk) && husk.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "the caged husk is not hurt and slowed");
+        cleanUp(helper);
         helper.succeed();
     }
 
@@ -172,6 +199,7 @@ public final class WallGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(hurt(husk), "the rampart did not hit the husk");
             helper.assertTrue(husk.getZ() > start + 1, "the rampart did not sweep the husk away");
+            cleanUp(helper);
         });
     }
 
@@ -182,6 +210,7 @@ public final class WallGameTests {
         int walls = helper.getLevel().getEntitiesOfClass(WallPiece.class, caster.getBoundingBox().inflate(4)).size();
         helper.assertTrue(walls == 4, "expected 4 walls around the caster, found " + walls);
         helper.assertTrue(caster.hasEffect(MobEffects.DAMAGE_RESISTANCE), "the caster does not resist damage");
+        cleanUp(helper);
         helper.succeed();
     }
 
@@ -200,6 +229,7 @@ public final class WallGameTests {
         });
         helper.runAfterDelay(Citadel.IMPACT + 4, () -> {
             helper.assertTrue(husk.getHealth() < before[0], "the citadel's fall did not hurt the husk");
+            cleanUp(helper);
             helper.succeed();
         });
     }
