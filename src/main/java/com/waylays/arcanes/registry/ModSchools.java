@@ -204,6 +204,25 @@ public final class ModSchools {
             VERDIGRIS_MAGIC
     ));
 
+    /**
+     * Wall Magic: walls, bricks and fortresses, built of three blocks only (stone, mossy and cracked stone bricks).
+     * Walls burst out of the ground to stop shots, cage, crush and charge; bricks are hurled, lobbed and rained.
+     */
+    public static final ResourceLocation WALL_RESOURCE = ArcanesOublies.id("wall");
+    public static final TagKey<Item> WALL_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("wall_focus"));
+    public static final ResourceKey<DamageType> WALL_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("wall_magic"));
+    public static final int WALL_COLOR = 0x9A9A92;
+
+    public static final DeferredHolder<SchoolType, SchoolType> WALL = SCHOOLS.register(WALL_RESOURCE.getPath(), () -> new SchoolType(
+            WALL_RESOURCE,
+            WALL_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".wall").withStyle(Style.EMPTY.withColor(WALL_COLOR)),
+            ModAttributes.WALL_SPELL_POWER,
+            ModAttributes.WALL_MAGIC_RESIST,
+            sound(SoundEvents.STONE_PLACE),
+            WALL_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

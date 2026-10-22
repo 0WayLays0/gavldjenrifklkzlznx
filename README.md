@@ -4,7 +4,7 @@ Addon pour **Iron's Spells 'n Spellbooks** (Minecraft 1.21.1, NeoForge 21.1.221+
 La dernière version pour Minecraft 1.20.1 (Forge) est la 0.9.0 (commit `6359b13` de l'historique).
 La liste complète des écoles et des sorts prévus est dans [`ADDONS_SPELLS.txt`](ADDONS_SPELLS.txt).
 
-## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss, Magie Runique, Magie de Glyphe, Magie des Jetons et Magie de Mousse, Cuivre et Rouille
+## Contenu de la bêta 1.0.0 : écoles de l'Or, de l'Explosion, du Livre, d'Errethys, Caractéristique Physique, Magie de Boss, Magie Runique, Magie de Glyphe, Magie des Jetons, Magie de Mousse, Cuivre et Rouille et Magie des Murs
 
 Quatre nouvelles écoles complètes dans Iron's Spells, chacune avec ses attributs « Puissance des sorts » et
 « Résistance », ses parchemins et son livre de sorts 3D (+10 % puissance de l'école, +200 mana ; 10 emplacements,
@@ -318,12 +318,33 @@ l'échelle, pas de textures inventées.
 Livre : **Codex Rouillé** (plaques de cuivre vert-de-gris rivetées, rouille sur les bords, mousse sur le dos).
 Focus de l'école : le **lingot de cuivre**.
 
+### Magie des Murs
+
+Faite de trois blocs seulement, et de rien d'autre : **briques de pierre**, **briques de pierre moussues** et **briques
+de pierre craquelées**. Les murs jaillissent du sol pour arrêter, enfermer, écraser et charger ; les briques sont
+lancées, tirées en cloche ou pleuvent.
+
+| Sort | Effet |
+|---|---|
+| **Trait de Brique** (Brick Bolt) | Une brique lancée sur l'ennemi : blesse, repousse et se brise (1 à 3 briques selon le niveau). |
+| **Mur Surgissant** (Rising Wall) | Un mur de 5 x 3 jaillit devant toi (6 à 11 s) : il arrête les tirs ennemis (même les flèches rapides) et empêche les ennemis de passer. |
+| **Pluie de Briques** (Brick Rain) | Des briques pleuvent 3 s sur l'endroit visé (la première tombe pile dessus), chacune éclate à l'impact. |
+| **Mur Éclaté** (Wall Burst) | Un mur s'élève, tremble, puis vole en éclats vers l'avant : cône de briques sur 7 blocs. |
+| **Mortier** (Mortar) | Un bloc de briques lancé en cloche (jusqu'à 26 blocs) : éclate à l'impact, blesse, ralentit et disperse sur 3 blocs. |
+| **Murs Broyeurs** (Crushing Walls) | Deux murs jaillissent de part et d'autre de l'ennemi visé et se referment sur lui : écrasé et étourdi. |
+| **Cage de Briques** (Brick Cage) | Huit piliers de briques enferment l'ennemi visé (5 à 9 s), ralenti tant qu'il est en cage. |
+| **Charge du Rempart** (Rampart Charge) | Un mur surgit et charge droit devant (9 à 14 blocs), balayant les ennemis. |
+| **Bastion** (Bastion) | Quatre murs en carré autour de toi (7 à 11 s) : tirs arrêtés, ennemis tenus à l'écart, et tu résistes aux dégâts. |
+| **Citadelle Déchue** (Fallen Citadel, ultime) | Une forteresse entière (huit murs crénelés, quatre tours) s'élève mur après mur autour de l'ennemi visé, l'enferme pendant que les tours lui lancent des briques, puis **tous les murs s'effondrent vers l'intérieur**. |
+
+Livre : **Codex des Remparts**. Focus : les trois briques de pierre.
+
 Les sons sont des sons de Minecraft combinés. Les textures sont dessinées par `tools/gen_assets.py`
 (`tools/explosion_assets.py` pour l'Explosion, `tools/book_assets.py` pour le Livre, `tools/errethys_assets.py`
 pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` pour Caractéristique Physique,
 `tools/boss_assets.py` pour la Magie de Boss, `tools/rune_assets.py` pour la Magie Runique, `tools/glyph_assets.py`
 pour la Magie de Glyphe, `tools/token_assets.py` pour la Magie des Jetons à partir de `tools/models/soul_token.bbmodel`,
-`tools/verdigris_assets.py` pour la Magie de Mousse, Cuivre et Rouille).
+`tools/verdigris_assets.py` pour la Magie de Mousse, Cuivre et Rouille, `tools/wall_assets.py` pour la Magie des Murs).
 
 ## Récupérer le mod
 

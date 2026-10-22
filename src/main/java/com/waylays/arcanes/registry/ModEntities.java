@@ -65,6 +65,9 @@ import com.waylays.arcanes.entity.verdigris.SporePatch;
 import com.waylays.arcanes.entity.verdigris.SunkenTemple;
 import com.waylays.arcanes.entity.verdigris.ToppleWall;
 import com.waylays.arcanes.entity.verdigris.VineSnare;
+import com.waylays.arcanes.entity.wall.BrickBolt;
+import com.waylays.arcanes.entity.wall.Citadel;
+import com.waylays.arcanes.entity.wall.WallPiece;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
 import com.waylays.arcanes.entity.gold.GildedChainsEntity;
@@ -320,6 +323,14 @@ public final class ModEntities {
             EntityType.Builder.<SporePatch>of(SporePatch::new, MobCategory.MISC).sized(1f, .2f).clientTrackingRange(8).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<SunkenTemple>> SUNKEN_TEMPLE = register("sunken_temple",
             EntityType.Builder.<SunkenTemple>of(SunkenTemple::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(14).updateInterval(20).fireImmune());
+
+    // Wall Magic: walls and bricks of stone bricks
+    public static final DeferredHolder<EntityType<?>, EntityType<BrickBolt>> BRICK_BOLT = register("brick_bolt",
+            EntityType.Builder.<BrickBolt>of(BrickBolt::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1));
+    public static final DeferredHolder<EntityType<?>, EntityType<WallPiece>> WALL_PIECE = register("wall_piece",
+            EntityType.Builder.<WallPiece>of(WallPiece::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Citadel>> CITADEL = register("citadel",
+            EntityType.Builder.<Citadel>of(Citadel::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(20).fireImmune());
 
     private ModEntities() {}
 

@@ -39,6 +39,8 @@ PALETTES = {
     "token": ["a9c4cc", "c4dce2", "e2f1f4", "7d98a1", "92afb8", "4fe4ff", "1aa9d6", "0e6f96", "e6f6fa", "a8d4de", "5f8e9a"],
     # A sheet of green copper foil, the writing in rust, bright copper rod ends
     "verdigris": ["5fa88a", "74bf9f", "9ad8bc", "3d7a62", "4e8f74", "d8814a", "a0451e", "6a2a10", "f6b278", "d8814a", "8a4a22"],
+    # Grey stone paper, the writing in moss green, stone brick rod ends
+    "wall": ["8e8d8e", "a3a2a3", "bcbbbc", "626162", "777677", "9cc05a", "5c7834", "3a4e20", "c9c8c9", "8a898a", "4e4d4e"],
 }
 
 

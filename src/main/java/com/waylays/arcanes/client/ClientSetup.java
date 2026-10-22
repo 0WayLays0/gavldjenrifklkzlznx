@@ -32,6 +32,9 @@ import com.waylays.arcanes.client.render.TokenMineRenderer;
 import com.waylays.arcanes.client.render.TokenMoteRenderer;
 import com.waylays.arcanes.client.render.TokenStormRenderer;
 import com.waylays.arcanes.client.render.TokenWaveRenderer;
+import com.waylays.arcanes.client.render.BrickBoltRenderer;
+import com.waylays.arcanes.client.render.CitadelRenderer;
+import com.waylays.arcanes.client.render.WallPieceRenderer;
 import com.waylays.arcanes.client.render.AncientBellRenderer;
 import com.waylays.arcanes.client.render.AncientPillarRenderer;
 import com.waylays.arcanes.client.render.CopperSpikesRenderer;
@@ -180,6 +183,9 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.SPORE_PATCH.get(), SporePatchRenderer::new);
         event.registerEntityRenderer(ModEntities.SUNKEN_TEMPLE.get(), SunkenTempleRenderer::new);
         event.registerEntityRenderer(ModEntities.RUST_BOLT.get(), RustBoltRenderer::new);
+        event.registerEntityRenderer(ModEntities.BRICK_BOLT.get(), BrickBoltRenderer::new);
+        event.registerEntityRenderer(ModEntities.WALL_PIECE.get(), WallPieceRenderer::new);
+        event.registerEntityRenderer(ModEntities.CITADEL.get(), CitadelRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));
@@ -210,6 +216,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.SIX_INKS_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.SOUL_LEDGER.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.RUSTED_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.RAMPART_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }

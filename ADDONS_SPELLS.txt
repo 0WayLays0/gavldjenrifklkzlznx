@@ -35,6 +35,8 @@ Ordre de développement :
  14. Magie de Glyphe (glyphes élémentaires tracés dans l'air) - demandée
      en plus
  15. Magie des Jetons (jetons d'âme bleu cyan) - demandée en plus
+ 16. Magie des Murs (briques de pierre seulement) - demandée en plus
+ 17. Rituels (sorts de groupe, lents) - demandés en plus
 
 
 ================================================================================
@@ -651,3 +653,27 @@ Registre des Âmes. Focus : Jeton d'Âme (objet craftable).
                            jetons soignent le lanceur.
 10. Hand of Souls      [~] ULTIME - Les jetons forment une main géante qui
                            saisit, écrase et fracasse l'ennemi au sol.
+
+
+================================================================================
+16. MAGIE DES MURS (briques de pierre)                            [~] EN TEST
+================================================================================
+Faite uniquement de trois blocs : briques de pierre, briques de pierre
+moussues, briques de pierre craquelées. Rien d'autre dans ses visuels.
+Livre : Codex des Remparts. Focus : les trois briques.
+
+ 1. Brick Bolt         [~] Une brique lancée (plus de briques en montant de
+                           niveau).
+ 2. Rising Wall        [~] Mur de 5 x 3 qui arrête les tirs ennemis et
+                           bloque le passage.
+ 3. Brick Rain         [~] Pluie de briques sur une zone (3 s).
+ 4. Wall Burst         [~] Mur qui tremble puis explose en cône de briques.
+ 5. Mortar             [~] Bloc de briques lancé en cloche, éclate à
+                           l'impact.
+ 6. Crushing Walls     [~] Deux murs se referment sur l'ennemi visé.
+ 7. Brick Cage         [~] Cage de piliers autour de l'ennemi visé.
+ 8. Rampart Charge     [~] Mur qui charge en balayant les ennemis.
+ 9. Bastion            [~] Quatre murs en carré autour du lanceur.
+10. Fallen Citadel     [~] ULTIME - Une forteresse s'élève autour de
+                           l'ennemi, ses tours lancent des briques, puis
+                           tous les murs s'effondrent vers l'intérieur.

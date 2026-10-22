@@ -52,6 +52,10 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> RUSTED_CODEX = ITEMS.register("rusted_codex",
             () -> spellbook(10, ModAttributes.VERDIGRIS_SPELL_POWER));
 
+    /** Wall Magic spellbook (bound between two plates of stone brick): 10 slots, +10% Wall Spell Power, +200 max mana. */
+    public static final DeferredHolder<Item, Item> RAMPART_CODEX = ITEMS.register("rampart_codex",
+            () -> spellbook(10, ModAttributes.WALL_SPELL_POWER));
+
     private ModItems() {}
 
     /** A legendary school spellbook, like Iron's own: +10% power in its school and +200 max mana. */

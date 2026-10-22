@@ -38,6 +38,8 @@ public final class ModAttributes {
     public static final DeferredHolder<Attribute, Attribute> TOKEN_MAGIC_RESIST = resistanceAttribute("token");
     public static final DeferredHolder<Attribute, Attribute> VERDIGRIS_SPELL_POWER = powerAttribute("verdigris");
     public static final DeferredHolder<Attribute, Attribute> VERDIGRIS_MAGIC_RESIST = resistanceAttribute("verdigris");
+    public static final DeferredHolder<Attribute, Attribute> WALL_SPELL_POWER = powerAttribute("wall");
+    public static final DeferredHolder<Attribute, Attribute> WALL_MAGIC_RESIST = resistanceAttribute("wall");
 
     private ModAttributes() {}
 

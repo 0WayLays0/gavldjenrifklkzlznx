@@ -1,0 +1,82 @@
+package com.waylays.arcanes.spells.wall;
+
+import com.waylays.arcanes.entity.wall.WallPiece;
+import com.waylays.arcanes.spells.SpellUtil;
+import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import io.redspace.ironsspellbooks.api.magic.MagicData;
+import io.redspace.ironsspellbooks.api.spells.AutoSpellConfig;
+import io.redspace.ironsspellbooks.api.spells.CastSource;
+import io.redspace.ironsspellbooks.api.spells.CastType;
+import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
+import io.redspace.ironsspellbooks.api.spells.SpellRarity;
+import io.redspace.ironsspellbooks.api.util.Utils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+
+/** Brick Cage: brick pillars burst up in a ring around the enemy looked at, shutting it in. */
+@AutoSpellConfig
+public class BrickCageSpell extends WallSpell {
+    public static final int RANGE = 20;
+    public static final int BARS = 8;
+    public static final float RING = 1.7f;
+
+    public BrickCageSpell() {
+        super("brick_cage", SpellRarity.RARE, 5, 18, CastType.INSTANT, SpellAnimations.ANIMATION_INSTANT_CAST);
+        this.manaCostPerLevel = 5;
+        this.baseSpellPower = 4;
+        this.spellPowerPerLevel = 1;
+        this.castTime = 0;
+        this.baseManaCost = 45;
+    }
+
+    public static int duration(int spellLevel) {
+        return 80 + 20 * spellLevel;
+    }
+
+    @Override
+    public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
+        return List.of(
+                Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getPower(spellLevel, caster), 1)),
+                Component.translatable("ui.arcanes_oublies.rooted", Utils.timeFromTicks(duration(spellLevel), 1)),
+                Component.translatable("ui.irons_spellbooks.distance", Utils.stringTruncation(RANGE, 1)));
+    }
+
+    @Override
+    public boolean checkPreCastConditions(Level level, int spellLevel, LivingEntity entity, MagicData playerMagicData) {
+        return Utils.preCastTargetHelper(level, entity, playerMagicData, this, RANGE, .35f);
+    }
+
+    @Override
+    public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
+        if (playerMagicData.getAdditionalCastData() instanceof TargetEntityCastData targetData) {
+            LivingEntity target = targetData.getTarget((ServerLevel) level);
+            if (target != null) {
+                cage(level, entity, target, duration(spellLevel), getPower(spellLevel, entity));
+            }
+        }
+        super.onCast(level, spellLevel, entity, castSource, playerMagicData);
+    }
+
+    public void cage(Level level, LivingEntity caster, LivingEntity target, int life, float damage) {
+        float ring = RING + target.getBbWidth() * .5f;
+        for (int i = 0; i < BARS; i++) {
+            float a = i * Mth.TWO_PI / BARS;
+            Vec3 p = SpellUtil.groundAt(level, target.position().add(Mth.cos(a) * ring, 0, Mth.sin(a) * ring), 3, 1);
+            // Each bar faces out of the cage, so it pushes those inside back in
+            float yaw = (float) (Mth.atan2(-Mth.cos(a), Mth.sin(a)) * Mth.RAD_TO_DEG);
+            WallPiece.raise(level, caster, this, WallPiece.Kind.PILLAR, p, yaw, .9f, Math.max(2.6f, target.getBbHeight() + .8f), life, 0, 1, 0);
+        }
+        target.invulnerableTime = 0;
+        io.redspace.ironsspellbooks.damage.DamageSources.applyDamage(target, damage, SpellUtil.damageSource(this, caster, caster));
+        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, life, 1));
+    }
+}

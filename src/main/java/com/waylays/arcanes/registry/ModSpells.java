@@ -120,6 +120,16 @@ import com.waylays.arcanes.spells.verdigris.RustSpell;
 import com.waylays.arcanes.spells.verdigris.StranglingVinesSpell;
 import com.waylays.arcanes.spells.verdigris.SunkenTempleSpell;
 import com.waylays.arcanes.spells.verdigris.TopplingWallSpell;
+import com.waylays.arcanes.spells.wall.BastionSpell;
+import com.waylays.arcanes.spells.wall.BrickBoltSpell;
+import com.waylays.arcanes.spells.wall.BrickCageSpell;
+import com.waylays.arcanes.spells.wall.BrickRainSpell;
+import com.waylays.arcanes.spells.wall.CitadelSpell;
+import com.waylays.arcanes.spells.wall.CrushingWallsSpell;
+import com.waylays.arcanes.spells.wall.MortarSpell;
+import com.waylays.arcanes.spells.wall.RampartChargeSpell;
+import com.waylays.arcanes.spells.wall.RisingWallSpell;
+import com.waylays.arcanes.spells.wall.WallBurstSpell;
 import com.waylays.arcanes.spells.rune.CircleOfEldersSpell;
 import com.waylays.arcanes.spells.rune.EdgeRuneSpell;
 import com.waylays.arcanes.spells.rune.MendingRunestoneSpell;
@@ -291,6 +301,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> ANCIENT_LIGHTNING_ROD = register(new LightningRodSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> ANCIENT_BELL = register(new AncientBellSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SUNKEN_TEMPLE = register(new SunkenTempleSpell());
+
+    // Wall Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BRICK_BOLT = register(new BrickBoltSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RISING_WALL = register(new RisingWallSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BRICK_RAIN = register(new BrickRainSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> WALL_BURST = register(new WallBurstSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MORTAR = register(new MortarSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CRUSHING_WALLS = register(new CrushingWallsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BRICK_CAGE = register(new BrickCageSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RAMPART_CHARGE = register(new RampartChargeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BASTION = register(new BastionSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> FALLEN_CITADEL = register(new CitadelSpell());
 
     private ModSpells() {}
 
