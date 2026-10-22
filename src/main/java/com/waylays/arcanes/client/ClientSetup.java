@@ -54,6 +54,9 @@ import com.waylays.arcanes.client.render.AmethystResonanceRenderer;
 import com.waylays.arcanes.client.render.AmethystGeodeRenderer;
 import com.waylays.arcanes.client.render.EmeraldBloomRenderer;
 import com.waylays.arcanes.client.render.GemCrownRenderer;
+import com.waylays.arcanes.client.render.GoldBoltRenderer;
+import com.waylays.arcanes.client.render.GoldCoinsRenderer;
+import com.waylays.arcanes.client.render.GoldSigilRenderer;
 import com.waylays.arcanes.client.render.RampartRenderer;
 import com.waylays.arcanes.client.render.WallImpactRenderer;
 import com.waylays.arcanes.client.render.WallPieceRenderer;
@@ -114,6 +117,10 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import com.waylays.arcanes.client.gold.GoldCoatLayer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.world.entity.EntityType;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 @EventBusSubscriber(modid = ArcanesOublies.MODID, value = Dist.CLIENT)
@@ -122,8 +129,7 @@ public final class ClientSetup {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(ModEntities.GOLD_BOLT.get(),
-                context -> new GoldItemProjectileRenderer<>(context, new ItemStack(Items.GOLD_INGOT), .9f, 1.15f, 35f));
+        event.registerEntityRenderer(ModEntities.GOLD_BOLT.get(), GoldBoltRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLDFALL_INGOT.get(),
                 context -> new GoldItemProjectileRenderer<>(context, new ItemStack(Items.GOLD_INGOT), 2.6f, 2.2f, 8f));
         event.registerEntityRenderer(ModEntities.MOLTEN_GOLD_BLOB.get(),
@@ -214,6 +220,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.WALL_SIGIL.get(), WallSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.WALL_IMPACT.get(), WallImpactRenderer::new);
         event.registerEntityRenderer(ModEntities.GEM_SIGIL.get(), GemSigilRenderer::new);
+        event.registerEntityRenderer(ModEntities.GOLD_SIGIL.get(), GoldSigilRenderer::new);
+        event.registerEntityRenderer(ModEntities.GOLD_COINS.get(), GoldCoinsRenderer::new);
         event.registerEntityRenderer(ModEntities.GEM_SHATTER.get(), GemShatterRenderer::new);
         event.registerEntityRenderer(ModEntities.RUBY_RAY.get(), RubyRayRenderer::new);
         event.registerEntityRenderer(ModEntities.RUBY_HEART.get(), RubyHeartRenderer::new);
@@ -240,6 +248,22 @@ public final class ClientSetup {
                 context -> new ManaCreatureRenderer<>(context, new ManaCrowModel(context.bakeLayer(ManaCrowModel.LAYER)), .25f, 1.25f, true));
         event.registerEntityRenderer(ModEntities.MANA_PIRANHA.get(), ManaPiranhaRenderer::new);
         event.registerEntityRenderer(ModEntities.MANA_DROMEDARY.get(), ManaCamelRenderer::new);
+    }
+
+    /** The gold of Gold magic can cover any body: every living thing's renderer, and the players', draw it. */
+    @SubscribeEvent
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static void addGoldCoat(EntityRenderersEvent.AddLayers event) {
+        for (EntityType<?> type : event.getEntityTypes()) {
+            if (event.getRenderer((EntityType) type) instanceof LivingEntityRenderer renderer) {
+                renderer.addLayer(new GoldCoatLayer(renderer));
+            }
+        }
+        for (PlayerSkin.Model skin : event.getSkins()) {
+            if (event.getSkin(skin) instanceof LivingEntityRenderer renderer) {
+                renderer.addLayer(new GoldCoatLayer(renderer));
+            }
+        }
     }
 
     @SubscribeEvent

@@ -7,8 +7,8 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /**
- * The addon's own packets. So far one: a fighter's body animation played outside of a cast (the riposte that answers
- * a parried blow), for everyone who sees them.
+ * The addon's own packets: a fighter's body animation played outside of a cast (the riposte that answers a parried
+ * blow), for everyone who sees them; and how much gold covers a body (Gold magic's coats, Midas statues).
  */
 public final class ArcanesNetwork {
     private static final String VERSION = "1";
@@ -18,6 +18,7 @@ public final class ArcanesNetwork {
     public static void register(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar(VERSION);
         registrar.playToClient(PlayAnimationPacket.TYPE, PlayAnimationPacket.STREAM_CODEC, PlayAnimationPacket::handle);
+        registrar.playToClient(GoldCoatPacket.TYPE, GoldCoatPacket.STREAM_CODEC, GoldCoatPacket::handle);
     }
 
     /** Plays the player animation {@code animation} on {@code player}, for them and everyone around. */

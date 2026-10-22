@@ -3,11 +3,16 @@ package com.waylays.arcanes.spells.gold;
 import io.redspace.ironsspellbooks.particle.BlastwaveParticleOptions;
 import io.redspace.ironsspellbooks.particle.FogParticleOptions;
 import io.redspace.ironsspellbooks.particle.SparkParticleOptions;
+import com.waylays.arcanes.entity.gold.GoldCoins;
+import com.waylays.arcanes.entity.gold.GoldSigil;
 import com.waylays.arcanes.spells.SpellUtil;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -29,6 +34,27 @@ public final class GoldFx {
     public static final DustParticleOptions MOLTEN_DUST = new DustParticleOptions(MOLTEN, 1.2f);
 
     private GoldFx() {}
+
+    /** The Sun Stone of Eldorado burning on the ground at {@code at}, {@code radius} wide, for {@code life} ticks. */
+    public static void sigil(Level level, Vec3 at, float radius, int life) {
+        if (!level.isClientSide) {
+            GoldSigil.burn(level, at, radius, life);
+        }
+    }
+
+    /** A spray of {@code count} gold coins out of {@code at}, thrown out with {@code force}: they spin, bounce and fade. */
+    public static void coins(Level level, Vec3 at, int count, float force) {
+        if (!level.isClientSide) {
+            GoldCoins.spray(level, at, count, force);
+            level.playSound(null, at.x, at.y, at.z, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, .6f, 1.8f);
+            level.playSound(null, at.x, at.y, at.z, SoundEvents.ARMOR_EQUIP_GOLD.value(), SoundSource.PLAYERS, .9f, 1.3f);
+        }
+    }
+
+    /** Lays {@code coats} coats of gold on {@code target} (see {@link GoldCoat}); returns how many it wears now. */
+    public static int gild(LivingEntity target, int coats) {
+        return GoldCoat.gild(target, coats);
+    }
 
     public static ParticleOptions sparks() {
         return new SparkParticleOptions(GOLD);

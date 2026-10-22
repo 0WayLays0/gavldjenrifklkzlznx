@@ -1,6 +1,7 @@
 package com.waylays.arcanes.gametest;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.effect.GildedEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
@@ -83,7 +84,7 @@ public final class GoldGameTests {
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 100)
-    public static void goldBoltHitsAndShatters(GameTestHelper helper) {
+    public static void goldBoltGildsThenRicochets(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 6.5));
         Pig bystander = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(5.8, 2, 7.0));
@@ -96,8 +97,10 @@ public final class GoldGameTests {
             helper.assertTrue(bolt.isRemoved(), "bolt is still flying (at " + helper.relativeVec(bolt.position()) + ")");
             String state = " [target " + describe(helper, target) + ", bystander " + describe(helper, bystander) + "]";
             helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 5f, "direct hit did not deal its damage" + state);
-            helper.assertTrue(bystander.getHealth() < bystander.getMaxHealth(), "shards did not hit the bystander" + state);
-            helper.assertTrue(bystander.getHealth() > target.getHealth(), "splash damage is as high as the direct hit" + state);
+            helper.assertTrue(bystander.getHealth() < bystander.getMaxHealth(), "the bolt did not ricochet on to the bystander" + state);
+            helper.assertTrue(bystander.getHealth() > target.getHealth(), "the ricochet is as strong as the direct hit" + state);
+            helper.assertTrue(GildedEffect.coats(target) == 1 && GildedEffect.coats(bystander) == 1, "struck pigs are not gilded once"
+                    + " (coats " + GildedEffect.coats(target) + ", " + GildedEffect.coats(bystander) + ")");
         });
     }
 

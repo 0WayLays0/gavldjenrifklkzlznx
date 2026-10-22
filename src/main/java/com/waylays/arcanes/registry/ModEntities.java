@@ -94,6 +94,8 @@ import com.waylays.arcanes.entity.gold.AurumBladeEntity;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
 import com.waylays.arcanes.entity.gold.GildedChainsEntity;
 import com.waylays.arcanes.entity.gold.GoldBoltProjectile;
+import com.waylays.arcanes.entity.gold.GoldCoins;
+import com.waylays.arcanes.entity.gold.GoldSigil;
 import com.waylays.arcanes.entity.gold.GoldSpikeEntity;
 import com.waylays.arcanes.entity.gold.GoldenSentinel;
 import com.waylays.arcanes.entity.gold.GoldfallIngot;
@@ -122,6 +124,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, ArcanesOublies.MODID);
 
+    public static final DeferredHolder<EntityType<?>, EntityType<GoldSigil>> GOLD_SIGIL = register("gold_sigil",
+            EntityType.Builder.<GoldSigil>of(GoldSigil::new, MobCategory.MISC).sized(.5f, .1f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GoldCoins>> GOLD_COINS = register("gold_coins",
+            EntityType.Builder.<GoldCoins>of(GoldCoins::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(40).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<GoldBoltProjectile>> GOLD_BOLT = register("gold_bolt",
             EntityType.Builder.<GoldBoltProjectile>of(GoldBoltProjectile::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(64).updateInterval(1));
 

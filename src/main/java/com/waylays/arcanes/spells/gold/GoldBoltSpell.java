@@ -26,13 +26,14 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Gold Bolt: a spinning golden ingot that bursts into gold shards on impact. The direct hit takes full damage,
- * enemies around the impact take {@link #SPLASH_RATIO} of it.
+ * Gold Bolt: an ingot of gold hurled spinning that gilds what it strikes and ricochets from enemy to enemy (see
+ * {@link GoldBoltProjectile}): once, and once more every four levels.
  */
 @AutoSpellConfig
 public class GoldBoltSpell extends AbstractSpell {
-    public static final float SPLASH_RATIO = .4f;
-    public static final float SPLASH_RADIUS = 2.5f;
+    public static int ricochets(int spellLevel) {
+        return 1 + spellLevel / 4;
+    }
 
     private final ResourceLocation spellId = ArcanesOublies.id("gold_bolt");
 
@@ -56,7 +57,8 @@ public class GoldBoltSpell extends AbstractSpell {
         float damage = getDamage(spellLevel, caster);
         return List.of(
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(damage, 2)),
-                Component.translatable("ui.arcanes_oublies.splash_damage", Utils.stringTruncation(damage * SPLASH_RATIO, 2))
+                Component.translatable("ui.arcanes_oublies.ricochets", ricochets(spellLevel), (int) (GoldBoltProjectile.RICOCHET_DAMAGE * 100)),
+                Component.translatable("ui.arcanes_oublies.gilds", 1)
         );
     }
 
@@ -88,6 +90,7 @@ public class GoldBoltSpell extends AbstractSpell {
         bolt.setPos(origin);
         bolt.shoot(look);
         bolt.setDamage(getDamage(spellLevel, entity));
+        bolt.setRicochets(ricochets(spellLevel));
         level.addFreshEntity(bolt);
 
         Vec3 hand = entity.getEyePosition().add(look.scale(.8)).subtract(0, .2, 0);

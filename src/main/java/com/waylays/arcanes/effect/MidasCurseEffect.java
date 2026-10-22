@@ -5,6 +5,7 @@ import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SpellUtil;
+import com.waylays.arcanes.spells.gold.GoldCoat;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import com.waylays.arcanes.spells.gold.MidasCurseSpell;
 import io.redspace.ironsspellbooks.damage.DamageSources;
@@ -31,8 +32,10 @@ import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import java.util.UUID;
 
 /**
- * Midas Curse: the victim slowly turns to gold. It gets slower and slower until it is frozen as a golden statue,
- * and when the curse runs out the statue shatters. Milk (or any other cure) removes it without the shatter.
+ * Midas Curse: the victim turns to gold from the feet up (drawn on its own body, see {@link GoldCoat}). It gets slower
+ * and slower until it is frozen as a golden statue, and when the curse runs out the statue shatters in coins and
+ * shards that gild everything around it. A victim already gilded through is a statue at once. Milk (or any other cure)
+ * removes it without the shatter.
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID)
 public class MidasCurseEffect extends MobEffect {
@@ -44,14 +47,34 @@ public class MidasCurseEffect extends MobEffect {
         super(MobEffectCategory.HARMFUL, ModSchools.GOLD_COLOR);
     }
 
-    /** Remembers who cast the curse and how hard the statue shatters (stored on the victim, survives a save). */
+    /** The part of the curse spent turning to gold: after it, the victim is a frozen statue until it shatters. */
+    public static final float TURNED = .66f;
+
+    /**
+     * Remembers who cast the curse and how hard the statue shatters (stored on the victim, survives a save). A victim
+     * already gilded through (five coats of Gilding) is a statue at once.
+     */
     public static void curse(LivingEntity victim, LivingEntity caster, int spellLevel, int duration, float shatterDamage) {
+        boolean gilded = GildedEffect.coats(victim) >= GildedEffect.MAX_COATS;
+        int left = gilded ? Math.max(20, (int) (duration * (1 - TURNED))) : duration;
         CompoundTag tag = new CompoundTag();
         tag.putUUID("Caster", caster.getUUID());
         tag.putFloat("Damage", shatterDamage);
         tag.putInt("Duration", duration);
+        tag.putLong("Start", victim.level().getGameTime() - (duration - left));
         victim.getPersistentData().put(TAG, tag);
-        victim.addEffect(new MobEffectInstance(ModEffects.MIDAS_CURSE, duration, spellLevel - 1, false, true, true));
+        victim.addEffect(new MobEffectInstance(ModEffects.MIDAS_CURSE, left, spellLevel - 1, false, true, true));
+        GoldCoat.syncLater(victim);
+    }
+
+    /** The game time the curse began (as if from the start, for a victim cursed already gilded through). */
+    public static long start(LivingEntity entity) {
+        return entity.getPersistentData().getCompound(TAG).getLong("Start");
+    }
+
+    /** The curse's whole length, in ticks. */
+    public static int total(LivingEntity entity) {
+        return Math.max(1, entity.getPersistentData().getCompound(TAG).getInt("Duration"));
     }
 
     /** 0 when cast, 1 when the statue shatters. */
@@ -76,10 +99,10 @@ public class MidasCurseEffect extends MobEffect {
         }
         float progress = progress(entity);
         // Slows to a near standstill well before the end: the last third is the frozen statue
-        float slow = Math.min(.97f, progress * 1.5f);
+        float slow = Math.min(.97f, progress / TURNED * .97f);
         setModifier(entity, Attributes.MOVEMENT_SPEED, SPEED_ID, -slow);
         setModifier(entity, Attributes.ATTACK_SPEED, ATTACK_SPEED_ID, -slow);
-        if (progress > .66f) {
+        if (progress > TURNED) {
             entity.setDeltaMovement(entity.getDeltaMovement().multiply(0, 1, 0));
         }
 
@@ -138,6 +161,14 @@ public class MidasCurseEffect extends MobEffect {
         level.playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.HOSTILE, 2.5f, .6f);
         level.playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 1.5f, .7f);
         level.playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.ANVIL_LAND, SoundSource.HOSTILE, .6f, 1.4f);
+        // The statue's shards gild everything around it
+        for (LivingEntity near : SpellUtil.enemiesAround(level, victim.position().add(0, victim.getBbHeight() * .5, 0), 4, caster, e -> e != victim)) {
+            GoldCoat.gild(near, 2);
+            if (caster != null) {
+                DamageSources.applyDamage(near, damage * .4f, SpellUtil.damageSource(ModSpells.MIDAS_CURSE.get(), caster, caster));
+            }
+        }
+        GoldFx.coins(level, victim.position().add(0, victim.getBbHeight() * .5, 0), 18, .45f);
         if (caster != null) {
             DamageSources.applyDamage(victim, damage, SpellUtil.damageSource(ModSpells.MIDAS_CURSE.get(), caster, caster));
         } else {

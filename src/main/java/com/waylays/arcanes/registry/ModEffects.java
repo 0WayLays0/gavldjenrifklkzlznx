@@ -5,6 +5,7 @@ import com.waylays.arcanes.effect.BlastLeapEffect;
 import com.waylays.arcanes.effect.BleedingEffect;
 import com.waylays.arcanes.effect.EntangledEffect;
 import com.waylays.arcanes.effect.GildedArmorEffect;
+import com.waylays.arcanes.effect.GildedEffect;
 import com.waylays.arcanes.effect.GlyphFrozenEffect;
 import com.waylays.arcanes.effect.GlyphMarkEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
@@ -31,6 +32,7 @@ public final class ModEffects {
 
     public static final DeferredHolder<MobEffect, MobEffect> MIDAS_CURSE = EFFECTS.register("midas_curse", MidasCurseEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> GILDED_ARMOR = EFFECTS.register("gilded_armor", GildedArmorEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> GILDED = EFFECTS.register("gilded", GildedEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> VOLATILE_BRAND = EFFECTS.register("volatile_brand", VolatileBrandEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> BLAST_LEAP = EFFECTS.register("blast_leap", BlastLeapEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> REACTIVE_SHIELD = EFFECTS.register("reactive_shield", ReactiveShieldEffect::new);

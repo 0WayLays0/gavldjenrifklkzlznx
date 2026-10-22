@@ -4,9 +4,9 @@ import com.waylays.arcanes.entity.SpellProjectile;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.SpellUtil;
-import com.waylays.arcanes.spells.gold.GoldBoltSpell;
 import com.waylays.arcanes.spells.gold.GoldFx;
 import io.redspace.ironsspellbooks.damage.DamageSources;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -18,12 +18,21 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Comparator;
+import java.util.List;
+
 /**
- * Gold Bolt: a spinning ingot. The direct hit takes full damage; the ingot then bursts into shards that hit
- * every enemy within {@link GoldBoltSpell#SPLASH_RADIUS} for {@link GoldBoltSpell#SPLASH_RATIO} of it.
+ * Gold Bolt: an ingot of gold hurled spinning, hot at the edges. It strikes, lays a coat of gold on what it struck
+ * and throws out a spray of coins; then it ricochets to the nearest other enemy in sight (a quarter weaker each time),
+ * as many times as it has ricochets left. When it has none, or meets a wall, it bursts in coins and shards.
  */
 public class GoldBoltProjectile extends SpellProjectile {
     public static final float SPEED = 1.6f;
+    public static final float RICOCHET_RANGE = 8;
+    public static final float RICOCHET_DAMAGE = .75f;
+
+    private final IntOpenHashSet struck = new IntOpenHashSet();
+    private int ricochets = 1;
 
     public GoldBoltProjectile(EntityType<? extends GoldBoltProjectile> entityType, Level level) {
         super(entityType, level);
@@ -39,49 +48,75 @@ public class GoldBoltProjectile extends SpellProjectile {
         shoot(direction, SPEED);
     }
 
+    public void setRicochets(int ricochets) {
+        this.ricochets = ricochets;
+    }
+
+    @Override
+    protected int lifetime() {
+        return 80;
+    }
+
+    @Override
+    protected boolean canHitEntity(Entity target) {
+        return super.canHitEntity(target) && !struck.contains(target.getId()) && !SpellUtil.isAlly(getOwner(), target);
+    }
+
     @Override
     protected void onImpact(HitResult hit) {
         Entity owner = getOwner();
-        Entity directTarget = null;
-        Vec3 burst = hit.getLocation();
-        if (hit instanceof EntityHitResult entityHit) {
-            directTarget = entityHit.getEntity();
-            // Burst on the target's surface, along the ingot's path
+        Vec3 at = hit.getLocation();
+        if (hit instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof LivingEntity target) {
+            struck.add(target.getId());
             Vec3 from = position().add(0, getBbHeight() * .5, 0);
-            burst = directTarget.getBoundingBox().inflate(.3).clip(from, from.add(getDeltaMovement())).orElse(directTarget.getBoundingBox().getCenter());
-            DamageSources.applyDamage(directTarget, getDamage(), SpellUtil.damageSource(ModSpells.GOLD_BOLT.get(), this, owner));
+            at = target.getBoundingBox().inflate(.3).clip(from, from.add(getDeltaMovement())).orElse(target.getBoundingBox().getCenter());
+            target.invulnerableTime = 0;
+            DamageSources.applyDamage(target, getDamage(), SpellUtil.damageSource(ModSpells.GOLD_BOLT.get(), this, owner));
+            GoldFx.gild(target, 1);
+            GoldFx.coins(level(), at, 6, .3f);
+            level().playSound(null, at.x, at.y, at.z, SoundEvents.ANVIL_LAND, SoundSource.NEUTRAL, .35f, 1.9f);
+            level().playSound(null, at.x, at.y, at.z, SoundEvents.ARMOR_EQUIP_GOLD.value(), SoundSource.NEUTRAL, 1.5f, .8f + .15f * struck.size());
+            if (ricochets > 0 && ricochet(target, at)) {
+                return;
+            }
         }
-        Entity excluded = directTarget;
-        for (LivingEntity victim : SpellUtil.enemiesAround(level(), burst, GoldBoltSpell.SPLASH_RADIUS, owner, e -> e != excluded)) {
-            DamageSources.applyDamage(victim, getDamage() * GoldBoltSpell.SPLASH_RATIO, SpellUtil.damageSource(ModSpells.GOLD_BOLT.get(), this, owner));
-        }
-        GoldFx.shatterBurst(level(), burst.x, burst.y, burst.z, 1f);
-        level().playSound(null, burst.x, burst.y, burst.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.NEUTRAL, 2f, 1.1f + random.nextFloat() * .2f);
-        level().playSound(null, burst.x, burst.y, burst.z, SoundEvents.ANVIL_LAND, SoundSource.NEUTRAL, .35f, 1.9f);
-        level().playSound(null, burst.x, burst.y, burst.z, SoundEvents.ARMOR_EQUIP_GOLD, SoundSource.NEUTRAL, 1.5f, .8f);
+        GoldFx.shatterBurst(level(), at.x, at.y, at.z, 1f);
+        GoldFx.coins(level(), at, 10, .4f);
+        level().playSound(null, at.x, at.y, at.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.NEUTRAL, 2f, 1.1f + random.nextFloat() * .2f);
         discard();
     }
 
-    /** Client side, every tick: a dense gold dust core, a pale glitter spiral and stray sparks. */
+    /** Off to the nearest other enemy in sight of {@code from}, if any. */
+    private boolean ricochet(LivingEntity from, Vec3 at) {
+        List<LivingEntity> next = SpellUtil.enemiesAround(level(), at, RICOCHET_RANGE, getOwner(),
+                e -> !struck.contains(e.getId()) && from.hasLineOfSight(e));
+        if (next.isEmpty()) {
+            return false;
+        }
+        next.sort(Comparator.comparingDouble(e -> e.distanceToSqr(at)));
+        Vec3 to = next.get(0).getBoundingBox().getCenter().subtract(at);
+        ricochets--;
+        setDamage(getDamage() * RICOCHET_DAMAGE);
+        setPos(at.x, at.y - getBbHeight() * .5, at.z);
+        setDeltaMovement(to.normalize().scale(SPEED));
+        hasImpulse = true;
+        level().playSound(null, at.x, at.y, at.z, SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.NEUTRAL, 1.2f, 1.6f);
+        return true;
+    }
+
+    /** Client side, every tick: glitter left in the air behind it. */
     @Override
     protected void clientTick() {
-        Level level = level();
         Vec3 motion = getDeltaMovement();
-        double cx = getX();
-        double cy = getY() + getBbHeight() * .5;
-        double cz = getZ();
-        level.addParticle(GoldFx.GOLD_DUST, cx, cy, cz, 0, 0, 0);
-        level.addParticle(GoldFx.DEEP_DUST, cx - motion.x * .5, cy - motion.y * .5, cz - motion.z * .5, 0, 0, 0);
-
-        float yHeading = -((float) (Mth.atan2(motion.z, motion.x) * Mth.RAD_TO_DEG) + 90.0F);
-        float radius = .3f;
-        for (int i = 0; i < 2; i++) {
-            double radians = tickCount * .5f + i * Mth.PI;
-            Vec3 swirl = new Vec3(Math.cos(radians) * radius, Math.sin(radians) * radius, 0).yRot(yHeading * Mth.DEG_TO_RAD);
-            level.addParticle(GoldFx.PALE_DUST, cx + swirl.x, cy + swirl.y, cz + swirl.z, 0, 0, 0);
-        }
+        double cx = getX(), cy = getY() + getBbHeight() * .5, cz = getZ();
+        level().addParticle(GoldFx.PALE_DUST, cx - motion.x * .5, cy - motion.y * .5, cz - motion.z * .5, 0, 0, 0);
         if (random.nextInt(3) == 0) {
-            level.addParticle(GoldFx.sparks(), cx, cy, cz, (random.nextFloat() - .5f) * .16f - motion.x * .1, .05 + (random.nextFloat() - .5f) * .16f, (random.nextFloat() - .5f) * .16f - motion.z * .1);
+            level().addParticle(GoldFx.sparks(), cx, cy, cz, (random.nextFloat() - .5f) * .16f - motion.x * .1, .05,
+                    (random.nextFloat() - .5f) * .16f - motion.z * .1);
+        }
+        if (random.nextInt(2) == 0) {
+            float a = tickCount * .7f;
+            level().addParticle(GoldFx.GOLD_DUST, cx + Mth.cos(a) * .25, cy + Mth.sin(a) * .25, cz, 0, 0, 0);
         }
     }
 }
