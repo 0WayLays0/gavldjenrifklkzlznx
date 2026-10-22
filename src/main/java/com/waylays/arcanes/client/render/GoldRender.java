@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.spells.gem.Gem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -85,6 +87,9 @@ public final class GoldRender {
             .box(-.022f, -.19f, .05f, .022f, -.14f, .062f)
             .box(-.009f, -.26f, .05f, .009f, -.19f, .062f)
             .build();
+
+    private static final int SUN_RAYS = 16;
+    private static final int SUN_JEWELS = 8;
 
     /** Spacing of the links of a chain: each one passes through the next. */
     public static final float LINK_PITCH = .27f;
@@ -204,6 +209,44 @@ public final class GoldRender {
         RenderHelper.groundQuad(buffer.getBuffer(RenderType.eyes(RuneRender.RING_GLOW)), poseStack.last(), radius * 1.1f,
                 RuneRender.additive(PALE, strength * .4f), GlyphRender.FULL);
         poseStack.popPose();
+    }
+
+    /** Turns the pose so that its +Z faces the camera from {@code centre} (in the world). */
+    public static void faceCamera(PoseStack poseStack, Vec3 centre) {
+        Vec3 eye = Minecraft.getInstance().getEntityRenderDispatcher().camera.getPosition().subtract(centre);
+        poseStack.mulPose(Axis.YP.rotationDegrees((float) Math.toDegrees(Math.atan2(eye.x, eye.z))));
+        poseStack.mulPose(Axis.XP.rotationDegrees((float) -Math.toDegrees(Math.atan2(eye.y, eye.horizontalDistance()))));
+    }
+
+    /**
+     * The sun stone of Eldorado, facing +Z at the origin, {@code radius} across the disc: a disc of gold stamped with the
+     * sun's face, set with rubies and emeralds, and sixteen rays round it (long ones in {@code rayColour}, short ones in
+     * {@code shortRayColour}) breathing a little.
+     */
+    public static void sunStone(PoseStack poseStack, MultiBufferSource buffer, float radius, int rayColour, int shortRayColour, float age, int seed) {
+        VertexConsumer metal = metal(buffer);
+        for (int k = 0; k < SUN_RAYS; k++) {
+            boolean big = k % 2 == 0;
+            poseStack.pushPose();
+            poseStack.mulPose(Axis.ZP.rotationDegrees(k * 360f / SUN_RAYS));
+            poseStack.translate(0, radius * .92f, 0);
+            float length = radius * (big ? 1.05f : .6f) * (1 + .08f * Mth.sin(age * .2f + k));
+            poseStack.scale(radius * (big ? .4f : .3f), length, radius * .14f);
+            Solid.draw(metal, poseStack.last(), big ? CRYSTAL : SPIKE, big ? rayColour : shortRayColour, 255, age + k * 4, .9f, GlyphRender.FULL);
+            poseStack.popPose();
+        }
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+        coin(poseStack, buffer, radius * 2, age, seed);
+        poseStack.popPose();
+        for (int k = 0; k < SUN_JEWELS; k++) {
+            float a = k * Mth.TWO_PI / SUN_JEWELS + Mth.PI / SUN_JEWELS;
+            poseStack.pushPose();
+            poseStack.translate(Mth.cos(a) * radius * .8f, Mth.sin(a) * radius * .8f, radius * .07f);
+            poseStack.mulPose(Axis.XP.rotationDegrees(90));
+            GemRender.gem(poseStack, buffer, GemRender.Cut.BRILLIANT, (k % 2 == 0 ? Gem.RUBY : Gem.EMERALD).color, radius * .2f, .9f, age + k * 9);
+            poseStack.popPose();
+        }
     }
 
     /** The colour of gold at {@code heat} (0 cold polished gold, 1 white-hot molten). */

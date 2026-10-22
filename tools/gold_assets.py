@@ -141,12 +141,75 @@ def sun_sigil():
     return Image.merge("RGBA", (light, light, light, Image.new("L", (S, S), 255)))
 
 
+def dragon_scales():
+    """32x24 near-white dragon scales, tiling both ways: rows of round scales, each overlapping the row above, lit at
+    its crown and darkened at its rim (tinted gold, or pale gold on the belly, in game)."""
+    w, h, size, row = 32, 24, 8, 6
+    img = Image.new("RGBA", (w, h))
+    px = img.load()
+    for y in range(h):
+        for x in range(w):
+            v = 150
+            # The lowest scale over this pixel wins: rows lower down overlap the ones above
+            for r in range(-1, h // row + 2):
+                cy = r * row
+                cx0 = (r % 2) * size / 2
+                for c in range(-1, w // size + 2):
+                    cx = cx0 + c * size
+                    dx = ((x + .5 - cx + w / 2) % w) - w / 2
+                    dy = ((y + .5 - cy + h / 2) % h) - h / 2
+                    d = math.hypot(dx, dy * 1.15) / (size * .62)
+                    if d < 1 and dy > -size * .2:
+                        rim = max(0.0, (d - .72) / .28)
+                        crown = max(0.0, 1 - math.hypot(dx, dy + size * .1) / (size * .45))
+                        v = int(205 + 50 * crown - 105 * rim ** 1.5)
+            v = max(0, min(255, v))
+            px[x, y] = (v, v, v, 255)
+    return img
+
+
+def golden_dragon_icon():
+    """A golden dragon coiling out of a great sun: a ring of fire behind, the gold S of its body over it, its horned
+    head with a crimson mane and a ruby eye at the top right."""
+    def draw(d, img, S):
+        c = S / 2
+        g.glow_spot(img, c, c, .5 * S, (255, 120, 40), .8)
+        for k in range(12):
+            ang = k * math.pi / 6
+            half = math.pi / 20
+            d.polygon([(c + math.cos(ang - half) * .3 * S, c + math.sin(ang - half) * .3 * S), (c + math.cos(ang) * .47 * S, c + math.sin(ang) * .47 * S),
+                       (c + math.cos(ang + half) * .3 * S, c + math.sin(ang + half) * .3 * S)], fill=(230, 90, 20, 255))
+        d.ellipse((c - .33 * S, c - .33 * S, c + .33 * S, c + .33 * S), fill=(110, 26, 12, 255), outline=(255, 140, 40, 255), width=max(2, S // 16))
+        # The body: an S of gold, thick at the neck and thin at the tail
+        pts = []
+        for i in range(48):
+            t = i / 47
+            pts.append((S * (.18 + .5 * t + .14 * math.sin(t * 6.3)), S * (.88 - .58 * t + .08 * math.cos(t * 5.5)), t))
+        for colour, extra in (((50, 22, 0, 255), max(3, S // 22)), (GOLD + (255,), 0)):
+            for (x0, y0, t0), (x1, y1, _) in zip(pts, pts[1:]):
+                d.line([(x0, y0), (x1, y1)], fill=colour, width=max(2, int(S * (.04 + .08 * t0))) + extra)
+        for (x0, y0, t0) in pts[3::4]:
+            d.ellipse((x0 - S * .012, y0 - S * .02, x0 + S * .012, y0 - S * .004), fill=PALE + (255,))
+        hx, hy = pts[-1][0] + S * .02, pts[-1][1] - S * .02
+        for k in range(7):
+            a = math.pi * (.5 + k * .16)
+            d.line([(hx, hy), (hx + math.cos(a) * S * .17, hy + math.sin(a) * S * .17)], fill=(215, 30, 45, 255), width=max(2, S // 24))
+        d.line([(hx - S * .03, hy - S * .06), (hx - S * .14, hy - S * .24)], fill=(255, 245, 200, 255), width=max(2, S // 26))
+        d.line([(hx + S * .03, hy - S * .06), (hx + S * .03, hy - S * .25)], fill=(255, 245, 200, 255), width=max(2, S // 26))
+        d.polygon([(hx - S * .09, hy - S * .08), (hx + S * .2, hy - S * .02), (hx + S * .19, hy + S * .06), (hx - S * .08, hy + S * .09)],
+                  fill=GOLD + (255,), outline=(50, 22, 0, 255), width=max(2, S // 40))
+        d.ellipse((hx + S * .01, hy - S * .045, hx + S * .06, hy + S * .005), fill=(235, 20, 60, 255))
+    return g.painted(96, draw, (.5, .5, (60, 16, 8), (10, 4, 16)))
+
+
 def main():
     g.save(metal(), "textures/entity/gold/metal.png")
     g.save(coin(), "textures/entity/gold/coin.png")
     g.save(gold_skin(), "textures/entity/gold/gold_skin.png")
     g.save(gold_sheen(), "textures/entity/gold/gold_sheen.png")
     g.save(sun_sigil(), "textures/entity/gold/sun_sigil.png")
+    g.save(dragon_scales(), "textures/entity/gold/dragon_scales.png")
+    g.save(golden_dragon_icon(), "textures/gui/spell_icons/golden_dragon.png")
 
 
 if __name__ == "__main__":

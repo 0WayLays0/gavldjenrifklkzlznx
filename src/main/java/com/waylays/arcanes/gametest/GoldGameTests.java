@@ -4,9 +4,11 @@ import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.effect.GildedEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
+import com.waylays.arcanes.entity.gold.DragonSun;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
 import com.waylays.arcanes.entity.gold.GildedChainsEntity;
 import com.waylays.arcanes.entity.gold.GoldBoltProjectile;
+import com.waylays.arcanes.entity.gold.GoldenDragon;
 import com.waylays.arcanes.entity.gold.GoldenSentinel;
 import com.waylays.arcanes.entity.gold.GoldfallIngot;
 import com.waylays.arcanes.entity.gold.MoltenGoldBlob;
@@ -44,6 +46,7 @@ import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -75,7 +78,8 @@ public final class GoldGameTests {
                 goldSpells++;
             }
         }
-        helper.assertTrue(goldSpells == 10, "expected 10 Gold spells, got " + goldSpells);
+        // The ten of the school and the Golden Dragon, its bonus
+        helper.assertTrue(goldSpells == 11, "expected 11 Gold spells, got " + goldSpells);
         helper.assertTrue(helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).containsKey(ModSchools.GOLD_MAGIC),
                 "gold_magic damage type missing");
         helper.assertTrue(gold.isFocus(new ItemStack(Items.GOLD_BLOCK)), "gold block is not the Gold focus");
@@ -311,5 +315,30 @@ public final class GoldGameTests {
         helper.assertTrue(MidasCurseEffect.progress(gilded) >= MidasCurseEffect.TURNED - .02f,
                 "a pig gilded through is not a statue at once (" + MidasCurseEffect.progress(gilded) + ")");
         helper.succeed();
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "gold_dragon", timeoutTicks = 360)
+    public static void goldenDragonComesOutOfItsSunAndGildsItsPrey(GameTestHelper helper) {
+        // The dragon circles well past the platform's chunk: keep the chunks around ticking or it freezes there
+        List<ChunkPos> forced = GameTestSetup.forceChunksAround(helper, 1);
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
+        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(6.5, 2, 6.5));
+        caster.setTarget(golem);
+        ModSpells.GOLDEN_DRAGON.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        List<GoldenDragon> dragons = helper.getLevel().getEntitiesOfClass(GoldenDragon.class, caster.getBoundingBox().inflate(16));
+        helper.assertTrue(dragons.size() == 1, "expected 1 dragon, got " + dragons.size());
+        GoldenDragon dragon = dragons.get(0);
+        helper.assertTrue(caster.getUUID().equals(dragon.getSummonerUUID()), "the dragon has no master");
+        List<DragonSun> suns = helper.getLevel().getEntitiesOfClass(DragonSun.class, dragon.getBoundingBox().inflate(2));
+        helper.assertTrue(suns.size() == 1, "the dragon did not come out of a sun (" + suns.size() + " suns around it)");
+        helper.succeedWhen(() -> {
+            helper.assertTrue(golem.getHealth() < golem.getMaxHealth(), "the dragon never hurt its prey [" + describe(helper, golem) + "]");
+            helper.assertTrue(GildedEffect.coats(golem) >= 1, "the dragon did not gild its prey");
+            helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the dragon hurt its summoner");
+            dragon.dismissSummon();
+            helper.assertTrue(dragon.getDuration() <= dragon.tickCount + GoldenDragon.MELT_TICKS, "sent away, the dragon does not melt");
+            dragon.discard();
+            forced.forEach(chunk -> helper.getLevel().setChunkForced(chunk.x, chunk.z, false));
+        });
     }
 }

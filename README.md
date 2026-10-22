@@ -20,24 +20,29 @@ parchemins de feu, de glace, etc. d'Iron's). La licence d'Iron's interdit de rep
 contient que les palettes de couleurs, et le jeu recolore lui-même le parchemin d'Iron's au chargement
 (`tools/scroll_assets.py`).
 
-**Invocations** (Sentinelles d'Or, Bibliothèque Interdite, Pile Volante, Dragon d'Origami et tous les sorts
+**Invocations** (Sentinelles d'Or, Dragon d'Or, Bibliothèque Interdite, Pile Volante, Dragon d'Origami et tous les sorts
 d'Errethys) : relancer le sort renvoie ses invocations (relance d'Iron's, instantanée et gratuite, visible sur
 l'écran) ; le temps de recharge démarre quand elles sont toutes parties (renvoyées, tuées ou à la fin de leur temps).
 
 ### Or
 
+**Dorure** : presque tous les sorts d'Or posent des couches d'or sur ce qu'ils touchent (jusqu'à 5). On voit l'or
+monter le long du corps depuis les pieds. Chaque couche ralentit de 6 % et fait prendre 8 % de dégâts d'Or en plus ;
+les couches s'effacent après quelques secondes sans nouvel or.
+
 | Sort | Effet |
 |---|---|
-| **Trait d'Or** (Gold Bolt) | Lingot d'or tournoyant. La cible prend tous les dégâts, les ennemis à 2,5 blocs autour en prennent 40 %. |
-| **Chaînes Dorées** (Gilded Chains) | Chaînes d'or qui sortent d'un cercle de runes et immobilisent la cible, puis se brisent. |
-| **Pluie d'Or** (Goldfall) | Lingots géants qui tombent du ciel l'un après l'autre autour de l'endroit visé. |
-| **Pics d'Or** (Golden Spikes) | Vague de pics de cristal d'or qui jaillissent du sol devant le lanceur et projettent les ennemis. |
-| **Malédiction de Midas** (Midas Curse) | La cible ralentit jusqu'à se figer en statue d'or, puis vole en éclats à la fin de l'effet. |
-| **Lame Aurum** (Aurum Blade) | Épée d'or géante qui se forme au-dessus de la cible et s'abat sur elle. |
-| **Torrent d'Or Fondu** (Molten Torrent) | Sort maintenu : flot d'or fondu qui brûle et laisse des flaques incandescentes. |
-| **Armure Dorée** (Gilded Armor) | Armure d'or liquide : armure en plus et une partie des dégâts reçus renvoyée à l'attaquant. |
-| **Sentinelles d'Or** (Golden Sentinels) | 2 à 4 chevaliers d'or qui défendent le lanceur pendant 30 s ou plus. |
-| **Soleil d'Eldorado** (Sun of Eldorado, ultime) | Soleil d'or qui tire des rayons sur les ennemis proches puis explose. |
+| **Trait d'Or** (Gold Bolt) | Lingot d'or tournoyant qui dore sa cible, projette des pièces et ricoche sur l'ennemi visible le plus proche (75 % des dégâts, 1 ricochet + 1 tous les 4 niveaux). |
+| **Chaînes Dorées** (Gilded Chains) | De vraies chaînes d'or sortent de médaillons solaires, se referment en deux boucles et un cadenas : la cible est clouée sur place, dorée de 2 couches puis d'une de plus toutes les 2 s. |
+| **Pluie d'Or** (Goldfall) | La pierre du soleil s'ouvre dans le ciel, des lingots géants en tombent pointe en avant, écrasent, repoussent et dorent, restent plantés puis fondent en pièces. |
+| **Pics d'Or** (Golden Spikes) | Vague de grappes de cristaux d'or (formes et tailles toutes différentes) qui dorent et projettent, terminée par une couronne de pics. |
+| **Malédiction de Midas** (Midas Curse) | La cible se change en or depuis les pieds jusqu'à se figer en statue qui vole en éclats et dore ceux autour. Chaque couche d'or déjà posée rapproche la statue : à 5 couches, elle se fige aussitôt. |
+| **Lame Aurum** (Aurum Blade) | Épée géante forgée d'or fondu sous la voûte solaire (garde au soleil gravé, pommeau en rubis) qui se plante sur la cible : onde de choc, 2 couches d'or, puis une réplique avant de fondre en pièces. |
+| **Torrent d'Or Fondu** (Molten Torrent) | Sort maintenu : filet d'or fondu qui brûle et dore. Les flaques refroidissent en plaques d'or massif qui retiennent et dorent ceux qui s'y tiennent, puis se brisent en pièces. |
+| **Armure Dorée** (Gilded Armor) | De l'or liquide monte le long du corps et durcit : armure en plus, une partie des dégâts renvoyée, et qui frappe au corps à corps en ressort doré. |
+| **Sentinelles d'Or** (Golden Sentinels) | 2 à 4 chevaliers d'or couronnés du soleil, qui sortent de l'or fondu et dorent à chaque coup. |
+| **Soleil d'Eldorado** (Sun of Eldorado, ultime) | La pierre du soleil sertie de rubis et d'émeraudes : ses rayons brûlent et dorent, changent en statues les ennemis dorés de part en part, puis supernova d'or. |
+| **Dragon d'Or** (Golden Dragon, bonus légendaire) | Un soleil géant s'embrase dans le ciel et le Dragon d'Or d'Eldorado en sort : long dragon d'écailles d'or, cornes, crinière cramoisie, moustaches de lumière et perle de feu. Il chasse les ennemis du lanceur, crache de l'or fondu, s'enroule autour de sa proie, rugit, plonge, et finit en cascade de pièces. Relancer le sort le renvoie. |
 
 Livre : **Grimoire d'Or**. Focus de l'école : bloc d'or.
 

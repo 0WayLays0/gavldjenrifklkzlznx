@@ -69,12 +69,14 @@ import com.waylays.arcanes.client.render.SporePatchRenderer;
 import com.waylays.arcanes.client.render.SunkenTempleRenderer;
 import com.waylays.arcanes.client.render.ToppleWallRenderer;
 import com.waylays.arcanes.client.render.VineSnareRenderer;
+import com.waylays.arcanes.client.render.DragonSunRenderer;
 import com.waylays.arcanes.client.render.EldoradoSunRenderer;
 import com.waylays.arcanes.client.render.FinalChapterRenderer;
 import com.waylays.arcanes.client.render.FlyingGrimoireRenderer;
 import com.waylays.arcanes.client.render.FlyingStackRenderer;
 import com.waylays.arcanes.client.render.GildedChainsRenderer;
 import com.waylays.arcanes.client.render.GlowOrbRenderer;
+import com.waylays.arcanes.client.render.GoldenDragonRenderer;
 import com.waylays.arcanes.client.render.GoldfallIngotRenderer;
 import com.waylays.arcanes.client.render.MoltenGoldBlobRenderer;
 import com.waylays.arcanes.client.render.GoldSpikeRenderer;
@@ -139,6 +141,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.MOLTEN_POOL.get(), MoltenPoolRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLDEN_SENTINEL.get(), GoldenSentinelRenderer::new);
         event.registerEntityRenderer(ModEntities.ELDORADO_SUN.get(), EldoradoSunRenderer::new);
+        event.registerEntityRenderer(ModEntities.GOLDEN_DRAGON.get(), GoldenDragonRenderer::new);
+        event.registerEntityRenderer(ModEntities.DRAGON_SUN.get(), DragonSunRenderer::new);
 
         event.registerEntityRenderer(ModEntities.BLAST_EFFECT.get(), BlastEffectRenderer::new);
         event.registerEntityRenderer(ModEntities.EXPLOSIVE_ORB.get(), context -> new GlowOrbRenderer<>(context, .8f, 0xFF7A2A));

@@ -46,6 +46,7 @@ import com.waylays.arcanes.spells.gold.AurumBladeSpell;
 import com.waylays.arcanes.spells.gold.GildedArmorSpell;
 import com.waylays.arcanes.spells.gold.GildedChainsSpell;
 import com.waylays.arcanes.spells.gold.GoldBoltSpell;
+import com.waylays.arcanes.spells.gold.GoldenDragonSpell;
 import com.waylays.arcanes.spells.gold.GoldenSentinelsSpell;
 import com.waylays.arcanes.spells.gold.GoldenSpikesSpell;
 import com.waylays.arcanes.spells.gold.GoldfallSpell;
@@ -173,6 +174,7 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> GILDED_ARMOR = register(new GildedArmorSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> GOLDEN_SENTINELS = register(new GoldenSentinelsSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SUN_OF_ELDORADO = register(new SunOfEldoradoSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GOLDEN_DRAGON = register(new GoldenDragonSpell());
 
     // Explosion school
     public static final DeferredHolder<AbstractSpell, AbstractSpell> BLAST_ORB = register(new BlastOrbSpell());

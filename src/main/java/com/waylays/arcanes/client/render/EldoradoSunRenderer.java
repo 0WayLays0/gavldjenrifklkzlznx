@@ -1,10 +1,8 @@
 package com.waylays.arcanes.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
-import com.waylays.arcanes.spells.gem.Gem;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -19,8 +17,6 @@ import net.minecraft.world.phys.Vec3;
  * beams run to the targets of the last volley. Before it explodes it shrinks, spins faster and burns white.
  */
 public class EldoradoSunRenderer extends EntityRenderer<EldoradoSun> {
-    private static final int RAYS = 16;
-    private static final int JEWELS = 8;
     /** Radius of the disc at full size. */
     private static final float RADIUS = 1.3f;
 
@@ -49,35 +45,9 @@ public class EldoradoSunRenderer extends EntityRenderer<EldoradoSun> {
         poseStack.pushPose();
         poseStack.translate(0, half, 0);
         // Its face turned toward whoever looks at it
-        Vec3 eye = this.entityRenderDispatcher.camera.getPosition().subtract(sun.getPosition(partialTicks).add(centre));
-        poseStack.mulPose(Axis.YP.rotationDegrees((float) Math.toDegrees(Math.atan2(eye.x, eye.z))));
+        GoldRender.faceCamera(poseStack, sun.getPosition(partialTicks).add(centre));
         poseStack.mulPose(Axis.ZP.rotationDegrees(spin));
-        float r = RADIUS * size;
-
-        VertexConsumer metal = GoldRender.metal(buffer);
-        for (int k = 0; k < RAYS; k++) {
-            boolean big = k % 2 == 0;
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.ZP.rotationDegrees(k * 360f / RAYS));
-            poseStack.translate(0, r * .92f, 0);
-            float length = r * (big ? 1.05f : .6f) * (1 + .08f * Mth.sin(age * .2f + k));
-            poseStack.scale(r * (big ? .4f : .3f), length, r * .14f);
-            Solid.draw(metal, poseStack.last(), big ? GoldRender.CRYSTAL : GoldRender.SPIKE, big ? rayColour : GoldRender.lerp(GoldRender.DEEP, rayColour, collapse),
-                    255, age + k * 4, .9f, GlyphRender.FULL);
-            poseStack.popPose();
-        }
-        poseStack.pushPose();
-        poseStack.mulPose(Axis.XP.rotationDegrees(90));
-        GoldRender.coin(poseStack, buffer, r * 2, age, sun.getId());
-        poseStack.popPose();
-        for (int k = 0; k < JEWELS; k++) {
-            float a = k * Mth.TWO_PI / JEWELS + Mth.PI / JEWELS;
-            poseStack.pushPose();
-            poseStack.translate(Mth.cos(a) * r * .8f, Mth.sin(a) * r * .8f, r * .07f);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-            GemRender.gem(poseStack, buffer, GemRender.Cut.BRILLIANT, (k % 2 == 0 ? Gem.RUBY : Gem.EMERALD).color, r * .2f, .9f, age + k * 9);
-            poseStack.popPose();
-        }
+        GoldRender.sunStone(poseStack, buffer, RADIUS * size, rayColour, GoldRender.lerp(GoldRender.DEEP, rayColour, collapse), age, sun.getId());
         poseStack.popPose();
 
         // Beams of the last volley

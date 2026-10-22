@@ -389,7 +389,7 @@ public final class BookGameTests {
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "book_dragon", timeoutTicks = 300)
     public static void origamiDragonHuntsWhatItsSummonerFights(GameTestHelper helper) {
         // The dragon circles 8 blocks out, past the platform's chunk: keep the chunks around ticking or it freezes there
-        List<ChunkPos> forced = forceChunksAround(helper, 1);
+        List<ChunkPos> forced = GameTestSetup.forceChunksAround(helper, 1);
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
         IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new Vec3(6.5, 2, 6.5));
         caster.setTarget(golem);
@@ -405,19 +405,5 @@ public final class BookGameTests {
             helper.assertTrue(dragon.isRemoved(), "the dragon is still there after being sent away");
             forced.forEach(chunk -> helper.getLevel().setChunkForced(chunk.x, chunk.z, false));
         });
-    }
-
-    /** Force-loads the chunks within {@code radius} of the platform's middle (those not already forced) and returns them. */
-    private static List<ChunkPos> forceChunksAround(GameTestHelper helper, int radius) {
-        ChunkPos middle = new ChunkPos(BlockPos.containing(helper.absoluteVec(new Vec3(4.5, 2, 4.5))));
-        List<ChunkPos> forced = new ArrayList<>();
-        for (int dx = -radius; dx <= radius; dx++) {
-            for (int dz = -radius; dz <= radius; dz++) {
-                if (helper.getLevel().setChunkForced(middle.x + dx, middle.z + dz, true)) {
-                    forced.add(new ChunkPos(middle.x + dx, middle.z + dz));
-                }
-            }
-        }
-        return forced;
     }
 }

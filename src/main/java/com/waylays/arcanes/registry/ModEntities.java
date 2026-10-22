@@ -91,12 +91,14 @@ import com.waylays.arcanes.entity.wall.WallImpact;
 import com.waylays.arcanes.entity.wall.WallPiece;
 import com.waylays.arcanes.entity.wall.WallSigil;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
+import com.waylays.arcanes.entity.gold.DragonSun;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
 import com.waylays.arcanes.entity.gold.GildedChainsEntity;
 import com.waylays.arcanes.entity.gold.GoldBoltProjectile;
 import com.waylays.arcanes.entity.gold.GoldCoins;
 import com.waylays.arcanes.entity.gold.GoldSigil;
 import com.waylays.arcanes.entity.gold.GoldSpikeEntity;
+import com.waylays.arcanes.entity.gold.GoldenDragon;
 import com.waylays.arcanes.entity.gold.GoldenSentinel;
 import com.waylays.arcanes.entity.gold.GoldfallIngot;
 import com.waylays.arcanes.entity.gold.MoltenGoldBlob;
@@ -154,6 +156,12 @@ public final class ModEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<EldoradoSun>> ELDORADO_SUN = register("eldorado_sun",
             EntityType.Builder.<EldoradoSun>of(EldoradoSun::new, MobCategory.MISC).sized(1.5f, 1.5f).clientTrackingRange(128).fireImmune());
+
+    public static final DeferredHolder<EntityType<?>, EntityType<GoldenDragon>> GOLDEN_DRAGON = register("golden_dragon",
+            EntityType.Builder.<GoldenDragon>of(GoldenDragon::new, MobCategory.MISC).sized(1.2f, 1.2f).clientTrackingRange(16).updateInterval(1).fireImmune());
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DragonSun>> DRAGON_SUN = register("dragon_sun",
+            EntityType.Builder.<DragonSun>of(DragonSun::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(20).fireImmune());
 
     // Explosion school
     public static final DeferredHolder<EntityType<?>, EntityType<BlastEffect>> BLAST_EFFECT = register("blast_effect",

@@ -207,8 +207,9 @@ public final class BossGameTests {
         Pig safe = EntityType.PIG.create(helper.getLevel());
         helper.assertTrue(safe != null, "could not make the sheltered pig");
         safe.moveTo(shelter.getX(), shelter.getY(), shelter.getZ());
-        // No AI: it stays in its shelter, off the platform
+        // No AI and no gravity: it stays in its shelter, which is often off the platform (a fall would hurt it)
         safe.setNoAi(true);
+        safe.setNoGravity(true);
         helper.getLevel().addFreshEntity(safe);
         Pig exposed = pig(helper, 5.5, 4.5);
         BossTelegraph judgment = helper.getLevel().getEntitiesOfClass(BossTelegraph.class, caster.getBoundingBox().inflate(2),

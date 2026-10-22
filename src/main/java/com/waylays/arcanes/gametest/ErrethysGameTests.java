@@ -31,6 +31,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Vindicator;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.entity.npc.Villager;
@@ -243,6 +245,11 @@ public final class ErrethysGameTests {
             List<ManaPiranha> piranhas = helper.getLevel().getEntitiesOfClass(ManaPiranha.class, foe[0].getBoundingBox().inflate(8));
             helper.assertTrue(!piranhas.isEmpty() && piranhas.get(0).getFrenzy() >= 1, "the piranha did not bite again in a frenzy");
         }, foe, false);
+        // Each bite knocks the prey back: without this it could drift out of the small pool between two bites
+        AttributeInstance steady = foe[0].getAttribute(Attributes.KNOCKBACK_RESISTANCE);
+        if (steady != null) {
+            steady.setBaseValue(1);
+        }
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_dry", timeoutTicks = ManaPiranha.DRY_TICKS + 40)
