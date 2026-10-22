@@ -23,7 +23,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 
 /**
  * Gilded Armor: a coat of liquid gold. Armor, toughness and knockback resistance, and part of every hit taken is
- * sent back to the attacker as Gold magic.
+ * sent back to the attacker as Gold magic; whoever strikes it hand to hand comes away gilded (a coat a second at most).
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID)
 public class GildedArmorEffect extends MobEffect {
@@ -78,6 +78,9 @@ public class GildedArmorEffect extends MobEffect {
             return;
         }
         DamageSources.applyDamage(attacker, reflected, SpellUtil.damageSource(ModSpells.GILDED_ARMOR.get(), victim, victim));
+        if (event.getSource().getDirectEntity() == attacker) {
+            GoldFx.gildEvery(attacker, 20);
+        }
         double y = victim.getY() + victim.getBbHeight() * .6;
         SpellUtil.particles(victim.level(), GoldFx.sparks(), victim.getX(), y, victim.getZ(), 10, .3, .3, .3, .35);
         SpellUtil.particles(victim.level(), GoldFx.nuggetShards(), victim.getX(), y, victim.getZ(), 4, .2, .2, .2, .15);

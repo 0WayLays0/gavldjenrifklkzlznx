@@ -20,9 +20,13 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * A gob of molten gold from Molten Torrent: burns what it hits, and leaves a glowing pool where it lands.
+ * A gob of molten gold from Molten Torrent (the gobs drawn one after another make the stream): burns what it hits and
+ * gilds it, a coat every so often while the stream stays on it, and leaves a pool of molten gold where it lands.
  */
 public class MoltenGoldBlob extends SpellProjectile {
+    /** Ticks of the stream on a target for one more coat of gold. */
+    public static final int GILD_EVERY = 15;
+
     public MoltenGoldBlob(EntityType<? extends MoltenGoldBlob> entityType, Level level) {
         super(entityType, level);
     }
@@ -50,6 +54,9 @@ public class MoltenGoldBlob extends SpellProjectile {
             Entity target = entityHit.getEntity();
             if (!SpellUtil.isAlly(owner, target) && DamageSources.applyDamage(target, getDamage(), SpellUtil.damageSource(ModSpells.MOLTEN_TORRENT.get(), this, owner))) {
                 target.igniteForSeconds(3);
+                if (target instanceof LivingEntity living) {
+                    GoldFx.gildEvery(living, GILD_EVERY);
+                }
             }
             at = target.position();
         } else if (hit instanceof BlockHitResult blockHit && blockHit.getDirection() == Direction.UP) {

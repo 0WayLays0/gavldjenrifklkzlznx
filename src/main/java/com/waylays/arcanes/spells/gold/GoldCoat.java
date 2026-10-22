@@ -30,6 +30,8 @@ public final class GoldCoat {
     /** Bodies whose coat changed this tick: told once at the end of it, when every effect has settled. */
     private static final Set<LivingEntity> PENDING = new LinkedHashSet<>();
 
+    private static final String LAST_TRICKLE = "arcanes_oublies.last_trickle";
+
     private GoldCoat() {}
 
     /** Lays {@code coats} more coats of gold on {@code target} (up to five). Returns the coats it now wears. */
@@ -41,6 +43,20 @@ public final class GoldCoat {
         target.addEffect(new MobEffectInstance(ModEffects.GILDED, 160 + 20 * now, now - 1, false, true, true));
         syncLater(target);
         return now;
+    }
+
+    /**
+     * One more coat of gold on {@code target}, unless gold that trickles on (a stream, a pool) gave it one less than
+     * {@code every} ticks ago. Returns the coats it now wears.
+     */
+    public static int gildEvery(LivingEntity target, int every) {
+        long now = target.level().getGameTime();
+        long last = target.getPersistentData().getLong(LAST_TRICKLE);
+        if (now - last < every && now >= last) {
+            return GildedEffect.coats(target);
+        }
+        target.getPersistentData().putLong(LAST_TRICKLE, now);
+        return gild(target, 1);
     }
 
     public static void syncLater(LivingEntity entity) {

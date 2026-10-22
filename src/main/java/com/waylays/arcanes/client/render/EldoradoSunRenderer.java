@@ -3,11 +3,9 @@ package com.waylays.arcanes.client.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
-import net.minecraft.client.renderer.LightTexture;
+import com.waylays.arcanes.spells.gem.Gem;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -16,82 +14,92 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Sun of Eldorado: layered additive billboards (wide glow, two counter-rotating ray crowns, white-hot core), a turning
- * rune ring around it, and golden beams to the targets of the last volley. Shrinks and flickers before exploding.
+ * Sun of Eldorado: the sun stone of Eldorado, a great disc of gold stamped with the sun's face and set with rubies and
+ * emeralds, sixteen rays of gold round it turning slowly, always facing the onlooker, in a corona of light. Golden
+ * beams run to the targets of the last volley. Before it explodes it shrinks, spins faster and burns white.
  */
 public class EldoradoSunRenderer extends EntityRenderer<EldoradoSun> {
-    private static final ResourceLocation GLOW = GoldItemProjectileRenderer.GLOW;
-    private static final ResourceLocation SUN = ArcanesOublies.id("textures/entity/eldorado_sun.png");
-    private static final ResourceLocation CIRCLE = ArcanesOublies.id("textures/entity/gold_circle.png");
-    private static final ResourceLocation BEAM = ArcanesOublies.id("textures/entity/gold_beam.png");
+    private static final int RAYS = 16;
+    private static final int JEWELS = 8;
+    /** Radius of the disc at full size. */
+    private static final float RADIUS = 1.3f;
 
     public EldoradoSunRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
     @Override
-    public void render(EldoradoSun entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-        float age = entity.tickCount + partialTicks;
+    public void render(EldoradoSun sun, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+        float age = sun.tickCount + partialTicks;
         float grow = Mth.clamp(age / EldoradoSun.GROW_TICKS, 0f, 1f);
         grow = 1 - (1 - grow) * (1 - grow);
-        float size = grow * (1 + Mth.sin(age * .3f) * .05f);
-        if (age > EldoradoSun.COLLAPSE_TICK) {
-            float c = Mth.clamp((age - EldoradoSun.COLLAPSE_TICK) / (EldoradoSun.EXPLODE_TICK - EldoradoSun.COLLAPSE_TICK), 0f, 1f);
-            size *= (1 - .75f * c) * (1 + Mth.sin(age * 2.5f) * .15f * c);
+        float size = Math.max(.02f, grow * (1 + Mth.sin(age * .3f) * .04f));
+        float collapse = Mth.clamp((age - EldoradoSun.COLLAPSE_TICK) / (EldoradoSun.EXPLODE_TICK - EldoradoSun.COLLAPSE_TICK), 0f, 1f);
+        if (collapse > 0) {
+            size *= (1 - .7f * collapse) * (1 + Mth.sin(age * 2.5f) * .15f * collapse);
         }
-        float half = entity.getBbHeight() * .5f;
+        float spin = age * (1.2f + collapse * 14);
+        int rayColour = GoldRender.lerp(GoldRender.GOLD, 0xFFF4D8, collapse);
+        float half = sun.getBbHeight() * .5f;
+        Vec3 centre = new Vec3(0, half, 0);
+
+        GemRender.glow(poseStack, buffer, centre, GoldRender.GOLD, 9 * size, .45f + .3f * collapse);
+        GemRender.glow(poseStack, buffer, centre, GoldRender.MOLTEN, 4.5f * size, .7f);
 
         poseStack.pushPose();
         poseStack.translate(0, half, 0);
+        // Its face turned toward whoever looks at it
+        Vec3 eye = this.entityRenderDispatcher.camera.getPosition().subtract(sun.getPosition(partialTicks).add(centre));
+        poseStack.mulPose(Axis.YP.rotationDegrees((float) Math.toDegrees(Math.atan2(eye.x, eye.z))));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(spin));
+        float r = RADIUS * size;
 
-        // Rune ring turning flat around the sun
+        VertexConsumer metal = GoldRender.metal(buffer);
+        for (int k = 0; k < RAYS; k++) {
+            boolean big = k % 2 == 0;
+            poseStack.pushPose();
+            poseStack.mulPose(Axis.ZP.rotationDegrees(k * 360f / RAYS));
+            poseStack.translate(0, r * .92f, 0);
+            float length = r * (big ? 1.05f : .6f) * (1 + .08f * Mth.sin(age * .2f + k));
+            poseStack.scale(r * (big ? .4f : .3f), length, r * .14f);
+            Solid.draw(metal, poseStack.last(), big ? GoldRender.CRYSTAL : GoldRender.SPIKE, big ? rayColour : GoldRender.lerp(GoldRender.DEEP, rayColour, collapse),
+                    255, age + k * 4, .9f, GlyphRender.FULL);
+            poseStack.popPose();
+        }
         poseStack.pushPose();
-        poseStack.mulPose(Axis.YP.rotationDegrees(age * 1.5f));
-        RenderHelper.groundQuad(buffer.getBuffer(RenderType.eyes(CIRCLE)), poseStack.last(), 3.6f * size, 0xFFFFFFFF, LightTexture.FULL_BRIGHT);
+        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+        GoldRender.coin(poseStack, buffer, r * 2, age, sun.getId());
         poseStack.popPose();
-
-        // Camera-facing layers
-        poseStack.pushPose();
-        poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        layer(buffer.getBuffer(RenderType.eyes(GLOW)), poseStack, 8f * size, 0, 0xFF909090);
-        layer(buffer.getBuffer(RenderType.eyes(SUN)), poseStack, 4.6f * size, age * 1.2f, 0xFFFFFFFF);
-        layer(buffer.getBuffer(RenderType.eyes(SUN)), poseStack, 3.6f * size, -age * 2f + 22.5f, 0xFFC0C0C0);
-        layer(buffer.getBuffer(RenderType.eyes(GLOW)), poseStack, 2.2f * size, 0, 0xFFFFFFFF);
-        poseStack.popPose();
-
-        // Beams of the last volley
-        float beamAge = age - entity.getVolleyTick();
-        if (beamAge >= 0 && beamAge < EldoradoSun.BEAM_TICKS) {
-            float fade = 1 - beamAge / EldoradoSun.BEAM_TICKS;
-            Vec3 sun = entity.getPosition(partialTicks).add(0, half, 0);
-            VertexConsumer beams = buffer.getBuffer(RenderType.eyes(BEAM));
-            int v = (int) (255 * fade);
-            int color = (255 << 24) | (v << 16) | (v << 8) | v;
-            for (int i = 0; i < EldoradoSun.MAX_BEAMS; i++) {
-                Entity target = entity.level().getEntity(entity.getBeamTarget(i));
-                if (target == null) {
-                    continue;
-                }
-                Vec3 to = target.getPosition(partialTicks).add(0, target.getBbHeight() * .5, 0).subtract(sun);
-                float length = (float) to.length();
-                RenderHelper.strand(beams, poseStack.last(), Vec3.ZERO, to, .5f * fade + .1f, Math.max(length, .01f), color, LightTexture.FULL_BRIGHT);
-            }
+        for (int k = 0; k < JEWELS; k++) {
+            float a = k * Mth.TWO_PI / JEWELS + Mth.PI / JEWELS;
+            poseStack.pushPose();
+            poseStack.translate(Mth.cos(a) * r * .8f, Mth.sin(a) * r * .8f, r * .07f);
+            poseStack.mulPose(Axis.XP.rotationDegrees(90));
+            GemRender.gem(poseStack, buffer, GemRender.Cut.BRILLIANT, (k % 2 == 0 ? Gem.RUBY : Gem.EMERALD).color, r * .2f, .9f, age + k * 9);
+            poseStack.popPose();
         }
         poseStack.popPose();
 
-        super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
-    }
-
-    private static void layer(VertexConsumer consumer, PoseStack poseStack, float size, float rollDegrees, int argb) {
-        poseStack.pushPose();
-        poseStack.mulPose(Axis.ZP.rotationDegrees(rollDegrees));
-        poseStack.scale(size, size, size);
-        RenderHelper.billboard(consumer, poseStack.last(), .5f, argb, LightTexture.FULL_BRIGHT);
-        poseStack.popPose();
+        // Beams of the last volley
+        float beamAge = age - sun.getVolleyTick();
+        if (beamAge >= 0 && beamAge < EldoradoSun.BEAM_TICKS) {
+            float fade = 1 - beamAge / EldoradoSun.BEAM_TICKS;
+            Vec3 from = sun.getPosition(partialTicks).add(centre);
+            for (int i = 0; i < EldoradoSun.MAX_BEAMS; i++) {
+                Entity target = sun.level().getEntity(sun.getBeamTarget(i));
+                if (target == null) {
+                    continue;
+                }
+                Vec3 to = target.getPosition(partialTicks).add(0, target.getBbHeight() * .5, 0).subtract(from).add(centre);
+                GemRender.ray(poseStack, buffer, centre, to, GoldRender.GOLD, .45f * fade + .1f, fade, age + i * 3);
+                GemRender.glow(poseStack, buffer, to, GoldRender.PALE, 1.4f, fade);
+            }
+        }
+        super.render(sun, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
     @Override
-    public ResourceLocation getTextureLocation(EldoradoSun entity) {
-        return SUN;
+    public ResourceLocation getTextureLocation(EldoradoSun sun) {
+        return GoldRender.SIGIL;
     }
 }

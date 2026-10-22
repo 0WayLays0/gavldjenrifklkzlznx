@@ -301,107 +301,6 @@ def golden_grimoire_model_texture():
     return img
 
 
-# ---------------------------------------------------------------- entity textures
-
-def gilded_chain_tile():
-    """Vertically tiling chain: a face-on link then an edge-on link. Transparent background (cutout)."""
-    return from_grid([
-        "....oooooooo....",
-        "...ohhllllbso...",
-        "..ohlo....obso..",
-        "..olo......oso..",
-        "..olo......oso..",
-        "..obo......oso..",
-        "..obso....osso..",
-        "...obbbbbbsso...",
-        "....oooooooo....",
-        "......ohso......",
-        "......ohso......",
-        "......olso......",
-        "......olso......",
-        "......obso......",
-        "......obso......",
-        "......ooso......",
-    ], {"o": OUTLINE, "h": HIGH, "l": LIGHT, "b": BASE, "s": SHADOW})
-
-
-def gold_glow():
-    """Additive halo (black = invisible)."""
-    size = 32
-    img = Image.new("RGBA", (size, size))
-    for y in range(size):
-        for x in range(size):
-            d = math.hypot(x + .5 - size / 2, y + .5 - size / 2) / (size / 2)
-            k = max(0.0, 1 - d) ** 2.2
-            core = max(0.0, 1 - d * 3) ** 2
-            r = min(255, int(255 * k + 40 * core))
-            g = min(255, int(200 * k + 55 * core))
-            b = min(255, int(70 * k + 120 * core))
-            img.putpixel((x, y), (r, g, b, 255))
-    return img
-
-
-def gold_circle():
-    """Additive rune circle (black = invisible): rings, a band of runes, a hexagram and a small sun."""
-    s = 4
-    size = 128 * s
-    c = size / 2
-    lines = Image.new("RGB", (size, size), (0, 0, 0))
-    d = ImageDraw.Draw(lines)
-    col = (255, 196, 64)
-    bright = (255, 236, 150)
-
-    def ring(radius, width, color):
-        d.ellipse((c - radius, c - radius, c + radius, c + radius), outline=color, width=int(width))
-
-    ring(61 * s, 2.2 * s, bright)
-    ring(57.5 * s, 1 * s, col)
-    ring(47 * s, 1.6 * s, bright)
-    ring(22 * s, 1.2 * s, col)
-    # Rune band between r=48 and r=57: 20 glyphs built from short strokes
-    glyphs = [
-        [(0, -1, 0, 1), (-.6, -1, .6, -1)],
-        [(-.6, 1, 0, -1), (0, -1, .6, 1)],
-        [(0, -1, 0, 1), (0, 0, .6, -.6), (0, 0, .6, .6)],
-        [(-.6, -1, .6, 1), (-.6, 1, .6, -1)],
-        [(0, -1, 0, 1), (-.6, 0, .6, 0)],
-        [(-.6, -1, -.6, 1), (.6, -1, .6, 1), (-.6, 0, .6, 0)],
-        [(0, -1, .6, 0), (.6, 0, 0, 1), (0, 1, -.6, 0), (-.6, 0, 0, -1)],
-        [(-.6, -1, .6, -1), (.6, -1, -.6, 1), (-.6, 1, .6, 1)],
-    ]
-    for i in range(20):
-        ang = i * 2 * math.pi / 20
-        gx, gy = c + math.cos(ang) * 52.3 * s, c + math.sin(ang) * 52.3 * s
-        scale = 3.0 * s
-        # Glyphs stand upright relative to the circle (rotated with the angle)
-        ca, sa = math.cos(ang + math.pi / 2), math.sin(ang + math.pi / 2)
-        for (x0, y0, x1, y1) in glyphs[i % len(glyphs)]:
-            p0 = (gx + (x0 * ca - y0 * sa) * scale, gy + (x0 * sa + y0 * ca) * scale)
-            p1 = (gx + (x1 * ca - y1 * sa) * scale, gy + (x1 * sa + y1 * ca) * scale)
-            d.line((p0, p1), fill=col, width=int(1.1 * s))
-    # Hexagram inscribed in the inner ring
-    for start in (-math.pi / 2, math.pi / 2):
-        pts = [(c + math.cos(start + k * 2 * math.pi / 3) * 46 * s, c + math.sin(start + k * 2 * math.pi / 3) * 46 * s) for k in range(3)]
-        d.line(pts + [pts[0]], fill=col, width=int(1.3 * s), joint="curve")
-    # Sun in the middle
-    for k in range(12):
-        ang = k * math.pi / 6
-        r0, r1 = 7 * s, (13 if k % 2 == 0 else 10) * s
-        d.line((c + math.cos(ang) * r0, c + math.sin(ang) * r0, c + math.cos(ang) * r1, c + math.sin(ang) * r1), fill=bright, width=int(1.2 * s))
-    d.ellipse((c - 5 * s, c - 5 * s, c + 5 * s, c + 5 * s), fill=bright)
-
-    lines = lines.resize((128, 128), Image.LANCZOS)
-    glow = lines.filter(ImageFilter.GaussianBlur(3))
-    out = Image.new("RGB", (128, 128))
-    lp, gp = lines.load(), glow.load()
-    op = out.load()
-    for y in range(128):
-        for x in range(128):
-            a, b = lp[x, y], gp[x, y]
-            op[x, y] = tuple(min(255, int(a[i] + b[i] * .9)) for i in range(3))
-    return out.convert("RGBA")
-
-
 # ---------------------------------------------------------------- painted icons (drawn large, scaled down)
 
 def painted(size, draw, background=None, final=16):
@@ -585,20 +484,6 @@ def gilded_armor_effect_icon():
     return painted(72, draw, None, 18)
 
 
-def gold_crystal():
-    img = Image.new("RGBA", (16, 16))
-    for y in range(16):
-        for x in range(16):
-            t = y / 15
-            c = lerp(GLINT, BASE, t * 1.2)
-            if (x + y) % 6 == 0 or (x - y) % 7 == 0:
-                c = lerp(c, HIGH, .6)
-            if x in (0, 15):
-                c = lerp(c, SHADOW, .5)
-            img.putpixel((x, y), c + (255,))
-    return img
-
-
 def molten_pool():
     """Additive (black = invisible): a ragged pool, white-hot centre, orange rim."""
     size = 64
@@ -618,43 +503,6 @@ def molten_pool():
             k = min(1, (1 - t) * 3)
             img.putpixel((x, y), tuple(int(v * k) for v in col) + (255,))
     return img
-
-
-def gold_beam():
-    """Additive beam cross-section, constant along the beam."""
-    img = Image.new("RGBA", (16, 16))
-    for y in range(16):
-        for x in range(16):
-            t = abs(x + .5 - 8) / 8
-            core = max(0.0, 1 - t * 3)
-            k = (1 - t) ** 1.5
-            img.putpixel((x, y), (min(255, int(255 * k + 40 * core)), min(255, int(190 * k + 60 * core)), min(255, int(50 * k + 150 * core)), 255))
-    return img
-
-
-def eldorado_sun():
-    """Additive crown of rays around an empty centre (the core is drawn with the glow)."""
-    s = 4
-    size = 128 * s
-    c = size / 2
-    img = Image.new("RGB", (size, size), (0, 0, 0))
-    d = ImageDraw.Draw(img)
-    for k in range(24):
-        ang = k * math.pi / 12
-        r = (61 if k % 2 == 0 else 46) * s
-        half = math.pi / (40 if k % 2 == 0 else 52)
-        d.polygon([(c + math.cos(ang - half) * 20 * s, c + math.sin(ang - half) * 20 * s),
-                   (c + math.cos(ang) * r, c + math.sin(ang) * r),
-                   (c + math.cos(ang + half) * 20 * s, c + math.sin(ang + half) * 20 * s)], fill=(255, 190, 60))
-    d.ellipse((c - 24 * s, c - 24 * s, c + 24 * s, c + 24 * s), outline=(255, 235, 150), width=3 * s)
-    img = img.resize((128, 128), Image.LANCZOS)
-    glow = img.filter(ImageFilter.GaussianBlur(4))
-    out = Image.new("RGB", (128, 128))
-    a, b, o = img.load(), glow.load(), out.load()
-    for y in range(128):
-        for x in range(128):
-            o[x, y] = tuple(min(255, int(a[x, y][i] + b[x, y][i] * .8)) for i in range(3))
-    return out.convert("RGBA")
 
 
 def golden_sentinel_skin():
@@ -800,9 +648,6 @@ def main():
     save(affinity_ring_gold(), "textures/item/affinity_ring_gold.png")
     save(golden_grimoire_icon(), "textures/item/golden_grimoire.png")
     save(golden_grimoire_model_texture(), "textures/item/golden_grimoire_3d.png")
-    save(gilded_chain_tile(), "textures/entity/gilded_chain.png")
-    save(gold_glow(), "textures/entity/gold_glow.png")
-    save(gold_circle(), "textures/entity/gold_circle.png")
     save(goldfall_icon(), "textures/gui/spell_icons/goldfall.png")
     save(golden_spikes_icon(), "textures/gui/spell_icons/golden_spikes.png")
     save(midas_curse_icon(), "textures/gui/spell_icons/midas_curse.png")
@@ -813,10 +658,7 @@ def main():
     save(sun_of_eldorado_icon(), "textures/gui/spell_icons/sun_of_eldorado.png")
     save(midas_curse_effect_icon(), "textures/mob_effect/midas_curse.png")
     save(gilded_armor_effect_icon(), "textures/mob_effect/gilded_armor.png")
-    save(gold_crystal(), "textures/entity/gold_crystal.png")
     save(molten_pool(), "textures/entity/molten_pool.png")
-    save(gold_beam(), "textures/entity/gold_beam.png")
-    save(eldorado_sun(), "textures/entity/eldorado_sun.png")
     save(golden_sentinel_skin(), "textures/entity/golden_sentinel.png")
     save(golden_sentinel_eyes(), "textures/entity/golden_sentinel_eyes.png")
     item_models()

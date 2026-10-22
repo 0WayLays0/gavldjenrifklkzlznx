@@ -49,27 +49,38 @@ public class GoldCoatLayer<T extends LivingEntity, M extends EntityModel<T>> ext
         M model = getParentModel();
         if (height > .001f) {
             float reach = Math.min(1.1f, height) + (height >= 1 ? EDGE : 0);
-            model.renderToBuffer(poseStack, new HeightMask(buffer.getBuffer(RenderType.entityTranslucent(SKIN)), feet.y, bodyHeight, reach, EDGE, false),
+            model.renderToBuffer(poseStack, new HeightMask(buffer.getBuffer(RenderType.entityTranslucent(SKIN)), feet.y, bodyHeight, reach, EDGE, false, false),
                     packedLight, OverlayTexture.NO_OVERLAY, 0xF2FFFFFF);
             float scroll = ageInTicks * .01f;
-            model.renderToBuffer(poseStack, new HeightMask(buffer.getBuffer(RenderType.energySwirl(SHEEN, scroll, scroll * .6f)), feet.y, bodyHeight, reach, EDGE, false),
+            model.renderToBuffer(poseStack, new HeightMask(buffer.getBuffer(RenderType.energySwirl(SHEEN, scroll, scroll * .6f)), feet.y, bodyHeight, reach, EDGE, false, true),
                     packedLight, OverlayTexture.NO_OVERLAY, 0xFF8A6A30);
             if (height < 1) {
                 // The climbing edge glows like molten gold
                 float pulse = .7f + .3f * Mth.sin(ageInTicks * .3f);
-                model.renderToBuffer(poseStack, new HeightMask(buffer.getBuffer(RenderType.eyes(SKIN)), feet.y, bodyHeight, reach, EDGE * 1.6f, true),
+                model.renderToBuffer(poseStack, new HeightMask(buffer.getBuffer(RenderType.eyes(SKIN)), feet.y, bodyHeight, reach, EDGE * 1.6f, true, true),
                         packedLight, OverlayTexture.NO_OVERLAY, (int) (pulse * 255) << 24 | 0xFF9A30);
             }
         }
         if (armor) {
+            // Liquid gold flows up from the feet, then hardens into a thin polished shell with light sliding over it
+            float flow = ClientGoldCoat.armor(entity, partialTick);
+            float reach = flow + (flow >= 1 ? EDGE : 0);
             float scroll = ageInTicks * .02f;
-            model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.energySwirl(SHEEN, scroll, -scroll)), packedLight, OverlayTexture.NO_OVERLAY, 0xFFB08A3C);
+            model.renderToBuffer(poseStack, new HeightMask(buffer.getBuffer(RenderType.entityTranslucent(SKIN)), feet.y, bodyHeight, reach, EDGE, false, false),
+                    packedLight, OverlayTexture.NO_OVERLAY, 0x80FFFFFF);
+            model.renderToBuffer(poseStack, new HeightMask(buffer.getBuffer(RenderType.energySwirl(SHEEN, scroll, -scroll)), feet.y, bodyHeight, reach, EDGE, false, true),
+                    packedLight, OverlayTexture.NO_OVERLAY, 0xFFB08A3C);
+            if (flow < 1) {
+                model.renderToBuffer(poseStack, new HeightMask(buffer.getBuffer(RenderType.eyes(SKIN)), feet.y, bodyHeight, reach, EDGE * 1.6f, true, true),
+                        packedLight, OverlayTexture.NO_OVERLAY, 0xFFFF9A30);
+            }
         }
     }
 
     /**
      * Passes a model's vertices through, fading each one's alpha by its height on the body: whole up to {@code reach}
      * of the body's height, fading out over {@code edge} above it; or ({@code band}) only a band of light at the edge.
+     * Additive render types (energy swirl, eyes) ignore alpha: for them ({@code additive}) the colour is faded instead.
      */
     private static final class HeightMask implements VertexConsumer {
         private final VertexConsumer out;
@@ -78,15 +89,17 @@ public class GoldCoatLayer<T extends LivingEntity, M extends EntityModel<T>> ext
         private final float reach;
         private final float edge;
         private final boolean band;
+        private final boolean additive;
         private float y;
 
-        HeightMask(VertexConsumer out, float feetY, float bodyHeight, float reach, float edge, boolean band) {
+        HeightMask(VertexConsumer out, float feetY, float bodyHeight, float reach, float edge, boolean band, boolean additive) {
             this.out = out;
             this.feetY = feetY;
             this.bodyHeight = bodyHeight;
             this.reach = reach;
             this.edge = edge;
             this.band = band;
+            this.additive = additive;
         }
 
         private float mask() {
@@ -106,7 +119,12 @@ public class GoldCoatLayer<T extends LivingEntity, M extends EntityModel<T>> ext
 
         @Override
         public VertexConsumer setColor(int red, int green, int blue, int alpha) {
-            out.setColor(red, green, blue, (int) (alpha * mask()));
+            float mask = mask();
+            if (additive) {
+                out.setColor((int) (red * mask), (int) (green * mask), (int) (blue * mask), (int) (alpha * mask));
+            } else {
+                out.setColor(red, green, blue, (int) (alpha * mask));
+            }
             return this;
         }
 

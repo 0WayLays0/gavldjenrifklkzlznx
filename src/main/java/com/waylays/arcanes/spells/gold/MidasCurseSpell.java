@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Midas Curse: the target slowly turns into a golden statue, then shatters (see {@link MidasCurseEffect}).
+ * Midas Curse: the target slowly turns into a golden statue, then shatters, gilding those around it (see
+ * {@link MidasCurseEffect}). Each coat of gold the target already wears gets it that much closer to the statue: with all
+ * five it turns at once.
  */
 @AutoSpellConfig
 public class MidasCurseSpell extends AbstractSpell {
@@ -55,7 +57,8 @@ public class MidasCurseSpell extends AbstractSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.effect_length", Utils.timeFromTicks(getDuration(spellLevel), 1)),
-                Component.translatable("ui.arcanes_oublies.shatter_damage", Utils.stringTruncation(getShatterDamage(spellLevel, caster), 2))
+                Component.translatable("ui.arcanes_oublies.shatter_damage", Utils.stringTruncation(getShatterDamage(spellLevel, caster), 2)),
+                Component.translatable("ui.arcanes_oublies.midas_coats")
         );
     }
 

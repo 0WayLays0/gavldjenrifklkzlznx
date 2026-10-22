@@ -51,7 +51,10 @@ public class MoltenTorrentSpell extends AbstractSpell {
 
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
-        return List.of(Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2)));
+        return List.of(
+                Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2)),
+                Component.translatable("ui.arcanes_oublies.gild_every", Utils.timeFromTicks(MoltenGoldBlob.GILD_EVERY, 1))
+        );
     }
 
     @Override
@@ -79,6 +82,7 @@ public class MoltenTorrentSpell extends AbstractSpell {
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, .6f, .5f + entity.getRandom().nextFloat() * .2f);
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.LAVA_AMBIENT, SoundSource.PLAYERS, 1f, 1.2f);
+        GoldFx.sigil(level, entity.position(), 1.3f, 40);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 

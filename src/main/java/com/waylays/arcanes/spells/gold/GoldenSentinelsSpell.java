@@ -115,6 +115,7 @@ public class GoldenSentinelsSpell extends SummoningSpell {
                 sentinel.setTarget(mob.getTarget());
             }
             summoned |= level.addFreshEntity(sentinel);
+            GoldFx.sigil(level, sentinel.position(), 1.1f, GoldenSentinel.EMERGE_TICKS + 12);
             SpellUtil.particles(level, GoldFx.sparks(), spot.x, spot.y + .1, spot.z, 15, .3, .05, .3, .3);
             SpellUtil.particles(level, GoldFx.DEEP_DUST, spot.x, spot.y + 1, spot.z, 30, .35, .9, .35, .02);
             SpellUtil.particles(level, GoldFx.nuggetShards(), spot.x, spot.y + 2, spot.z, 12, .3, .2, .3, .1);

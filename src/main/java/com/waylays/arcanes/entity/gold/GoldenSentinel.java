@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -40,13 +41,18 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
- * A golden knight summoned by Golden Sentinels. Guards its summoner: attacks what the summoner attacks, what attacks
- * the summoner and nearby monsters. Shatters into gold when its time runs out or when it dies.
+ * A golden knight summoned by Golden Sentinels, crowned with the sun of Eldorado. It rises out of molten gold (still
+ * and untouchable for the moment it takes), then guards its summoner: attacks what the summoner attacks, what attacks
+ * the summoner and nearby monsters, and every blow lays a coat of gold. Shatters into coins when its time runs out or
+ * when it dies.
  */
 public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
     @Nullable
     private UUID ownerUUID;
     private int lifeTicks = 600;
+
+    /** Ticks it takes to rise out of the gold. */
+    public static final int EMERGE_TICKS = 24;
 
     public GoldenSentinel(EntityType<? extends GoldenSentinel> entityType, Level level) {
         super(entityType, level);
@@ -117,10 +123,25 @@ public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
                 e -> e instanceof Enemy && !SpellUtil.isAlly(getSummoner(), e)));
     }
 
+    /** Rising out of the gold, it neither thinks nor moves. */
+    @Override
+    protected boolean isImmobile() {
+        return tickCount < EMERGE_TICKS || super.isImmobile();
+    }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        return (tickCount >= EMERGE_TICKS || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) && super.hurt(source, amount);
+    }
+
     @Override
     public void tick() {
         super.tick();
         if (level().isClientSide) {
+            if (tickCount < EMERGE_TICKS) {
+                level().addParticle(random.nextInt(3) == 0 ? GoldFx.sparks() : GoldFx.MOLTEN_DUST, getRandomX(.8), getY() + .05, getRandomZ(.8),
+                        0, .08 + random.nextDouble() * .1, 0);
+            }
             if (random.nextInt(8) == 0) {
                 level().addParticle(GoldFx.PALE_DUST, getRandomX(.6), getY() + random.nextDouble() * getBbHeight(), getRandomZ(.6), 0, .02, 0);
             }
@@ -149,6 +170,7 @@ public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
     public void shatter() {
         if (!level().isClientSide) {
             GoldFx.shatterBurst(level(), getX(), getY() + 1, getZ(), 1.2f);
+            GoldFx.coins(level(), position().add(0, 1.2, 0), 10, .3f);
             level().playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.NEUTRAL, 1.5f, .8f);
         }
         discard();
@@ -166,6 +188,9 @@ public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
     public boolean doHurtTarget(Entity target) {
         boolean hit = super.doHurtTarget(target);
         if (hit) {
+            if (target instanceof LivingEntity living) {
+                GoldFx.gild(living, 1);
+            }
             SpellUtil.particles(level(), GoldFx.sparks(), target.getX(), target.getY() + target.getBbHeight() * .6, target.getZ(), 5, .2, .2, .2, .25);
         }
         return hit;

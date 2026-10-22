@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Gilded Armor: liquid gold flows up the caster's body and hardens into armor that sends part of every hit back
- * (see {@link GildedArmorEffect}).
+ * Gilded Armor: liquid gold flows up the caster's body and hardens into armor that sends part of every hit back and
+ * gilds whoever strikes it hand to hand (see {@link GildedArmorEffect}).
  */
 @AutoSpellConfig
 public class GildedArmorSpell extends AbstractSpell {
@@ -56,7 +56,8 @@ public class GildedArmorSpell extends AbstractSpell {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.effect_length", Utils.timeFromTicks(getDuration(spellLevel), 1)),
                 Component.translatable("ui.arcanes_oublies.armor", 3 * (amplifier + 1)),
-                Component.translatable("ui.arcanes_oublies.reflect", (int) (GildedArmorEffect.reflectRatio(amplifier) * 100))
+                Component.translatable("ui.arcanes_oublies.reflect", (int) (GildedArmorEffect.reflectRatio(amplifier) * 100)),
+                Component.translatable("ui.arcanes_oublies.armor_gilds")
         );
     }
 
@@ -95,6 +96,8 @@ public class GildedArmorSpell extends AbstractSpell {
         SpellUtil.particles(level, GoldFx.sparks(), entity.getX(), entity.getY() + h * .5, entity.getZ(), 12, w * .5, h * .3, w * .5, .25);
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.5f, .8f);
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ANVIL_PLACE, SoundSource.PLAYERS, .4f, 1.8f);
+        level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.LAVA_POP, SoundSource.PLAYERS, 1f, .8f);
+        GoldFx.sigil(level, entity.position(), 1.4f, 24);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 

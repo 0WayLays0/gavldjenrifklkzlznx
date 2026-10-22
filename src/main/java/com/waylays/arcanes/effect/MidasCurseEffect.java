@@ -55,8 +55,9 @@ public class MidasCurseEffect extends MobEffect {
      * already gilded through (five coats of Gilding) is a statue at once.
      */
     public static void curse(LivingEntity victim, LivingEntity caster, int spellLevel, int duration, float shatterDamage) {
-        boolean gilded = GildedEffect.coats(victim) >= GildedEffect.MAX_COATS;
-        int left = gilded ? Math.max(20, (int) (duration * (1 - TURNED))) : duration;
+        // Every coat of gold it already wears is that much of the way to the statue: gilded through, it is one at once
+        int head = (int) (duration * TURNED * GildedEffect.coats(victim) / GildedEffect.MAX_COATS);
+        int left = Math.max(20, duration - head);
         CompoundTag tag = new CompoundTag();
         tag.putUUID("Caster", caster.getUUID());
         tag.putFloat("Damage", shatterDamage);
@@ -67,7 +68,7 @@ public class MidasCurseEffect extends MobEffect {
         GoldCoat.syncLater(victim);
     }
 
-    /** The game time the curse began (as if from the start, for a victim cursed already gilded through). */
+    /** The game time the curse began (as if from the start, for a victim cursed already gilded). */
     public static long start(LivingEntity entity) {
         return entity.getPersistentData().getCompound(TAG).getLong("Start");
     }

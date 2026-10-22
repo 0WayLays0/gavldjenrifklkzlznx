@@ -16,6 +16,7 @@ import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.gold.GildedChainsSpell;
+import com.waylays.arcanes.spells.gold.GoldFx;
 import com.waylays.arcanes.spells.gold.GoldenSentinelsSpell;
 import com.waylays.arcanes.spells.gold.GoldfallSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -226,6 +227,7 @@ public final class GoldGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(target.getHealth() < target.getMaxHealth(), "molten gold did not hurt the pig [" + describe(helper, target) + "]");
             helper.assertTrue(target.getRemainingFireTicks() > 0 || target.getHealth() <= target.getMaxHealth() - 3f, "the pig was not set on fire");
+            helper.assertTrue(GildedEffect.coats(target) >= 1, "molten gold did not gild the pig");
             int pools = helper.getLevel().getEntitiesOfClass(MoltenPool.class, caster.getBoundingBox().inflate(12)).size();
             helper.assertTrue(pools >= 1, "no molten pool on the floor");
         });
@@ -263,6 +265,7 @@ public final class GoldGameTests {
             }
             state.append("]");
             helper.assertTrue(enemy.getHealth() < enemy.getMaxHealth(), "the sentinels did not attack the husk" + state);
+            helper.assertTrue(GildedEffect.coats(enemy) >= 1, "the sentinels' blows did not gild the husk" + state);
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "a sentinel hurt its summoner");
         });
     }
@@ -275,12 +278,38 @@ public final class GoldGameTests {
         List<EldoradoSun> suns = helper.getLevel().getEntitiesOfClass(EldoradoSun.class, caster.getBoundingBox().inflate(10));
         helper.assertTrue(suns.size() == 1, "expected one sun, got " + suns.size());
         EldoradoSun sun = suns.get(0);
-        helper.runAfterDelay(EldoradoSun.FIRST_VOLLEY + 15, () ->
-                helper.assertTrue(enemy.getHealth() < enemy.getMaxHealth(), "the sun's beams missed [" + describe(helper, enemy) + "]"));
+        helper.runAfterDelay(EldoradoSun.FIRST_VOLLEY + 15, () -> {
+            helper.assertTrue(enemy.getHealth() < enemy.getMaxHealth(), "the sun's beams missed [" + describe(helper, enemy) + "]");
+            helper.assertTrue(GildedEffect.coats(enemy) >= 1, "the sun's beams did not gild the golem");
+        });
         helper.succeedWhen(() -> {
             helper.assertTrue(sun.isRemoved(), "the sun has not exploded yet");
             helper.assertTrue(enemy.getHealth() <= enemy.getMaxHealth() - 40, "beams and explosion dealt too little [" + describe(helper, enemy) + "]");
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the explosion hurt the caster");
         });
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
+    public static void gildingPilesUpToFiveCoats(GameTestHelper helper) {
+        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
+        double baseSpeed = pig.getAttributeValue(Attributes.MOVEMENT_SPEED);
+        helper.assertTrue(GoldFx.gild(pig, 2) == 2 && GildedEffect.coats(pig) == 2, "two coats did not make two");
+        helper.assertTrue(pig.getAttributeValue(Attributes.MOVEMENT_SPEED) < baseSpeed, "gold does not slow the pig");
+        helper.assertTrue(GoldFx.gild(pig, 9) == GildedEffect.MAX_COATS, "gilding went past " + GildedEffect.MAX_COATS + " coats");
+        helper.succeed();
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
+    public static void midasCurseTurnsTheGildedThroughAtOnce(GameTestHelper helper) {
+        Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
+        Pig plain = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
+        Pig gilded = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, 2, 6.5));
+        GoldFx.gild(gilded, GildedEffect.MAX_COATS);
+        MidasCurseEffect.curse(plain, caster, 1, 100, 5f);
+        MidasCurseEffect.curse(gilded, caster, 1, 100, 5f);
+        helper.assertTrue(MidasCurseEffect.progress(plain) < .05f, "a plain pig started its curse " + MidasCurseEffect.progress(plain) + " of the way");
+        helper.assertTrue(MidasCurseEffect.progress(gilded) >= MidasCurseEffect.TURNED - .02f,
+                "a pig gilded through is not a statue at once (" + MidasCurseEffect.progress(gilded) + ")");
+        helper.succeed();
     }
 }
