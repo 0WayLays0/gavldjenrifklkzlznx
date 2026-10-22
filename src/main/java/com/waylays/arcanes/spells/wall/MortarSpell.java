@@ -1,6 +1,7 @@
 package com.waylays.arcanes.spells.wall;
 
 import com.waylays.arcanes.entity.wall.BrickBolt;
+import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AutoSpellConfig;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
@@ -17,16 +18,16 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-/** Mortar: a lump of bricks lobbed high onto the spot the caster points at; it bursts where it lands. */
+/** Mortar: a lump of bricks lobbed high; a sigil burns where it will land, and it bursts there in a blast of bricks. */
 @AutoSpellConfig
 public class MortarSpell extends WallSpell {
-    public static final float RANGE = 26;
-    public static final int FLIGHT = 22;
+    public static final float RANGE = 30;
+    public static final int FLIGHT = 24;
 
     public MortarSpell() {
         super("mortar", SpellRarity.UNCOMMON, 8, 8, CastType.INSTANT, SpellAnimations.ONE_HANDED_HORIZONTAL_SWING_ANIMATION);
         this.manaCostPerLevel = 4;
-        this.baseSpellPower = 8;
+        this.baseSpellPower = 9;
         this.spellPowerPerLevel = 1;
         this.castTime = 0;
         this.baseManaCost = 35;
@@ -43,10 +44,10 @@ public class MortarSpell extends WallSpell {
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         Vec3 to = aimedSpot(level, entity, RANGE);
-        Vec3 from = entity.getEyePosition().add(entity.getLookAngle().scale(.8));
-        Vec3 velocity = lob(from, to, FLIGHT, .05);
-        BrickBolt.shoot(level, entity, this, BrickBolt.Kind.MORTAR, from, velocity, getPower(spellLevel, entity));
-        WallFx.sound(level, from, net.minecraft.sounds.SoundEvents.CROSSBOW_SHOOT, 1f, .5f);
+        Vec3 from = entity.getEyePosition().add(entity.getLookAngle().scale(.8)).add(0, .4, 0);
+        BrickBolt.shoot(level, entity, this, BrickBolt.Kind.MORTAR, from, lob(from, to, FLIGHT, .05), to, getPower(spellLevel, entity));
+        WallFx.sigil(level, SpellUtil.groundAt(level, entity.position(), 2, 1), 1.6f, 16);
+        WallFx.sound(level, from, net.minecraft.sounds.SoundEvents.CROSSBOW_SHOOT, 1.2f, .5f);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 

@@ -1,8 +1,9 @@
 package com.waylays.arcanes.spells.wall;
 
-import com.waylays.arcanes.entity.wall.WallPiece;
+import com.waylays.arcanes.entity.wall.Rampart;
 import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -22,20 +23,21 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-/** Brick Cage: brick pillars burst up in a ring around the enemy looked at, shutting it in. */
+/**
+ * Oubliette: a closed cell of real stone bricks builds itself round the enemy looked at, ring after ring then the lid:
+ * it is walled in, in the dark, until the cell crumbles.
+ */
 @AutoSpellConfig
 public class BrickCageSpell extends WallSpell {
     public static final int RANGE = 20;
-    public static final int BARS = 8;
-    public static final float RING = 1.7f;
 
     public BrickCageSpell() {
-        super("brick_cage", SpellRarity.RARE, 5, 18, CastType.INSTANT, SpellAnimations.ANIMATION_INSTANT_CAST);
-        this.manaCostPerLevel = 5;
+        super("brick_cage", SpellRarity.RARE, 5, 22, CastType.INSTANT, SpellAnimations.ANIMATION_INSTANT_CAST);
+        this.manaCostPerLevel = 6;
         this.baseSpellPower = 4;
         this.spellPowerPerLevel = 1;
         this.castTime = 0;
-        this.baseManaCost = 45;
+        this.baseManaCost = 50;
     }
 
     public static int duration(int spellLevel) {
@@ -46,7 +48,7 @@ public class BrickCageSpell extends WallSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getPower(spellLevel, caster), 1)),
-                Component.translatable("ui.arcanes_oublies.rooted", Utils.timeFromTicks(duration(spellLevel), 1)),
+                Component.translatable("ui.arcanes_oublies.walled_in", Utils.timeFromTicks(duration(spellLevel), 1)),
                 Component.translatable("ui.irons_spellbooks.distance", Utils.stringTruncation(RANGE, 1)));
     }
 
@@ -67,16 +69,18 @@ public class BrickCageSpell extends WallSpell {
     }
 
     public void cage(Level level, LivingEntity caster, LivingEntity target, int life, float damage) {
-        float ring = RING + target.getBbWidth() * .5f;
-        for (int i = 0; i < BARS; i++) {
-            float a = i * Mth.TWO_PI / BARS;
-            Vec3 p = SpellUtil.groundAt(level, target.position().add(Mth.cos(a) * ring, 0, Mth.sin(a) * ring), 3, 1);
-            // Each bar faces out of the cage, so it pushes those inside back in
-            float yaw = (float) (Mth.atan2(-Mth.cos(a), Mth.sin(a)) * Mth.RAD_TO_DEG);
-            WallPiece.raise(level, caster, this, WallPiece.Kind.PILLAR, p, yaw, .9f, Math.max(2.6f, target.getBbHeight() + .8f), life, 0, 1, 0);
-        }
+        // The cell rises round the block the target stands in, wide and high enough to hold it: the target is set in
+        // the middle of it first, so the walls close round it and do not push it out
+        int half = Mth.clamp(Mth.ceil((target.getBbWidth() + 1) * .5f), 1, 3);
+        int height = Mth.clamp(Mth.ceil(target.getBbHeight() + .2f), 2, 6);
+        BlockPos cell = BlockPos.containing(target.position());
+        target.teleportTo(cell.getX() + .5, target.getY(), cell.getZ() + .5);
+        Rampart.raise(level, caster, Rampart.Shape.CAGE, target.position(), 0, half, height, life);
+        target.setDeltaMovement(0, Math.min(0, target.getDeltaMovement().y), 0);
+        target.hurtMarked = true;
         target.invulnerableTime = 0;
         io.redspace.ironsspellbooks.damage.DamageSources.applyDamage(target, damage, SpellUtil.damageSource(this, caster, caster));
-        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, life, 1));
+        target.addEffect(new MobEffectInstance(MobEffects.DARKNESS, life, 0));
+        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2));
     }
 }

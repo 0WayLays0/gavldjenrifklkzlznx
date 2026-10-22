@@ -320,22 +320,27 @@ Focus de l'école : le **lingot de cuivre**.
 
 ### Magie des Murs
 
-Faite de trois blocs seulement, et de rien d'autre : **briques de pierre**, **briques de pierre moussues** et **briques
-de pierre craquelées**. Les murs jaillissent du sol pour arrêter, enfermer, écraser et charger ; les briques sont
-lancées, tirées en cloche ou pleuvent.
+La magie du grand méchant. Faite de trois blocs seulement : **briques de pierre**, **briques de pierre moussues** et
+**briques de pierre craquelées** ; tout le reste n'est que lumière par-dessus (le mortier qui rougeoit comme des
+braises entre les briques, des runes gravées, le **sceau du maçon** qui s'embrase au sol à chaque incantation). Les
+murs se **bâtissent brique par brique**, chaque bloc jaillissant du sol jusqu'à sa place. Le Mur Surgissant,
+l'Oubliette, le Bastion et le rempart de la Forteresse sont faits de **vrais blocs** : solides, on ne les traverse pas
+et les tirs s'y brisent. Ils ne se posent que dans l'air (ou l'herbe, la neige, l'eau...), jamais dans une
+construction ni là où le lanceur n'a pas le droit de construire, et à la fin le sol redevient exactement comme avant
+(même après un redémarrage du serveur). Un bloc cassé pendant le sort ne donne rien : il retombe en poussière.
 
 | Sort | Effet |
 |---|---|
-| **Trait de Brique** (Brick Bolt) | Une brique lancée sur l'ennemi : blesse, repousse et se brise (1 à 3 briques selon le niveau). |
-| **Mur Surgissant** (Rising Wall) | Un mur de 5 x 3 jaillit devant toi (6 à 11 s) : il arrête les tirs ennemis (même les flèches rapides) et empêche les ennemis de passer. |
-| **Pluie de Briques** (Brick Rain) | Des briques pleuvent 3 s sur l'endroit visé (la première tombe pile dessus), chacune éclate à l'impact. |
-| **Mur Éclaté** (Wall Burst) | Un mur s'élève, tremble, puis vole en éclats vers l'avant : cône de briques sur 7 blocs. |
-| **Mortier** (Mortar) | Un bloc de briques lancé en cloche (jusqu'à 26 blocs) : éclate à l'impact, blesse, ralentit et disperse sur 3 blocs. |
-| **Murs Broyeurs** (Crushing Walls) | Deux murs jaillissent de part et d'autre de l'ennemi visé et se referment sur lui : écrasé et étourdi. |
-| **Cage de Briques** (Brick Cage) | Huit piliers de briques enferment l'ennemi visé (5 à 9 s), ralenti tant qu'il est en cage. |
-| **Charge du Rempart** (Rampart Charge) | Un mur surgit et charge droit devant (9 à 14 blocs), balayant les ennemis. |
-| **Bastion** (Bastion) | Quatre murs en carré autour de toi (7 à 11 s) : tirs arrêtés, ennemis tenus à l'écart, et tu résistes aux dégâts. |
-| **Citadelle Déchue** (Fallen Citadel, ultime) | Une forteresse entière (huit murs crénelés, quatre tours) s'élève mur après mur autour de l'ennemi visé, l'enferme pendant que les tours lui lancent des briques, puis **tous les murs s'effondrent vers l'intérieur**. |
+| **Volée de Briques** (Brick Volley) | Des briques s'arrachent du sol à hauteur d'épaules, flottent un instant puis partent l'une après l'autre sur l'ennemi visé (3 à 6 briques), frappent fort et éclatent. |
+| **Mur Surgissant** (Rising Wall) | Un mur crénelé en vrais blocs se bâtit devant toi : 5 x 3, puis 4 de haut (niv. 3) et 7 de large (niv. 4), 8 à 13 s. |
+| **Pluie de Briques** (Brick Rain) | Un sceau s'embrase sur l'endroit visé, un tourbillon de briques se forme au-dessus puis déverse 16 à 30 briques sur 4 blocs (la première pile au centre). |
+| **Mur Éclaté** (Wall Burst) | Un mur se bâtit, son mortier chauffe à blanc, il tremble puis explose vers l'avant : cône de briques sur 8 blocs. |
+| **Mortier** (Mortar) | Un bloc de briques lancé en cloche (jusqu'à 30 blocs), un sceau marque l'impact : éclate, blesse, ralentit et disperse sur 3,5 blocs. |
+| **Murs Broyeurs** (Crushing Walls) | Deux murs se bâtissent de part et d'autre de l'ennemi visé et se referment sur lui de plus en plus vite, **face contre face** : broyé, étourdi, puis les murs volent en éclats. |
+| **Oubliette** (Oubliette) | Une cellule close en vrais blocs (anneau puis couvercle, à la taille de la cible) se bâtit autour de l'ennemi visé : emmuré dans le noir 5 à 9 s. |
+| **Charge du Rempart** (Rampart Charge) | Un grand mur crénelé se bâtit et charge droit devant (10 à 15 blocs) en labourant le sol, balaie les ennemis puis s'écrase et explose. |
+| **Bastion** (Bastion) | Un donjon carré en vrais blocs se bâtit autour de toi en faisant le tour (murs crénelés à 3 blocs, une tour à chaque coin), 9,5 à 15,5 s : personne n'entre, aucun tir ne passe, et tu résistes aux dégâts. |
+| **Forteresse du Tyran** (Tyrant's Fortress, ultime) | 2 s d'incantation, un grand sceau s'étend sous toi ; puis un rempart circulaire en vrais blocs (9 blocs de rayon) se bâtit tout autour de toi et huit tours surgissent le long, braseros allumés. Pendant 10 s, les tours pilonnent tous les ennemis à 26 blocs pendant que tu résistes aux coups ; puis toute la forteresse **explose vers l'extérieur**. |
 
 Livre : **Codex des Remparts**. Focus : les trois briques de pierre.
 

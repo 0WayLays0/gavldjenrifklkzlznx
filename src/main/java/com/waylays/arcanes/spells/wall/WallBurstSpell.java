@@ -18,13 +18,13 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-/** Wall Burst: a wall rises before the caster, then blows apart forward in a cone of flying bricks. */
+/** Wall Burst: a wall builds itself before the caster, its mortar heating white-hot, shaking, then blows apart in a cone of bricks. */
 @AutoSpellConfig
 public class WallBurstSpell extends WallSpell {
     public WallBurstSpell() {
         super("wall_burst", SpellRarity.UNCOMMON, 8, 9, CastType.INSTANT, SpellAnimations.ONE_HANDED_HORIZONTAL_SWING_ANIMATION);
         this.manaCostPerLevel = 4;
-        this.baseSpellPower = 7;
+        this.baseSpellPower = 8;
         this.spellPowerPerLevel = 1;
         this.castTime = 0;
         this.baseManaCost = 35;
@@ -40,8 +40,8 @@ public class WallBurstSpell extends WallSpell {
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         Vec3 dir = Vec3.directionFromRotation(0, entity.getYRot());
-        Vec3 at = SpellUtil.groundAt(level, entity.position().add(dir.scale(1.6)), 3, 1);
-        WallPiece.raise(level, entity, this, WallPiece.Kind.BURST, at, entity.getYRot(), 3, 2.5f, 60, 0, 1, getPower(spellLevel, entity));
+        Vec3 at = SpellUtil.groundAt(level, entity.position().add(dir.scale(1.8)), 3, 1);
+        WallPiece.raise(level, entity, this, WallPiece.Kind.BURST, at, entity.getYRot(), 4, 3, 0, 1, getPower(spellLevel, entity));
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 }

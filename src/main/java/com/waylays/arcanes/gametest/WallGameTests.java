@@ -1,8 +1,8 @@
 package com.waylays.arcanes.gametest;
 
 import com.waylays.arcanes.ArcanesOublies;
-import com.waylays.arcanes.entity.wall.BrickBolt;
 import com.waylays.arcanes.entity.wall.Citadel;
+import com.waylays.arcanes.entity.wall.Rampart;
 import com.waylays.arcanes.entity.wall.WallPiece;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
@@ -16,10 +16,10 @@ import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.SchoolType;
 import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
 import io.redspace.ironsspellbooks.item.SpellBook;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -28,15 +28,18 @@ import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.entity.projectile.Snowball;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 /**
- * Server-side checks run by CI for Wall Magic: the school is there; the brick, the rain, the burst, the mortar, the
- * crushing walls, the cage and the charge hurt; the rising wall stops a shot; the bastion stands round the caster; the
- * citadel lobs bricks and then falls on what is inside. Each test runs in a batch of its own.
+ * Server-side checks run by CI for Wall Magic: the school is there; the volley, the rain, the burst, the mortar, the
+ * crushing walls and the charge hurt; the rising wall, the oubliette and the bastion are built of real bricks (the wall
+ * stops a shot, the oubliette shuts its prisoner in) and are taken away when they end; the fortress shells the enemy
+ * and then blows apart on it. Each test runs in a batch of its own.
  */
 @GameTestHolder(ArcanesOublies.MODID)
 @PrefixGameTestTemplate(false)
@@ -64,12 +67,23 @@ public final class WallGameTests {
     }
 
     /**
-     * Takes down what the test raised (walls, bricks, citadels): they outlast the test, and left standing they would
-     * stop the shots of the tests run next on the same spot.
+     * Takes down what the test raised (ramparts, walls, bricks, the fortress): they outlast the test, and left standing
+     * they would stop the shots of the tests run next on the same spot. A rampart taken down puts its blocks back.
      */
     private static void cleanUp(GameTestHelper helper) {
-        helper.getLevel().getEntitiesOfClass(Entity.class, helper.getBounds().inflate(16),
-                e -> e instanceof WallPiece || e instanceof Citadel || e instanceof BrickBolt).forEach(Entity::discard);
+        GameTestSetup.clearLeftovers(helper);
+    }
+
+    /** Whether the block at (x, y, z) is one of Wall Magic's three bricks. */
+    private static boolean brick(GameTestHelper helper, int x, int y, int z) {
+        BlockState state = helper.getBlockState(new BlockPos(x, y, z));
+        return state.is(Blocks.STONE_BRICKS) || state.is(Blocks.MOSSY_STONE_BRICKS) || state.is(Blocks.CRACKED_STONE_BRICKS);
+    }
+
+    private static Rampart rampart(GameTestHelper helper, LivingEntity near) {
+        var found = helper.getLevel().getEntitiesOfClass(Rampart.class, near.getBoundingBox().inflate(8));
+        helper.assertTrue(found.size() == 1, "expected 1 rampart, found " + found.size());
+        return found.get(0);
     }
 
     private static void cast(GameTestHelper helper, DeferredHolder<AbstractSpell, AbstractSpell> spell, LivingEntity caster) {
@@ -113,23 +127,35 @@ public final class WallGameTests {
         });
     }
 
-    /** A snowball thrown at the caster through the wall is stopped by it. */
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_rising", timeoutTicks = 60)
+    /**
+     * The wall is built of real bricks 3 blocks ahead (x 2 to 6, rows y 2 to 4 at z 3), a snowball thrown at the
+     * caster breaks on it, and the bricks are gone once the wall has crumbled.
+     */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_rising", timeoutTicks = 80)
     public static void risingWallStopsAShot(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         cast(helper, ModSpells.RISING_WALL, caster);
-        helper.assertTrue(!helper.getLevel().getEntitiesOfClass(WallPiece.class, caster.getBoundingBox().inflate(6)).isEmpty(), "no wall rose");
-        helper.runAfterDelay(WallPiece.RISE + 2, () -> {
+        Rampart wall = rampart(helper, caster);
+        helper.runAfterDelay(wall.built() + 1, () -> {
+            for (int x = 2; x <= 6; x++) {
+                for (int y = 2; y <= 4; y++) {
+                    helper.assertTrue(brick(helper, x, y, 3), "no brick at " + x + " " + y + " 3");
+                }
+            }
             Vec3 from = helper.absoluteVec(new Vec3(4.5, 3.2, 7.5));
             Snowball ball = new Snowball(helper.getLevel(), from.x, from.y, from.z);
             ball.setDeltaMovement(0, 0, -1.0);
             helper.getLevel().addFreshEntity(ball);
             helper.runAfterDelay(12, () -> {
-                helper.assertTrue(ball.isRemoved(), "the snowball went through the wall");
-                helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the snowball reached the caster");
-                cleanUp(helper);
-                helper.succeed();
+                helper.assertTrue(ball.isRemoved(), "the snowball was not stopped");
+                helper.assertTrue(helper.relativeVec(ball.position()).z > 2.5, "the snowball went through the wall");
+                wall.crumbleNow();
+                helper.runAfterDelay(2, () -> {
+                    helper.assertTrue(!brick(helper, 4, 2, 3), "the bricks were left behind when the wall crumbled");
+                    cleanUp(helper);
+                    helper.succeed();
+                });
             });
         });
     }
@@ -152,7 +178,7 @@ public final class WallGameTests {
         Witch caster = caster(helper, 4.5, 1.5);
         Husk husk = husk(helper, 4.5, 5.5);
         cast(helper, ModSpells.WALL_BURST, caster);
-        helper.runAfterDelay(WallPiece.RISE + WallPiece.BURST_DELAY - 2, () -> helper.assertTrue(!hurt(husk), "the wall burst too early"));
+        helper.runAfterDelay(WallPiece.BURST_DELAY, () -> helper.assertTrue(!hurt(husk), "the wall burst before it was built"));
         helper.succeedWhen(() -> {
             helper.assertTrue(hurt(husk), "the bursting wall did not hit the husk");
             cleanUp(helper);
@@ -184,17 +210,32 @@ public final class WallGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_cage", timeoutTicks = 30)
+    /** The husk is walled in a closed cell of real bricks: a ring round its block (4, 2, 4), three high, and a lid. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_cage", timeoutTicks = 60)
     public static void brickCageShutsIn(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 4.5);
         castAt(helper, ModSpells.BRICK_CAGE, caster, husk);
-        int bars = helper.getLevel().getEntitiesOfClass(WallPiece.class, husk.getBoundingBox().inflate(3)).size();
-        helper.assertTrue(bars == 8, "expected 8 bars around the husk, found " + bars);
-        helper.assertTrue(hurt(husk) && husk.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "the caged husk is not hurt and slowed");
-        cleanUp(helper);
-        helper.succeed();
+        helper.assertTrue(hurt(husk) && husk.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "the walled-in husk is not hurt and slowed");
+        Rampart cage = rampart(helper, husk);
+        helper.runAfterDelay(cage.built() + 1, () -> {
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (dx != 0 || dz != 0) {
+                        for (int y = 2; y <= 4; y++) {
+                            helper.assertTrue(brick(helper, 4 + dx, y, 4 + dz), "the cell has a gap at " + (4 + dx) + " " + y + " " + (4 + dz));
+                        }
+                    }
+                    helper.assertTrue(brick(helper, 4 + dx, 5, 4 + dz), "the lid has a gap at " + (4 + dx) + " 5 " + (4 + dz));
+                }
+            }
+            BlockPos in = helper.relativePos(husk.blockPosition());
+            helper.assertTrue(in.getX() == 4 && in.getZ() == 4 && husk.isAlive(), "the husk is not in its cell");
+            helper.assertTrue(husk.hasEffect(MobEffects.DARKNESS), "the husk is not in the dark");
+            cleanUp(helper);
+            helper.succeed();
+        });
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_charge", timeoutTicks = 50)
@@ -211,37 +252,48 @@ public final class WallGameTests {
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_bastion", timeoutTicks = 20)
+    /** A keep of real bricks rises round the caster: walls 3 blocks out on every side, a taller tower at each corner. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_bastion", timeoutTicks = 80)
     public static void bastionStandsAround(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, 4.5);
         cast(helper, ModSpells.BASTION, caster);
-        int walls = helper.getLevel().getEntitiesOfClass(WallPiece.class, caster.getBoundingBox().inflate(4)).size();
-        helper.assertTrue(walls == 4, "expected 4 walls around the caster, found " + walls);
         helper.assertTrue(caster.hasEffect(MobEffects.DAMAGE_RESISTANCE), "the caster does not resist damage");
-        cleanUp(helper);
-        helper.succeed();
+        Rampart keep = rampart(helper, caster);
+        helper.runAfterDelay(keep.built() + 1, () -> {
+            for (int i = 1; i <= 7; i++) {
+                for (int y = 2; y <= 4; y++) {
+                    helper.assertTrue(brick(helper, i, y, 1) && brick(helper, i, y, 7) && brick(helper, 1, y, i) && brick(helper, 7, y, i),
+                            "the keep has a gap in row " + y + " at " + i);
+                }
+            }
+            helper.assertTrue(brick(helper, 1, 5, 1) && brick(helper, 7, 6, 7), "the corner towers are missing");
+            helper.assertTrue(!brick(helper, 4, 2, 4) && caster.isAlive(), "the keep was built over the caster");
+            cleanUp(helper);
+            helper.succeed();
+        });
     }
 
-    /** The citadel rises round the husk, its towers lob bricks on it, then it falls on it. */
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_citadel", timeoutTicks = 160)
-    public static void citadelFallsOnTheEnemy(GameTestHelper helper) {
+    /**
+     * The fortress rises round the husk (its wall and towers out beyond the test's barrier walls; the towers lob their
+     * shells over them), the towers shell the husk, then the fortress blows apart on it.
+     */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_citadel", timeoutTicks = 300)
+    public static void citadelShellsThenFalls(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, .5, .5);
         Husk husk = husk(helper, 4.5, 4.5);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(400);
         husk.setHealth(400);
-        Citadel citadel = Citadel.raise(helper.getLevel(), caster, ModSpells.FALLEN_CITADEL.get(), husk.position(), 8);
-        // Towers on the diagonals: only there are their battlements inside the barrier walls around the test (bricks
-        // lobbed from outside them would hit the barriers; in play there are none)
-        citadel.setYRot(45);
+        Citadel.raise(helper.getLevel(), caster, ModSpells.FALLEN_CITADEL.get(), husk.position(), 8);
         float[] before = {0};
-        helper.runAfterDelay(Citadel.IMPACT - 2, () -> {
-            helper.assertTrue(hurt(husk), "no brick from the towers hit the husk");
-            before[0] = husk.getHealth();
+        helper.runAfterDelay(Citadel.RISEN + 2 * Citadel.VOLLEY_TICKS + 30, () -> {
+            helper.assertTrue(hurt(husk), "no shell from the towers hit the husk");
+            helper.assertTrue(caster.hasEffect(MobEffects.DAMAGE_RESISTANCE), "the caster is not shielded by the fortress");
         });
-        helper.runAfterDelay(Citadel.IMPACT + 4, () -> {
-            helper.assertTrue(husk.getHealth() < before[0], "the citadel's fall did not hurt the husk");
+        helper.runAfterDelay(Citadel.COLLAPSE - 1, () -> before[0] = husk.getHealth());
+        helper.runAfterDelay(Citadel.COLLAPSE + 2, () -> {
+            helper.assertTrue(husk.getHealth() < before[0], "the fortress blowing apart did not hurt the husk");
             cleanUp(helper);
             helper.succeed();
         });

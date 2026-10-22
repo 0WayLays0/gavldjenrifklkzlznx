@@ -70,9 +70,13 @@ import com.waylays.arcanes.entity.ritual.RitualDome;
 import com.waylays.arcanes.entity.ritual.RitualPortal;
 import com.waylays.arcanes.entity.ritual.StormCloud;
 import com.waylays.arcanes.entity.wall.BrickBolt;
+import com.waylays.arcanes.entity.wall.BrickStorm;
 import com.waylays.arcanes.ritual.RitualCircle;
 import com.waylays.arcanes.entity.wall.Citadel;
+import com.waylays.arcanes.entity.wall.Rampart;
+import com.waylays.arcanes.entity.wall.WallImpact;
 import com.waylays.arcanes.entity.wall.WallPiece;
+import com.waylays.arcanes.entity.wall.WallSigil;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
 import com.waylays.arcanes.entity.gold.EldoradoSun;
 import com.waylays.arcanes.entity.gold.GildedChainsEntity;
@@ -336,6 +340,14 @@ public final class ModEntities {
             EntityType.Builder.<WallPiece>of(WallPiece::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<Citadel>> CITADEL = register("citadel",
             EntityType.Builder.<Citadel>of(Citadel::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Rampart>> RAMPART = register("rampart",
+            EntityType.Builder.<Rampart>of(Rampart::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BrickStorm>> BRICK_STORM = register("brick_storm",
+            EntityType.Builder.<BrickStorm>of(BrickStorm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<WallSigil>> WALL_SIGIL = register("wall_sigil",
+            EntityType.Builder.<WallSigil>of(WallSigil::new, MobCategory.MISC).sized(.5f, .1f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<WallImpact>> WALL_IMPACT = register("wall_impact",
+            EntityType.Builder.<WallImpact>of(WallImpact::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(40).fireImmune());
 
     // Rituals: the chalk circle and what the rituals leave in the world
     public static final DeferredHolder<EntityType<?>, EntityType<RitualCircle>> RITUAL_CIRCLE = register("ritual_circle",

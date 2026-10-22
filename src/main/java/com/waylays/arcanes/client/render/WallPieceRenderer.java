@@ -1,21 +1,24 @@
 package com.waylays.arcanes.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.waylays.arcanes.entity.wall.WallPiece;
 import com.waylays.arcanes.spells.wall.WallFx;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * A wall of Wall Magic, laid brick block by brick block (stone, mossy and cracked stone bricks only, picked steadily
- * from its id), crenellated on top; a pillar is one block wide with a wider cap. It bursts out of the ground, slides
- * when it slides, shudders as it sinks.
+ * A moving or bursting wall: brick blocks flying up into place in a ripple from the middle, crenellated, the mortar
+ * glowing (hotter as a burst wall is about to blow, with a shudder); sliding when it slides; then its bricks fly
+ * apart: forward for a charge or a burst, up and out for the crushing walls.
  */
 public class WallPieceRenderer extends EntityRenderer<WallPiece> {
     public WallPieceRenderer(EntityRendererProvider.Context context) {
@@ -24,69 +27,92 @@ public class WallPieceRenderer extends EntityRenderer<WallPiece> {
 
     @Override
     public void render(WallPiece wall, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-        float risen = wall.risen(partialTicks);
-        if (risen <= .001f) {
-            return;
-        }
         float age = wall.tickCount + partialTicks;
-        if (wall.getKind() == WallPiece.Kind.BURST && age >= WallPiece.RISE + WallPiece.BURST_DELAY) {
-            return;
-        }
-        float h = wall.getHeight();
+        int columns = wall.columns();
+        int rows = wall.rows();
+        float height = wall.getHeight();
+        float width = wall.getWidth();
+        float cell = width / columns;
         int seed = wall.getId() * 97;
+        int shattered = wall.getShattered();
         Vec3 off = wall.offset(partialTicks);
-        boolean sinking = age > wall.getLife();
-        // Shudders as it sinks, and trembles before a burst
-        float shake = sinking ? .05f * Mth.sin(age * 3.3f)
-                : wall.getKind() == WallPiece.Kind.BURST && age > WallPiece.RISE ? .04f * (age - WallPiece.RISE) / WallPiece.BURST_DELAY * Mth.sin(age * 5.1f) : 0;
+        float heat = wall.heat(partialTicks);
+        float shake = wall.getKind() == WallPiece.Kind.BURST && heat > .6f ? (heat - .6f) * .25f * Mth.sin(age * 4.3f) : 0;
+
+        if (age < wall.built() + 10) {
+            WallRender.sigil(poseStack, buffer, width * .6f + 1, Mth.clamp(age / 5, 0, 1) * Mth.clamp(1 - (age - wall.built()) / 10, 0, 1), age * 1.4f);
+        }
         poseStack.pushPose();
-        poseStack.translate(off.x + shake, -(1 - risen) * h, off.z + shake * .6f);
+        poseStack.translate(off.x + shake, 0, off.z + shake * .7f);
         poseStack.mulPose(Axis.YP.rotationDegrees(-wall.getYRot()));
-        if (wall.getKind() == WallPiece.Kind.PILLAR) {
-            pillar(poseStack, buffer, packedLight, seed, h);
-        } else {
-            wall(poseStack, buffer, packedLight, seed, wall.getWidth(), h);
+        // Two passes, the bricks then their mortar: a buffer must not be written to again once another one has been
+        // asked for (asking for it sends the first off)
+        for (int pass = 0; pass < 2; pass++) {
+            VertexConsumer stroke = pass == 1 && shattered < 0 ? buffer.getBuffer(RenderType.eyes(GlyphRender.STROKE)) : null;
+            for (int c = 0; c < columns; c++) {
+                float x = -width * .5f + cell * (c + .5f);
+                for (int r = 0; r <= rows; r++) {
+                    boolean merlon = r == rows;
+                    if (merlon && (c % 2 != 0 && columns > 1)) {
+                        continue;
+                    }
+                    float y = merlon ? height : r;
+                    int s = seed + c * 13 + r * 7;
+                    BlockState state = WallFx.brick(s);
+                    if (shattered >= 0) {
+                        if (pass == 0) {
+                            fly(wall, state, poseStack, buffer, packedLight, x, y + .5f, age - shattered, s);
+                        }
+                        continue;
+                    }
+                    float since = age - wall.cellDelay(c, Math.min(r, rows - 1)) - (merlon ? 2 : 0);
+                    if (since < 0) {
+                        continue;
+                    }
+                    float t = Math.min(1, since / WallPiece.CELL_RISE);
+                    if (pass == 0) {
+                        float lift = -(1 - t) * (1 - t) * 2.4f + .15f * Mth.sin(t * Mth.PI);
+                        if (merlon) {
+                            RuneRender.block(state, poseStack, buffer, packedLight, x, y + lift, 0, .9f, .5f, WallPiece.THICK, 0, 0);
+                        } else {
+                            WallRender.brick(state, poseStack, buffer, packedLight, x, y + lift, 0, cell);
+                        }
+                    } else if (stroke != null && !merlon && t >= 1) {
+                        float flare = Math.max(0, 1 - (since - WallPiece.CELL_RISE) / 8);
+                        float pulse = .35f + .15f * Mth.sin(age * .2f + c + r);
+                        WallRender.mortar(stroke, poseStack.last(), x, y, 0, 0, .07f + heat * .05f,
+                                WallRender.ember(Math.max(heat, flare), Math.min(1, pulse + heat * .6f + flare)));
+                    }
+                }
+            }
         }
         poseStack.popPose();
         super.render(wall, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
-    /** Rows of blocks, the last row a part block, merlons on every other block of the top. */
-    static void wall(PoseStack poseStack, MultiBufferSource buffer, int light, int seed, float width, float height) {
-        int columns = Math.max(1, Math.round(width));
-        float cell = width / columns;
-        float body = height - .5f;
-        int rows = Mth.ceil(body);
-        for (int c = 0; c < columns; c++) {
-            float x = -width * .5f + cell * (c + .5f);
-            for (int r = 0; r < rows; r++) {
-                float rowHeight = Math.min(1, body - r);
-                // Every other row is offset a little, as bricks are laid
-                float jog = (r & 1) * .02f;
-                RuneRender.block(WallFx.brick(seed + c * 13 + r * 7), poseStack, buffer, light, x + jog, r, 0, cell + .002f, rowHeight + .002f, WallPiece.THICK, 0, 0);
-            }
-            if ((c & 1) == 0 || columns == 1) {
-                RuneRender.block(WallFx.brick(seed + c * 13 + 101), poseStack, buffer, light, x, body, 0, cell * .9f, .5f, WallPiece.THICK * 1.05f, 0, 0);
-            }
+    /** One brick flying apart: forward for a charge or a burst, up and out for the crushing walls. */
+    private static void fly(WallPiece wall, BlockState state, PoseStack poseStack, MultiBufferSource buffer, int light, float x, float y, float t, int seed) {
+        float h1 = RuneRender.hash(seed), h2 = RuneRender.hash(seed + 1), h3 = RuneRender.hash(seed + 2);
+        float vx, vy, vz;
+        if (wall.getKind() == WallPiece.Kind.SLAM) {
+            vx = (h1 - .5f) * .35f;
+            vy = .3f + .3f * h2;
+            vz = -.1f - .15f * h3;
+        } else {
+            vx = x * .06f + (h1 - .5f) * .2f;
+            vy = .18f + .25f * h2;
+            vz = .35f + .35f * h3;
         }
-    }
-
-    private static void pillar(PoseStack poseStack, MultiBufferSource buffer, int light, int seed, float height) {
-        int rows = Mth.ceil(height - .35f);
-        for (int r = 0; r < rows; r++) {
-            float rowHeight = Math.min(1, height - .35f - r);
-            RuneRender.block(WallFx.brick(seed + r * 7), poseStack, buffer, light, 0, r, 0, .8f, rowHeight, .8f, 0, 0);
-        }
-        RuneRender.block(WallFx.brick(seed + 55), poseStack, buffer, light, 0, height - .35f, 0, 1f, .35f, 1f, 0, 0);
+        WallRender.fragment(state, poseStack, buffer, light, x, y, 0, vx, vy, vz, t, WallPiece.SHATTER_TICKS, .55f + .3f * h1, seed);
     }
 
     @Override
     public boolean shouldRender(WallPiece wall, Frustum frustum, double x, double y, double z) {
-        return frustum.isVisible(wall.getBoundingBox().inflate(wall.getWidth() + 12, wall.getHeight() + 1, wall.getWidth() + 12));
+        return frustum.isVisible(wall.getBoundingBox().inflate(wall.getWidth() + 14, wall.getHeight() + 4, wall.getWidth() + 14));
     }
 
     @Override
     public ResourceLocation getTextureLocation(WallPiece wall) {
-        return RuneRender.GLOW;
+        return WallRender.SIGIL;
     }
 }

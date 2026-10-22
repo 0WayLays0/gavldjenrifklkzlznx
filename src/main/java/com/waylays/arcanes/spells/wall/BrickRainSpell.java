@@ -1,8 +1,6 @@
 package com.waylays.arcanes.spells.wall;
 
-import com.waylays.arcanes.entity.wall.BrickBolt;
-import com.waylays.arcanes.spells.boss.BossScheduler;
-import net.minecraft.server.level.ServerLevel;
+import com.waylays.arcanes.entity.wall.BrickStorm;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AutoSpellConfig;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
@@ -19,11 +17,14 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-/** Brick Rain: bricks rain down for a few seconds on the spot the caster points at, each bursting where it lands. */
+/**
+ * Brick Rain: a sigil burns where the caster points, a vortex of bricks gathers in the air above it, turning, and pours
+ * its bricks down, the first right on the spot.
+ */
 @AutoSpellConfig
 public class BrickRainSpell extends WallSpell {
-    public static final float RANGE = 24;
-    public static final float RADIUS = 3.5f;
+    public static final float RANGE = 26;
+    public static final float RADIUS = 4;
     public static final int TICKS = 60;
 
     public BrickRainSpell() {
@@ -36,7 +37,7 @@ public class BrickRainSpell extends WallSpell {
     }
 
     public static int bricks(int spellLevel) {
-        return 12 + 2 * spellLevel;
+        return 14 + 2 * spellLevel;
     }
 
     @Override
@@ -49,24 +50,9 @@ public class BrickRainSpell extends WallSpell {
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
-        if (level instanceof ServerLevel server) {
-            Vec3 at = aimedSpot(level, entity, RANGE);
-            float damage = getPower(spellLevel, entity);
-            int n = bricks(spellLevel);
-            for (int i = 0; i < n; i++) {
-                int delay = i * TICKS / n;
-                float a = WallFx.hash(entity.getId() * 31 + i) * Mth.TWO_PI;
-                // The first brick falls right on the spot, the others all around
-                float r = i == 0 ? 0 : Mth.sqrt(WallFx.hash(entity.getId() * 17 + i)) * RADIUS;
-                Vec3 spot = at.add(Mth.cos(a) * r, 0, Mth.sin(a) * r);
-                BossScheduler.after(server, delay, l -> {
-                    if (entity.isAlive()) {
-                        BrickBolt.shoot(l, entity, this, BrickBolt.Kind.FALLING, spot.add(0, 14, 0), new Vec3(0, -.5, 0), damage);
-                    }
-                });
-            }
-            WallFx.sound(level, at, net.minecraft.sounds.SoundEvents.STONE_BREAK, 1.5f, .5f);
-        }
+        Vec3 at = aimedSpot(level, entity, RANGE);
+        BrickStorm.gather(level, entity, this, at, RADIUS, bricks(spellLevel), TICKS, getPower(spellLevel, entity));
+        WallFx.sound(level, at, net.minecraft.sounds.SoundEvents.STONE_BREAK, 1.5f, .5f);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 }

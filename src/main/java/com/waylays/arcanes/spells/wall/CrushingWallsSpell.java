@@ -20,7 +20,10 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-/** Crushing Walls: two walls burst out on either side of the enemy looked at and slam together on it. */
+/**
+ * Crushing Walls: two walls build themselves on either side of the enemy looked at and slam together on it, faster and
+ * faster, face to face: it is crushed and dazed, and both walls burst in flying bricks.
+ */
 @AutoSpellConfig
 public class CrushingWallsSpell extends WallSpell {
     public static final int RANGE = 20;
@@ -29,7 +32,7 @@ public class CrushingWallsSpell extends WallSpell {
     public CrushingWallsSpell() {
         super("crushing_walls", SpellRarity.RARE, 5, 14, CastType.INSTANT, SpellAnimations.ANIMATION_INSTANT_CAST);
         this.manaCostPerLevel = 6;
-        this.baseSpellPower = 9;
+        this.baseSpellPower = 10;
         this.spellPowerPerLevel = 2;
         this.castTime = 0;
         this.baseManaCost = 50;
@@ -59,13 +62,14 @@ public class CrushingWallsSpell extends WallSpell {
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 
-    /** The two walls, on either side of {@code at} across {@code yaw}, sliding together. */
+    /** The two walls, on either side of {@code at} across {@code yaw}: their faces meet right on it. */
     public void crush(Level level, LivingEntity caster, Vec3 at, float yaw, float damage) {
         Vec3 dir = Vec3.directionFromRotation(0, yaw);
-        float travel = GAP - WallPiece.THICK * .5f - .3f;
+        float travel = GAP - WallPiece.THICK * .5f;
         for (int side = -1; side <= 1; side += 2) {
             Vec3 p = SpellUtil.groundAt(level, at.add(dir.scale(side * GAP)), 3, 1);
-            WallPiece.raise(level, caster, this, WallPiece.Kind.SLAM, p, side < 0 ? yaw : yaw + 180, 3.2f, 3, 50, travel, 9, damage);
+            WallPiece.raise(level, caster, this, WallPiece.Kind.SLAM, p, side < 0 ? yaw : yaw + 180, 4, 3, travel, 9, damage);
         }
+        WallFx.sigil(level, SpellUtil.groundAt(level, at, 3, 1), GAP + 1, 40);
     }
 }

@@ -589,24 +589,31 @@ Registre des Âmes. Focus : Jeton d'Âme (objet craftable).
 16. MAGIE DES MURS (briques de pierre)                            [~] EN TEST
 ================================================================================
 Faite uniquement de trois blocs : briques de pierre, briques de pierre
-moussues, briques de pierre craquelées. Rien d'autre dans ses visuels.
+moussues, briques de pierre craquelées (le reste n'est que lumière : mortier
+qui rougeoit comme des braises, runes, sceau du maçon au sol à chaque
+incantation). La magie du grand méchant. Refaite : les murs se bâtissent
+brique par brique ; Mur Surgissant, Oubliette, Bastion et rempart de la
+Forteresse sont en vrais blocs (solides), posés seulement dans l'air et
+retirés à la fin (le sol redevient comme avant).
 Livre : Codex des Remparts. Focus : les trois briques.
 
- 1. Brick Bolt         [~] Une brique lancée (plus de briques en montant de
-                           niveau).
- 2. Rising Wall        [~] Mur de 5 x 3 qui arrête les tirs ennemis et
-                           bloque le passage.
- 3. Brick Rain         [~] Pluie de briques sur une zone (3 s).
- 4. Wall Burst         [~] Mur qui tremble puis explose en cône de briques.
- 5. Mortar             [~] Bloc de briques lancé en cloche, éclate à
-                           l'impact.
- 6. Crushing Walls     [~] Deux murs se referment sur l'ennemi visé.
- 7. Brick Cage         [~] Cage de piliers autour de l'ennemi visé.
- 8. Rampart Charge     [~] Mur qui charge en balayant les ennemis.
- 9. Bastion            [~] Quatre murs en carré autour du lanceur.
-10. Fallen Citadel     [~] ULTIME - Une forteresse s'élève autour de
-                           l'ennemi, ses tours lancent des briques, puis
-                           tous les murs s'effondrent vers l'intérieur.
+ 1. Brick Volley       [~] Volée de briques : arrachées du sol, elles
+                           flottent puis partent l'une après l'autre (3 à 6).
+ 2. Rising Wall        [~] Mur crénelé en vrais blocs (5 x 3 jusqu'à 7 x 4).
+ 3. Brick Rain         [~] Sceau au sol, tourbillon de briques au-dessus qui
+                           déverse ses briques.
+ 4. Wall Burst         [~] Mur qui chauffe, tremble puis explose en cône.
+ 5. Mortar             [~] Bloc de briques en cloche, sceau sur l'impact.
+ 6. Crushing Walls     [~] Deux murs se referment face contre face sur
+                           l'ennemi visé.
+ 7. Oubliette          [~] Cellule close en vrais blocs autour de l'ennemi.
+ 8. Rampart Charge     [~] Grand mur qui charge en labourant le sol puis
+                           explose.
+ 9. Bastion            [~] Donjon carré en vrais blocs, tours aux coins.
+10. Tyrant's Fortress  [~] ULTIME - Forteresse autour du lanceur (rempart
+                           circulaire en vrais blocs, 8 tours) : les tours
+                           pilonnent les ennemis 10 s, puis tout explose
+                           vers l'extérieur.
 
 
 ================================================================================

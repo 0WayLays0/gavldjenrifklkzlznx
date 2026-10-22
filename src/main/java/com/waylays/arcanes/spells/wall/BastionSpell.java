@@ -1,6 +1,6 @@
 package com.waylays.arcanes.spells.wall;
 
-import com.waylays.arcanes.entity.wall.WallPiece;
+import com.waylays.arcanes.entity.wall.Rampart;
 import com.waylays.arcanes.spells.SpellUtil;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -20,10 +20,13 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-/** Bastion: four walls burst up in a square around the caster, stopping shots and keeping enemies out. */
+/**
+ * Bastion: a square keep of real stone bricks builds itself round the caster, its walls crenellated, a taller tower at
+ * each corner, running round as it rises: nobody gets in, no shot gets through. The caster resists damage inside.
+ */
 @AutoSpellConfig
 public class BastionSpell extends WallSpell {
-    public static final float SIDE = 2.6f;
+    public static final int HALF = 3;
 
     public BastionSpell() {
         super("bastion", SpellRarity.RARE, 5, 30, CastType.INSTANT, SpellAnimations.SELF_CAST_ANIMATION);
@@ -35,25 +38,21 @@ public class BastionSpell extends WallSpell {
     }
 
     public static int duration(int spellLevel) {
-        return 120 + 20 * spellLevel;
+        return 160 + 30 * spellLevel;
     }
 
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
-                Component.translatable("ui.arcanes_oublies.stops_shots"),
+                Component.translatable("ui.arcanes_oublies.solid_wall"),
                 Component.translatable("ui.irons_spellbooks.duration", Utils.timeFromTicks(duration(spellLevel), 1)));
     }
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         int life = duration(spellLevel);
-        for (int i = 0; i < 4; i++) {
-            float yaw = entity.getYRot() + i * 90;
-            Vec3 dir = Vec3.directionFromRotation(0, yaw);
-            Vec3 at = SpellUtil.groundAt(level, entity.position().add(dir.scale(SIDE)), 3, 1);
-            WallPiece.raise(level, entity, this, WallPiece.Kind.STAND, at, yaw, SIDE * 2 + 1, 2.6f, life, 0, 1, 0);
-        }
+        Vec3 at = SpellUtil.groundAt(level, entity.position(), 2, 1);
+        Rampart.raise(level, entity, Rampart.Shape.BASTION, at, 0, HALF, 3, life);
         entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, life, 0));
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }

@@ -268,6 +268,60 @@ def affinity_ring_wall():
         "R": STONE_DARK, "C": MOSS, "L": MOSS_LIGHT})
 
 
+def mason_sigil():
+    """256x256 white sigil (tinted ember in game, drawn glowing on the ground): two rings with a course of bricks laid
+    between them, a square and a turned square inside, a keystone in the middle and runic notches all round."""
+    S = 256
+    big = Image.new("L", (S * 2, S * 2), 0)
+    d = ImageDraw.Draw(big)
+    c = S
+    W = 2 * S
+
+    def ring(r, w):
+        d.ellipse((c - r, c - r, c + r, c + r), outline=255, width=w)
+
+    ring(250, 10)
+    ring(206, 7)
+    # A course of bricks between the rings: segments with mortar gaps, two staggered rows
+    for row, (r0, r1) in enumerate(((210, 228), (230, 246))):
+        n = 22
+        for k in range(n):
+            a0 = (k + row * .5) * 2 * math.pi / n + .03
+            a1 = (k + 1 + row * .5) * 2 * math.pi / n - .03
+            pts = []
+            for t in range(9):
+                a = a0 + (a1 - a0) * t / 8
+                pts.append((c + math.cos(a) * r1, c + math.sin(a) * r1))
+            for t in range(8, -1, -1):
+                a = a0 + (a1 - a0) * t / 8
+                pts.append((c + math.cos(a) * r0, c + math.sin(a) * r0))
+            d.polygon(pts, fill=150 if (k + row) % 3 else 220)
+    # Runic notches round the inner ring
+    for k in range(24):
+        a = k * 2 * math.pi / 24
+        r0, r1 = (180, 200) if k % 2 else (170, 200)
+        d.line((c + math.cos(a) * r0, c + math.sin(a) * r0, c + math.cos(a) * r1, c + math.sin(a) * r1), fill=255, width=6)
+    # A square and a turned square
+    q = 140
+    d.polygon([(c - q, c - q), (c + q, c - q), (c + q, c + q), (c - q, c + q)], outline=255, width=8)
+    q2 = 198
+    d.polygon([(c, c - q2), (c + q2, c), (c, c + q2), (c - q2, c)], outline=210, width=6)
+    # Brick hatching inside the square
+    for y in range(-q + 30, q, 44):
+        d.line((c - q + 12, c + y, c + q - 12, c + y), fill=110, width=4)
+        off = 0 if (y // 44) % 2 else 40
+        for x in range(-q + 12 + off, q - 12, 80):
+            d.line((c + x, c + y, c + x, c + y + 44 if y + 44 < q else c + q - 12), fill=110, width=4)
+    # The keystone in the middle
+    ks = [(c - 34, c - 44), (c + 34, c - 44), (c + 22, c + 40), (c - 22, c + 40)]
+    d.polygon(ks, fill=255)
+    d.polygon([(c - 18, c - 28), (c + 18, c - 28), (c + 10, c + 24), (c - 10, c + 24)], fill=90)
+    alpha = big.resize((S, S), Image.LANCZOS)
+    out = Image.new("RGBA", (S, S), (255, 255, 255, 0))
+    out.putalpha(alpha)
+    return out
+
+
 ICONS = (("brick_bolt", brick_bolt_icon), ("rising_wall", rising_wall_icon), ("brick_rain", brick_rain_icon),
          ("wall_burst", wall_burst_icon), ("mortar", mortar_icon), ("crushing_walls", crushing_walls_icon),
          ("brick_cage", brick_cage_icon), ("rampart_charge", rampart_charge_icon), ("bastion", bastion_icon),
@@ -282,6 +336,7 @@ def main():
     g.save(rampart_codex_model_texture(), "textures/item/rampart_codex_3d.png")
     g.write_json("models/item/affinity_ring_wall.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_wall"}})
     g.book_models("rampart_codex")
+    g.save(mason_sigil(), "textures/entity/wall/sigil.png")
 
 
 if __name__ == "__main__":
