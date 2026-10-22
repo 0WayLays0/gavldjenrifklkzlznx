@@ -725,41 +725,71 @@ def book_models(name):
         return box(frm, to, {k: face for k in ("north", "south", "east", "west", "up", "down")})
 
     edges = {k: edge for k in ("north", "south", "up", "down")}
+
+    def plate(frm, to, outer, uv):
+        """A thin piece on a cover: {uv} on its outer face ("east" or "west"), the cover's edge elsewhere."""
+        return box(frm, to, dict(edges, **{outer: uv, ("west" if outer == "east" else "east"): edge}))
+
+    # A slim book (about Iron's own size): 10 long, 7.6 high, 4.4 thick, standing on its open edge, spine up; the
+    # back cover faces west, the front cover east. The covers' art fills them; their middle is raised in a panel.
+    z0, z1, h = 3, 13, 7.6
+    back, front = (5.8, 6.4), (9.6, 10.2)
+
+    def panel_uv(mirror):
+        # The middle of the cover art (z 4.3..11.7, y 1.05..6.55 of the cover), for the raised panel
+        u0, u1 = (z1 - 11.7) / 10 * 12, (z1 - 4.3) / 10 * 12
+        v0, v1 = (h - 6.55) / h * 9, (h - 1.05) / h * 9
+        return f(u1, v0, u0, v1) if mirror else f(u0, v0, u1, v1)
+
     elements = [
-        # Covers (book standing on its open edge, spine up)
-        box([4.5, 0, 2], [5.5, 9, 14], dict(edges, west=cover_mirror, east=edge)),
-        box([10.5, 0, 2], [11.5, 9, 14], dict(edges, east=cover, west=edge)),
-        # Spine and page block
-        box([5.5, 8, 2], [10.5, 9.2, 14], {"up": spine, "down": edge, "north": edge, "south": edge}),
-        box([5.5, .4, 2.6], [10.5, 8, 13.4], {"north": pages_side, "south": pages_side, "down": pages_edge}),
-        # Raised bands across the spine
-        solid([4.3, 9.2, 4.2], [11.7, 9.6, 4.8], gold),
-        solid([4.3, 9.2, 7.7], [11.7, 9.6, 8.3], gold),
-        solid([4.3, 9.2, 11.2], [11.7, 9.6, 11.8], gold),
+        # Covers, and the raised panel in the middle of each
+        box([back[0], 0, z0], [back[1], h, z1], dict(edges, west=cover_mirror, east=edge)),
+        box([front[0], 0, z0], [front[1], h, z1], dict(edges, east=cover, west=edge)),
+        plate([back[0] - .15, 1.05, 4.3], [back[0], 6.55, 11.7], "west", panel_uv(True)),
+        plate([front[1], 1.05, 4.3], [front[1] + .15, 6.55, 11.7], "east", panel_uv(False)),
+        # The page block, set in from the covers' edges
+        box([back[1], .3, z0 + .35], [front[0], 7.0, z1 - .35], {"north": pages_side, "south": pages_side, "down": pages_edge}),
+        # A rounded spine: the back between the covers, a crown over it, four raised bands
+        box([back[1], 7.0, z0], [front[0], h, z1], {"up": spine, "north": edge, "south": edge}),
+        box([6.7, h, z0], [9.3, h + .35, z1], {"up": spine, "north": edge, "south": edge, "east": edge, "west": edge}),
     ]
-    # Gold corner guards on both covers
-    for x0, x1 in ((4.1, 4.5), (11.5, 11.9)):
-        for y0, y1 in ((0, 1.6), (7.4, 9)):
-            for z0, z1 in ((1.8, 3.4), (12.6, 14.2)):
-                elements.append(solid([x0, y0, z0], [x1, y1, z1], gold))
+    for z in (4.3, 6.8, 9.2, 11.7):
+        elements.append(solid([6.55, h + .3, z - .22], [9.45, h + .55, z + .22], gold))
+    # Headbands at both ends of the spine, in the gem's colour
+    for za, zb in ((z0 - .05, z0 + .3), (z1 - .3, z1 + .05)):
+        elements.append(solid([6.6, 6.55, za], [9.4, 7.05, zb], gem))
+    # Slim metal corners, an L on each corner of each cover
+    for x0, x1 in ((back[0] - .18, back[0]), (front[1], front[1] + .18)):
+        for y_edge, y_in in ((0, 1), (h, h - 1)):
+            for z_edge, z_in in ((z0, z0 + 1), (z1, z1 - 1)):
+                ya, yb = sorted((y_edge, y_in))
+                za, zb = sorted((z_edge, z_in))
+                yt = sorted((y_edge, y_edge + (.38 if y_edge == 0 else -.38)))
+                zt = sorted((z_edge, z_edge + (.38 if z_edge == z0 else -.38)))
+                elements.append(solid([x0, yt[0], za], [x1, yt[1], zb], gold))
+                elements.append(solid([x0, ya, zt[0]], [x1, yb, zt[1]], gold))
     elements += [
-        # Gem in its bezel on the front cover
-        solid([11.5, 3.1, 6.6], [11.9, 5.9, 9.4], gold),
-        solid([11.9, 3.6, 7.1], [12.3, 5.4, 8.9], gem),
-        # Clasp strap wrapping the open edge
-        solid([4.3, -.3, 7.4], [11.7, 0, 8.6], strap),
-        solid([11.5, 0, 7.4], [11.8, 2.4, 8.6], strap),
+        # On the front cover: a diamond bezel with the gem set in it
+        dict(solid([front[1] + .15, 3.05, 7.25], [front[1] + .3, 4.55, 8.75], gold),
+             rotation={"origin": [front[1] + .2, 3.8, 8], "axis": "x", "angle": 45}),
+        solid([front[1] + .3, 3.4, 7.6], [front[1] + .52, 4.2, 8.4], gem),
+        # The clasp: a strap around the open edge, buckled on the front cover
+        solid([back[0] - .1, -.2, 7.45], [front[1] + .1, 0, 8.55], strap),
+        solid([back[0] - .18, -.2, 7.45], [back[0], 1.2, 8.55], strap),
+        solid([front[1], -.2, 7.45], [front[1] + .18, 2.1, 8.55], strap),
+        solid([front[1] + .18, 1.45, 7.6], [front[1] + .36, 2.0, 8.4], gold),
     ]
     write_json(f"models/item/{name}_3d.json", {
         "textures": {"book": f"arcanes_oublies:item/{name}_3d", "particle": f"arcanes_oublies:item/{name}_3d"},
         "elements": elements,
+        # Held like Iron's own spellbooks, a little smaller
         "display": {
-            "thirdperson_righthand": {"rotation": [90, 180, 0], "translation": [0, -1.5, 2], "scale": [0.65, 0.65, 0.65]},
-            "thirdperson_lefthand": {"rotation": [90, 180, 0], "translation": [0, -1.5, 2], "scale": [0.65, 0.65, 0.65]},
-            "firstperson_righthand": {"rotation": [-130, 10, 90], "translation": [-4, 2, -3.5], "scale": [0.9, 0.9, 0.9]},
-            "firstperson_lefthand": {"rotation": [-130, 10, -90], "translation": [4, 2, -3], "scale": [0.9, 0.9, 0.9]},
-            "ground": {"rotation": [-90, 0, 0], "translation": [0, 0, -4], "scale": [0.65, 0.65, 0.65]},
-            "head": {"rotation": [0, 0, -90], "translation": [4, 8, 0]},
+            "thirdperson_righthand": {"rotation": [90, 180, 0], "translation": [0, -2, 2], "scale": [0.7, 0.7, 0.7]},
+            "thirdperson_lefthand": {"rotation": [90, 180, 0], "translation": [0, -2, 2], "scale": [0.7, 0.7, 0.7]},
+            "firstperson_righthand": {"rotation": [-137, 10, 90], "translation": [-4.25, 2, -3.75], "scale": [0.85, 0.85, 0.85]},
+            "firstperson_lefthand": {"rotation": [-137, 10, -90], "translation": [4.25, 2, -3.25], "scale": [0.85, 0.85, 0.85]},
+            "ground": {"rotation": [-89, 0, 0], "translation": [0, 0, -4], "scale": [0.7, 0.7, 0.7]},
+            "head": {"rotation": [0, 0, -90], "translation": [4, 8.5, 0]},
         },
     })
 
