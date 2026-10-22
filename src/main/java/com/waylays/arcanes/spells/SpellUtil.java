@@ -4,6 +4,7 @@ import com.waylays.arcanes.entity.OwnedSummon;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.util.CameraShakeData;
 import io.redspace.ironsspellbooks.api.util.CameraShakeManager;
+import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.damage.DamageSources;
 import io.redspace.ironsspellbooks.damage.SpellDamageSource;
 import net.minecraft.core.BlockPos;
@@ -12,9 +13,11 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -79,6 +82,23 @@ public final class SpellUtil {
             return down.getLocation();
         }
         return groundAt(level, at, 8, 1);
+    }
+
+    /** The enemy the caster looks at within {@code range}, if any. */
+    @Nullable
+    public static LivingEntity aimedEnemy(Level level, LivingEntity caster, double range) {
+        HitResult hit = Utils.raycastForEntity(level, caster, (float) range, true, .6f);
+        if (hit instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof LivingEntity living && living.isAlive()
+                && !(living instanceof ArmorStand) && !isAlly(caster, living)) {
+            return living;
+        }
+        return null;
+    }
+
+    /** Where the caster's aim meets the ground: under the enemy they look at, else the ground they point at. */
+    public static Vec3 aimedSpot(Level level, LivingEntity caster, double range) {
+        LivingEntity target = aimedEnemy(level, caster, range);
+        return target != null ? groundAt(level, target.position(), 3, 1) : aimedGround(level, caster, range);
     }
 
     public static void cameraShake(Level level, Vec3 origin, int ticks, float radius) {

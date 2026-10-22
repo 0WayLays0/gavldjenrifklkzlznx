@@ -269,7 +269,7 @@ def affinity_ring_wall():
 
 
 def mason_sigil():
-    """256x256 white sigil (tinted ember in game, drawn glowing on the ground): two rings with a course of bricks laid
+    """256x256 sigil, white on black (tinted ember in game, drawn glowing on the ground): two rings with a course of bricks laid
     between them, a square and a turned square inside, a keystone in the middle and runic notches all round."""
     S = 256
     big = Image.new("L", (S * 2, S * 2), 0)
@@ -316,10 +316,9 @@ def mason_sigil():
     ks = [(c - 34, c - 44), (c + 34, c - 44), (c + 22, c + 40), (c - 22, c + 40)]
     d.polygon(ks, fill=255)
     d.polygon([(c - 18, c - 28), (c + 18, c - 28), (c + 10, c + 24), (c - 10, c + 24)], fill=90)
-    alpha = big.resize((S, S), Image.LANCZOS)
-    out = Image.new("RGBA", (S, S), (255, 255, 255, 0))
-    out.putalpha(alpha)
-    return out
+    # Drawn additive in game: the light is the colour itself, so it is white on black (the alpha is not used)
+    light = big.resize((S, S), Image.LANCZOS)
+    return Image.merge("RGBA", (light, light, light, Image.new("L", (S, S), 255)))
 
 
 ICONS = (("brick_bolt", brick_bolt_icon), ("rising_wall", rising_wall_icon), ("brick_rain", brick_rain_icon),

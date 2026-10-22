@@ -8,13 +8,9 @@ import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
-import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
@@ -72,17 +68,11 @@ public abstract class WallSpell extends AbstractSpell {
     /** The enemy the caster looks at within {@code range}, if any. */
     @Nullable
     public static LivingEntity aimed(Level level, LivingEntity caster, double range) {
-        HitResult hit = Utils.raycastForEntity(level, caster, (float) range, true, .6f);
-        if (hit instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof LivingEntity living && living.isAlive()
-                && !(living instanceof ArmorStand) && !SpellUtil.isAlly(caster, living)) {
-            return living;
-        }
-        return null;
+        return SpellUtil.aimedEnemy(level, caster, range);
     }
 
     /** Where the caster's aim meets the ground: under the enemy they look at, else the ground they point at. */
     public static Vec3 aimedSpot(Level level, LivingEntity caster, double range) {
-        LivingEntity target = aimed(level, caster, range);
-        return target != null ? SpellUtil.groundAt(level, target.position(), 3, 1) : SpellUtil.aimedGround(level, caster, range);
+        return SpellUtil.aimedSpot(level, caster, range);
     }
 }

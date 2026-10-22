@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.waylays.arcanes.entity.wall.Rampart;
 import com.waylays.arcanes.spells.wall.WallFx;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -46,28 +47,31 @@ public class RampartRenderer extends EntityRenderer<Rampart> {
         // Three passes, one buffer each: a buffer must not be written to again once another one has been asked for
         // (asking for it sends the first off)
         for (Rampart.Cell c : cells) {
-            int seed = (int) foot.offset(c.dx(), c.dy(), c.dz()).asLong();
+            BlockPos cellPos = foot.offset(c.dx(), c.dy(), c.dz());
+            int seed = (int) cellPos.asLong();
             BlockState state = WallFx.brick(seed);
             float since = age - c.delay();
-            if (since < 0) {
+            if (since < 0 || since >= Rampart.CELL_RISE && age < life) {
                 continue;
             }
+            // Lit as its own place is (the rampart's foot is inside its first block, in the dark)
+            int light = LevelRenderer.getLightColor(rampart.level(), cellPos);
             if (age >= life) {
                 // Crumbling: each block topples out and sinks, the top ones first
                 float t = age - life - RuneRender.hash(seed) * 5;
                 float dir = c.face() < 0 ? 0 : c.face() * Mth.HALF_PI;
                 float vx = -Mth.sin(dir) * .06f + (RuneRender.hash(seed + 1) - .5f) * .08f;
                 float vz = Mth.cos(dir) * .06f + (RuneRender.hash(seed + 2) - .5f) * .08f;
-                WallRender.fragment(state, poseStack, buffer, packedLight, c.dx(), c.dy() + .5f, c.dz(), vx, .12f, vz, Math.max(0, t),
+                WallRender.fragment(state, poseStack, buffer, light, c.dx(), c.dy() + .5f, c.dz(), vx, .12f, vz, Math.max(0, t),
                         Rampart.CRUMBLE, 1, seed);
-            } else if (since < Rampart.CELL_RISE) {
+            } else {
                 // Flying up out of the ground into its place, a little past it and back (the real block takes over)
                 float t = since / Rampart.CELL_RISE;
                 float lift = -(1 - t) * (1 - t) * 2.4f + .15f * Mth.sin(t * Mth.PI);
                 poseStack.pushPose();
                 poseStack.translate(c.dx(), c.dy() + lift, c.dz());
                 poseStack.mulPose(Axis.YP.rotationDegrees((1 - t) * 40 * (RuneRender.hash(seed) - .5f)));
-                WallRender.brick(state, poseStack, buffer, packedLight, 0, 0, 0, 1);
+                WallRender.brick(state, poseStack, buffer, light, 0, 0, 0, 1);
                 poseStack.popPose();
             }
         }
