@@ -103,6 +103,7 @@ public final class WallGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_brick", timeoutTicks = 40)
     public static void brickBoltHits(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, 1.5);
         Husk husk = husk(helper, 4.5, 6.5);
         cast(helper, ModSpells.BRICK_BOLT, caster);
@@ -115,6 +116,7 @@ public final class WallGameTests {
     /** A snowball thrown at the caster through the wall is stopped by it. */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_rising", timeoutTicks = 60)
     public static void risingWallStopsAShot(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         cast(helper, ModSpells.RISING_WALL, caster);
         helper.assertTrue(!helper.getLevel().getEntitiesOfClass(WallPiece.class, caster.getBoundingBox().inflate(6)).isEmpty(), "no wall rose");
@@ -134,6 +136,7 @@ public final class WallGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_rain", timeoutTicks = 120)
     public static void brickRainFalls(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, 1.5);
         Husk husk = husk(helper, 4.5, 6.5);
         cast(helper, ModSpells.BRICK_RAIN, caster);
@@ -145,6 +148,7 @@ public final class WallGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_burst", timeoutTicks = 50)
     public static void wallBurstsOnTheEnemy(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, 1.5);
         Husk husk = husk(helper, 4.5, 5.5);
         cast(helper, ModSpells.WALL_BURST, caster);
@@ -157,6 +161,7 @@ public final class WallGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_mortar", timeoutTicks = 60)
     public static void mortarLands(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 6.5);
         cast(helper, ModSpells.MORTAR, caster);
@@ -168,6 +173,7 @@ public final class WallGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_crush", timeoutTicks = 50)
     public static void crushingWallsCrush(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 4.5);
         castAt(helper, ModSpells.CRUSHING_WALLS, caster, husk);
@@ -180,6 +186,7 @@ public final class WallGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_cage", timeoutTicks = 30)
     public static void brickCageShutsIn(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 4.5);
         castAt(helper, ModSpells.BRICK_CAGE, caster, husk);
@@ -192,6 +199,7 @@ public final class WallGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_charge", timeoutTicks = 50)
     public static void rampartChargeSweeps(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 4.5);
         double start = husk.getZ();
@@ -205,6 +213,7 @@ public final class WallGameTests {
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_bastion", timeoutTicks = 20)
     public static void bastionStandsAround(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, 4.5);
         cast(helper, ModSpells.BASTION, caster);
         int walls = helper.getLevel().getEntitiesOfClass(WallPiece.class, caster.getBoundingBox().inflate(4)).size();
@@ -217,6 +226,7 @@ public final class WallGameTests {
     /** The citadel rises round the husk, its towers lob bricks on it, then it falls on it. */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_citadel", timeoutTicks = 160)
     public static void citadelFallsOnTheEnemy(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, .5, .5);
         Husk husk = husk(helper, 4.5, 4.5);
         husk.getAttribute(Attributes.MAX_HEALTH).setBaseValue(400);
