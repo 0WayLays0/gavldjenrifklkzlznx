@@ -116,7 +116,10 @@ public final class RitualGameTests {
                 "the ritual broke before its leeway ran out"));
         helper.succeedWhen(() -> {
             helper.assertTrue(circle.getState() == RitualCircle.State.FAILED, "the ritual did not break");
-            helper.assertTrue(hurt(witches.get(1)) && hurt(witches.get(2)), "the broken ritual did not lash back");
+            // Everyone still in the circle takes the backlash
+            for (Witch witch : witches.subList(1, witches.size())) {
+                helper.assertTrue(hurt(witch), "the broken ritual did not lash back");
+            }
             cleanUp(helper);
         });
     }
