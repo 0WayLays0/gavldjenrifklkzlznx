@@ -9,17 +9,17 @@ import net.minecraft.util.Mth;
  */
 public enum Ritual {
     /** A meteor falls where the leader looks. */
-    METEOR("meteor", 3, 600, 0xFF7A2E),
+    METEOR("meteor", 2, 600, 0xFF7A2E),
     /** A great dome shields the place from hostile creatures and their shots. */
-    DOME("dome", 4, 800, 0x7FD8FF),
+    DOME("dome", 2, 800, 0x7FD8FF),
     /** A storm gathers over the place and strikes hostile creatures with lightning. */
-    STORM("storm", 3, 600, 0x9FA8FF),
+    STORM("storm", 2, 600, 0x9FA8FF),
     /** A portal opens to the anchor the leader marked with their chalk, and one back. */
     PORTAL("portal", 2, 400, 0xC27BFF),
     /** The elders' blessing: everyone around is healed, cleansed and strengthened for a long while. */
-    BLESSING("blessing", 4, 900, 0xFFE27A),
+    BLESSING("blessing", 2, 900, 0xFFE27A),
     /** A colossus of stone wakes and fights for the group. */
-    COLOSSUS("colossus", 5, 1200, 0xB8B0A0);
+    COLOSSUS("colossus", 2, 1200, 0xB8B0A0);
 
     /** Mana each participant gives, spread over the channelling. */
     public static final float MANA = 75;

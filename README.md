@@ -397,12 +397,12 @@ deux fois plus fort). Pour une scène RP, le staff peut donner le tag `arcanes_o
 
 | Rituel | Participants | Incantation | Effet |
 |---|---|---|---|
-| **Météore guidé** | 3 | 30 s | Un météore tombe lentement du ciel là où regarde le meneur (64 blocs) : explosion de feu sur les créatures hostiles (aucun bloc cassé). |
-| **Dôme de protection** | 4 | 40 s | Un dôme de lumière de 16 blocs pendant 5 min : les créatures hostiles ne peuvent pas entrer, leurs tirs se brisent dessus, les joueurs dessous résistent aux dégâts. |
-| **Appel de la tempête** | 3 | 30 s | Un orage d'une minute au-dessus du lieu (24 blocs) : la foudre frappe une créature hostile toutes les 1,5 s. |
+| **Météore guidé** | 2 | 30 s | Un météore tombe lentement du ciel là où regarde le meneur (64 blocs) : explosion de feu sur les créatures hostiles (aucun bloc cassé). |
+| **Dôme de protection** | 2 | 40 s | Un dôme de lumière de 16 blocs pendant 5 min : les créatures hostiles ne peuvent pas entrer, leurs tirs se brisent dessus, les joueurs dessous résistent aux dégâts. |
+| **Appel de la tempête** | 2 | 30 s | Un orage d'une minute au-dessus du lieu (24 blocs) : la foudre frappe une créature hostile toutes les 1,5 s. |
 | **Portail** | 2 | 20 s | Un portail d'une minute vers l'ancre marquée avec la craie du meneur (accroupi + clic sur le sol, même dans une autre dimension), et son jumeau pour revenir. |
-| **Bénédiction des anciens** | 4 | 45 s | Chaque joueur à 24 blocs est soigné, purifié et renforcé 5 min (Régénération, Absorption, Résistance, Force). |
-| **Éveil du colosse** | 5 | 60 s | Un colosse géant (golem 2,5 fois plus grand, 300 PV) s'éveille et combat pour le groupe pendant 3 min. |
+| **Bénédiction des anciens** | 2 | 45 s | Chaque joueur à 24 blocs est soigné, purifié et renforcé 5 min (Régénération, Absorption, Résistance, Force). |
+| **Éveil du colosse** | 2 | 60 s | Un colosse géant (golem 2,5 fois plus grand, 300 PV) s'éveille et combat pour le groupe pendant 3 min. |
 
 Les rituels n'épargnent que leurs participants et ne visent que les créatures hostiles : ils ne blessent jamais les
 autres joueurs.
