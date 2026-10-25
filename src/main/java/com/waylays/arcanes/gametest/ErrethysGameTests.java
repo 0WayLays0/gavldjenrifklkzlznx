@@ -3,13 +3,19 @@ package com.waylays.arcanes.gametest;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.OwnedSummon;
 import com.waylays.arcanes.entity.book.FlyingGrimoire;
+import com.waylays.arcanes.entity.errethys.ManaButterfly;
 import com.waylays.arcanes.entity.errethys.ManaCamel;
 import com.waylays.arcanes.entity.errethys.ManaCrow;
+import com.waylays.arcanes.entity.errethys.ManaFalcon;
+import com.waylays.arcanes.entity.errethys.ManaFox;
+import com.waylays.arcanes.entity.errethys.ManaKangaroo;
 import com.waylays.arcanes.entity.errethys.ManaRat;
 import com.waylays.arcanes.entity.errethys.ManaPiranha;
 import com.waylays.arcanes.entity.errethys.ManaSerpent;
 import com.waylays.arcanes.entity.errethys.ManaSummon;
+import com.waylays.arcanes.entity.errethys.ManaWolf;
 import com.waylays.arcanes.entity.gold.GoldenSentinel;
+import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
@@ -96,7 +102,7 @@ public final class ErrethysGameTests {
                 count++;
             }
         }
-        helper.assertTrue(count == 5, "expected 5 Errethys spells, got " + count);
+        helper.assertTrue(count == 10, "expected 10 Errethys spells, got " + count);
         helper.assertTrue(helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).containsKey(ModSchools.ERRETHYS_MAGIC),
                 "errethys_magic damage type missing");
         helper.assertTrue(errethys.isFocus(new ItemStack(Items.PRISMARINE_CRYSTALS)), "prismarine crystals are not the Errethys focus");
@@ -113,12 +119,22 @@ public final class ErrethysGameTests {
         ModSpells.MANA_PIRANHA.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_SERPENT.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_CROWS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_FOX.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_WOLF.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_BUTTERFLY.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_KANGAROO.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         // Casting again replaces the creature instead of adding one
         ModSpells.MANA_RATS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         helper.assertTrue(around(helper, ManaRat.class, caster).size() == 1, "expected 1 rat, got " + around(helper, ManaRat.class, caster).size());
         helper.assertTrue(around(helper, ManaPiranha.class, caster).size() == 1, "expected 1 piranha, got " + around(helper, ManaPiranha.class, caster).size());
         helper.assertTrue(around(helper, ManaSerpent.class, caster).size() == 1, "expected 1 serpent, got " + around(helper, ManaSerpent.class, caster).size());
         helper.assertTrue(around(helper, ManaCrow.class, caster).size() == 1, "expected 1 crow, got " + around(helper, ManaCrow.class, caster).size());
+        helper.assertTrue(around(helper, ManaFox.class, caster).size() == 1, "expected 1 fox, got " + around(helper, ManaFox.class, caster).size());
+        helper.assertTrue(around(helper, ManaWolf.class, caster).size() == 1, "expected 1 wolf, got " + around(helper, ManaWolf.class, caster).size());
+        helper.assertTrue(around(helper, ManaButterfly.class, caster).size() == 1, "expected 1 butterfly, got " + around(helper, ManaButterfly.class, caster).size());
+        helper.assertTrue(around(helper, ManaKangaroo.class, caster).size() == 1, "expected 1 kangaroo, got " + around(helper, ManaKangaroo.class, caster).size());
+        ManaRat rat = around(helper, ManaRat.class, caster).get(0);
+        helper.assertTrue(rat.getMaxHealth() == 1, "the rat should have 1 health, has " + rat.getMaxHealth());
         for (ManaSummon summon : around(helper, ManaSummon.class, caster)) {
             helper.assertTrue(caster.getUUID().equals(summon.getSummonerUUID()), "a creature has no master: " + summon);
             helper.assertTrue(SpellUtil.isAlly(caster, summon), "the caster's spells would hurt " + summon);
@@ -183,6 +199,40 @@ public final class ErrethysGameTests {
         camel.dissolve();
         helper.assertTrue(!rider.isPassenger(), "the fading dromedary kept its rider");
         helper.succeed();
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_ride")
+    public static void summonerRidesTheFalcon(GameTestHelper helper) {
+        Player rider = helper.makeMockPlayer(GameType.SURVIVAL);
+        ManaFalcon falcon = ModEntities.MANA_FALCON.get().create(helper.getLevel());
+        helper.assertTrue(falcon != null, "no falcon");
+        Vec3 at = helper.absoluteVec(new Vec3(4.5, 3, 4.5));
+        falcon.moveTo(at.x, at.y, at.z, 0, 0);
+        falcon.setup(rider, 200, 15, .9f);
+        helper.getLevel().addFreshEntity(falcon);
+        helper.assertTrue(falcon.getMaxHealth() == 15, "the falcon should have 15 health, has " + falcon.getMaxHealth());
+        Player stranger = helper.makeMockPlayer(GameType.SURVIVAL);
+        helper.assertTrue(falcon.mobInteract(stranger, InteractionHand.MAIN_HAND) == InteractionResult.PASS, "a stranger climbed on the falcon");
+        falcon.mobInteract(rider, InteractionHand.MAIN_HAND);
+        helper.assertTrue(rider.getVehicle() == falcon, "the summoner could not climb on");
+        helper.assertTrue(falcon.getControllingPassenger() == rider, "the summoner does not steer the falcon");
+        falcon.dissolve();
+        helper.assertTrue(!rider.isPassenger(), "the fading falcon kept its rider");
+        helper.succeed();
+    }
+
+    /** The butterfly heals its summoner by three hearts at its first beat of light, ten seconds in. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_butterfly", timeoutTicks = ManaButterfly.HEAL_EVERY + 60)
+    public static void butterflyHealsItsSummoner(GameTestHelper helper) {
+        Villager caster = helper.spawnWithNoFreeWill(EntityType.VILLAGER, new Vec3(4.5, 2, 4.5));
+        caster.setHealth(6);
+        ModSpells.MANA_BUTTERFLY.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        helper.assertTrue(around(helper, ManaButterfly.class, caster).size() == 1, "no butterfly");
+        helper.runAfterDelay(ManaButterfly.HEAL_EVERY - 20, () -> helper.assertTrue(caster.getHealth() <= 6, "the butterfly healed too early"));
+        helper.succeedWhen(() -> {
+            helper.assertTrue(caster.getHealth() >= 6 + ManaButterfly.HEAL - .01f, "the butterfly did not heal its summoner (health " + caster.getHealth() + ")");
+            dismissAll(helper, caster);
+        });
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_life", timeoutTicks = 40)
@@ -277,5 +327,21 @@ public final class ErrethysGameTests {
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_crows", timeoutTicks = 300)
     public static void manaCrowsPeck(GameTestHelper helper) {
         fight(helper, ModSpells.MANA_CROWS, () -> {}, new Vindicator[1], true);
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_fox", timeoutTicks = 300)
+    public static void manaFoxBleeds(GameTestHelper helper) {
+        Vindicator[] foe = new Vindicator[1];
+        fight(helper, ModSpells.MANA_FOX, () -> helper.assertTrue(foe[0].hasEffect(ModEffects.BLEEDING), "the fox's bite did not bleed"), foe, false);
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_wolf", timeoutTicks = 300)
+    public static void manaWolfBites(GameTestHelper helper) {
+        fight(helper, ModSpells.MANA_WOLF, () -> {}, new Vindicator[1], true);
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_kangaroo", timeoutTicks = 300)
+    public static void manaKangarooBoxes(GameTestHelper helper) {
+        fight(helper, ModSpells.MANA_KANGAROO, () -> {}, new Vindicator[1], false);
     }
 }

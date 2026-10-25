@@ -38,7 +38,7 @@ public class ManaCrowsSpell extends ManaSummonSpell {
 
     @Override
     public double getHealth(int spellLevel) {
-        return 10 + spellLevel * 2;
+        return 10;
     }
 
     @Override

@@ -26,6 +26,11 @@ import com.waylays.arcanes.entity.boss.BossTelegraph;
 import com.waylays.arcanes.entity.boss.RuneWall;
 import com.waylays.arcanes.entity.boss.VoidOrb;
 import com.waylays.arcanes.entity.errethys.ManaCamel;
+import com.waylays.arcanes.entity.errethys.ManaWolf;
+import com.waylays.arcanes.entity.errethys.ManaKangaroo;
+import com.waylays.arcanes.entity.errethys.ManaFox;
+import com.waylays.arcanes.entity.errethys.ManaFalcon;
+import com.waylays.arcanes.entity.errethys.ManaButterfly;
 import com.waylays.arcanes.entity.errethys.ManaCrow;
 import com.waylays.arcanes.entity.errethys.ManaRat;
 import com.waylays.arcanes.entity.errethys.ManaPiranha;
@@ -268,6 +273,21 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<ManaCamel>> MANA_DROMEDARY = register("mana_dromedary",
             EntityType.Builder.<ManaCamel>of(ManaCamel::new, MobCategory.MISC).sized(1.7f, 2.375f).clientTrackingRange(10));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaFox>> MANA_FOX = register("mana_fox",
+            EntityType.Builder.<ManaFox>of(ManaFox::new, MobCategory.MISC).sized(.6f, .7f).clientTrackingRange(10));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaWolf>> MANA_WOLF = register("mana_wolf",
+            EntityType.Builder.<ManaWolf>of(ManaWolf::new, MobCategory.MISC).sized(.7f, .95f).clientTrackingRange(10));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaButterfly>> MANA_BUTTERFLY = register("mana_butterfly",
+            EntityType.Builder.<ManaButterfly>of(ManaButterfly::new, MobCategory.MISC).sized(.5f, .4f).clientTrackingRange(10));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaKangaroo>> MANA_KANGAROO = register("mana_kangaroo",
+            EntityType.Builder.<ManaKangaroo>of(ManaKangaroo::new, MobCategory.MISC).sized(.7f, 1.8f).clientTrackingRange(10));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaFalcon>> MANA_FALCON = register("mana_falcon",
+            EntityType.Builder.<ManaFalcon>of(ManaFalcon::new, MobCategory.MISC).sized(1.4f, 1.1f).clientTrackingRange(10));
+
     // Physical Prowess
     public static final DeferredHolder<EntityType<?>, EntityType<StrikeTrail>> STRIKE_TRAIL = register("strike_trail",
             EntityType.Builder.<StrikeTrail>of(StrikeTrail::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(20));
@@ -430,5 +450,10 @@ public final class ModEntities {
         event.put(MANA_SERPENT.get(), ManaSerpent.createAttributes().build());
         event.put(MANA_CROW.get(), ManaCrow.createAttributes().build());
         event.put(MANA_DROMEDARY.get(), ManaCamel.createAttributes().build());
+        event.put(MANA_FOX.get(), ManaFox.createAttributes().build());
+        event.put(MANA_WOLF.get(), ManaWolf.createAttributes().build());
+        event.put(MANA_BUTTERFLY.get(), ManaButterfly.createAttributes().build());
+        event.put(MANA_KANGAROO.get(), ManaKangaroo.createAttributes().build());
+        event.put(MANA_FALCON.get(), ManaFalcon.createAttributes().build());
     }
 }

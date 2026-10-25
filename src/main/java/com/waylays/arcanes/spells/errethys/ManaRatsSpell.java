@@ -29,8 +29,9 @@ public class ManaRatsSpell extends ManaSummonSpell {
         return 500 + spellLevel * 100;
     }
 
+    /** A single hit takes it apart: it is there to harry, not to last. */
     @Override
     public double getHealth(int spellLevel) {
-        return 10 + spellLevel * 2;
+        return 1;
     }
 }

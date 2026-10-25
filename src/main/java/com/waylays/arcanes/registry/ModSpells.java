@@ -28,6 +28,11 @@ import com.waylays.arcanes.spells.boss.StarfallSpell;
 import com.waylays.arcanes.spells.boss.TripleNovaSpell;
 import com.waylays.arcanes.spells.boss.VoidOrbSpell;
 import com.waylays.arcanes.spells.errethys.ManaCrowsSpell;
+import com.waylays.arcanes.spells.errethys.ManaWolfSpell;
+import com.waylays.arcanes.spells.errethys.ManaKangarooSpell;
+import com.waylays.arcanes.spells.errethys.ManaFoxSpell;
+import com.waylays.arcanes.spells.errethys.ManaFalconSpell;
+import com.waylays.arcanes.spells.errethys.ManaButterflySpell;
 import com.waylays.arcanes.spells.errethys.ManaDromedarySpell;
 import com.waylays.arcanes.spells.errethys.ManaRatsSpell;
 import com.waylays.arcanes.spells.errethys.ManaPiranhaSpell;
@@ -212,6 +217,11 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_DROMEDARY = register(new ManaDromedarySpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_SERPENT = register(new ManaSerpentSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_CROWS = register(new ManaCrowsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_FOX = register(new ManaFoxSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_WOLF = register(new ManaWolfSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_BUTTERFLY = register(new ManaButterflySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_KANGAROO = register(new ManaKangarooSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_FALCON = register(new ManaFalconSpell());
 
     // Physical Prowess: fighting moves, not magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> PUNCH = register(new PunchSkill());

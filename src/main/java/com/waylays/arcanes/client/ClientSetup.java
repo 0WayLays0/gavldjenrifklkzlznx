@@ -2,6 +2,11 @@ package com.waylays.arcanes.client;
 
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.client.model.ManaCrowModel;
+import com.waylays.arcanes.client.model.ManaWolfModel;
+import com.waylays.arcanes.client.model.ManaKangarooModel;
+import com.waylays.arcanes.client.model.ManaFoxModel;
+import com.waylays.arcanes.client.model.ManaFalconModel;
+import com.waylays.arcanes.client.model.ManaButterflyModel;
 import com.waylays.arcanes.client.model.ManaPiranhaModel;
 import com.waylays.arcanes.client.model.ManaRatModel;
 import com.waylays.arcanes.client.model.ManaSerpentModel;
@@ -251,6 +256,16 @@ public final class ClientSetup {
                 context -> new ManaCreatureRenderer<>(context, new ManaCrowModel(context.bakeLayer(ManaCrowModel.LAYER)), .25f, 1.25f, true));
         event.registerEntityRenderer(ModEntities.MANA_PIRANHA.get(), ManaPiranhaRenderer::new);
         event.registerEntityRenderer(ModEntities.MANA_DROMEDARY.get(), ManaCamelRenderer::new);
+        event.registerEntityRenderer(ModEntities.MANA_FOX.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaFoxModel(context.bakeLayer(ManaFoxModel.LAYER)), .3f, 1.05f, true));
+        event.registerEntityRenderer(ModEntities.MANA_WOLF.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaWolfModel(context.bakeLayer(ManaWolfModel.LAYER)), .4f, 1.15f, true));
+        event.registerEntityRenderer(ModEntities.MANA_BUTTERFLY.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaButterflyModel(context.bakeLayer(ManaButterflyModel.LAYER)), .15f, 1.1f, true));
+        event.registerEntityRenderer(ModEntities.MANA_KANGAROO.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaKangarooModel(context.bakeLayer(ManaKangarooModel.LAYER)), .4f, 1.05f, true));
+        event.registerEntityRenderer(ModEntities.MANA_FALCON.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaFalconModel(context.bakeLayer(ManaFalconModel.LAYER)), .6f, 1.5f, true));
     }
 
     /** The gold of Gold magic can cover any body: every living thing's renderer, and the players', draw it. */
@@ -275,6 +290,11 @@ public final class ClientSetup {
         event.registerLayerDefinition(ManaSerpentModel.LAYER, ManaSerpentModel::createBodyLayer);
         event.registerLayerDefinition(ManaCrowModel.LAYER, ManaCrowModel::createBodyLayer);
         event.registerLayerDefinition(ManaPiranhaModel.LAYER, ManaPiranhaModel::createBodyLayer);
+        event.registerLayerDefinition(ManaFoxModel.LAYER, ManaFoxModel::createBodyLayer);
+        event.registerLayerDefinition(ManaWolfModel.LAYER, ManaWolfModel::createBodyLayer);
+        event.registerLayerDefinition(ManaButterflyModel.LAYER, ManaButterflyModel::createBodyLayer);
+        event.registerLayerDefinition(ManaKangarooModel.LAYER, ManaKangarooModel::createBodyLayer);
+        event.registerLayerDefinition(ManaFalconModel.LAYER, ManaFalconModel::createBodyLayer);
     }
 
     @SubscribeEvent

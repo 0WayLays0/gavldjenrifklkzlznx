@@ -43,7 +43,7 @@ public class ManaSerpent extends ManaSummon {
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 16)
-                .add(Attributes.MOVEMENT_SPEED, .22)
+                .add(Attributes.MOVEMENT_SPEED, .16)
                 .add(Attributes.ATTACK_DAMAGE, 3)
                 .add(Attributes.FOLLOW_RANGE, 24);
     }
@@ -61,8 +61,8 @@ public class ManaSerpent extends ManaSummon {
     @Override
     protected void registerMoveGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.35, true));
-        this.goalSelector.addGoal(2, new SummonFollowOwnerGoal(this, 1.3, 6, 2.5, -1));
+        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.15, true));
+        this.goalSelector.addGoal(2, new SummonFollowOwnerGoal(this, 1.15, 6, 2.5, -1));
         this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, .9));
         this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 6));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));

@@ -184,6 +184,116 @@ def mana_crows_icon():
     ])
 
 
+def mana_fox_icon():
+    """A fox at a run: pointed ears, a long snout, a great bushy tail streaming behind."""
+    return _icon([
+        "................",
+        "................",
+        "...........b.b..",
+        "..........bLbLb.",
+        "..........bLLLLb",
+        ".........bLLeLLb",
+        "tt......bLLLLLbb",
+        "tLtbbbbbLLLLLb..",
+        "tLLLLLLLLLLLLb..",
+        ".tLLLLLLLLLLb...",
+        "..tkkLLLLLLb....",
+        "...bLb...bLb....",
+        "...b.b...b.b....",
+        "................",
+        "................",
+        "................",
+    ])
+
+
+def mana_wolf_icon():
+    """A wolf's head, howling up: upright ears, heavy mane, the muzzle raised."""
+    return _icon([
+        "................",
+        "..........bbb...",
+        ".........bLLLb..",
+        "....b.b.bLLeLb..",
+        "...bLbLbLLLLb...",
+        "...bLLLLLLLb....",
+        "..bLLeLLLLb.....",
+        "..bLLLLLLLb.....",
+        ".bkLLLLLLLLb....",
+        ".bkkLLLLLLLLb...",
+        "..bkkLLLLLLLLb..",
+        "...bkkkLLLLLLb..",
+        "....bbkkkLLLLb..",
+        "......bbbLLLb...",
+        ".........bbb....",
+        "................",
+    ])
+
+
+def mana_butterfly_icon():
+    """A butterfly seen from above, wings spread, antennae curling."""
+    return _icon([
+        "................",
+        "......b..b......",
+        ".......bb.......",
+        ".bbb...bb...bbb.",
+        "bLLLb..bb..bLLLb",
+        "bLeLLb.bb.bLLeLb",
+        "bLLLLLbkkbLLLLLb",
+        ".bLLLLbkkbLLLLb.",
+        "..bbbbbkkbbbbb..",
+        "..bLLLbkkbLLLb..",
+        ".bLLeLbkkbLeLLb.",
+        ".bLLLLb..bLLLLb.",
+        "..bLLb....bLLb..",
+        "...bb......bb...",
+        "................",
+        "................",
+    ])
+
+
+def mana_kangaroo_icon():
+    """A kangaroo standing in a boxer's guard, tall ears, a big fist forward, the tail behind."""
+    return _icon([
+        "................",
+        "......b.b.......",
+        ".....bLbLb......",
+        ".....bLbLb......",
+        "....bLLLLLb.....",
+        "...bLLeLLLb.....",
+        "..bLLLLLLb......",
+        "...bLLLLLbbb....",
+        "...bLLLLLbkkb...",
+        "..bLLLLLLbkkb...",
+        "..bLLLLLLLbb....",
+        "..bLLLLLLLb.....",
+        ".tbLLb.bLLb.....",
+        "tt.bLb..bLb.....",
+        "t..bLLLb.bLLLb..",
+        "................",
+    ])
+
+
+def mana_falcon_icon():
+    """A falcon diving at us, wings swept back, hooked beak."""
+    return _icon([
+        "................",
+        "................",
+        "bb............bb",
+        "bLbb........bbLb",
+        ".bLLbb....bbLLb.",
+        "..bLLLb..bLLLb..",
+        "...bLLLbbLLLb...",
+        "....bLLeeLLb....",
+        ".....bLkkLb.....",
+        "......bkkb......",
+        "......bLLb......",
+        ".....bLLLLb.....",
+        ".....btLLtb.....",
+        "......t..t......",
+        "................",
+        "................",
+    ])
+
+
 def affinity_ring_errethys():
     return g.from_grid([
         "................",
@@ -212,7 +322,9 @@ def main():
     g.save(mana_glow(False), "textures/entity/mana_glow.png")
     g.save(mana_glow(True), "textures/entity/mana_glow_eyes.png")
     for name, fn in (("mana_rats", mana_rats_icon), ("mana_piranha", mana_piranha_icon), ("mana_dromedary", mana_dromedary_icon),
-                     ("mana_serpent", mana_serpent_icon), ("mana_crows", mana_crows_icon)):
+                     ("mana_serpent", mana_serpent_icon), ("mana_crows", mana_crows_icon), ("mana_fox", mana_fox_icon),
+                     ("mana_wolf", mana_wolf_icon), ("mana_butterfly", mana_butterfly_icon), ("mana_kangaroo", mana_kangaroo_icon),
+                     ("mana_falcon", mana_falcon_icon)):
         g.save(fn(), f"textures/gui/spell_icons/{name}.png")
     g.save(affinity_ring_errethys(), "textures/item/affinity_ring_errethys.png")
     g.write_json("models/item/affinity_ring_errethys.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_errethys"}})

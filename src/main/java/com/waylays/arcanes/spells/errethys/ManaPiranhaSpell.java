@@ -97,6 +97,6 @@ public class ManaPiranhaSpell extends ManaSummonSpell {
 
     @Override
     public double getHealth(int spellLevel) {
-        return 12 + spellLevel * 2;
+        return 25;
     }
 }
