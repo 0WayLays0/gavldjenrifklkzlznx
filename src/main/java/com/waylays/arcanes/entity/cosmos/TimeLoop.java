@@ -108,15 +108,8 @@ public class TimeLoop extends SpellEffectEntity {
     }
 
     private void loopBack(ServerLevel level, LivingEntity target) {
-        // An echo where it had got to; then back to the start
+        // An echo where it had got to
         TemporalEcho.leave(level, target, target.position(), target.getYRot(), 30, Cosmos.ORANGE);
-        target.teleportTo(level, anchor.x, anchor.y, anchor.z, Set.of(), anchorYRot, target.getXRot());
-        target.setDeltaMovement(Vec3.ZERO);
-        target.hurtMarked = true;
-        target.resetFallDistance();
-        CosmosFx.fold(level, anchor.add(0, 1, 0), .9f, 1.3f);
-        CosmosFx.sound(level, anchor, SoundEvents.BELL_RESONATE, .7f, 1.6f);
-        CosmosFx.time(level, anchor.add(0, target.getBbHeight() * .5, 0), 24, .5);
         AbstractSpell spell = spellId == null ? null : SpellRegistry.getSpell(spellId);
         Entity owner = getOwner();
         if (spell != null) {
@@ -126,6 +119,17 @@ public class TimeLoop extends SpellEffectEntity {
             target.invulnerableTime = 0;
             DamageSources.applyDamage(target, again, SpellUtil.damageSource(spell, this, owner));
         }
+        // Then back to the start, standing still: the sting's knockback does not carry it off again
+        if (target.isAlive()) {
+            target.teleportTo(level, anchor.x, anchor.y, anchor.z, Set.of(), anchorYRot, target.getXRot());
+            setPos(anchor.x, anchor.y, anchor.z);
+            target.setDeltaMovement(Vec3.ZERO);
+            target.hurtMarked = true;
+            target.resetFallDistance();
+        }
+        CosmosFx.fold(level, anchor.add(0, 1, 0), .9f, 1.3f);
+        CosmosFx.sound(level, anchor, SoundEvents.BELL_RESONATE, .7f, 1.6f);
+        CosmosFx.time(level, anchor.add(0, target.getBbHeight() * .5, 0), 24, .5);
     }
 
     /** What hits the looped target is remembered, to strike again when the loop closes. */
