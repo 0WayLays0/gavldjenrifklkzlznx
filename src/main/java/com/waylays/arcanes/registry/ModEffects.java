@@ -8,6 +8,7 @@ import com.waylays.arcanes.effect.GildedArmorEffect;
 import com.waylays.arcanes.effect.GildedEffect;
 import com.waylays.arcanes.effect.GlyphFrozenEffect;
 import com.waylays.arcanes.effect.GlyphMarkEffect;
+import com.waylays.arcanes.effect.LowGravityEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.effect.ParchmentAegisEffect;
 import com.waylays.arcanes.effect.PetrifiedEffect;
@@ -18,6 +19,7 @@ import com.waylays.arcanes.effect.RustedEffect;
 import com.waylays.arcanes.effect.SilenceEffect;
 import com.waylays.arcanes.effect.SunderedEffect;
 import com.waylays.arcanes.effect.VolatileBrandEffect;
+import com.waylays.arcanes.effect.WeightlessEffect;
 import com.waylays.arcanes.spells.glyph.GlyphElement;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
@@ -50,6 +52,9 @@ public final class ModEffects {
     /** Moss, Copper and Rust: rusted armour (protects less, wears away), and vines holding a creature in place. */
     public static final DeferredHolder<MobEffect, MobEffect> RUSTED = EFFECTS.register("rusted", RustedEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> ENTANGLED = EFFECTS.register("entangled", EntangledEffect::new);
+    // Cosmos
+    public static final DeferredHolder<MobEffect, MobEffect> WEIGHTLESS = EFFECTS.register("weightless", WeightlessEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> LOW_GRAVITY = EFFECTS.register("low_gravity", LowGravityEffect::new);
 
     private ModEffects() {}
 }

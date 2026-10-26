@@ -597,13 +597,28 @@ def pocket_moon_icon():
 
 def living_constellation_icon():
     def draw(d, img, S):
-        pts = [(.2, .75), (.32, .4), (.55, .2), (.75, .45), (.62, .8)]
-        d.line([(x * S, y * S) for x, y in pts], fill=_c(GOLD, 200), width=S // 28)
-        d.line((pts[1][0] * S, pts[1][1] * S, pts[3][0] * S, pts[3][1] * S), fill=_c(GOLD, 150), width=S // 32)
-        for x, y in pts:
-            d.ellipse(((x - .05) * S, (y - .05) * S, (x + .05) * S, (y + .05) * S), fill=_c(STAR))
-            d.line(((x - .09) * S, y * S, (x + .09) * S, y * S), fill=_c(STAR), width=1)
-            d.line((x * S, (y - .09) * S, x * S, (y + .09) * S), fill=_c(STAR), width=1)
+        _stars(d, S, 4, 8)
+        # The Lion, side on, facing right: its stars and the lines between them
+        j = {"tail": (.1, .3), "tail2": (.16, .44), "hip": (.3, .46), "back": (.48, .44), "withers": (.64, .42), "neck": (.72, .32),
+             "head": (.8, .26), "snout": (.92, .32), "jaw": (.84, .4), "chest": (.66, .58), "belly": (.42, .6),
+             "fl": (.7, .9), "fl2": (.68, .74), "fr": (.6, .9), "hl": (.34, .9), "hl2": (.28, .74), "hr": (.42, .9)}
+        lines = [("tail", "tail2"), ("tail2", "hip"), ("hip", "back"), ("back", "withers"), ("withers", "neck"), ("neck", "head"),
+                 ("head", "snout"), ("snout", "jaw"), ("jaw", "neck"), ("withers", "chest"), ("chest", "belly"), ("belly", "hip"),
+                 ("chest", "fl2"), ("fl2", "fl"), ("chest", "fr"), ("hip", "hl2"), ("hl2", "hl"), ("belly", "hr")]
+        for a, b in lines:
+            d.line((j[a][0] * S, j[a][1] * S, j[b][0] * S, j[b][1] * S), fill=_c(GOLD, 210), width=max(1, S // 30))
+        # The mane
+        cx, cy = .74, .3
+        for k in range(10):
+            a = k / 10 * math.tau
+            L = .16 if k % 2 == 0 else .1
+            d.line(((cx + math.cos(a) * .06) * S, (cy + math.sin(a) * .06) * S, (cx + math.cos(a) * L) * S, (cy + math.sin(a) * L) * S),
+                   fill=_c(ORANGE, 200), width=max(1, S // 40))
+        for name, (x, y) in j.items():
+            r = .05 if name in ("withers", "head", "tail") else .032
+            if r > .04:
+                g.glow_spot(img, x * S, y * S, S * .09, (120, 150, 255), .7)
+            d.ellipse(((x - r) * S, (y - r) * S, (x + r) * S, (y + r) * S), fill=_c(STAR))
     return _icon(draw, .5, .5, (40, 40, 110))
 
 
@@ -667,6 +682,25 @@ def end_of_time_icon():
             d.line([(x * S, y * S) for x, y in pts], fill=_c(AMBER), width=S // 22)
         d.ellipse((.42 * S, .28 * S, .58 * S, .4 * S), fill=_c(CREAM))
     return _icon(draw, .5, .35, (90, 30, 60))
+
+
+def weightless_effect_icon():
+    def draw(d, img, S):
+        _silhouette(d, S, .5, .78, .62, (150, 170, 255))
+        for x in (.18, .82):
+            d.line((x * S, .8 * S, x * S, .3 * S), fill=_c(ICE), width=S // 14)
+            d.polygon([((x - .1) * S, .34 * S), ((x + .1) * S, .34 * S), (x * S, .14 * S)], fill=_c(ICE))
+    return g.painted(72, draw, None, 18)
+
+
+def low_gravity_effect_icon():
+    def draw(d, img, S):
+        d.ellipse((.12 * S, .12 * S, .88 * S, .88 * S), fill=_c((190, 196, 214)), outline=_c((90, 96, 120)), width=S // 24)
+        for x, y, r in ((.36, .38, .09), (.62, .6, .12), (.6, .3, .06), (.34, .66, .05)):
+            d.ellipse(((x - r) * S, (y - r) * S, (x + r) * S, (y + r) * S), fill=_c((140, 146, 168)))
+        d.arc((.2 * S, .04 * S, .8 * S, .56 * S), 200, 340, fill=_c(GOLD), width=S // 16)
+        d.polygon([(.74 * S, .1 * S), (.84 * S, .2 * S), (.7 * S, .22 * S)], fill=_c(GOLD))
+    return g.painted(72, draw, None, 18)
 
 
 ICONS = [
@@ -840,6 +874,8 @@ def main():
     g.save(clock(), D + "clock.png")
     for name, icon in ICONS:
         g.save(icon(), f"textures/gui/spell_icons/{name}.png")
+    g.save(weightless_effect_icon(), "textures/mob_effect/weightless.png")
+    g.save(low_gravity_effect_icon(), "textures/mob_effect/low_gravity.png")
     g.save(affinity_ring_cosmos(), "textures/item/affinity_ring_cosmos.png")
     g.write_json("models/item/affinity_ring_cosmos.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_cosmos"}})
     g.save(codex_icon(), "textures/item/codex_out_of_time.png")

@@ -249,6 +249,16 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.COSMIC_VARIANT.get(), com.waylays.arcanes.client.render.CosmicVariantRenderer::new);
         event.registerEntityRenderer(ModEntities.PRUNED_REMAINS.get(), com.waylays.arcanes.client.render.PrunedRemainsRenderer::new);
         event.registerEntityRenderer(ModEntities.TIME_STOP_BUBBLE.get(), com.waylays.arcanes.client.render.TimeStopBubbleRenderer::new);
+        event.registerEntityRenderer(ModEntities.CAPTIVE_PLANET.get(), com.waylays.arcanes.client.render.CaptivePlanetRenderer::new);
+        event.registerEntityRenderer(ModEntities.RIDDEN_COMET.get(), com.waylays.arcanes.client.render.RiddenCometRenderer::new);
+        event.registerEntityRenderer(ModEntities.COMET_CRATER.get(), com.waylays.arcanes.client.render.CometCraterRenderer::new);
+        event.registerEntityRenderer(ModEntities.POCKET_MOON.get(), com.waylays.arcanes.client.render.PocketMoonRenderer::new);
+        event.registerEntityRenderer(ModEntities.ASTEROID_BELT.get(), com.waylays.arcanes.client.render.AsteroidBeltRenderer::new);
+        event.registerEntityRenderer(ModEntities.ZERO_GRAVITY_FIELD.get(), com.waylays.arcanes.client.render.ZeroGravityFieldRenderer::new);
+        event.registerEntityRenderer(ModEntities.STAR_LION.get(), com.waylays.arcanes.client.render.StarLionRenderer::new);
+        event.registerEntityRenderer(ModEntities.BLACK_HOLE.get(), com.waylays.arcanes.client.render.BlackHoleRenderer::new);
+        event.registerEntityRenderer(ModEntities.RESET_CHARGE.get(), com.waylays.arcanes.client.render.ResetChargeRenderer::new);
+        event.registerEntityRenderer(ModEntities.TIME_STORM.get(), com.waylays.arcanes.client.render.TimeStormRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_CIRCLE.get(), RitualCircleRenderer::new);
         event.registerEntityRenderer(ModEntities.METEOR.get(), MeteorRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_DOME.get(), RitualDomeRenderer::new);

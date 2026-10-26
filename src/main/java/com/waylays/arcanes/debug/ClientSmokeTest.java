@@ -119,6 +119,8 @@ public final class ClientSmokeTest {
     /** Where the photographed spells are cast, once it is built. */
     private static BlockPos photoFloor;
     private static int shotCastTick;
+    /** The spell cast last. */
+    private static AbstractSpell lastCast;
     private static float shotYaw;
 
     static {
@@ -212,6 +214,7 @@ public final class ClientSmokeTest {
         }
         if (spellIndex < spells.size() && ticks % TICKS_PER_SPELL == 1) {
             AbstractSpell spell = spells.get(spellIndex++).get();
+            lastCast = spell;
             String name = spell.getSpellId().substring(spell.getSpellId().indexOf(':') + 1);
             String school = "school:" + spell.getSchoolType().getId().getPath();
             shotName = SHOTS.stream().anyMatch(s -> s.endsWith("*") ? name.startsWith(s.substring(0, s.length() - 1)) : s.equals(name) || s.equals(school))
@@ -258,6 +261,17 @@ public final class ClientSmokeTest {
                     screenshot(mc, shotName + "_" + (k + 1));
                 }
             }
+        }
+        if (ticks - shotCastTick == 15 && lastCast instanceof com.waylays.arcanes.spells.cosmos.PocketUniverseSpell) {
+            // Its door would take the player away in the middle of the next spells: the island is visited at the end
+            java.util.UUID id = mc.player.getUUID();
+            server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayer(id);
+                if (player != null) {
+                    player.serverLevel().getEntitiesOfClass(com.waylays.arcanes.entity.cosmos.TimeDoor.class, player.getBoundingBox().inflate(16),
+                            d -> d.getMode() == com.waylays.arcanes.entity.cosmos.TimeDoor.Mode.ENTRY).forEach(Entity::discard);
+                }
+            });
         }
         if (ticks % TICKS_PER_SPELL == RECAST_DELAY + 1) {
             java.util.UUID id = mc.player.getUUID();
@@ -356,6 +370,8 @@ public final class ClientSmokeTest {
         }
         try {
             ServerLevel level = player.serverLevel();
+            // Off whatever it rides (the Flying Stack, a comet) first, or it would be put down beside it
+            player.stopRiding();
             if (alone) {
                 toPhotoFloor(level, player);
                 for (Entity e : level.getEntities((Entity) null, player.getBoundingBox().inflate(64), x -> !(x instanceof Player))) {

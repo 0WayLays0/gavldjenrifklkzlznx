@@ -87,13 +87,23 @@ import com.waylays.arcanes.entity.gem.AmethystResonance;
 import com.waylays.arcanes.entity.gem.AmethystGeode;
 import com.waylays.arcanes.entity.gem.EmeraldBloom;
 import com.waylays.arcanes.entity.gem.GemCrown;
+import com.waylays.arcanes.entity.cosmos.AsteroidBelt;
+import com.waylays.arcanes.entity.cosmos.BlackHole;
+import com.waylays.arcanes.entity.cosmos.CaptivePlanet;
+import com.waylays.arcanes.entity.cosmos.CometCrater;
 import com.waylays.arcanes.entity.cosmos.CosmicVariant;
-import com.waylays.arcanes.entity.cosmos.PruningBaton;
+import com.waylays.arcanes.entity.cosmos.PocketMoon;
 import com.waylays.arcanes.entity.cosmos.PrunedRemains;
+import com.waylays.arcanes.entity.cosmos.PruningBaton;
+import com.waylays.arcanes.entity.cosmos.ResetCharge;
+import com.waylays.arcanes.entity.cosmos.RiddenComet;
+import com.waylays.arcanes.entity.cosmos.StarLion;
 import com.waylays.arcanes.entity.cosmos.TemporalEcho;
 import com.waylays.arcanes.entity.cosmos.TimeDoor;
 import com.waylays.arcanes.entity.cosmos.TimeLoop;
 import com.waylays.arcanes.entity.cosmos.TimeStopBubble;
+import com.waylays.arcanes.entity.cosmos.TimeStorm;
+import com.waylays.arcanes.entity.cosmos.ZeroGravityField;
 import com.waylays.arcanes.entity.wall.BrickBolt;
 import com.waylays.arcanes.entity.wall.BrickStorm;
 import com.waylays.arcanes.ritual.RitualCircle;
@@ -444,6 +454,27 @@ public final class ModEntities {
             EntityType.Builder.<PrunedRemains>of(PrunedRemains::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(2).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<TimeStopBubble>> TIME_STOP_BUBBLE = register("time_stop_bubble",
             EntityType.Builder.<TimeStopBubble>of(TimeStopBubble::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    // Cosmos: space and the ultimates
+    public static final DeferredHolder<EntityType<?>, EntityType<CaptivePlanet>> CAPTIVE_PLANET = register("captive_planet",
+            EntityType.Builder.<CaptivePlanet>of(CaptivePlanet::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RiddenComet>> RIDDEN_COMET = register("ridden_comet",
+            EntityType.Builder.<RiddenComet>of(RiddenComet::new, MobCategory.MISC).sized(1.6f, 1.6f).clientTrackingRange(12).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<CometCrater>> COMET_CRATER = register("comet_crater",
+            EntityType.Builder.<CometCrater>of(CometCrater::new, MobCategory.MISC).sized(1f, .2f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<PocketMoon>> POCKET_MOON = register("pocket_moon",
+            EntityType.Builder.<PocketMoon>of(PocketMoon::new, MobCategory.MISC).sized(.9f, .9f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<AsteroidBelt>> ASTEROID_BELT = register("asteroid_belt",
+            EntityType.Builder.<AsteroidBelt>of(AsteroidBelt::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(10).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<ZeroGravityField>> ZERO_GRAVITY_FIELD = register("zero_gravity_field",
+            EntityType.Builder.<ZeroGravityField>of(ZeroGravityField::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<StarLion>> STAR_LION = register("star_lion",
+            EntityType.Builder.<StarLion>of(StarLion::new, MobCategory.MISC).sized(1.4f, 1.7f).clientTrackingRange(10).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BlackHole>> BLACK_HOLE = register("black_hole",
+            EntityType.Builder.<BlackHole>of(BlackHole::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<ResetCharge>> RESET_CHARGE = register("reset_charge",
+            EntityType.Builder.<ResetCharge>of(ResetCharge::new, MobCategory.MISC).sized(.8f, .9f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TimeStorm>> TIME_STORM = register("time_storm",
+            EntityType.Builder.<TimeStorm>of(TimeStorm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(2).fireImmune());
 
     // Rituals: the chalk circle and what the rituals leave in the world
     public static final DeferredHolder<EntityType<?>, EntityType<RitualCircle>> RITUAL_CIRCLE = register("ritual_circle",
@@ -479,5 +510,7 @@ public final class ModEntities {
         event.put(MANA_KANGAROO.get(), ManaKangaroo.createAttributes().build());
         event.put(MANA_FALCON.get(), ManaFalcon.createAttributes().build());
         event.put(COSMIC_VARIANT.get(), CosmicVariant.createAttributes().build());
+        event.put(RIDDEN_COMET.get(), RiddenComet.createAttributes().build());
+        event.put(STAR_LION.get(), StarLion.createAttributes().build());
     }
 }

@@ -85,10 +85,7 @@ public abstract class ManaSummon extends PathfinderMob implements OwnedSummon {
     public void tick() {
         super.tick();
         if (level().isClientSide) {
-            if (random.nextInt(4) == 0) {
-                level().addParticle(random.nextInt(3) == 0 ? ErrethysFx.PALE_DUST : ErrethysFx.SKY_DUST,
-                        getRandomX(.7), getY() + random.nextDouble() * getBbHeight(), getRandomZ(.7), 0, .01, 0);
-            }
+            sparkle();
             return;
         }
         if (--lifeTicks <= 0) {
@@ -109,9 +106,22 @@ public abstract class ManaSummon extends PathfinderMob implements OwnedSummon {
     /** Comes apart into motes of mana and disappears. */
     public void dissolve() {
         if (!level().isClientSide) {
-            ErrethysFx.dissolve(level(), getBoundingBox().getCenter(), Math.max(.6f, getBbWidth() * 1.5f));
+            dissolveFx();
         }
         discard();
+    }
+
+    /** Client: the motes it gives off as it moves. */
+    protected void sparkle() {
+        if (random.nextInt(4) == 0) {
+            level().addParticle(random.nextInt(3) == 0 ? ErrethysFx.PALE_DUST : ErrethysFx.SKY_DUST,
+                    getRandomX(.7), getY() + random.nextDouble() * getBbHeight(), getRandomZ(.7), 0, .01, 0);
+        }
+    }
+
+    /** Server: what is left of it as it comes apart. */
+    protected void dissolveFx() {
+        ErrethysFx.dissolve(level(), getBoundingBox().getCenter(), Math.max(.6f, getBbWidth() * 1.5f));
     }
 
     @Override

@@ -228,6 +228,43 @@ public final class CosmosRender {
         }
     }
 
+    /**
+     * A dome over the origin {@code radius} across painted with {@code texture} (light added, tiled {@code uTiles} times
+     * round and {@code vTiles} up, sliding by {@code drift}), seen from outside and from within: a field's bubble.
+     */
+    public static void dome(PoseStack poseStack, MultiBufferSource buffer, ResourceLocation texture, float radius, float uTiles, float vTiles,
+                            float drift, int argb) {
+        VertexConsumer consumer = buffer.getBuffer(RenderType.eyes(texture));
+        PoseStack.Pose pose = poseStack.last();
+        int lat = 10, lon = 32;
+        for (int i = 0; i < lat; i++) {
+            float v0 = i / (float) lat, v1 = (i + 1) / (float) lat;
+            for (int j = 0; j < lon; j++) {
+                float u0 = j / (float) lon, u1 = (j + 1) / (float) lon;
+                float[] a = domePoint(v0, u0, radius), b = domePoint(v1, u0, radius), c = domePoint(v1, u1, radius), d = domePoint(v0, u1, radius);
+                float tu0 = u0 * uTiles + drift, tu1 = u1 * uTiles + drift, tv0 = v0 * vTiles - drift, tv1 = v1 * vTiles - drift;
+                // Outside, then inside
+                domeVertex(consumer, pose, a, tu0, tv0, argb);
+                domeVertex(consumer, pose, d, tu1, tv0, argb);
+                domeVertex(consumer, pose, c, tu1, tv1, argb);
+                domeVertex(consumer, pose, b, tu0, tv1, argb);
+                domeVertex(consumer, pose, a, tu0, tv0, argb);
+                domeVertex(consumer, pose, b, tu0, tv1, argb);
+                domeVertex(consumer, pose, c, tu1, tv1, argb);
+                domeVertex(consumer, pose, d, tu1, tv0, argb);
+            }
+        }
+    }
+
+    private static float[] domePoint(float v, float u, float r) {
+        float lat = v * Mth.HALF_PI, lon = u * Mth.TWO_PI;
+        return new float[]{Mth.cos(lat) * Mth.cos(lon) * r, Mth.sin(lat) * r, Mth.cos(lat) * Mth.sin(lon) * r};
+    }
+
+    private static void domeVertex(VertexConsumer consumer, PoseStack.Pose pose, float[] p, float u, float v, int argb) {
+        RenderHelper.vertex(consumer, pose, p[0], p[1], p[2], u, v, argb, GlyphRender.FULL, 0, 1, 0);
+    }
+
     // ------------------------------------------------------------------ time
 
     /**
