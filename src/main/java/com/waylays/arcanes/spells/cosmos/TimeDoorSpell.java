@@ -18,9 +18,10 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 /**
- * Time Door: two TVA doors open, one in front of the caster and one where the caster stood five seconds ago. Whatever
- * goes into the first comes out of the second, at the same speed: the caster stepping back to where they were, a
- * monster shoved through and sent off behind, an arrow fired into it.
+ * Time Door: two TVA doors open, one in front of the caster and one where the caster stood five seconds ago, joined by
+ * an arc of orange light. Whatever goes into the first comes out of the second, at the same speed. The caster and
+ * their allies who go through are undone back to five seconds before: the blows, ills and fire taken since are gone.
+ * A monster shoved through comes out hurt, reeling and slowed, far behind; an arrow fired into it flies on from there.
  */
 @AutoSpellConfig
 public class TimeDoorSpell extends CosmosSpell {
@@ -30,8 +31,8 @@ public class TimeDoorSpell extends CosmosSpell {
     public TimeDoorSpell() {
         super("time_door", SpellRarity.UNCOMMON, 5, 20, CastType.INSTANT, SpellAnimations.SELF_CAST_ANIMATION);
         this.manaCostPerLevel = 4;
-        this.baseSpellPower = 1;
-        this.spellPowerPerLevel = 0;
+        this.baseSpellPower = 4;
+        this.spellPowerPerLevel = 1;
         this.castTime = 0;
         this.baseManaCost = 35;
     }
@@ -44,6 +45,8 @@ public class TimeDoorSpell extends CosmosSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.arcanes_oublies.door_back", Utils.timeFromTicks(BACK, 1)),
+                Component.translatable("ui.arcanes_oublies.door_undo"),
+                Component.translatable("ui.arcanes_oublies.door_foe", Utils.stringTruncation(getPower(spellLevel, caster), 1)),
                 Component.translatable("ui.irons_spellbooks.duration", Utils.timeFromTicks(life(spellLevel), 1)));
     }
 
@@ -63,7 +66,7 @@ public class TimeDoorSpell extends CosmosSpell {
                 out = SpellUtil.groundAt(level, entity.position().subtract(forward.scale(9)), 4, 3);
                 outYRot = entity.getYRot() + 180;
             }
-            TimeDoor.gate(level, entity, in, entity.getYRot() + 180, out, outYRot, life(spellLevel));
+            TimeDoor.gate(level, entity, in, entity.getYRot() + 180, out, outYRot, life(spellLevel), getPower(spellLevel, entity));
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }

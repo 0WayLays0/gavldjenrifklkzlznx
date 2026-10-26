@@ -2,6 +2,13 @@ package com.waylays.arcanes.entity.cosmos;
 
 import com.waylays.arcanes.entity.SpellEffectEntity;
 import com.waylays.arcanes.registry.ModEntities;
+import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.SpellUtil;
+import com.waylays.arcanes.spells.cosmos.Cosmos;
+import com.waylays.arcanes.spells.cosmos.TimeTrail;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import com.waylays.arcanes.spells.cosmos.CosmosFx;
 import com.waylays.arcanes.spells.cosmos.PocketUniverse;
 import net.minecraft.core.BlockPos;
@@ -42,9 +49,11 @@ import java.util.UUID;
  * them) into their pocket universe, then closes.</li>
  * <li>{@link Mode#EXIT}: stands on each island of the pocket universe for good; walking into it takes you back where
  * you came from.</li>
- * <li>{@link Mode#GATE_IN} and {@link Mode#GATE_OUT}: the pair of the Time Door spell. Whatever goes into the first
- * (its caster, a monster pushed into it, an arrow) comes out of the second, where the caster stood five seconds
- * before, carried on at the same speed.</li>
+ * <li>{@link Mode#GATE_IN} and {@link Mode#GATE_OUT}: the pair of the Time Door spell, joined by an arc of orange light.
+ * Whatever goes into the first (its caster, a monster pushed into it, an arrow) comes out of the second, where the
+ * caster stood five seconds before, carried on at the same speed. The caster and their allies come out as they were
+ * five seconds before: hurt no more than they were then, rid of the ills and the fire caught since. A foe comes out
+ * reeling, hurt, slowed and sick.</li>
  * </ul>
  */
 public class TimeDoor extends SpellEffectEntity {
@@ -62,6 +71,9 @@ public class TimeDoor extends SpellEffectEntity {
 
     private static final EntityDataAccessor<Integer> DATA_MODE = SynchedEntityData.defineId(TimeDoor.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_LIFE = SynchedEntityData.defineId(TimeDoor.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> DATA_PARTNER = SynchedEntityData.defineId(TimeDoor.class, EntityDataSerializers.INT);
+    /** How far back the doors take what goes through them, in ticks. */
+    public static final int BACK = 100;
 
     private final List<UUID> guests = new ArrayList<>();
     private int spellLevel = 1;
@@ -77,6 +89,13 @@ public class TimeDoor extends SpellEffectEntity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_MODE, Mode.GATE_IN.ordinal());
         builder.define(DATA_LIFE, 200);
+        builder.define(DATA_PARTNER, -1);
+    }
+
+    /** The other door of a pair (on the client too), if it is there. */
+    @Nullable
+    public TimeDoor getPartner() {
+        return level().getEntity(this.entityData.get(DATA_PARTNER)) instanceof TimeDoor door ? door : null;
     }
 
     public Mode getMode() {
@@ -119,12 +138,20 @@ public class TimeDoor extends SpellEffectEntity {
 
     /** The pair of doors of the Time Door spell: in front of the caster, and where they stood {@code back} ago. */
     public static TimeDoor gate(Level level, LivingEntity caster, Vec3 in, float inYRot, Vec3 out, float outYRot, int life) {
+        return gate(level, caster, in, inYRot, out, outYRot, life, 0);
+    }
+
+    /** The pair, the foes coming out of it hurt by {@code damage}. */
+    public static TimeDoor gate(Level level, LivingEntity caster, Vec3 in, float inYRot, Vec3 out, float outYRot, int life, float damage) {
         TimeDoor exit = create(level, Mode.GATE_OUT, out, outYRot, life, caster);
         TimeDoor entrance = create(level, Mode.GATE_IN, in, inYRot, life, caster);
         entrance.partner = exit.getUUID();
         exit.partner = entrance.getUUID();
+        entrance.damage = damage;
         level.addFreshEntity(exit);
         level.addFreshEntity(entrance);
+        entrance.entityData.set(DATA_PARTNER, exit.getId());
+        exit.entityData.set(DATA_PARTNER, entrance.getId());
         CosmosFx.fold(level, in.add(0, 1.3, 0), 1.2f, 1f);
         CosmosFx.fold(level, out.add(0, 1.3, 0), 1.2f, .8f);
         return entrance;
@@ -232,10 +259,51 @@ public class TimeDoor extends SpellEffectEntity {
             e.setDeltaMovement(f.x * speed, v.y, f.z * speed);
             e.hurtMarked = true;
             e.resetFallDistance();
+            if (e instanceof LivingEntity living) {
+                comeOut(level, living);
+            }
             CosmosFx.time(level, from.add(0, e.getBbHeight() * .5, 0), 16, .4);
             CosmosFx.time(level, to.add(0, e.getBbHeight() * .5, 0), 16, .4);
-            CosmosFx.sound(level, from, net.minecraft.sounds.SoundEvents.ENDERMAN_TELEPORT, .7f, 1.3f);
-            CosmosFx.sound(level, to, net.minecraft.sounds.SoundEvents.ENDERMAN_TELEPORT, .7f, 1.1f);
+            CosmosFx.sound(level, from, SoundEvents.ENDERMAN_TELEPORT, .7f, 1.3f);
+            CosmosFx.sound(level, to, SoundEvents.ENDERMAN_TELEPORT, .7f, 1.1f);
+        }
+    }
+
+    /**
+     * What comes out of the second door: the caster and their allies as they were five seconds before (their health
+     * then if it was higher, without the ills and the fire caught since); a foe reeling, hurt, slowed and sick.
+     */
+    private void comeOut(ServerLevel level, LivingEntity living) {
+        Entity owner = getOwner();
+        Vec3 c = living.getBoundingBox().getCenter();
+        if (owner != null && Cosmos.isAlly(owner, living)) {
+            float then = TimeTrail.bestHealth(living, BACK);
+            TimeTrail.Sample past = TimeTrail.ago(living, BACK);
+            if (past != null) {
+                then = Math.max(living.getHealth(), past.health());
+            }
+            if (then > living.getHealth()) {
+                living.setHealth(Math.min(living.getMaxHealth(), then));
+                SpellUtil.particles(level, net.minecraft.core.particles.ParticleTypes.HEART, c.x, c.y + .5, c.z, 4, .3, .3, .3, 0);
+            }
+            living.clearFire();
+            for (var effect : java.util.List.copyOf(living.getActiveEffects())) {
+                if (effect.getEffect().value().getCategory() == net.minecraft.world.effect.MobEffectCategory.HARMFUL) {
+                    living.removeEffect(effect.getEffect());
+                }
+            }
+            CosmosFx.sound(level, c, SoundEvents.AMETHYST_BLOCK_CHIME, 1, 1.4f);
+            SpellUtil.particles(level, CosmosFx.AMBER, c.x, c.y, c.z, 20, .3, .5, .3, .05);
+        } else if (owner instanceof LivingEntity caster) {
+            if (damage > 0) {
+                var spell = ModSpells.TIME_DOOR.get();
+                living.invulnerableTime = 0;
+                io.redspace.ironsspellbooks.damage.DamageSources.applyDamage(living, damage, SpellUtil.damageSource(spell, this, caster));
+            }
+            living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1));
+            living.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0));
+            living.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 60, 0));
+            CosmosFx.sound(level, c, SoundEvents.ZOMBIE_VILLAGER_CURE, .4f, 1.8f);
         }
     }
 

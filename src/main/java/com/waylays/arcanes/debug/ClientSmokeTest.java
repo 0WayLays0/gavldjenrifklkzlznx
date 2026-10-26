@@ -102,7 +102,7 @@ public final class ClientSmokeTest {
     private static final int SHOT_WIDTH = 640;
     private static final int SHOT_CHUNK = 8000;
 
-    private enum Stage { WAIT_TITLE, CREATING, SETTLING, CASTING, DONE }
+    private enum Stage { WAIT_TITLE, CREATING, SETTLING, CASTING, VISITING, DONE }
 
     private static volatile Stage stage = Stage.WAIT_TITLE;
     private static int ticks;
@@ -195,6 +195,7 @@ public final class ClientSmokeTest {
                 }
             }
             case CASTING -> cast(mc);
+            case VISITING -> visit(mc);
             default -> {
             }
         }
@@ -263,6 +264,58 @@ public final class ClientSmokeTest {
             server.execute(() -> recastOnServer(server, id));
         }
         if (spellIndex >= spells.size() && ticks > (spells.size() - 1) * TICKS_PER_SPELL + FINAL_TICKS) {
+            stage = Stage.VISITING;
+            ticks = 0;
+        }
+    }
+
+    /** Ticks spent in the pocket universe once the client is there. */
+    private static int inPocket;
+
+    /**
+     * Last, a visit to the Pocket Universe: the player is taken to their island, and once its terrain is drawn it is
+     * photographed toward its door, up at the clock in its sky, and toward its ringed planet; then back home.
+     */
+    private static void visit(Minecraft mc) {
+        IntegratedServer server = mc.getSingleplayerServer();
+        if (server == null || mc.player == null) {
+            finish(mc);
+            return;
+        }
+        java.util.UUID id = mc.player.getUUID();
+        if (ticks == 1) {
+            server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayer(id);
+                if (player != null) {
+                    log("visiting the pocket universe: {}", com.waylays.arcanes.spells.cosmos.PocketUniverse.enter(player, player, 4));
+                }
+            });
+        }
+        boolean there = mc.level != null && mc.level.dimension() == com.waylays.arcanes.spells.cosmos.PocketUniverse.DIMENSION && mc.screen == null;
+        if (there) {
+            inPocket++;
+        }
+        if (inPocket == 60) {
+            aim(mc, 180, 14);
+        } else if (inPocket == 80) {
+            aim(mc, 180, -70);
+        } else if (inPocket == 100) {
+            aim(mc, -144, -16);
+        }
+        if (inPocket == 64 || inPocket == 84 || inPocket == 104) {
+            screenshot(mc, "pocket_visit_" + (inPocket - 44) / 20);
+        }
+        if (inPocket >= 110) {
+            server.execute(() -> {
+                ServerPlayer player = server.getPlayerList().getPlayer(id);
+                if (player != null) {
+                    com.waylays.arcanes.spells.cosmos.PocketUniverse.leave(player);
+                }
+            });
+            finish(mc);
+        } else if (ticks > 900) {
+            failures.incrementAndGet();
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the pocket universe was never reached (in it for {} ticks)", inPocket);
             finish(mc);
         }
     }

@@ -94,11 +94,14 @@ public class TimeStopBubbleRenderer extends EntityRenderer<TimeStopBubble> {
             CosmosRender.star(poseStack, buffer, .18f + w * .2f, k % 3 == 0 ? Cosmos.CREAM : Cosmos.AMBER, strength * .9f, k * 37);
             poseStack.popPose();
         }
-        // The stopped clock on the ground
+        // A ring of light on the ground where time stops, and a small stopped clock hanging over the caster's spot
         poseStack.pushPose();
-        poseStack.translate(0, .06, 0);
-        poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-        CosmosRender.clock(poseStack, buffer, radius * .55f, .75f * strength, .25f, .5f, Math.min(age, 12) / 60f);
+        poseStack.translate(0, .05, 0);
+        RenderHelper.groundQuad(buffer.getBuffer(RenderType.eyes(RuneRender.RING_GLOW)), poseStack.last(), radius * 1.05f,
+                RuneRender.additive(Cosmos.ORANGE, .55f * strength), GlyphRender.FULL);
+        poseStack.translate(0, 3.2, 0);
+        poseStack.mulPose(net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
+        CosmosRender.clock(poseStack, buffer, .8f, .85f * strength, .25f, .5f, Math.min(age, 12) / 60f);
         poseStack.popPose();
         super.render(bubble, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }

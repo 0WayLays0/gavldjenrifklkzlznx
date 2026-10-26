@@ -41,6 +41,16 @@ public class TimeLoopRenderer extends EntityRenderer<TimeLoop> {
         if (!CosmosRender.inEcho()) {
             CosmosRender.echo(target, poseStack, buffer, partialTicks, Cosmos.AMBER, .22f + .12f * Mth.sin(age * .4f), age * .03f);
         }
+        // A clock dial behind its head: ticking on through the loop, its hands whirling back as the loop closes
+        float since = age % TimeLoop.PERIOD;
+        float back = since < 10 && done > 0 ? 1 - since / 10 : 0;
+        float minute = since / TimeLoop.PERIOD - back * 2.5f;
+        poseStack.pushPose();
+        poseStack.translate(0, target.getBbHeight() + .75f, 0);
+        poseStack.mulPose(net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
+        poseStack.mulPose(Axis.YP.rotationDegrees(180));
+        CosmosRender.clock(poseStack, buffer, .55f + .1f * back, .9f * appear, minute / 12f + .3f, minute, -1);
+        poseStack.popPose();
         float radius = target.getBbWidth() * .5f + .85f;
         poseStack.translate(0, target.getBbHeight() * .55f, 0);
         poseStack.mulPose(Axis.YP.rotationDegrees(age * 1.2f));

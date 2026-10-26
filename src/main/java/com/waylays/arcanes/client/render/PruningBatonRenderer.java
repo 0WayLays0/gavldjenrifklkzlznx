@@ -34,10 +34,16 @@ public class PruningBatonRenderer extends EntityRenderer<PruningBaton> {
         super(context);
     }
 
-    /** Where the tip is at swing {@code s} (0 to 1), in the caster's frame (+Z forward). */
-    private static Vec3 tip(float s, float reach) {
-        // Local +X is the caster's left: the swing goes from their right to their left
-        float a = Mth.lerp(s, -75, 75) * Mth.DEG_TO_RAD;
+    /**
+     * Where the tip is at swing {@code s} (0 to 1) of blow {@code stage}, in the caster's frame (+Z forward, +X their
+     * left): the first sweeps from their right to their left, the second back, the third comes down overhead.
+     */
+    private static Vec3 tip(float s, float reach, int stage) {
+        if (stage >= 3) {
+            float e = Mth.lerp(s, 110, -38) * Mth.DEG_TO_RAD;
+            return new Vec3(-.15, SHOULDER + .15 + Mth.sin(e) * reach, Mth.cos(e) * reach);
+        }
+        float a = (stage == 2 ? Mth.lerp(s, 75, -75) : Mth.lerp(s, -75, 75)) * Mth.DEG_TO_RAD;
         float drop = Mth.lerp(s, .15f, -.25f);
         return new Vec3(Mth.sin(a) * reach, SHOULDER + drop, Mth.cos(a) * reach);
     }
@@ -47,6 +53,7 @@ public class PruningBatonRenderer extends EntityRenderer<PruningBaton> {
         Entity caster = baton.getCaster();
         float age = baton.tickCount + partialTicks;
         float s = PruningBaton.swing(age);
+        int stage = baton.getStage();
         float fade = 1 - Mth.clamp((age - PruningBaton.SWING_TICKS) / (PruningBaton.LIFE - PruningBaton.SWING_TICKS), 0, 1);
         poseStack.pushPose();
         if (caster != null) {
@@ -62,12 +69,13 @@ public class PruningBatonRenderer extends EntityRenderer<PruningBaton> {
         for (int k = 0; k < steps; k++) {
             float s0 = s * k / steps, s1 = s * (k + 1) / steps;
             float w = (float) (k + 1) / steps;
-            GlyphRender.beam(stroke, poseStack.last(), tip(s0, LENGTH + .3f), tip(s1, LENGTH + .3f), .32f * w, RuneRender.additive(Cosmos.ORANGE, .55f * w * fade));
-            GlyphRender.beam(stroke, poseStack.last(), tip(s0, LENGTH + .3f), tip(s1, LENGTH + .3f), .1f * w, RuneRender.additive(Cosmos.CREAM, .8f * w * fade));
+            float wide = stage >= 3 ? 1.6f : 1;
+            GlyphRender.beam(stroke, poseStack.last(), tip(s0, LENGTH + .3f, stage), tip(s1, LENGTH + .3f, stage), .32f * w * wide, RuneRender.additive(Cosmos.ORANGE, .55f * w * fade));
+            GlyphRender.beam(stroke, poseStack.last(), tip(s0, LENGTH + .3f, stage), tip(s1, LENGTH + .3f, stage), .1f * w, RuneRender.additive(Cosmos.CREAM, .8f * w * fade));
         }
         // The baton itself, from the shoulder out toward the tip
-        Vec3 shoulder = new Vec3(-.3, SHOULDER - .1, .1);
-        Vec3 dir = tip(s, LENGTH + .3f).subtract(shoulder).normalize();
+        Vec3 shoulder = stage >= 3 ? new Vec3(-.2, SHOULDER + .1, .05) : new Vec3(-.3, SHOULDER - .1, .1);
+        Vec3 dir = tip(s, LENGTH + .3f, stage).subtract(shoulder).normalize();
         poseStack.pushPose();
         poseStack.translate(shoulder.x + dir.x * .25, shoulder.y + dir.y * .25, shoulder.z + dir.z * .25);
         poseStack.mulPose(new org.joml.Quaternionf().rotationTo(0, 1, 0, (float) dir.x, (float) dir.y, (float) dir.z));

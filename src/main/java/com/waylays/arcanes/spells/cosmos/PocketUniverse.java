@@ -334,13 +334,99 @@ public final class PocketUniverse {
         return k == 0 ? Blocks.ANDESITE.defaultBlockState() : k == 1 ? Blocks.COBBLESTONE.defaultBlockState() : Blocks.STONE.defaultBlockState();
     }
 
-    /** Flowers and grass on top, two trees, amethyst hanging under the rock. */
+    /**
+     * The island's look: a giant stopped clock set in the ground round its door (a face of dark stone, an orange rim,
+     * glowing hour marks, its hands stopped a moment before midnight), lamp posts, flowers and grass, two trees, a
+     * stream running off the edge into the void, amethyst hanging under the rock, and three islets floating round it.
+     */
     private static void decorate(ServerLevel level, BlockPos c, int r, RandomSource random, long seed) {
+        clockFloor(level, c);
+        for (int k = 0; k < 4; k++) {
+            double a = Mth.PI / 4 + k * Mth.HALF_PI;
+            BlockPos post = c.offset((int) Math.round(Math.cos(a) * 6), 1, (int) Math.round(Math.sin(a) * 6));
+            set(level, post, Blocks.DARK_OAK_FENCE.defaultBlockState());
+            set(level, post.above(), Blocks.DARK_OAK_FENCE.defaultBlockState());
+            set(level, post.above(2), Blocks.LANTERN.defaultBlockState());
+        }
+        stream(level, c, r, seed);
+        for (int k = 0; k < 3; k++) {
+            double a = (seed % 100) * .1 + k * Mth.TWO_PI / 3 + .4;
+            int d = r + 7 + k * 2;
+            islet(level, c.offset((int) (Math.cos(a) * d), -2 + k * 4, (int) (Math.sin(a) * d)), 2 + (k + (int) (seed % 2)) % 2, random);
+        }
+        decoratePlants(level, c, r, random, seed);
+    }
+
+    private static void set(ServerLevel level, BlockPos pos, BlockState state) {
+        level.setBlock(pos, state, Block.UPDATE_CLIENTS);
+    }
+
+    /** The stopped clock in the ground round the island's middle, 4 blocks across its face. */
+    private static void clockFloor(ServerLevel level, BlockPos c) {
+        for (int dx = -5; dx <= 5; dx++) {
+            for (int dz = -5; dz <= 5; dz++) {
+                double d = Math.sqrt(dx * dx + dz * dz);
+                if (d > 4.6) {
+                    continue;
+                }
+                BlockState state = d > 3.8 ? Blocks.ORANGE_TERRACOTTA.defaultBlockState()
+                        : d < 1 ? Blocks.WAXED_COPPER_BLOCK.defaultBlockState() : Blocks.POLISHED_DEEPSLATE.defaultBlockState();
+                set(level, c.offset(dx, 0, dz), state);
+            }
+        }
+        // Hour marks that glow, twelve at the top (toward the door)
+        for (int h = 0; h < 12; h++) {
+            double a = h * Mth.TWO_PI / 12 - Mth.HALF_PI;
+            set(level, c.offset((int) Math.round(Math.cos(a) * 3.3), 0, (int) Math.round(Math.sin(a) * 3.3)),
+                    h == 0 ? Blocks.SHROOMLIGHT.defaultBlockState() : Blocks.OCHRE_FROGLIGHT.defaultBlockState());
+        }
+        // The hands, stopped a moment before midnight: both toward the door, the minute hand a touch to the left
+        for (int k = 1; k <= 3; k++) {
+            set(level, c.offset(0, 0, -k), Blocks.ORANGE_CONCRETE.defaultBlockState());
+        }
+        set(level, c.offset(-1, 0, -2), Blocks.ORANGE_CONCRETE.defaultBlockState());
+    }
+
+    /** A stream running from a spring to the island's edge, and off it into the void. */
+    private static void stream(ServerLevel level, BlockPos c, int r, long seed) {
+        double a = Mth.PI * .75 + (seed % 7) * .1;
+        for (int d = r - 5; d <= r + 1; d++) {
+            BlockPos pos = c.offset((int) Math.round(Math.cos(a) * d), 0, (int) Math.round(Math.sin(a) * d));
+            BlockState here = level.getBlockState(pos);
+            if (here.is(Blocks.GRASS_BLOCK) || here.is(Blocks.DIRT)) {
+                set(level, pos.below(), Blocks.STONE.defaultBlockState());
+                set(level, pos, Blocks.WATER.defaultBlockState());
+            }
+        }
+    }
+
+    /** A little floating island: a lens of rock with grass on top. */
+    private static void islet(ServerLevel level, BlockPos at, int radius, RandomSource random) {
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                double d = Math.sqrt(dx * dx + dz * dz);
+                if (d > radius + .3) {
+                    continue;
+                }
+                int depth = (int) Math.round((radius + 1.5) * (1 - d / (radius + 1)));
+                for (int y = -depth; y <= 0; y++) {
+                    BlockPos pos = at.offset(dx, y, dz);
+                    if (level.getBlockState(pos).isAir()) {
+                        set(level, pos, y == 0 ? Blocks.GRASS_BLOCK.defaultBlockState() : y == -depth && random.nextInt(3) == 0
+                                ? Blocks.AMETHYST_BLOCK.defaultBlockState() : Blocks.STONE.defaultBlockState());
+                    }
+                }
+            }
+        }
+    }
+
+    /** Flowers and grass on top, two trees, amethyst hanging under the rock. */
+    private static void decoratePlants(ServerLevel level, BlockPos c, int r, RandomSource random, long seed) {
         BlockState[] plants = {Blocks.SHORT_GRASS.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState(), Blocks.CORNFLOWER.defaultBlockState(),
                 Blocks.ALLIUM.defaultBlockState(), Blocks.OXEYE_DAISY.defaultBlockState(), Blocks.AZURE_BLUET.defaultBlockState()};
         for (int k = 0; k < r * 3; k++) {
             int dx = random.nextInt(2 * r) - r, dz = random.nextInt(2 * r) - r;
-            if (dx * dx + dz * dz > (r - 2) * (r - 2) || Math.abs(dx) <= 2 && dz >= -3 && dz <= 4) {
+            if (dx * dx + dz * dz > (r - 2) * (r - 2) || dx * dx + dz * dz < 36) {
                 continue;
             }
             BlockPos pos = c.offset(dx, 1, dz);

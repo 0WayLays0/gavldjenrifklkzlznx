@@ -247,6 +247,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.PRUNING_BATON.get(), com.waylays.arcanes.client.render.PruningBatonRenderer::new);
         event.registerEntityRenderer(ModEntities.TIME_LOOP.get(), com.waylays.arcanes.client.render.TimeLoopRenderer::new);
         event.registerEntityRenderer(ModEntities.COSMIC_VARIANT.get(), com.waylays.arcanes.client.render.CosmicVariantRenderer::new);
+        event.registerEntityRenderer(ModEntities.PRUNED_REMAINS.get(), com.waylays.arcanes.client.render.PrunedRemainsRenderer::new);
         event.registerEntityRenderer(ModEntities.TIME_STOP_BUBBLE.get(), com.waylays.arcanes.client.render.TimeStopBubbleRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_CIRCLE.get(), RitualCircleRenderer::new);
         event.registerEntityRenderer(ModEntities.METEOR.get(), MeteorRenderer::new);
@@ -290,6 +291,23 @@ public final class ClientSetup {
         }
     }
 
+    /** The Codex Out of Time's 3D book, drawn by its own renderer. */
+    @SubscribeEvent
+    public static void registerModels(net.neoforged.neoforge.client.event.ModelEvent.RegisterAdditional event) {
+        event.register(com.waylays.arcanes.client.render.CodexOutOfTimeRenderer.BOOK);
+    }
+
+    /** The Codex Out of Time: its clock ticks and a moon goes round it (see CodexOutOfTimeRenderer). */
+    @SubscribeEvent
+    public static void registerItemExtensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
+        event.registerItem(new net.neoforged.neoforge.client.extensions.common.IClientItemExtensions() {
+            @Override
+            public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                return com.waylays.arcanes.client.render.CodexOutOfTimeRenderer.get();
+            }
+        }, ModItems.CODEX_OUT_OF_TIME.get());
+    }
+
     /** The sky of the Pocket Universe (the dimension type's effects). */
     @SubscribeEvent
     public static void registerSkies(net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent event) {
@@ -323,6 +341,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.RUSTED_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.RAMPART_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.JEWELLERS_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.CODEX_OUT_OF_TIME.get(), SpellBookCurioRenderer::new);
         });
     }
 }

@@ -89,6 +89,7 @@ import com.waylays.arcanes.entity.gem.EmeraldBloom;
 import com.waylays.arcanes.entity.gem.GemCrown;
 import com.waylays.arcanes.entity.cosmos.CosmicVariant;
 import com.waylays.arcanes.entity.cosmos.PruningBaton;
+import com.waylays.arcanes.entity.cosmos.PrunedRemains;
 import com.waylays.arcanes.entity.cosmos.TemporalEcho;
 import com.waylays.arcanes.entity.cosmos.TimeDoor;
 import com.waylays.arcanes.entity.cosmos.TimeLoop;
@@ -439,6 +440,8 @@ public final class ModEntities {
             EntityType.Builder.<TimeLoop>of(TimeLoop::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(2).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<CosmicVariant>> COSMIC_VARIANT = register("cosmic_variant",
             EntityType.Builder.<CosmicVariant>of(CosmicVariant::new, MobCategory.MISC).sized(.6f, 1.8f).clientTrackingRange(10).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<PrunedRemains>> PRUNED_REMAINS = register("pruned_remains",
+            EntityType.Builder.<PrunedRemains>of(PrunedRemains::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(2).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<TimeStopBubble>> TIME_STOP_BUBBLE = register("time_stop_bubble",
             EntityType.Builder.<TimeStopBubble>of(TimeStopBubble::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
 

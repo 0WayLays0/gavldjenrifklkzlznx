@@ -43,16 +43,27 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * A variant of the caster from another branch of time: the caster's own likeness in flickering orange light, scanned
- * in beside them. It looks where they look and casts one of the other spells of their spellbook at the level it holds
- * there, then glitches out of existence. It cannot be hurt, and its spells spare its original and their allies.
+ * A variant of the caster from another branch of time: the caster's own likeness in flickering light, scanned in
+ * beside them, a TVA designation hanging over its head. As it arrives it casts one of the other spells of their
+ * spellbook at what they are looking at; then, as long as it lasts, every spell its original casts, it casts too, a
+ * beat later, at the same thing. It cannot be hurt, and its spells spare its original and their allies. When its time
+ * is up it glitches out of existence.
  */
+@net.neoforged.fml.common.EventBusSubscriber(modid = com.waylays.arcanes.ArcanesOublies.MODID)
 public class CosmicVariant extends Mob implements OwnedSummon, AntiMagicSusceptible {
     public static final int CAST_TICK = 12;
-    public static final int LIFE = 46;
+    /** Ticks it takes to scan in, and to break up. */
+    public static final int SCAN_TICKS = 10;
 
     private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER = SynchedEntityData.defineId(CosmicVariant.class, EntityDataSerializers.OPTIONAL_UUID);
     private static final EntityDataAccessor<Integer> DATA_CAST = SynchedEntityData.defineId(CosmicVariant.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> DATA_LIFE = SynchedEntityData.defineId(CosmicVariant.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> DATA_DESIGNATION = SynchedEntityData.defineId(CosmicVariant.class, EntityDataSerializers.INT);
+
+    /** A spell its original cast, to be cast again a beat later. */
+    private record Echo(String spellId, int level, Vec3 aim, int at) {}
+
+    private final java.util.List<Echo> echoes = new java.util.ArrayList<>();
 
     @Nullable
     private String spellId;
@@ -71,26 +82,26 @@ public class CosmicVariant extends Mob implements OwnedSummon, AntiMagicSuscepti
     }
 
     /** Scans in a variant of {@code caster} at {@code at}; it will cast a spell of theirs at what they are looking at. */
+    /** Scans in a variant of {@code caster} at {@code at} for {@code life} ticks. */
     @Nullable
     public static CosmicVariant scanIn(Level level, LivingEntity caster, Vec3 at) {
+        return scanIn(level, caster, at, 46);
+    }
+
+    @Nullable
+    public static CosmicVariant scanIn(Level level, LivingEntity caster, Vec3 at, int life) {
         SpellSlot slot = pick(caster);
         if (slot == null) {
             return null;
         }
         CosmicVariant variant = new CosmicVariant(ModEntities.COSMIC_VARIANT.get(), level);
         variant.entityData.set(DATA_OWNER, Optional.of(caster.getUUID()));
+        variant.entityData.set(DATA_LIFE, life);
+        variant.entityData.set(DATA_DESIGNATION, 1000 + caster.getRandom().nextInt(9000));
         variant.spellId = slot.getSpell().getSpellId();
         variant.spellLevel = slot.getLevel();
-        // It looks at what its original looks at
-        Vec3 eye = caster.getEyePosition();
-        HitResult hit = level.clip(new ClipContext(eye, eye.add(caster.getLookAngle().scale(32)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
-        variant.aim = hit.getLocation();
-        Vec3 d = variant.aim.subtract(at.add(0, caster.getEyeHeight(), 0));
-        float yRot = (float) (Mth.atan2(-d.x, d.z) * Mth.RAD_TO_DEG);
-        float xRot = (float) (-Mth.atan2(d.y, d.horizontalDistance()) * Mth.RAD_TO_DEG);
-        variant.moveTo(at.x, at.y, at.z, yRot, xRot);
-        variant.setYHeadRot(yRot);
-        variant.setYBodyRot(yRot);
+        variant.moveTo(at.x, at.y, at.z, caster.getYRot(), caster.getXRot());
+        variant.faceAim(aimOf(caster));
         level.addFreshEntity(variant);
         CosmosFx.time(level, at.add(0, 1, 0), 30, .5);
         CosmosFx.sound(level, at, SoundEvents.BEACON_POWER_SELECT, 1, 1.7f);
@@ -119,6 +130,54 @@ public class CosmicVariant extends Mob implements OwnedSummon, AntiMagicSuscepti
         return slots.get(caster.getRandom().nextInt(slots.size()));
     }
 
+    /** What {@code caster} is looking at: the first block in their line of sight, at most 32 blocks away. */
+    private static Vec3 aimOf(LivingEntity caster) {
+        Vec3 eye = caster.getEyePosition();
+        HitResult hit = caster.level().clip(new ClipContext(eye, eye.add(caster.getLookAngle().scale(32)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
+        return hit.getLocation();
+    }
+
+    /** Turns to look at {@code target} from its eyes. */
+    private void faceAim(Vec3 target) {
+        this.aim = target;
+        Vec3 d = target.subtract(getEyePosition());
+        float yRot = (float) (Mth.atan2(-d.x, d.z) * Mth.RAD_TO_DEG);
+        float xRot = (float) (-Mth.atan2(d.y, d.horizontalDistance()) * Mth.RAD_TO_DEG);
+        setYRot(yRot);
+        setXRot(xRot);
+        yRotO = yRot;
+        xRotO = xRot;
+        setYHeadRot(yRot);
+        setYBodyRot(yRot);
+    }
+
+    /** Every spell a player casts, their variants cast too, a beat later each, at what the player is looking at. */
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void onOriginalCasts(io.redspace.ironsspellbooks.api.events.SpellOnCastEvent event) {
+        if (!(event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player)) {
+            return;
+        }
+        AbstractSpell spell = SpellRegistry.getSpell(event.getSpellId());
+        if (!castable(spell)) {
+            return;
+        }
+        Vec3 aim = aimOf(player);
+        int k = 0;
+        for (CosmicVariant variant : player.level().getEntitiesOfClass(CosmicVariant.class, player.getBoundingBox().inflate(32),
+                v -> player.getUUID().equals(v.getSummonerUUID()) && v.tickCount < v.getLife() - SCAN_TICKS)) {
+            variant.echoes.add(new Echo(spell.getSpellId(), event.getSpellLevel(), aim, variant.tickCount + 4 + 3 * k++));
+        }
+    }
+
+    public int getLife() {
+        return this.entityData.get(DATA_LIFE);
+    }
+
+    /** Its TVA designation (L-xxxx), shown over its head. */
+    public int getDesignation() {
+        return this.entityData.get(DATA_DESIGNATION);
+    }
+
     public static boolean castable(@Nullable AbstractSpell spell) {
         if (spell == null || spell == SpellRegistry.none() || !spell.isEnabled() || spell.getCastType() == CastType.CONTINUOUS
                 || spell instanceof SummoningSpell) {
@@ -133,6 +192,8 @@ public class CosmicVariant extends Mob implements OwnedSummon, AntiMagicSuscepti
         super.defineSynchedData(builder);
         builder.define(DATA_OWNER, Optional.empty());
         builder.define(DATA_CAST, -1);
+        builder.define(DATA_LIFE, 46);
+        builder.define(DATA_DESIGNATION, 1130);
     }
 
     /** The tick it cast its spell (-1 not yet): the client raises its arm then. */
@@ -150,18 +211,26 @@ public class CosmicVariant extends Mob implements OwnedSummon, AntiMagicSuscepti
             return;
         }
         if (tickCount == CAST_TICK) {
-            cast();
+            cast(spellId, spellLevel);
         }
-        if (tickCount >= LIFE) {
+        for (Echo echo : java.util.List.copyOf(echoes)) {
+            if (tickCount >= echo.at()) {
+                echoes.remove(echo);
+                faceAim(echo.aim());
+                cast(echo.spellId(), echo.level());
+            }
+        }
+        if (tickCount >= getLife()) {
             glitchOut();
         }
     }
 
-    private void cast() {
-        AbstractSpell spell = spellId == null ? null : SpellRegistry.getSpell(spellId);
+    private void cast(@Nullable String id, int level0) {
+        AbstractSpell spell = id == null ? null : SpellRegistry.getSpell(id);
         if (spell == null || !(level() instanceof ServerLevel level)) {
             return;
         }
+        int spellLevel = Math.max(1, level0);
         this.entityData.set(DATA_CAST, tickCount);
         MagicData data = new MagicData(true);
         try {

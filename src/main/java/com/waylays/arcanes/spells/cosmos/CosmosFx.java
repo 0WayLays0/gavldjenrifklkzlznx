@@ -10,7 +10,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -54,8 +53,8 @@ public final class CosmosFx {
     }
 
     /**
-     * Prunes {@code victim}: it is struck by {@code source} for far more than it has left, its body crumbles into orange
-     * dust at once instead of falling over, and the TVA's dull hum closes over it.
+     * Prunes {@code victim}: orange dust bursts from it, it stops dead, turns to orange light and crumbles away from
+     * its feet up, then it is struck down by {@code source} and gone (see PrunedRemains).
      */
     public static void prune(ServerLevel level, LivingEntity victim, DamageSource source) {
         AABB box = victim.getBoundingBox();
@@ -63,15 +62,7 @@ public final class CosmosFx {
         int count = (int) Math.min(120, 30 + box.getSize() * 40);
         SpellUtil.particles(level, PRUNED, c.x, c.y, c.z, count, box.getXsize() * .35, box.getYsize() * .35, box.getZsize() * .35, .03);
         SpellUtil.particles(level, TIME, c.x, c.y, c.z, count / 2, box.getXsize() * .4, box.getYsize() * .4, box.getZsize() * .4, .08);
-        sound(level, c, SoundEvents.BEACON_DEACTIVATE, 1.2f, 1.6f);
-        sound(level, c, SoundEvents.SAND_BREAK, 1.2f, .6f);
-        victim.invulnerableTime = 0;
-        victim.hurt(source, 10000f);
-        if (victim.isDeadOrDying() && !(victim instanceof Player)) {
-            // Gone at once: nothing is left to fall over
-            victim.deathTime = 19;
-            victim.setInvisible(true);
-        }
+        com.waylays.arcanes.entity.cosmos.PrunedRemains.prune(level, victim, source);
     }
 
     /** The tick of a clock: higher {@code pitch}, smaller clock. */

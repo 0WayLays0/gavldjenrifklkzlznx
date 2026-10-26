@@ -1,10 +1,13 @@
 package com.waylays.arcanes.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.waylays.arcanes.entity.cosmos.CosmicVariant;
 import com.waylays.arcanes.spells.cosmos.Cosmos;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Component;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.multiplayer.PlayerInfo;
@@ -50,10 +53,11 @@ public class CosmicVariantRenderer extends EntityRenderer<CosmicVariant> {
     @Override
     public void render(CosmicVariant variant, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         float age = variant.tickCount + partialTicks;
-        float scanIn = Mth.clamp(age / 8, 0, 1);
-        float out = Mth.clamp((CosmicVariant.LIFE - age) / 6, 0, 1);
-        float alpha = scanIn * out;
-        if (alpha <= .01f) {
+        // Scanned in from the feet up; broken up from the head down as it goes
+        float scan = Mth.clamp(age / CosmicVariant.SCAN_TICKS, 0, 1);
+        float out = Mth.clamp((variant.getLife() - age) / CosmicVariant.SCAN_TICKS, 0, 1);
+        float top = Math.min(scan, out) * 1.12f;
+        if (top <= .01f) {
             return;
         }
         PlayerSkin skin = skin(variant);
@@ -72,30 +76,55 @@ public class CosmicVariantRenderer extends EntityRenderer<CosmicVariant> {
             model.rightArm.xRot = Mth.lerp(raise, model.rightArm.xRot, -Mth.HALF_PI + pitch * Mth.DEG_TO_RAD);
             model.rightSleeve.copyFrom(model.rightArm);
         }
-        boolean glitch = RuneRender.hash(variant.getId() * 13 + (int) (age * .5f)) < .18f || out < 1;
+        boolean glitch = RuneRender.hash(variant.getId() * 13 + (int) (age * .5f)) < .12f || out < 1;
+        float height = variant.getBbHeight();
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(180 - bodyYaw));
         poseStack.scale(-.9375f, -.9375f, .9375f);
         poseStack.translate(0, -1.501, 0);
-        // The likeness, see-through and washed in orange
-        int tint = RuneRender.alpha(GoldRender.lerp(0xFFFFFF, Cosmos.AMBER, .45f), .62f * alpha);
-        model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityTranslucent(skin.texture())), GlyphRender.FULL, OverlayTexture.NO_OVERLAY, tint);
-        // Scanlines running down it
-        model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.energySwirl(CosmosRender.SCANLINES, 0, age * .02f)), GlyphRender.FULL,
-                OverlayTexture.NO_OVERLAY, RuneRender.additive(Cosmos.ORANGE, .55f * alpha));
+        // The likeness itself, a little see-through and warm
+        int tint = RuneRender.alpha(GoldRender.lerp(0xFFFFFF, Cosmos.AMBER, .2f), .8f);
+        model.renderToBuffer(poseStack, mask(buffer.getBuffer(RenderType.entityTranslucent(skin.texture())), poseStack, height, top, false, 0), GlyphRender.FULL,
+                OverlayTexture.NO_OVERLAY, tint);
+        // A faint wash of scanlines
+        model.renderToBuffer(poseStack, mask(buffer.getBuffer(RenderType.energySwirl(CosmosRender.SCANLINES, 0, age * .02f)), poseStack, height, top, true,
+                RuneRender.additive(Cosmos.ORANGE, .22f)), GlyphRender.FULL, OverlayTexture.NO_OVERLAY, -1);
         // Two ghosts slipping sideways when the signal breaks up
         if (glitch) {
             float slip = (RuneRender.hash((int) age * 7 + variant.getId()) - .5f) * .18f / .9375f;
             for (int k = 0; k < 2; k++) {
                 poseStack.pushPose();
                 poseStack.translate(k == 0 ? slip : -slip, 0, 0);
-                model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.energySwirl(CosmosRender.SCANLINES, 0, age * .05f + k)), GlyphRender.FULL,
-                        OverlayTexture.NO_OVERLAY, RuneRender.additive(k == 0 ? Cosmos.ORANGE : Cosmos.BLUE, .45f * alpha));
+                model.renderToBuffer(poseStack, mask(buffer.getBuffer(RenderType.energySwirl(CosmosRender.SCANLINES, 0, age * .05f + k)), poseStack, height, top, true,
+                        RuneRender.additive(k == 0 ? Cosmos.ORANGE : Cosmos.BLUE, .4f)), GlyphRender.FULL, OverlayTexture.NO_OVERLAY, -1);
                 poseStack.popPose();
             }
         }
         poseStack.popPose();
+        // The TVA's designation over its head
+        if (scan >= 1) {
+            poseStack.pushPose();
+            poseStack.translate(0, height + .45f, 0);
+            poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+            poseStack.scale(.022f, -.022f, .022f);
+            Component tag = Component.translatable("entity.arcanes_oublies.cosmic_variant.tag", variant.getDesignation());
+            float x = -getFont().width(tag) / 2f;
+            float flicker = glitch ? .5f : 1;
+            getFont().drawInBatch(tag, x, 0, RuneRender.alpha(Cosmos.AMBER, out * flicker), false, poseStack.last().pose(), buffer, Font.DisplayMode.NORMAL,
+                    0x50000000, GlyphRender.FULL);
+            poseStack.popPose();
+        }
         super.render(variant, entityYaw, partialTicks, poseStack, buffer, packedLight);
+    }
+
+    /**
+     * The model shown up to {@code top} (a share of its height from the feet), with a seam of light along the cut. In
+     * the model's frame y runs down from the top of the head, so the cut is reckoned from the pose's own height.
+     */
+    private static VertexConsumer mask(VertexConsumer out, PoseStack poseStack, float height, float top, boolean additive, int light) {
+        // The model's feet (model y 24/16 = 1.5) are 1.501 below its origin, after the flip and scale
+        float originY = poseStack.last().pose().m31() - 1.5f * .9375f;
+        return new CosmosRender.Masked(out, light, originY, height, 0, top, RuneRender.additive(Cosmos.CREAM, 1), additive);
     }
 
     @Override

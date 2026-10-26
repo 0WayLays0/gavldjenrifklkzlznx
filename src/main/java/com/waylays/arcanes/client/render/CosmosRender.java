@@ -307,21 +307,42 @@ public final class CosmosRender {
      * draws it; only the light changes. An echo is never drawn inside another.
      */
     public static void echo(Entity entity, PoseStack poseStack, MultiBufferSource buffer, float partialTick, int rgb, float strength, float scroll) {
-        if (entity == null || echoDepth > 0 || strength <= .01f) {
+        echo(entity, poseStack, buffer, partialTick, rgb, strength, scroll, 0, 1);
+    }
+
+    /**
+     * An echo shown only between the heights {@code from} and {@code to} (shares of its height from its feet, 0 to 1),
+     * with a bright seam of cream light along each edge: a creature crumbling into light from its feet up (from
+     * rising), or being scanned in (to rising). An invisible creature (one being pruned) is drawn all the same.
+     */
+    public static void echo(Entity entity, PoseStack poseStack, MultiBufferSource buffer, float partialTick, int rgb, float strength, float scroll,
+                            float from, float to) {
+        if (entity == null || echoDepth > 0 || strength <= .01f || from >= to) {
             return;
         }
         @SuppressWarnings("unchecked")
         EntityRenderer<Entity> renderer = (EntityRenderer<Entity>) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity);
         RenderType swirl = RenderType.energySwirl(SCANLINES, scroll * .3f, scroll);
         int argb = RuneRender.additive(rgb, strength);
-        MultiBufferSource tinted = type -> type.format() == DefaultVertexFormat.NEW_ENTITY ? new Tinted(buffer.getBuffer(swirl), argb) : Discard.INSTANCE;
+        float originY = poseStack.last().pose().m31();
+        float height = Math.max(.2f, entity.getBbHeight());
+        MultiBufferSource tinted = type -> type.format() == DefaultVertexFormat.NEW_ENTITY
+                ? new Masked(buffer.getBuffer(swirl), argb, originY, height, from, to, RuneRender.additive(Cosmos.CREAM, strength), true)
+                : Discard.INSTANCE;
+        boolean wasInvisible = entity.isInvisible();
         echoDepth++;
         try {
+            if (wasInvisible) {
+                entity.setInvisible(false);
+            }
             float yaw = Mth.lerp(partialTick, entity.yRotO, entity.getYRot());
             renderer.render(entity, yaw, partialTick, poseStack, tinted, GlyphRender.FULL);
         } catch (RuntimeException e) {
             // A creature that cannot be drawn this way is just not echoed
         } finally {
+            if (wasInvisible) {
+                entity.setInvisible(true);
+            }
             echoDepth--;
         }
     }
@@ -331,27 +352,59 @@ public final class CosmosRender {
         return echoDepth > 0;
     }
 
-    /** Every vertex in the echo's light, at full brightness. */
-    private static final class Tinted implements VertexConsumer {
+    /**
+     * A vertex consumer showing a model only between two heights (shares of {@code height} above {@code originY}, the
+     * pose's height of its feet), with a seam of {@code edge} light at each limit. {@code additive}: every vertex gets
+     * {@code fixed} light at full brightness (an echo); otherwise the model keeps its colours and fades by alpha.
+     */
+    public static final class Masked implements VertexConsumer {
+        private static final float SEAM = .08f;
         private final VertexConsumer out;
-        private final int r, g, b;
+        private final int fixed;
+        private final float originY, height, from, to;
+        private final int edge;
+        private final boolean additive;
+        private float factor = 1;
+        private float seam;
 
-        Tinted(VertexConsumer out, int argb) {
+        public Masked(VertexConsumer out, int fixed, float originY, float height, float from, float to, int edge, boolean additive) {
             this.out = out;
-            this.r = (argb >> 16) & 0xFF;
-            this.g = (argb >> 8) & 0xFF;
-            this.b = argb & 0xFF;
+            this.fixed = fixed;
+            this.originY = originY;
+            this.height = height;
+            this.from = from;
+            this.to = to;
+            this.edge = edge;
+            this.additive = additive;
         }
 
         @Override
         public VertexConsumer addVertex(float x, float y, float z) {
+            float h = (y - originY) / height;
+            float below = from <= 0 ? 1 : Mth.clamp((h - from) / SEAM, 0, 1);
+            float above = to >= 1 ? 1 : Mth.clamp((to - h) / SEAM, 0, 1);
+            factor = below * above;
+            seam = factor > 0 ? Math.max(from <= 0 ? 0 : 1 - Mth.clamp((h - from) / (SEAM * 2), 0, 1),
+                    to >= 1 ? 0 : 1 - Mth.clamp((to - h) / (SEAM * 2), 0, 1)) : 0;
             out.addVertex(x, y, z);
             return this;
         }
 
         @Override
         public VertexConsumer setColor(int red, int green, int blue, int alpha) {
-            out.setColor(r, g, b, 255);
+            int r = additive ? (fixed >> 16) & 0xFF : red;
+            int g = additive ? (fixed >> 8) & 0xFF : green;
+            int b = additive ? fixed & 0xFF : blue;
+            if (seam > 0) {
+                r = (int) Mth.lerp(seam * .8f, r, (edge >> 16) & 0xFF);
+                g = (int) Mth.lerp(seam * .8f, g, (edge >> 8) & 0xFF);
+                b = (int) Mth.lerp(seam * .8f, b, edge & 0xFF);
+            }
+            if (additive) {
+                out.setColor((int) (r * factor), (int) (g * factor), (int) (b * factor), 255);
+            } else {
+                out.setColor(r, g, b, (int) (alpha * factor));
+            }
             return this;
         }
 
@@ -369,7 +422,11 @@ public final class CosmosRender {
 
         @Override
         public VertexConsumer setUv2(int u, int v) {
-            out.setUv2(GlyphRender.FULL & 0xFFFF, GlyphRender.FULL >> 16);
+            if (additive) {
+                out.setUv2(GlyphRender.FULL & 0xFFFF, GlyphRender.FULL >> 16);
+            } else {
+                out.setUv2(u, v);
+            }
             return this;
         }
 

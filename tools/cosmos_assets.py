@@ -777,6 +777,50 @@ def affinity_ring_cosmos():
         "B": BLUE, "O": ORANGE})
 
 
+def post_effects():
+    """The screen effects of stopped time (client/TimeStopVision): the world in warm sepia, and its negative for the
+    blink when time stops. Both are Minecraft's own colour shader with other colours."""
+    def chain(uniforms):
+        return {"targets": ["swap"], "passes": [
+            {"name": "color_convolve", "intarget": "minecraft:main", "outtarget": "swap",
+             "uniforms": [{"name": k, "values": v} for k, v in uniforms]},
+            {"name": "blit", "intarget": "swap", "outtarget": "minecraft:main"}]}
+    g.write_json("shaders/post/time_stop.json", chain([
+        ("RedMatrix", [0.44, 0.74, 0.20]),
+        ("GreenMatrix", [0.34, 0.64, 0.16]),
+        ("BlueMatrix", [0.22, 0.44, 0.11]),
+        ("Saturation", [1.15]),
+    ]))
+    g.write_json("shaders/post/time_stop_flash.json", chain([
+        ("RedMatrix", [-1.0, 0.0, 0.0]),
+        ("GreenMatrix", [0.0, -1.0, 0.0]),
+        ("BlueMatrix", [0.0, 0.0, -1.0]),
+        ("Offset", [1.0, 0.75, 0.45]),
+    ]))
+
+
+def held_models():
+    """The codex is drawn by its own renderer (client/render/CodexOutOfTimeRenderer) everywhere but in the GUI: the
+    3D book (its model kept as codex_out_of_time_3d) with its clock ticking and a moon going round it. Its held model
+    only carries the way it is held."""
+    import json
+    import os
+    path = os.path.join(g.ROOT, "models/item/codex_out_of_time_3d.json")
+    with open(path, encoding="utf-8") as f:
+        book = json.load(f)
+    g.write_json("models/item/codex_out_of_time.json", {
+        "parent": "minecraft:item/handheld",
+        "loader": "neoforge:separate_transforms",
+        "base": {"parent": "arcanes_oublies:item/codex_out_of_time_held"},
+        "perspectives": {"gui": {"parent": "arcanes_oublies:item/codex_out_of_time_gui"}},
+    })
+    g.write_json("models/item/codex_out_of_time_held.json", {
+        "parent": "minecraft:builtin/entity",
+        "textures": {"particle": "arcanes_oublies:item/codex_out_of_time_3d"},
+        "display": book["display"],
+    })
+
+
 def main():
     g.save(stars(), D + "stars.png")
     g.save(nebula(), D + "nebula.png")
@@ -801,6 +845,8 @@ def main():
     g.save(codex_icon(), "textures/item/codex_out_of_time.png")
     g.save(codex_model_texture(), "textures/item/codex_out_of_time_3d.png")
     g.book_models("codex_out_of_time")
+    held_models()
+    post_effects()
 
 
 if __name__ == "__main__":

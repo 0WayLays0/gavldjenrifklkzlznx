@@ -25,9 +25,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 
 /**
- * The TVA's pruning baton in the caster's hand for one swing: a rod of dark steel with a glowing orange tip that leaves
- * a trail of time through the air. What it strikes is sent back to where it was three seconds ago (an echo of it is
- * left where it stood), and what it strikes when already weak enough is pruned: it crumbles into orange dust.
+ * The TVA's pruning baton in the caster's hand for one blow of its combo: a rod of dark steel with a glowing orange
+ * tip that leaves a trail of time through the air. The first blow sweeps from the right, the second back from the
+ * left: what they strike is sent back to where it was three seconds ago (an echo of it is left where it stood). The
+ * third comes down overhead and slams the ground: a wave of orange light throws back all round, and the pruning line
+ * is far higher. What any blow strikes when already weak enough is pruned: it crumbles into orange light and is gone.
  */
 public class PruningBaton extends SpellEffectEntity {
     public static final int SWING_TICKS = 8;
@@ -37,7 +39,12 @@ public class PruningBaton extends SpellEffectEntity {
     /** How far back a struck target is sent, in ticks. */
     public static final int BACK = 60;
 
+    /** The slam comes down a little later than the sweeps. */
+    public static final int SLAM_TICK = 6;
+    public static final float SLAM_RADIUS = 3.4f;
+
     private static final EntityDataAccessor<Integer> DATA_CASTER = SynchedEntityData.defineId(PruningBaton.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> DATA_STAGE = SynchedEntityData.defineId(PruningBaton.class, EntityDataSerializers.INT);
 
     @Nullable
     private String spellId;
@@ -47,7 +54,8 @@ public class PruningBaton extends SpellEffectEntity {
         super(entityType, level);
     }
 
-    public static void swing(Level level, LivingEntity caster, AbstractSpell spell, int spellLevel, float damage) {
+    /** One blow of the combo: {@code stage} 1 sweeps from the right, 2 back from the left, 3 slams down overhead. */
+    public static void swing(Level level, LivingEntity caster, AbstractSpell spell, int spellLevel, float damage, int stage) {
         PruningBaton baton = new PruningBaton(ModEntities.PRUNING_BATON.get(), level);
         baton.setOwner(caster);
         baton.spellId = spell.getSpellId();
@@ -55,14 +63,21 @@ public class PruningBaton extends SpellEffectEntity {
         baton.damage = damage;
         baton.moveTo(caster.getX(), caster.getY(), caster.getZ(), caster.getYRot(), 0);
         baton.entityData.set(DATA_CASTER, caster.getId());
+        baton.entityData.set(DATA_STAGE, stage);
         level.addFreshEntity(baton);
-        CosmosFx.sound(level, caster.position(), SoundEvents.PLAYER_ATTACK_SWEEP, 1, 1.3f);
-        CosmosFx.sound(level, caster.position(), SoundEvents.BEACON_POWER_SELECT, .5f, 1.8f);
+        CosmosFx.sound(level, caster.position(), SoundEvents.PLAYER_ATTACK_SWEEP, 1, 1.1f + .15f * stage);
+        CosmosFx.sound(level, caster.position(), SoundEvents.BEACON_POWER_SELECT, .5f, 1.6f + .2f * stage);
+    }
+
+    /** Which blow of the combo it is (1 to 3). */
+    public int getStage() {
+        return this.entityData.get(DATA_STAGE);
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_CASTER, -1);
+        builder.define(DATA_STAGE, 1);
     }
 
     @Nullable
@@ -84,8 +99,12 @@ public class PruningBaton extends SpellEffectEntity {
             discard();
             return;
         }
-        if (tickCount == HIT_TICK && level() instanceof ServerLevel level && caster instanceof LivingEntity living) {
-            strike(level, living);
+        if (level() instanceof ServerLevel level && caster instanceof LivingEntity living) {
+            if (getStage() < 3 && tickCount == HIT_TICK) {
+                strike(level, living);
+            } else if (getStage() >= 3 && tickCount == SLAM_TICK) {
+                slam(level, living);
+            }
         }
     }
 
@@ -133,6 +152,38 @@ public class PruningBaton extends SpellEffectEntity {
                 target.hurtMarked = true;
             }
         }
+    }
+
+    /** The third blow: the baton slams the ground in front, a wave of orange light throws back what is round it. */
+    private void slam(ServerLevel level, LivingEntity caster) {
+        AbstractSpell spell = spellId == null ? null : SpellRegistry.getSpell(spellId);
+        if (spell == null) {
+            return;
+        }
+        Vec3 look = Vec3.directionFromRotation(0, caster.getYRot());
+        Vec3 at = SpellUtil.groundAt(level, caster.position().add(look.scale(1.8)), 2, 1);
+        for (LivingEntity target : SpellUtil.enemiesAround(level, at.add(0, .8, 0), SLAM_RADIUS, caster, e -> true)) {
+            boolean hurt = DamageSources.applyDamage(target, damage * 1.6f, SpellUtil.damageSource(spell, this, caster));
+            if (!target.isAlive()) {
+                continue;
+            }
+            if (!Cosmos.isBoss(target) && target.getHealth() <= PruningBatonSpell.pruneLine(spellLevel, target.getMaxHealth()) * 1.8f) {
+                CosmosFx.prune(level, target, SpellUtil.damageSource(spell, this, caster));
+            } else if (hurt) {
+                Vec3 push = target.position().subtract(at).multiply(1, 0, 1);
+                push = push.lengthSqr() < 1.0E-4 ? look : push.normalize();
+                target.push(push.x * .9, .55, push.z * .9);
+                target.hurtMarked = true;
+            }
+        }
+        SpellUtil.particles(level, new io.redspace.ironsspellbooks.particle.BlastwaveParticleOptions(1f, .55f, .12f, SLAM_RADIUS * 2), at.x, at.y + .05, at.z, 1, 0, 0, 0, 0);
+        SpellUtil.particles(level, new io.redspace.ironsspellbooks.particle.BlastwaveParticleOptions(1f, .85f, .55f, SLAM_RADIUS), at.x, at.y + .1, at.z, 1, 0, 0, 0, 0);
+        CosmosFx.time(level, at.add(0, .3, 0), 40, SLAM_RADIUS * .4);
+        SpellUtil.particles(level, net.minecraft.core.particles.ParticleTypes.CRIT, at.x, at.y + .2, at.z, 30, 1.2, .2, 1.2, .5);
+        SpellUtil.cameraShake(level, at, 8, 10);
+        CosmosFx.sound(level, at, SoundEvents.ANVIL_LAND, .6f, 1.6f);
+        CosmosFx.sound(level, at, SoundEvents.BEACON_DEACTIVATE, 1, 1.4f);
+        CosmosFx.sound(level, at, SoundEvents.GENERIC_EXPLODE.value(), .5f, 1.6f);
     }
 
     /** How far the swing has gone (0 to 1) at {@code age}. */

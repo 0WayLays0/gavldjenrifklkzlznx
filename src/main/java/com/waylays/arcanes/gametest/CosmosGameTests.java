@@ -102,7 +102,7 @@ public final class CosmosGameTests {
         }
         BlockPos c = PocketUniverse.centre(9000);
         PocketUniverse.build(pocket, c, 0, 1, 7);
-        helper.assertTrue(pocket.getBlockState(c).is(Blocks.GRASS_BLOCK), "no grass in the middle of the island");
+        helper.assertTrue(!pocket.getBlockState(c).isAir(), "no ground in the middle of the island (its stopped clock)");
         helper.assertTrue(!pocket.getBlockState(c.below(3)).isAir(), "the island has no rock under its grass");
         // Past the ragged edge of a level 1 island (11 across its radius at most 12), within that of level 3 (17, at least 12.6)
         BlockPos ring = c.east(12);

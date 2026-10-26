@@ -17,9 +17,10 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 /**
- * Variant: a variant of the caster from another branch of time scans in beside them and casts one of the other spells
- * of their spellbook (any but summonings and held spells), at the level it holds there, at what they are looking at.
- * At higher levels, a second variant comes on the other side.
+ * Variant: variants of the caster from other branches of time scan in beside them (one, two from level 3, three at
+ * level 5). Each casts one of the other spells of the caster's spellbook as it arrives; then, as long as they last,
+ * every spell the caster casts (but summonings and held spells), they cast too, a beat later, at what the caster is
+ * looking at.
  */
 @AutoSpellConfig
 public class VariantSpell extends CosmosSpell {
@@ -33,12 +34,19 @@ public class VariantSpell extends CosmosSpell {
     }
 
     public static int variants(int spellLevel) {
-        return spellLevel >= 4 ? 2 : 1;
+        return spellLevel >= 5 ? 3 : spellLevel >= 3 ? 2 : 1;
+    }
+
+    public static int life(int spellLevel) {
+        return 160 + 40 * spellLevel;
     }
 
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
-        return List.of(Component.translatable("ui.arcanes_oublies.variants", variants(spellLevel)));
+        return List.of(
+                Component.translatable("ui.arcanes_oublies.variants", variants(spellLevel)),
+                Component.translatable("ui.arcanes_oublies.variants_mirror"),
+                Component.translatable("ui.irons_spellbooks.duration", io.redspace.ironsspellbooks.api.util.Utils.timeFromTicks(life(spellLevel), 1)));
     }
 
     @Override
@@ -48,9 +56,10 @@ public class VariantSpell extends CosmosSpell {
             // Local left (+X when facing +Z): the first variant on the right, the second on the left
             Vec3 left = new Vec3(forward.z, 0, -forward.x);
             for (int k = 0; k < variants(spellLevel); k++) {
-                Vec3 side = left.scale(k == 0 ? -1.6 : 1.6).add(forward.scale(.4));
+                // Right, left, then behind
+                Vec3 side = k == 2 ? forward.scale(-1.8) : left.scale(k == 0 ? -1.6 : 1.6).add(forward.scale(.4));
                 Vec3 at = SpellUtil.groundAt(level, entity.position().add(side), 3, 2);
-                CosmicVariant.scanIn(level, entity, at);
+                CosmicVariant.scanIn(level, entity, at, life(spellLevel));
             }
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);

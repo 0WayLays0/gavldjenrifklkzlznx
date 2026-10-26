@@ -47,6 +47,8 @@ public class TimeLoop extends SpellEffectEntity {
     private float anchorYRot;
     /** Damage the target took during the current loop. */
     private float taken;
+    /** Where the last ghost of its path was left. */
+    private Vec3 lastGhost = Vec3.ZERO;
 
     public TimeLoop(EntityType<? extends TimeLoop> entityType, Level level) {
         super(entityType, level);
@@ -102,14 +104,27 @@ public class TimeLoop extends SpellEffectEntity {
         if (tickCount % 20 == 0) {
             CosmosFx.tick(level, target.position(), .8f, 1.6f);
         }
+        // Ghosts of its path through the loop, left behind as it goes
+        if (tickCount % 6 == 0 && target.position().distanceToSqr(lastGhost) > .25) {
+            TemporalEcho.leave(level, target, target.position(), target.getYRot(), 36, Cosmos.AMBER);
+            lastGhost = target.position();
+        }
         if (tickCount % PERIOD == 0) {
             loopBack(level, target);
         }
     }
 
     private void loopBack(ServerLevel level, LivingEntity target) {
-        // An echo where it had got to
-        TemporalEcho.leave(level, target, target.position(), target.getYRot(), 30, Cosmos.ORANGE);
+        // An echo where it had got to, and a stream of time flowing back from there to the start
+        Vec3 was = target.position();
+        TemporalEcho.leave(level, target, was, target.getYRot(), 30, Cosmos.ORANGE);
+        Vec3 step = anchor.subtract(was).scale(1 / 12.0);
+        for (int k = 0; k <= 12; k++) {
+            Vec3 p = was.add(step.scale(k)).add(0, target.getBbHeight() * .5, 0);
+            SpellUtil.particles(level, CosmosFx.TIME, p.x, p.y, p.z, 3, .15, .2, .15, .01);
+        }
+        SpellUtil.cameraShake(level, anchor, 6, 8);
+        lastGhost = anchor;
         AbstractSpell spell = spellId == null ? null : SpellRegistry.getSpell(spellId);
         Entity owner = getOwner();
         if (spell != null) {
