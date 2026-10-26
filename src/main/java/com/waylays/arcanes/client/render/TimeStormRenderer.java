@@ -75,7 +75,7 @@ public class TimeStormRenderer extends EntityRenderer<TimeStorm> {
         for (int k : order) {
             float h = RuneRender.hash(k * 7 + 4);
             float size = (1.6f + 1.8f * h) * s;
-            float lit = Mth.clamp(.5f + .5f * Mth.sin(age * (.1f + .2f * h) + k * 2.3f), 0, 1) * (1 - at[k].y / (TimeStorm.HEIGHT * s + 1));
+            float lit = Mth.clamp(.5f + .5f * Mth.sin(age * (.1f + .2f * h) + k * 2.3f), 0, 1) * (1 - (float) at[k].y / (TimeStorm.HEIGHT * s + 1));
             int colour = GoldRender.lerp(h < .5f ? DARK : PURPLE, LIT, lit * .55f);
             poseStack.pushPose();
             poseStack.translate(at[k].x, at[k].y, at[k].z);
