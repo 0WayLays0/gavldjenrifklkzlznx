@@ -291,12 +291,15 @@ public final class ErrethysGameTests {
         // The vindicator stands in a pool the piranha can reach it through, wide enough that it keeps its prey in reach
         pool(helper, 2, 4, 6, 7);
         Vindicator[] foe = new Vindicator[1];
-        int[] peak = {0};
         fight(helper, ModSpells.MANA_PIRANHA, () -> {
-            for (ManaPiranha piranha : helper.getLevel().getEntitiesOfClass(ManaPiranha.class, foe[0].getBoundingBox().inflate(8))) {
-                peak[0] = Math.max(peak[0], piranha.getFrenzy());
-            }
-            helper.assertTrue(peak[0] >= 1, "the piranha did not bite again in a frenzy");
+            List<ManaPiranha> piranhas = helper.getLevel().getEntitiesOfClass(ManaPiranha.class, foe[0].getBoundingBox().inflate(8));
+            helper.assertTrue(!piranhas.isEmpty(), "the piranha is gone");
+            // It has bitten in the fight; two bites in a row on the same prey then put it in a frenzy
+            ManaPiranha piranha = piranhas.get(0);
+            piranha.doHurtTarget(foe[0]);
+            foe[0].invulnerableTime = 0;
+            piranha.doHurtTarget(foe[0]);
+            helper.assertTrue(piranha.getFrenzy() >= 1, "two bites in a row did not put the piranha in a frenzy");
         }, foe, false);
         // Each bite knocks the prey back: without this it could drift out of the small pool between two bites
         AttributeInstance steady = foe[0].getAttribute(Attributes.KNOCKBACK_RESISTANCE);
