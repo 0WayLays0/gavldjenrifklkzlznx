@@ -323,7 +323,8 @@ public final class ClientSmokeTest {
                     : school.equals(ModSchools.TOKEN_RESOURCE) ? ModItems.SOUL_LEDGER.get()
                     : school.equals(ModSchools.VERDIGRIS_RESOURCE) ? ModItems.RUSTED_CODEX.get()
                     : school.equals(ModSchools.WALL_RESOURCE) ? ModItems.RAMPART_CODEX.get()
-                    : school.equals(ModSchools.GEM_RESOURCE) ? ModItems.JEWELLERS_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get();
+                    : school.equals(ModSchools.GEM_RESOURCE) ? ModItems.JEWELLERS_CODEX.get()
+                    : school.equals(ModSchools.COSMOS_RESOURCE) ? ModItems.CODEX_OUT_OF_TIME.get() : ModItems.GOLDEN_GRIMOIRE.get();
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(book));
             // A sturdy target dummy 6 blocks in front of the player, at eye level of the raycast
             Vec3 forward = Vec3.directionFromRotation(0, player.getYRot());
@@ -537,6 +538,11 @@ public final class ClientSmokeTest {
         AbstractSpell spell = toRecast;
         toRecast = null;
         ServerPlayer player = server.getPlayerList().getPlayer(id);
+        if (player != null && com.waylays.arcanes.spells.cosmos.PocketUniverse.isIn(player)) {
+            // The Pocket Universe took the player into their island: back out for the next spells
+            com.waylays.arcanes.spells.cosmos.PocketUniverse.leave(player);
+            log("back from the pocket universe to {}", player.level().dimension().location());
+        }
         if (spell == null || player == null) {
             return;
         }

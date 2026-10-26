@@ -43,6 +43,8 @@ PALETTES = {
     "wall": ["8e8d8e", "a3a2a3", "bcbbbc", "626162", "777677", "9cc05a", "5c7834", "3a4e20", "c9c8c9", "8a898a", "4e4d4e"],
     # Deep violet paper, the writing in ruby, gold rod ends
     "gem": ["5a3a78", "6e4a90", "8a64aa", "3a2450", "4a3064", "e01848", "a01034", "60081c", "f2c33c", "c4961e", "7a5a10"],
+    # Night-blue paper sown with stars, the writing in the TVA's orange, bronze rod ends
+    "cosmos": ["1c1f4a", "252a5e", "2f3672", "121433", "181b40", "ffe7c2", "ff8a1e", "c85a10", "ffb347", "b8702a", "5c3416"],
 }
 
 

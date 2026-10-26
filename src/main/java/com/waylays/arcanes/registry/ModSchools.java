@@ -243,6 +243,26 @@ public final class ModSchools {
             GEM_MAGIC
     ));
 
+    /**
+     * Cosmos: the magic of space and time. Time is the orange of the Time Variance Authority's doors and clocks (a
+     * universe in a pocket, doors back to where you were, loops, variants, stopped time); space is deep blue and
+     * violet sown with stars (planets, comets, moons and constellations).
+     */
+    public static final ResourceLocation COSMOS_RESOURCE = ArcanesOublies.id("cosmos");
+    public static final TagKey<Item> COSMOS_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("cosmos_focus"));
+    public static final ResourceKey<DamageType> COSMOS_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("cosmos_magic"));
+    public static final int COSMOS_COLOR = 0x6C7CFF;
+
+    public static final DeferredHolder<SchoolType, SchoolType> COSMOS = SCHOOLS.register(COSMOS_RESOURCE.getPath(), () -> new SchoolType(
+            COSMOS_RESOURCE,
+            COSMOS_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".cosmos").withStyle(Style.EMPTY.withColor(COSMOS_COLOR)),
+            ModAttributes.COSMOS_SPELL_POWER,
+            ModAttributes.COSMOS_MAGIC_RESIST,
+            sound(SoundEvents.BEACON_POWER_SELECT),
+            COSMOS_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

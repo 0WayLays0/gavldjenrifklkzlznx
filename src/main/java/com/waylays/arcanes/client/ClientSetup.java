@@ -242,6 +242,12 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.AMETHYST_GEODE.get(), AmethystGeodeRenderer::new);
         event.registerEntityRenderer(ModEntities.EMERALD_BLOOM.get(), EmeraldBloomRenderer::new);
         event.registerEntityRenderer(ModEntities.GEM_CROWN.get(), GemCrownRenderer::new);
+        event.registerEntityRenderer(ModEntities.TIME_DOOR.get(), com.waylays.arcanes.client.render.TimeDoorRenderer::new);
+        event.registerEntityRenderer(ModEntities.TEMPORAL_ECHO.get(), com.waylays.arcanes.client.render.TemporalEchoRenderer::new);
+        event.registerEntityRenderer(ModEntities.PRUNING_BATON.get(), com.waylays.arcanes.client.render.PruningBatonRenderer::new);
+        event.registerEntityRenderer(ModEntities.TIME_LOOP.get(), com.waylays.arcanes.client.render.TimeLoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.COSMIC_VARIANT.get(), com.waylays.arcanes.client.render.CosmicVariantRenderer::new);
+        event.registerEntityRenderer(ModEntities.TIME_STOP_BUBBLE.get(), com.waylays.arcanes.client.render.TimeStopBubbleRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_CIRCLE.get(), RitualCircleRenderer::new);
         event.registerEntityRenderer(ModEntities.METEOR.get(), MeteorRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_DOME.get(), RitualDomeRenderer::new);
@@ -282,6 +288,12 @@ public final class ClientSetup {
                 renderer.addLayer(new GoldCoatLayer(renderer));
             }
         }
+    }
+
+    /** The sky of the Pocket Universe (the dimension type's effects). */
+    @SubscribeEvent
+    public static void registerSkies(net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent event) {
+        event.register(ArcanesOublies.id("pocket"), new com.waylays.arcanes.client.render.PocketSkyEffects());
     }
 
     @SubscribeEvent

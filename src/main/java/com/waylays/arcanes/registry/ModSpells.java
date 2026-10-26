@@ -136,6 +136,12 @@ import com.waylays.arcanes.spells.gem.AmethystResonanceSpell;
 import com.waylays.arcanes.spells.gem.AmethystGeodeSpell;
 import com.waylays.arcanes.spells.gem.EmeraldBloomSpell;
 import com.waylays.arcanes.spells.gem.CrownOfGemsSpell;
+import com.waylays.arcanes.spells.cosmos.PocketUniverseSpell;
+import com.waylays.arcanes.spells.cosmos.PruningBatonSpell;
+import com.waylays.arcanes.spells.cosmos.TimeDoorSpell;
+import com.waylays.arcanes.spells.cosmos.TimeLoopSpell;
+import com.waylays.arcanes.spells.cosmos.TimeStopSpell;
+import com.waylays.arcanes.spells.cosmos.VariantSpell;
 import com.waylays.arcanes.spells.wall.BastionSpell;
 import com.waylays.arcanes.spells.wall.BrickBoltSpell;
 import com.waylays.arcanes.spells.wall.BrickCageSpell;
@@ -347,6 +353,14 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> AMETHYST_GEODE = register(new AmethystGeodeSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> EMERALD_BLOOM = register(new EmeraldBloomSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> CROWN_OF_GEMS = register(new CrownOfGemsSpell());
+
+    // Cosmos: time
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> POCKET_UNIVERSE = register(new PocketUniverseSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TIME_DOOR = register(new TimeDoorSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PRUNING_BATON = register(new PruningBatonSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TIME_LOOP = register(new TimeLoopSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> VARIANT = register(new VariantSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TIME_STOP = register(new TimeStopSpell());
 
     private ModSpells() {}
 

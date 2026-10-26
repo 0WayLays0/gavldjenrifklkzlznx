@@ -18,7 +18,8 @@
         "arcanes_token": "arcanes_oublies:item/scroll_palettes/token",
         "arcanes_verdigris": "arcanes_oublies:item/scroll_palettes/verdigris",
         "arcanes_wall": "arcanes_oublies:item/scroll_palettes/wall",
-        "arcanes_gem": "arcanes_oublies:item/scroll_palettes/gem"
+        "arcanes_gem": "arcanes_oublies:item/scroll_palettes/gem",
+        "arcanes_cosmos": "arcanes_oublies:item/scroll_palettes/cosmos"
       }
     }
   ]

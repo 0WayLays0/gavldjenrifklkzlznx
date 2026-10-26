@@ -87,6 +87,12 @@ import com.waylays.arcanes.entity.gem.AmethystResonance;
 import com.waylays.arcanes.entity.gem.AmethystGeode;
 import com.waylays.arcanes.entity.gem.EmeraldBloom;
 import com.waylays.arcanes.entity.gem.GemCrown;
+import com.waylays.arcanes.entity.cosmos.CosmicVariant;
+import com.waylays.arcanes.entity.cosmos.PruningBaton;
+import com.waylays.arcanes.entity.cosmos.TemporalEcho;
+import com.waylays.arcanes.entity.cosmos.TimeDoor;
+import com.waylays.arcanes.entity.cosmos.TimeLoop;
+import com.waylays.arcanes.entity.cosmos.TimeStopBubble;
 import com.waylays.arcanes.entity.wall.BrickBolt;
 import com.waylays.arcanes.entity.wall.BrickStorm;
 import com.waylays.arcanes.ritual.RitualCircle;
@@ -422,6 +428,20 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<WallImpact>> WALL_IMPACT = register("wall_impact",
             EntityType.Builder.<WallImpact>of(WallImpact::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(40).fireImmune());
 
+    // Cosmos
+    public static final DeferredHolder<EntityType<?>, EntityType<TimeDoor>> TIME_DOOR = register("time_door",
+            EntityType.Builder.<TimeDoor>of(TimeDoor::new, MobCategory.MISC).sized(1.5f, 2.7f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TemporalEcho>> TEMPORAL_ECHO = register("temporal_echo",
+            EntityType.Builder.<TemporalEcho>of(TemporalEcho::new, MobCategory.MISC).sized(.6f, 1.8f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<PruningBaton>> PRUNING_BATON = register("pruning_baton",
+            EntityType.Builder.<PruningBaton>of(PruningBaton::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TimeLoop>> TIME_LOOP = register("time_loop",
+            EntityType.Builder.<TimeLoop>of(TimeLoop::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(2).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<CosmicVariant>> COSMIC_VARIANT = register("cosmic_variant",
+            EntityType.Builder.<CosmicVariant>of(CosmicVariant::new, MobCategory.MISC).sized(.6f, 1.8f).clientTrackingRange(10).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TimeStopBubble>> TIME_STOP_BUBBLE = register("time_stop_bubble",
+            EntityType.Builder.<TimeStopBubble>of(TimeStopBubble::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+
     // Rituals: the chalk circle and what the rituals leave in the world
     public static final DeferredHolder<EntityType<?>, EntityType<RitualCircle>> RITUAL_CIRCLE = register("ritual_circle",
             EntityType.Builder.<RitualCircle>of(RitualCircle::new, MobCategory.MISC).sized(1f, .1f).clientTrackingRange(16).updateInterval(10).fireImmune());
@@ -455,5 +475,6 @@ public final class ModEntities {
         event.put(MANA_BUTTERFLY.get(), ManaButterfly.createAttributes().build());
         event.put(MANA_KANGAROO.get(), ManaKangaroo.createAttributes().build());
         event.put(MANA_FALCON.get(), ManaFalcon.createAttributes().build());
+        event.put(COSMIC_VARIANT.get(), CosmicVariant.createAttributes().build());
     }
 }

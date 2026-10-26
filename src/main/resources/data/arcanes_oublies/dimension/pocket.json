@@ -1,0 +1,18 @@
+{
+  "type": "arcanes_oublies:pocket",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "arcanes_oublies:pocket",
+      "layers": [
+        {
+          "block": "minecraft:air",
+          "height": 1
+        }
+      ],
+      "lakes": false,
+      "features": false,
+      "structure_overrides": []
+    }
+  }
+}

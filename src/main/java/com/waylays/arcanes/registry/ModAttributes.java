@@ -42,6 +42,8 @@ public final class ModAttributes {
     public static final DeferredHolder<Attribute, Attribute> WALL_MAGIC_RESIST = resistanceAttribute("wall");
     public static final DeferredHolder<Attribute, Attribute> GEM_SPELL_POWER = powerAttribute("gem");
     public static final DeferredHolder<Attribute, Attribute> GEM_MAGIC_RESIST = resistanceAttribute("gem");
+    public static final DeferredHolder<Attribute, Attribute> COSMOS_SPELL_POWER = powerAttribute("cosmos");
+    public static final DeferredHolder<Attribute, Attribute> COSMOS_MAGIC_RESIST = resistanceAttribute("cosmos");
 
     private ModAttributes() {}
 
