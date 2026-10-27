@@ -55,6 +55,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -120,6 +121,13 @@ public final class ClientSmokeTest {
     private static BlockPos photoFloor;
     private static int shotCastTick;
     private static float shotYaw;
+    /** Frames drawn so far. */
+    private static int frames;
+    /** The creative tab's next step, the tick and frame its last step was taken at, and the name of its next picture. */
+    private static int creativeStep;
+    private static int creativeTick;
+    private static int creativeFrame;
+    private static String creativeShot = "all";
 
     static {
         if (ENABLED) {
@@ -170,6 +178,11 @@ public final class ClientSmokeTest {
     }
 
     @SubscribeEvent
+    public static void onFrame(RenderFrameEvent.Post event) {
+        frames++;
+    }
+
+    @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         if (!ENABLED) {
             return;
@@ -186,8 +199,7 @@ public final class ClientSmokeTest {
                 }
             }
             case SETTLING -> {
-                creativeTab(mc);
-                if (ticks >= SETTLE_TICKS) {
+                if (creativeTab(mc) && ticks >= SETTLE_TICKS) {
                     mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
                     stage = Stage.CASTING;
                     ticks = 0;
@@ -405,19 +417,24 @@ public final class ClientSmokeTest {
     }
 
     /**
-     * Opens the creative inventory on the addon's tab and goes through its school buttons: a school's button must
-     * leave that school's items only. Photographed with {@code creative} in {@code arcanes.shots}.
+     * Opens the creative inventory on the addon's tab and goes through its school entries: a school's entry must
+     * leave that school's items only. Photographed with {@code creative} in {@code arcanes.shots}. Each step waits for
+     * frames drawn since the one before (under xvfb a frame can take several ticks, and a picture is the last frame
+     * drawn). Returns whether it is done.
      */
-    private static void creativeTab(Minecraft mc) {
+    private static boolean creativeTab(Minecraft mc) {
+        if (creativeStep > 7 || ticks < 20 || ticks - creativeTick < 5 || frames - creativeFrame < 2) {
+            return creativeStep > 7;
+        }
         boolean shots = SHOTS.contains("creative");
         try {
-            switch (ticks) {
-                case 20 -> {
+            switch (creativeStep) {
+                case 0 -> {
                     // Chosen before the screen opens, so that it opens on the page of tabs that holds the addon's
                     CreativeModeInventoryScreen.selectedTab = ModCreativeTabs.MAIN.get();
                     mc.setScreen(new InventoryScreen(mc.player));
                 }
-                case 25 -> {
+                case 1 -> {
                     if (mc.screen instanceof CreativeModeInventoryScreen screen) {
                         screen.selectTab(ModCreativeTabs.MAIN.get());
                         if (!screen.getCurrentPage().getVisibleTabs().contains(ModCreativeTabs.MAIN.get())) {
@@ -429,15 +446,16 @@ public final class ClientSmokeTest {
                         ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the creative inventory did not open ({})", mc.screen);
                     }
                 }
-                case 30, 36, 42 -> {
+                case 2, 4, 6 -> {
                     if (shots) {
-                        screenshot(mc, "creative_" + ticks);
+                        screenshot(mc, "creative_" + creativeShot);
                     }
                 }
-                case 32, 38 -> {
-                    int index = ticks == 32 ? 1 : ModCreativeTabs.SECTIONS.size();
+                case 3, 5 -> {
+                    int index = creativeStep == 3 ? 1 : ModCreativeTabs.SECTIONS.size();
                     CreativeTabFilter.press(index);
                     ModCreativeTabs.Section section = ModCreativeTabs.SECTIONS.get(index - 1);
+                    creativeShot = section.school().get().getId().getPath();
                     if (mc.screen instanceof CreativeModeInventoryScreen screen) {
                         var items = screen.getMenu().items;
                         if (items.isEmpty() || items.stream().anyMatch(stack -> ModCreativeTabs.sectionOf(stack) != section)) {
@@ -449,18 +467,23 @@ public final class ClientSmokeTest {
                         }
                     }
                 }
-                case 46 -> {
+                case 7 -> {
                     CreativeTabFilter.press(0);
                     mc.setScreen(null);
                 }
                 default -> {
                 }
             }
+            creativeStep++;
         } catch (Throwable t) {
             failures.incrementAndGet();
             ArcanesOublies.LOGGER.error("[SmokeTest] FAIL going through the creative tab", t);
             mc.setScreen(null);
+            creativeStep = 8;
         }
+        creativeTick = ticks;
+        creativeFrame = frames;
+        return creativeStep > 7;
     }
 
     /**

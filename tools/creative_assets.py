@@ -1,6 +1,7 @@
-"""The addon's creative tab: its own background (a night-blue panel framed in gold, a faint arcane circle behind the
-items), its scroller (a gold-set gem), and the sprites of the school bar beside it (a framed panel, the school
-slots, the arrows). Original art; the item slots and the scroll track sit where the game expects them.
+"""The addon's creative tab: its own background (a night-blue panel framed in gold), the arcane circle drawn behind the
+items in the chosen school's colour (a ring of runes and a star turning inside it, white here and tinted in game), its
+scroller (a gold-set gem), and the sprites of the school bar beside it (a framed panel, the school slots, the arrows).
+Original art; the item slots and the scroll track sit where the game expects them.
 """
 import math
 
@@ -114,27 +115,86 @@ def _slot(img, x, y, size=SLOT):
             _px(img, x + i, y + j, c)
 
 
-def _arcane_circle(img, cx, cy, r, strength=1.0):
-    """A faint circle of runes behind the items."""
-    color = (96, 78, 170)
-    for k in range(720):
-        a = k / 720 * math.tau
-        for rr, op in ((r, .45), (r - 4, .3), (r * .55, .25)):
-            _blend(img, int(round(cx + math.cos(a) * rr)), int(round(cy + math.sin(a) * rr)), color, op * strength)
-    for k in range(24):
-        a = k / 24 * math.tau
-        for s in range(3 if k % 2 else 5):
-            rr = r - 1 - s
-            _blend(img, int(round(cx + math.cos(a) * rr)), int(round(cy + math.sin(a) * rr)), color, .45 * strength)
-    # A six-pointed star inside
-    pts = [(cx + math.cos(a) * r * .55, cy + math.sin(a) * r * .55) for a in (k / 6 * math.tau - math.pi / 2 for k in range(6))]
+CIRCLE = 96
+# Glyphs for the circle's runes (3 x 5), read outward to inward
+RUNES = [
+    ["#.#", "###", ".#.", ".#.", ".#."],
+    ["##.", "#.#", "##.", "#..", "#.."],
+    [".#.", "#.#", ".#.", "#.#", ".#."],
+    ["#..", "##.", "#.#", "##.", "#.."],
+    ["###", "..#", ".#.", "#..", "###"],
+    [".#.", ".#.", "###", ".#.", "#.#"],
+    ["#.#", "#.#", ".#.", "#.#", "#.#"],
+    ["###", "#..", "##.", "#..", "#.."],
+]
+
+
+def _white(img, x, y, a):
+    """Adds opacity {a} (0 to 1) of white at (x, y): the circle's art, tinted in game."""
+    x, y = int(round(x)), int(round(y))
+    if 0 <= x < img.width and 0 <= y < img.height:
+        al = img.getpixel((x, y))[3]
+        img.putpixel((x, y), (255, 255, 255, min(255, al + int(255 * a))))
+
+
+def _ring(img, c, r, a):
+    for k in range(int(r * 8)):
+        t = k / (r * 8) * math.tau
+        _white(img, c + math.cos(t) * r, c + math.sin(t) * r, a)
+
+
+def _segment(img, x0, y0, x1, y1, a):
+    n = int(math.hypot(x1 - x0, y1 - y0) * 2) + 1
+    for s in range(n + 1):
+        t = s / n
+        _white(img, x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, a)
+
+
+def circle_ring():
+    """The circle's outer part, which stays still: two rings with runes between them and ticks inside."""
+    img = Image.new("RGBA", (CIRCLE, CIRCLE), (0, 0, 0, 0))
+    c = (CIRCLE - 1) / 2
+    _ring(img, c, 46, .9)
+    _ring(img, c, 39, .7)
+    _ring(img, c, 34, .35)
+    # Runes: little glyphs standing in the band between the rings, a dot between each two
+    for k in range(16):
+        glyph = RUNES[k % len(RUNES)]
+        t0 = k / 16 * math.tau
+        for v, line in enumerate(glyph):
+            for u, ch in enumerate(line):
+                if ch == "#":
+                    t = t0 + (u - 1) / 42.5
+                    rr = 44.5 - v
+                    _white(img, c + math.cos(t) * rr, c + math.sin(t) * rr, .85)
+        t = t0 + math.tau / 32
+        _white(img, c + math.cos(t) * 42.5, c + math.sin(t) * 42.5, .9)
+    for k in range(48):
+        t = k / 48 * math.tau
+        for s in range(3 if k % 4 == 0 else 1):
+            _white(img, c + math.cos(t) * (38 - s), c + math.sin(t) * (38 - s), .55)
+    return img
+
+
+def circle_star():
+    """The circle's inner part, which turns: a six-pointed star in a ring, a smaller ring and a dot at its heart."""
+    img = Image.new("RGBA", (CIRCLE, CIRCLE), (0, 0, 0, 0))
+    c = (CIRCLE - 1) / 2
+    r = 30
+    pts = [(c + math.cos(t) * r, c + math.sin(t) * r) for t in (k / 6 * math.tau - math.pi / 2 for k in range(6))]
     for tri in ((0, 2, 4), (1, 3, 5)):
         for a, b in ((tri[0], tri[1]), (tri[1], tri[2]), (tri[2], tri[0])):
-            (x0, y0), (x1, y1) = pts[a], pts[b]
-            n = int(math.hypot(x1 - x0, y1 - y0) * 2)
-            for s in range(n + 1):
-                t = s / n
-                _blend(img, int(round(x0 + (x1 - x0) * t)), int(round(y0 + (y1 - y0) * t)), color, .35 * strength)
+            _segment(img, *pts[a], *pts[b], .75)
+    _ring(img, c, 31, .55)
+    _ring(img, c, 13, .6)
+    # Small circles on the star's points
+    for x, y in pts:
+        for k in range(16):
+            t = k / 16 * math.tau
+            _white(img, x + math.cos(t) * 2.4, y + math.sin(t) * 2.4, .5)
+    for dx, dy in ((0, 0), (1, 0), (0, 1), (-1, 0), (0, -1)):
+        _white(img, c + dx, c + dy, .9 if dx == dy == 0 else .5)
+    return img
 
 
 def tab_background():
@@ -148,8 +208,6 @@ def tab_background():
     for row in range(5):
         for col in range(9):
             _slot(img, GRID_X + col * SLOT, GRID_Y + row * SLOT)
-    # The circle shows faintly through the slots, behind the items
-    _arcane_circle(img, 88, 62, 44, .6)
     _gold_rule(img, 8, 169, 108, 88)
     for col in range(9):
         _slot(img, GRID_X + col * SLOT, HOTBAR_Y)
@@ -230,6 +288,8 @@ def arrow(up, lit):
 
 def main():
     g.save(tab_background(), "textures/gui/creative/tab.png")
+    g.save(circle_ring(), "textures/gui/creative/circle_ring.png")
+    g.save(circle_star(), "textures/gui/creative/circle_star.png")
     g.save(scroller(), "textures/gui/sprites/creative/scroller.png")
     g.save(side_panel(), "textures/gui/sprites/creative/panel.png")
     g.write_json("textures/gui/sprites/creative/panel.png.mcmeta",
