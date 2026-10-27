@@ -75,11 +75,11 @@ public class BoneColossusRenderer extends EntityRenderer<BoneColossus> {
         float since = age - colossus.slamStart();
         for (int side = -1; side <= 1; side += 2) {
             Vector3f shoulder = new Vector3f(side * BoneColossus.SHOULDER_X, BoneColossus.SHOULDER_Y, 0);
-            Vector3f rest = new Vector3f(side * 3.8f, 1.6f + .25f * Mth.sin(age * .05f + side), 3.3f);
+            Vector3f rest = new Vector3f(side * 5.2f, 1.3f + .25f * Mth.sin(age * .05f + side), 9.5f);
             Vector3f hand = rest;
             float fist = .35f;
             if (side == colossus.slamSide() && since >= 0 && since <= BoneColossus.RETURN) {
-                Vector3f high = new Vector3f(side * 2.6f, 13.5f, 1.2f);
+                Vector3f high = new Vector3f(side * 3f, 15.5f, 4f);
                 Vector3f hit = new Vector3f((float) target.x, .9f, (float) target.z);
                 if (since < BoneColossus.RAISE) {
                     float k = since / BoneColossus.RAISE;

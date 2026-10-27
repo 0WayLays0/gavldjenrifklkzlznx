@@ -45,11 +45,12 @@ public class BoneWardRenderer extends EntityRenderer<BoneWard> {
             poseStack.mulPose(com.mojang.math.Axis.XP.rotation(-.2f));
             poseStack.scale(scale, scale, scale);
             PoseStack.Pose p = poseStack.last();
-            // A shoulder blade: a flat triangle of bone (three flattened lobes), a ridge across it and a spike
-            BoneRender.blob(bone, p, new Vector3f(0, .05f, 0), new Vector3f(.42f, 0, 0), new Vector3f(0, .5f, 0), new Vector3f(0, 0, .07f), 10, 6, packedLight, BoneRender.WHITE);
-            BoneRender.blob(bone, p, new Vector3f(0, -.38f, 0), new Vector3f(.2f, 0, 0), new Vector3f(0, .22f, 0), new Vector3f(0, 0, .06f), 8, 4, packedLight, BoneRender.WHITE);
-            BoneRender.bone(bone, p, new Vector3f(-.36f, .26f, .07f), new Vector3f(.38f, .14f, .07f), .07f, packedLight, BoneRender.WHITE);
-            BoneRender.spike(bone, p, new Vector3f(.1f, .2f, .1f), new Vector3f(.18f, .3f, .55f), .08f, new Vector3f(0, .05f, 0), packedLight, BoneRender.WHITE);
+            // A shoulder blade: a thin triangle of bone narrowing to a point below, a ridge across its top and a spike
+            BoneRender.blob(bone, p, new Vector3f(0, .14f, 0), new Vector3f(.34f, 0, 0), new Vector3f(0, .3f, 0), new Vector3f(0, 0, .035f), 10, 6, packedLight, BoneRender.WHITE);
+            BoneRender.blob(bone, p, new Vector3f(-.03f, -.22f, 0), new Vector3f(.19f, 0, 0), new Vector3f(0, .3f, 0), new Vector3f(0, 0, .03f), 8, 5, packedLight, BoneRender.WHITE);
+            BoneRender.spike(bone, p, new Vector3f(-.05f, -.3f, 0), new Vector3f(-.08f, -.68f, .02f), .09f, new Vector3f(), packedLight, BoneRender.WHITE);
+            BoneRender.bone(bone, p, new Vector3f(-.34f, .3f, .04f), new Vector3f(.36f, .24f, .04f), .055f, packedLight, BoneRender.WHITE);
+            BoneRender.spike(bone, p, new Vector3f(.1f, .28f, .06f), new Vector3f(.2f, .42f, .6f), .065f, new Vector3f(0, .06f, 0), packedLight, BoneRender.WHITE);
             poseStack.popPose();
         }
         VertexConsumer glow = buffer.getBuffer(RenderType.eyes(GlyphRender.GLOW));
@@ -57,7 +58,7 @@ public class BoneWardRenderer extends EntityRenderer<BoneWard> {
             poseStack.pushPose();
             poseStack.translate(where[i][0] * .85f, where[i][1], where[i][2] * .85f);
             poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            RenderHelper.billboard(glow, poseStack.last(), .55f * scale, RuneRender.additive(BoneFx.MARROW, .45f * scale), GlyphRender.FULL);
+            RenderHelper.billboard(glow, poseStack.last(), .42f * scale, RuneRender.additive(BoneFx.MARROW, .3f * scale), GlyphRender.FULL);
             poseStack.popPose();
         }
         super.render(ward, entityYaw, partialTicks, poseStack, buffer, packedLight);

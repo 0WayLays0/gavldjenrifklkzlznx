@@ -39,9 +39,11 @@ public class BoneColossus extends SpellEffectEntity {
     public static final int RETURN = 30;
     public static final float SHOULDER_X = 3.3f;
     public static final float SHOULDER_Y = 7f;
-    public static final float ARM = 6.2f;
+    public static final float ARM = 8f;
+    /** How far behind the caster it rises (the camera behind a player stays clear of its ribs). */
+    public static final float BEHIND = 7;
     public static final float SLAM_RADIUS = 4f;
-    public static final float HUNT = 20;
+    public static final float HUNT = 24;
 
     private static final EntityDataAccessor<Integer> DATA_LIFE = SynchedEntityData.defineId(BoneColossus.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_SLAM = SynchedEntityData.defineId(BoneColossus.class, EntityDataSerializers.INT);
@@ -63,7 +65,7 @@ public class BoneColossus extends SpellEffectEntity {
         colossus.spellId = spell.getSpellId();
         colossus.damage = damage;
         Vec3 forward = Vec3.directionFromRotation(0, caster.getYRot());
-        Vec3 at = SpellUtil.groundAt(level, caster.position().subtract(forward.scale(2.5)), 4, 1);
+        Vec3 at = SpellUtil.groundAt(level, caster.position().subtract(forward.scale(BEHIND)), 4, 1);
         colossus.moveTo(at.x, at.y, at.z, caster.getYRot(), 0);
         colossus.entityData.set(DATA_LIFE, life);
         level.addFreshEntity(colossus);
