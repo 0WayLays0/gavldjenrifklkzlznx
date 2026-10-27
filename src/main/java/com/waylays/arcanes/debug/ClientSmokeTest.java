@@ -217,7 +217,8 @@ public final class ClientSmokeTest {
                     ? name : null;
             shotCastTick = ticks;
             java.util.UUID id = mc.player.getUUID();
-            boolean alone = shotName != null;
+            // The piranha needs its pool dug in solid ground: it is always cast on the photo floor
+            boolean alone = shotName != null || spell == ModSpells.MANA_PIRANHA.get();
             server.execute(() -> castOnServer(server, id, spell, alone));
             // A held spell photographed is held on until the last picture, as a player would
             held = alone && spell.getCastType() == CastType.CONTINUOUS ? spell : null;
@@ -411,10 +412,18 @@ public final class ClientSmokeTest {
         boolean shots = SHOTS.contains("creative");
         try {
             switch (ticks) {
-                case 20 -> mc.setScreen(new InventoryScreen(mc.player));
+                case 20 -> {
+                    // Chosen before the screen opens, so that it opens on the page of tabs that holds the addon's
+                    CreativeModeInventoryScreen.selectedTab = ModCreativeTabs.MAIN.get();
+                    mc.setScreen(new InventoryScreen(mc.player));
+                }
                 case 25 -> {
                     if (mc.screen instanceof CreativeModeInventoryScreen screen) {
                         screen.selectTab(ModCreativeTabs.MAIN.get());
+                        if (!screen.getCurrentPage().getVisibleTabs().contains(ModCreativeTabs.MAIN.get())) {
+                            failures.incrementAndGet();
+                            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the creative inventory is not on the page of the addon's tab");
+                        }
                     } else {
                         failures.incrementAndGet();
                         ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the creative inventory did not open ({})", mc.screen);
