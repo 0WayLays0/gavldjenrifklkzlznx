@@ -17,9 +17,8 @@ import java.util.WeakHashMap;
 
 /**
  * The past of every living thing, as time magic sees it: where it stood, which way it looked and how hurt it was,
- * a few times a second over the last {@link #SPAN} ticks. The Time Door opens where its caster stood five seconds
- * ago, the Pruning Baton and the Reset Charge send their targets back to where they were, the Reset Charge gives its
- * allies back the health they had. Kept on both sides (the client draws the past as echoes), never saved.
+ * a few times a second over the last {@link #SPAN} ticks. The Reset Charge sends its targets back to where they
+ * were and gives its allies back the health they had. Kept on both sides (the client draws the past as echoes), never saved.
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID)
 public final class TimeTrail {

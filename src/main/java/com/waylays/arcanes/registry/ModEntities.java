@@ -91,18 +91,13 @@ import com.waylays.arcanes.entity.cosmos.AsteroidBelt;
 import com.waylays.arcanes.entity.cosmos.BlackHole;
 import com.waylays.arcanes.entity.cosmos.CaptivePlanet;
 import com.waylays.arcanes.entity.cosmos.CometCrater;
-import com.waylays.arcanes.entity.cosmos.CosmicVariant;
 import com.waylays.arcanes.entity.cosmos.PocketMoon;
 import com.waylays.arcanes.entity.cosmos.PrunedRemains;
-import com.waylays.arcanes.entity.cosmos.PruningBaton;
 import com.waylays.arcanes.entity.cosmos.ResetCharge;
 import com.waylays.arcanes.entity.cosmos.RiddenComet;
 import com.waylays.arcanes.entity.cosmos.StarLion;
 import com.waylays.arcanes.entity.cosmos.TemporalEcho;
-import com.waylays.arcanes.entity.cosmos.TimeDoor;
 import com.waylays.arcanes.entity.cosmos.TimeLoop;
-import com.waylays.arcanes.entity.cosmos.TimeStopBubble;
-import com.waylays.arcanes.entity.cosmos.TimeStorm;
 import com.waylays.arcanes.entity.cosmos.ZeroGravityField;
 import com.waylays.arcanes.entity.wall.BrickBolt;
 import com.waylays.arcanes.entity.wall.BrickStorm;
@@ -440,20 +435,12 @@ public final class ModEntities {
             EntityType.Builder.<WallImpact>of(WallImpact::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(40).fireImmune());
 
     // Cosmos
-    public static final DeferredHolder<EntityType<?>, EntityType<TimeDoor>> TIME_DOOR = register("time_door",
-            EntityType.Builder.<TimeDoor>of(TimeDoor::new, MobCategory.MISC).sized(1.5f, 2.7f).clientTrackingRange(12).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<TemporalEcho>> TEMPORAL_ECHO = register("temporal_echo",
             EntityType.Builder.<TemporalEcho>of(TemporalEcho::new, MobCategory.MISC).sized(.6f, 1.8f).clientTrackingRange(10).updateInterval(20).fireImmune());
-    public static final DeferredHolder<EntityType<?>, EntityType<PruningBaton>> PRUNING_BATON = register("pruning_baton",
-            EntityType.Builder.<PruningBaton>of(PruningBaton::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<TimeLoop>> TIME_LOOP = register("time_loop",
             EntityType.Builder.<TimeLoop>of(TimeLoop::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(2).fireImmune());
-    public static final DeferredHolder<EntityType<?>, EntityType<CosmicVariant>> COSMIC_VARIANT = register("cosmic_variant",
-            EntityType.Builder.<CosmicVariant>of(CosmicVariant::new, MobCategory.MISC).sized(.6f, 1.8f).clientTrackingRange(10).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<PrunedRemains>> PRUNED_REMAINS = register("pruned_remains",
             EntityType.Builder.<PrunedRemains>of(PrunedRemains::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(2).fireImmune());
-    public static final DeferredHolder<EntityType<?>, EntityType<TimeStopBubble>> TIME_STOP_BUBBLE = register("time_stop_bubble",
-            EntityType.Builder.<TimeStopBubble>of(TimeStopBubble::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
     // Cosmos: space and the ultimates
     public static final DeferredHolder<EntityType<?>, EntityType<CaptivePlanet>> CAPTIVE_PLANET = register("captive_planet",
             EntityType.Builder.<CaptivePlanet>of(CaptivePlanet::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
@@ -473,8 +460,6 @@ public final class ModEntities {
             EntityType.Builder.<BlackHole>of(BlackHole::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<ResetCharge>> RESET_CHARGE = register("reset_charge",
             EntityType.Builder.<ResetCharge>of(ResetCharge::new, MobCategory.MISC).sized(.8f, .9f).clientTrackingRange(12).updateInterval(20).fireImmune());
-    public static final DeferredHolder<EntityType<?>, EntityType<TimeStorm>> TIME_STORM = register("time_storm",
-            EntityType.Builder.<TimeStorm>of(TimeStorm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(2).fireImmune());
 
     // Rituals: the chalk circle and what the rituals leave in the world
     public static final DeferredHolder<EntityType<?>, EntityType<RitualCircle>> RITUAL_CIRCLE = register("ritual_circle",
@@ -509,7 +494,6 @@ public final class ModEntities {
         event.put(MANA_BUTTERFLY.get(), ManaButterfly.createAttributes().build());
         event.put(MANA_KANGAROO.get(), ManaKangaroo.createAttributes().build());
         event.put(MANA_FALCON.get(), ManaFalcon.createAttributes().build());
-        event.put(COSMIC_VARIANT.get(), CosmicVariant.createAttributes().build());
         event.put(RIDDEN_COMET.get(), RiddenComet.createAttributes().build());
         event.put(STAR_LION.get(), StarLion.createAttributes().build());
     }

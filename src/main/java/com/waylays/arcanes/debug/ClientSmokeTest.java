@@ -102,7 +102,7 @@ public final class ClientSmokeTest {
     private static final int SHOT_WIDTH = 640;
     private static final int SHOT_CHUNK = 8000;
 
-    private enum Stage { WAIT_TITLE, CREATING, SETTLING, CASTING, VISITING, DONE }
+    private enum Stage { WAIT_TITLE, CREATING, SETTLING, CASTING, DONE }
 
     private static volatile Stage stage = Stage.WAIT_TITLE;
     private static int ticks;
@@ -119,8 +119,6 @@ public final class ClientSmokeTest {
     /** Where the photographed spells are cast, once it is built. */
     private static BlockPos photoFloor;
     private static int shotCastTick;
-    /** The spell cast last. */
-    private static AbstractSpell lastCast;
     private static float shotYaw;
 
     static {
@@ -197,7 +195,6 @@ public final class ClientSmokeTest {
                 }
             }
             case CASTING -> cast(mc);
-            case VISITING -> visit(mc);
             default -> {
             }
         }
@@ -214,7 +211,6 @@ public final class ClientSmokeTest {
         }
         if (spellIndex < spells.size() && ticks % TICKS_PER_SPELL == 1) {
             AbstractSpell spell = spells.get(spellIndex++).get();
-            lastCast = spell;
             String name = spell.getSpellId().substring(spell.getSpellId().indexOf(':') + 1);
             String school = "school:" + spell.getSchoolType().getId().getPath();
             shotName = SHOTS.stream().anyMatch(s -> s.endsWith("*") ? name.startsWith(s.substring(0, s.length() - 1)) : s.equals(name) || s.equals(school))
@@ -262,74 +258,11 @@ public final class ClientSmokeTest {
                 }
             }
         }
-        if (ticks - shotCastTick == 15 && lastCast instanceof com.waylays.arcanes.spells.cosmos.PocketUniverseSpell) {
-            // Its door would take the player away in the middle of the next spells: the island is visited at the end
-            java.util.UUID id = mc.player.getUUID();
-            server.execute(() -> {
-                ServerPlayer player = server.getPlayerList().getPlayer(id);
-                if (player != null) {
-                    player.serverLevel().getEntitiesOfClass(com.waylays.arcanes.entity.cosmos.TimeDoor.class, player.getBoundingBox().inflate(16),
-                            d -> d.getMode() == com.waylays.arcanes.entity.cosmos.TimeDoor.Mode.ENTRY).forEach(Entity::discard);
-                }
-            });
-        }
         if (ticks % TICKS_PER_SPELL == RECAST_DELAY + 1) {
             java.util.UUID id = mc.player.getUUID();
             server.execute(() -> recastOnServer(server, id));
         }
         if (spellIndex >= spells.size() && ticks > (spells.size() - 1) * TICKS_PER_SPELL + FINAL_TICKS) {
-            stage = Stage.VISITING;
-            ticks = 0;
-        }
-    }
-
-    /** Ticks spent in the pocket universe once the client is there. */
-    private static int inPocket;
-
-    /**
-     * Last, a visit to the Pocket Universe: the player is taken to their island, and once its terrain is drawn it is
-     * photographed toward its door, up at the clock in its sky, and toward its ringed planet; then back home.
-     */
-    private static void visit(Minecraft mc) {
-        IntegratedServer server = mc.getSingleplayerServer();
-        if (server == null || mc.player == null) {
-            finish(mc);
-            return;
-        }
-        java.util.UUID id = mc.player.getUUID();
-        if (ticks == 1) {
-            server.execute(() -> {
-                ServerPlayer player = server.getPlayerList().getPlayer(id);
-                if (player != null) {
-                    log("visiting the pocket universe: {}", com.waylays.arcanes.spells.cosmos.PocketUniverse.enter(player, player, 4));
-                }
-            });
-        }
-        boolean there = mc.level != null && mc.level.dimension() == com.waylays.arcanes.spells.cosmos.PocketUniverse.DIMENSION && mc.screen == null;
-        if (there) {
-            inPocket++;
-        }
-        if (inPocket == 60) {
-            aim(mc, 180, 14);
-        } else if (inPocket == 80) {
-            aim(mc, 180, -70);
-        } else if (inPocket == 100) {
-            aim(mc, -144, -16);
-        }
-        if (inPocket == 64 || inPocket == 84 || inPocket == 104) {
-            screenshot(mc, "pocket_visit_" + (inPocket - 44) / 20);
-        }
-        if (inPocket >= 110) {
-            server.execute(() -> {
-                ServerPlayer player = server.getPlayerList().getPlayer(id);
-                if (player != null) {
-                    com.waylays.arcanes.spells.cosmos.PocketUniverse.leave(player);
-                }
-            });
-            finish(mc);
-        } else if (ticks > 900) {
-            failures.incrementAndGet();
-            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the pocket universe was never reached (in it for {} ticks)", inPocket);
             finish(mc);
         }
     }
@@ -607,11 +540,6 @@ public final class ClientSmokeTest {
         AbstractSpell spell = toRecast;
         toRecast = null;
         ServerPlayer player = server.getPlayerList().getPlayer(id);
-        if (player != null && com.waylays.arcanes.spells.cosmos.PocketUniverse.isIn(player)) {
-            // The Pocket Universe took the player into their island: back out for the next spells
-            com.waylays.arcanes.spells.cosmos.PocketUniverse.leave(player);
-            log("back from the pocket universe to {}", player.level().dimension().location());
-        }
         if (spell == null || player == null) {
             return;
         }

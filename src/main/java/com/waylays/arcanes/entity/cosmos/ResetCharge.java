@@ -5,7 +5,6 @@ import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.spells.SpellUtil;
 import com.waylays.arcanes.spells.cosmos.Cosmos;
 import com.waylays.arcanes.spells.cosmos.CosmosFx;
-import com.waylays.arcanes.spells.cosmos.PruningBatonSpell;
 import com.waylays.arcanes.spells.cosmos.TimeTrail;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -182,7 +181,7 @@ public class ResetCharge extends SpellEffectEntity {
         if (!e.isAlive()) {
             return;
         }
-        if (!Cosmos.isBoss(e) && e.getHealth() <= PruningBatonSpell.pruneLine(spellLevel + 4, e.getMaxHealth())) {
+        if (!Cosmos.isBoss(e) && e.getHealth() <= Cosmos.pruneLine(spellLevel + 4, e.getMaxHealth())) {
             CosmosFx.prune(level, e, source);
             return;
         }

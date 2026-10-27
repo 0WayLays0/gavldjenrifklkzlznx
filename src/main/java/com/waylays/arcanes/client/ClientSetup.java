@@ -242,13 +242,9 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.AMETHYST_GEODE.get(), AmethystGeodeRenderer::new);
         event.registerEntityRenderer(ModEntities.EMERALD_BLOOM.get(), EmeraldBloomRenderer::new);
         event.registerEntityRenderer(ModEntities.GEM_CROWN.get(), GemCrownRenderer::new);
-        event.registerEntityRenderer(ModEntities.TIME_DOOR.get(), com.waylays.arcanes.client.render.TimeDoorRenderer::new);
         event.registerEntityRenderer(ModEntities.TEMPORAL_ECHO.get(), com.waylays.arcanes.client.render.TemporalEchoRenderer::new);
-        event.registerEntityRenderer(ModEntities.PRUNING_BATON.get(), com.waylays.arcanes.client.render.PruningBatonRenderer::new);
         event.registerEntityRenderer(ModEntities.TIME_LOOP.get(), com.waylays.arcanes.client.render.TimeLoopRenderer::new);
-        event.registerEntityRenderer(ModEntities.COSMIC_VARIANT.get(), com.waylays.arcanes.client.render.CosmicVariantRenderer::new);
         event.registerEntityRenderer(ModEntities.PRUNED_REMAINS.get(), com.waylays.arcanes.client.render.PrunedRemainsRenderer::new);
-        event.registerEntityRenderer(ModEntities.TIME_STOP_BUBBLE.get(), com.waylays.arcanes.client.render.TimeStopBubbleRenderer::new);
         event.registerEntityRenderer(ModEntities.CAPTIVE_PLANET.get(), com.waylays.arcanes.client.render.CaptivePlanetRenderer::new);
         event.registerEntityRenderer(ModEntities.RIDDEN_COMET.get(), com.waylays.arcanes.client.render.RiddenCometRenderer::new);
         event.registerEntityRenderer(ModEntities.COMET_CRATER.get(), com.waylays.arcanes.client.render.CometCraterRenderer::new);
@@ -258,7 +254,6 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.STAR_LION.get(), com.waylays.arcanes.client.render.StarLionRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACK_HOLE.get(), com.waylays.arcanes.client.render.BlackHoleRenderer::new);
         event.registerEntityRenderer(ModEntities.RESET_CHARGE.get(), com.waylays.arcanes.client.render.ResetChargeRenderer::new);
-        event.registerEntityRenderer(ModEntities.TIME_STORM.get(), com.waylays.arcanes.client.render.TimeStormRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_CIRCLE.get(), RitualCircleRenderer::new);
         event.registerEntityRenderer(ModEntities.METEOR.get(), MeteorRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_DOME.get(), RitualDomeRenderer::new);
@@ -316,12 +311,6 @@ public final class ClientSetup {
                 return com.waylays.arcanes.client.render.CodexOutOfTimeRenderer.get();
             }
         }, ModItems.CODEX_OUT_OF_TIME.get());
-    }
-
-    /** The sky of the Pocket Universe (the dimension type's effects). */
-    @SubscribeEvent
-    public static void registerSkies(net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent event) {
-        event.register(ArcanesOublies.id("pocket"), new com.waylays.arcanes.client.render.PocketSkyEffects());
     }
 
     @SubscribeEvent

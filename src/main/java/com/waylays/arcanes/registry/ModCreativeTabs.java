@@ -19,8 +19,8 @@ import javax.annotation.Nullable;
 
 /**
  * One creative tab for the whole addon, laid out school by school (its spellbook first, then a scroll of each of its
- * spells at every level, in the order they were added). The school buttons beside the tab (client/CreativeTabFilter)
- * show one school at a time.
+ * spells at every level, in the order they were added). The bar of schools beside the tab (client/CreativeTabFilter)
+ * shows one school at a time.
  */
 public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ArcanesOublies.MODID);
@@ -46,6 +46,11 @@ public final class ModCreativeTabs {
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup." + ArcanesOublies.MODID))
             .icon(() -> new ItemStack(ModItems.GOLDEN_GRIMOIRE.get()))
+            // A night-blue panel framed in gold, a gem for the scroll bar, gold titles, a gold glow on the slot under the mouse
+            .backgroundTexture(ArcanesOublies.id("textures/gui/creative/tab.png"))
+            .withScrollBarSpriteLocation(ArcanesOublies.id("creative/scroller"))
+            .withLabelColor(0xFFD77A)
+            .withSlotColor(0x60FFD77A)
             .displayItems((parameters, output) -> {
                 // The rituals are not a school: their chalk comes first
                 output.accept(ModItems.RITUAL_CHALK.get());

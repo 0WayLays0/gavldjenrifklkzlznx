@@ -18,15 +18,14 @@ import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
 /**
- * Drawing shared by the Cosmos renderers and the sky of the Pocket Universe.
+ * Drawing shared by the Cosmos renderers.
  * <ul>
  * <li>Planets and moons: textured spheres lit by a sun of their own (a day side and a night side with a soft
  * terminator), wrapped in a glow of atmosphere; rings of dusty ice; a black hole's accretion disk.</li>
  * <li>Starlight: twinkling four-pointed stars, starfields and nebulae on the inside of a sphere.</li>
- * <li>Time: the TVA's clock (a face, glowing hands), and its time door, a glowing orange frame on a haze of rising
- * light.</li>
+ * <li>Time: the TVA's clock (a face, glowing hands).</li>
  * <li>Echoes: any creature drawn again as a glitching silhouette of scanlines in time's orange, its exact shape,
- * whatever it is (a past self, a frozen moment, a variant).</li>
+ * whatever it is (a past self, what is being pruned).</li>
  * </ul>
  */
 public final class CosmosRender {
@@ -211,7 +210,7 @@ public final class CosmosRender {
 
     /**
      * The inside of a sphere {@code radius} across round the origin painted with {@code texture} (light added, tiled
-     * {@code tiles} times round), for skies and the depths seen through doors: a starfield, a nebula.
+     * {@code tiles} times round), for skies and the depths of space: a starfield, a nebula.
      */
     public static void skySphere(PoseStack poseStack, MultiBufferSource buffer, ResourceLocation texture, float radius, int tiles, int rgb, float strength) {
         VertexConsumer consumer = buffer.getBuffer(RenderType.eyes(texture));
@@ -297,43 +296,6 @@ public final class CosmosRender {
         float a = turns * Mth.TWO_PI;
         float x = Mth.sin(a) * length, y = Mth.cos(a) * length;
         GlyphRender.ribbon(stroke, pose, -x * .12f, -y * .12f, x, y, width, argb);
-    }
-
-    /**
-     * The TVA's time door standing at the origin, facing +Z: a frame of orange light {@code width} by {@code height}
-     * (its foot on the ground), glowing hazy light rising inside it, a swirl in its heart. {@code open} 0 to 1: it
-     * opens from a line of light in its middle.
-     */
-    public static void door(PoseStack poseStack, MultiBufferSource buffer, float width, float height, float open, float time) {
-        if (open <= .01f) {
-            return;
-        }
-        float w = width * open;
-        float flicker = 1 + .06f * Mth.sin(time * 1.3f) + .04f * Mth.sin(time * 3.1f);
-        poseStack.pushPose();
-        poseStack.translate(0, height * .5f, 0);
-        // The haze, rising
-        RenderHelper.rect(buffer.getBuffer(RenderType.energySwirl(HAZE, 0, -time * .012f)), poseStack.last(), w, height,
-                RuneRender.additive(Cosmos.ORANGE, .75f * open), GlyphRender.FULL, true);
-        // The swirl in its heart
-        poseStack.pushPose();
-        poseStack.translate(0, 0, .01f);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(-time * 4));
-        float swirl = Math.min(w, height) * .9f;
-        RenderHelper.rect(buffer.getBuffer(RenderType.eyes(VORTEX)), poseStack.last(), swirl, swirl, RuneRender.additive(Cosmos.AMBER, .7f * open), GlyphRender.FULL, true);
-        poseStack.popPose();
-        // The frame: a wide glow and a bright core round the opening
-        VertexConsumer stroke = buffer.getBuffer(RenderType.eyes(GlyphRender.STROKE));
-        float hw = w * .5f, hh = height * .5f;
-        Vec3[] corners = {new Vec3(-hw, -hh, 0), new Vec3(hw, -hh, 0), new Vec3(hw, hh, 0), new Vec3(-hw, hh, 0)};
-        for (int k = 0; k < 4; k++) {
-            Vec3 a = corners[k], b = corners[(k + 1) % 4];
-            GlyphRender.beam(stroke, poseStack.last(), a, b, .5f * flicker, RuneRender.additive(Cosmos.ORANGE, .55f * open));
-            GlyphRender.beam(stroke, poseStack.last(), a, b, .2f * flicker, RuneRender.additive(Cosmos.AMBER, .95f * open));
-            GlyphRender.beam(stroke, poseStack.last(), a, b, .07f, RuneRender.additive(Cosmos.CREAM, open));
-        }
-        GlyphRender.halo(buffer, poseStack.last(), GlyphRender.GLOW, Math.max(w, height) * .9f, RuneRender.additive(Cosmos.ORANGE, .25f * open * flicker));
-        poseStack.popPose();
     }
 
     // ------------------------------------------------------------------ echoes

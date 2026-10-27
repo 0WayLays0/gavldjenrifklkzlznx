@@ -58,6 +58,14 @@ public final class Cosmos {
         return other instanceof Player player && player.getLastHurtMob() == caster;
     }
 
+    /**
+     * At or under this health after a blow, a creature is pruned from time: a share of its greatest health growing with
+     * the spell's level (10% plus 2% a level, at most 30%), never under 3.
+     */
+    public static float pruneLine(int spellLevel, float maxHealth) {
+        return Math.max(3, maxHealth * Math.min(.3f, .1f + .02f * spellLevel));
+    }
+
     /** Bosses are never pruned outright: they only take the blow's damage. */
     public static boolean isBoss(Entity entity) {
         return entity.getType().is(Tags.EntityTypes.BOSSES);

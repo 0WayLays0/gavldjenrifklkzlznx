@@ -499,37 +499,6 @@ def _silhouette(d, S, x, y, h, color, a=255):
     d.rectangle(((x + w * .08) * S, (y - h * .4) * S, (x + w * .5) * S, y * S), fill=_c(color, a))
 
 
-def pocket_universe_icon():
-    def draw(d, img, S):
-        _stars(d, S, 1, 10)
-        # The floating island under its stopped clock
-        d.polygon([(.18 * S, .66 * S), (.82 * S, .66 * S), (.6 * S, .78 * S), (.5 * S, .95 * S), (.4 * S, .8 * S)], fill=_c((90, 70, 60)))
-        d.rectangle((.18 * S, .6 * S, .82 * S, .67 * S), fill=_c((70, 170, 70)))
-        _door(d, S, .5, .5, .16, .22)
-        _clock(d, S, .5, .22, .16, (0, .25))
-    return _icon(draw, .5, .4, (40, 30, 90))
-
-
-def time_door_icon():
-    def draw(d, img, S):
-        _door(d, S, .5, .52, .42, .72)
-        _silhouette(d, S, .5, .86, .5, (60, 20, 0), 180)
-    return _icon(draw, .5, .5, (110, 50, 10))
-
-
-def pruning_baton_icon():
-    def draw(d, img, S):
-        for k in range(14):
-            a = k / 14 * math.tau
-            r = .1 + (k % 3) * .05
-            d.ellipse(((.72 + math.cos(a) * r - .03) * S, (.3 + math.sin(a) * r - .03) * S, (.72 + math.cos(a) * r + .03) * S, (.3 + math.sin(a) * r + .03) * S), fill=_c(AMBER))
-        d.line((.18 * S, .85 * S, .66 * S, .37 * S), fill=_c((60, 50, 50)), width=S // 9)
-        d.line((.18 * S, .85 * S, .66 * S, .37 * S), fill=_c((140, 130, 130)), width=S // 20)
-        d.line((.6 * S, .43 * S, .74 * S, .29 * S), fill=_c(ORANGE), width=S // 7)
-        d.line((.62 * S, .41 * S, .72 * S, .31 * S), fill=_c(CREAM), width=S // 16)
-    return _icon(draw, .7, .3, (110, 50, 10))
-
-
 def time_loop_icon():
     def draw(d, img, S):
         _silhouette(d, S, .3, .82, .5, ORANGE, 90)
@@ -538,26 +507,6 @@ def time_loop_icon():
         d.ellipse((.12 * S, .45 * S, .88 * S, .68 * S), outline=_c(GOLD), width=S // 14)
         d.polygon([(.84 * S, .5 * S), (.95 * S, .58 * S), (.8 * S, .62 * S)], fill=_c(GOLD))
     return _icon(draw, .5, .55, (90, 50, 20))
-
-
-def variant_icon():
-    def draw(d, img, S):
-        _silhouette(d, S, .35, .9, .7, (50, 40, 80))
-        for k, dx in enumerate((-.03, 0, .03)):
-            _silhouette(d, S, .66 + dx, .9, .7, ORANGE, 80 + k * 50)
-        for y in range(8):
-            d.line((.45 * S, (.3 + y * .07) * S, .9 * S, (.3 + y * .07) * S), fill=_c(CREAM, 70), width=1)
-    return _icon(draw, .65, .55, (90, 40, 20))
-
-
-def time_stop_icon():
-    def draw(d, img, S):
-        d.ellipse((.06 * S, .06 * S, .94 * S, .94 * S), outline=_c(ORANGE, 160), width=S // 18)
-        d.ellipse((.12 * S, .12 * S, .88 * S, .88 * S), fill=_c((40, 30, 60)))
-        _clock(d, S, .5, .5, .3, (.0, .0))
-        d.rectangle((.4 * S, .4 * S, .46 * S, .6 * S), fill=_c(CREAM))
-        d.rectangle((.54 * S, .4 * S, .6 * S, .6 * S), fill=_c(CREAM))
-    return _icon(draw, .5, .5, (80, 50, 40))
 
 
 def captive_orbit_icon():
@@ -670,20 +619,6 @@ def reset_charge_icon():
     return _icon(draw, .5, .5, (110, 50, 10))
 
 
-def end_of_time_icon():
-    def draw(d, img, S):
-        rnd = np.random.default_rng(13)
-        for k in range(16):
-            x, y, r = .2 + rnd.random() * .6, .15 + rnd.random() * .4, .1 + rnd.random() * .12
-            col = (120, 40, 140) if k % 3 else (220, 90, 40)
-            d.ellipse(((x - r) * S, (y - r) * S, (x + r) * S, (y + r) * S), fill=_c(col, 200))
-        for x0 in (.35, .62):
-            pts = [(x0, .45), (x0 - .06, .62), (x0 + .03, .7), (x0 - .04, .9)]
-            d.line([(x * S, y * S) for x, y in pts], fill=_c(AMBER), width=S // 22)
-        d.ellipse((.42 * S, .28 * S, .58 * S, .4 * S), fill=_c(CREAM))
-    return _icon(draw, .5, .35, (90, 30, 60))
-
-
 def weightless_effect_icon():
     def draw(d, img, S):
         _silhouette(d, S, .5, .78, .62, (150, 170, 255))
@@ -704,12 +639,7 @@ def low_gravity_effect_icon():
 
 
 ICONS = [
-    ("pocket_universe", pocket_universe_icon),
-    ("time_door", time_door_icon),
-    ("pruning_baton", pruning_baton_icon),
     ("time_loop", time_loop_icon),
-    ("variant", variant_icon),
-    ("time_stop", time_stop_icon),
     ("captive_orbit", captive_orbit_icon),
     ("comet_ride", comet_ride_icon),
     ("pocket_moon", pocket_moon_icon),
@@ -718,7 +648,6 @@ ICONS = [
     ("zero_gravity", zero_gravity_icon),
     ("black_hole", black_hole_icon),
     ("reset_charge", reset_charge_icon),
-    ("end_of_time", end_of_time_icon),
 ]
 
 
@@ -811,28 +740,6 @@ def affinity_ring_cosmos():
         "B": BLUE, "O": ORANGE})
 
 
-def post_effects():
-    """The screen effects of stopped time (client/TimeStopVision): the world in warm sepia, and its negative for the
-    blink when time stops. Both are Minecraft's own colour shader with other colours."""
-    def chain(uniforms):
-        return {"targets": ["swap"], "passes": [
-            {"name": "color_convolve", "intarget": "minecraft:main", "outtarget": "swap",
-             "uniforms": [{"name": k, "values": v} for k, v in uniforms]},
-            {"name": "blit", "intarget": "swap", "outtarget": "minecraft:main"}]}
-    g.write_json("shaders/post/time_stop.json", chain([
-        ("RedMatrix", [0.44, 0.74, 0.20]),
-        ("GreenMatrix", [0.34, 0.64, 0.16]),
-        ("BlueMatrix", [0.22, 0.44, 0.11]),
-        ("Saturation", [1.15]),
-    ]))
-    g.write_json("shaders/post/time_stop_flash.json", chain([
-        ("RedMatrix", [-1.0, 0.0, 0.0]),
-        ("GreenMatrix", [0.0, -1.0, 0.0]),
-        ("BlueMatrix", [0.0, 0.0, -1.0]),
-        ("Offset", [1.0, 0.75, 0.45]),
-    ]))
-
-
 def held_models():
     """The codex is drawn by its own renderer (client/render/CodexOutOfTimeRenderer) everywhere but in the GUI: the
     3D book (its model kept as codex_out_of_time_3d) with its clock ticking and a moon going round it. Its held model
@@ -882,7 +789,6 @@ def main():
     g.save(codex_model_texture(), "textures/item/codex_out_of_time_3d.png")
     g.book_models("codex_out_of_time")
     held_models()
-    post_effects()
 
 
 if __name__ == "__main__":
