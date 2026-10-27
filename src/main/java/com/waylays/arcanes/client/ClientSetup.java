@@ -230,6 +230,15 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.KEEP.get(), NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.BRICK_QUAKE.get(), com.waylays.arcanes.client.render.BrickQuakeRenderer::new);
         event.registerEntityRenderer(ModEntities.SIEGE.get(), NoopRenderer::new);
+        // Bone Magic
+        event.registerEntityRenderer(ModEntities.BONE_LANCE.get(), com.waylays.arcanes.client.render.BoneLanceRenderer::new);
+        event.registerEntityRenderer(ModEntities.SPIKE_FIELD.get(), com.waylays.arcanes.client.render.SpikeFieldRenderer::new);
+        event.registerEntityRenderer(ModEntities.SPINE_WHIP.get(), com.waylays.arcanes.client.render.SpineWhipRenderer::new);
+        event.registerEntityRenderer(ModEntities.BONE_WARD.get(), com.waylays.arcanes.client.render.BoneWardRenderer::new);
+        event.registerEntityRenderer(ModEntities.RIB_CAGE.get(), com.waylays.arcanes.client.render.RibCageRenderer::new);
+        event.registerEntityRenderer(ModEntities.GRASP.get(), com.waylays.arcanes.client.render.GraspRenderer::new);
+        event.registerEntityRenderer(ModEntities.BONE_WYRM.get(), com.waylays.arcanes.client.render.BoneWyrmRenderer::new);
+        event.registerEntityRenderer(ModEntities.BONE_COLOSSUS.get(), com.waylays.arcanes.client.render.BoneColossusRenderer::new);
         event.registerEntityRenderer(ModEntities.GEM_SIGIL.get(), GemSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_SIGIL.get(), GoldSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_COINS.get(), GoldCoinsRenderer::new);
@@ -344,6 +353,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.RAMPART_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.JEWELLERS_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.CODEX_OUT_OF_TIME.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.OSSUARY_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }

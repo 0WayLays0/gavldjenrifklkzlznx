@@ -99,6 +99,14 @@ import com.waylays.arcanes.entity.cosmos.StarLion;
 import com.waylays.arcanes.entity.cosmos.TemporalEcho;
 import com.waylays.arcanes.entity.cosmos.TimeLoop;
 import com.waylays.arcanes.entity.cosmos.ZeroGravityField;
+import com.waylays.arcanes.entity.bone.BoneLance;
+import com.waylays.arcanes.entity.bone.SpikeField;
+import com.waylays.arcanes.entity.bone.SpineWhip;
+import com.waylays.arcanes.entity.bone.BoneWard;
+import com.waylays.arcanes.entity.bone.RibCage;
+import com.waylays.arcanes.entity.bone.Grasp;
+import com.waylays.arcanes.entity.bone.BoneWyrm;
+import com.waylays.arcanes.entity.bone.BoneColossus;
 import com.waylays.arcanes.entity.wall.BrickBolt;
 import com.waylays.arcanes.entity.wall.BrickQuake;
 import com.waylays.arcanes.entity.wall.BrickStorm;
@@ -442,6 +450,24 @@ public final class ModEntities {
             EntityType.Builder.<BrickQuake>of(BrickQuake::new, MobCategory.MISC).sized(1f, .5f).clientTrackingRange(12).updateInterval(40).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<Siege>> SIEGE = register("siege",
             EntityType.Builder.<Siege>of(Siege::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(40).fireImmune());
+
+    // Bone Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<BoneLance>> BONE_LANCE = register("bone_lance",
+            EntityType.Builder.<BoneLance>of(BoneLance::new, MobCategory.MISC).sized(.4f, .4f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<SpikeField>> SPIKE_FIELD = register("bone_spikes",
+            EntityType.Builder.<SpikeField>of(SpikeField::new, MobCategory.MISC).sized(1f, .5f).clientTrackingRange(12).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<SpineWhip>> SPINE_WHIP = register("spine_whip",
+            EntityType.Builder.<SpineWhip>of(SpineWhip::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BoneWard>> BONE_WARD = register("bone_ward",
+            EntityType.Builder.<BoneWard>of(BoneWard::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RibCage>> RIB_CAGE = register("rib_cage",
+            EntityType.Builder.<RibCage>of(RibCage::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Grasp>> GRASP = register("skeletal_grasp",
+            EntityType.Builder.<Grasp>of(Grasp::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BoneWyrm>> BONE_WYRM = register("bone_wyrm",
+            EntityType.Builder.<BoneWyrm>of(BoneWyrm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BoneColossus>> BONE_COLOSSUS = register("gashadokuro",
+            EntityType.Builder.<BoneColossus>of(BoneColossus::new, MobCategory.MISC).sized(2f, 2f).clientTrackingRange(16).updateInterval(40).fireImmune());
 
     // Cosmos
     public static final DeferredHolder<EntityType<?>, EntityType<TemporalEcho>> TEMPORAL_ECHO = register("temporal_echo",

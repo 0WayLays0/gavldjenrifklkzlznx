@@ -263,6 +263,26 @@ public final class ModSchools {
             COSMOS_MAGIC
     ));
 
+    /**
+     * Bone Magic: bones called up out of the ground and grown out of the caster, ivory white, the marrow glowing
+     * crimson: lances, spikes, a whip of vertebrae, ribs closing like a cage, a skeletal hand, a wyrm of vertebrae and a
+     * giant skeleton.
+     */
+    public static final ResourceLocation BONE_RESOURCE = ArcanesOublies.id("bone");
+    public static final TagKey<Item> BONE_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("bone_focus"));
+    public static final ResourceKey<DamageType> BONE_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("bone_magic"));
+    public static final int BONE_COLOR = 0xE8DCC0;
+
+    public static final DeferredHolder<SchoolType, SchoolType> BONE = SCHOOLS.register(BONE_RESOURCE.getPath(), () -> new SchoolType(
+            BONE_RESOURCE,
+            BONE_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".bone").withStyle(Style.EMPTY.withColor(BONE_COLOR)),
+            ModAttributes.BONE_SPELL_POWER,
+            ModAttributes.BONE_MAGIC_RESIST,
+            sound(SoundEvents.BONE_BLOCK_PLACE),
+            BONE_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

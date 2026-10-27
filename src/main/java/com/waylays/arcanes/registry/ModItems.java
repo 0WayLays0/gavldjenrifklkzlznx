@@ -64,6 +64,10 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> CODEX_OUT_OF_TIME = ITEMS.register("codex_out_of_time",
             () -> spellbook(12, ModAttributes.COSMOS_SPELL_POWER));
 
+    /** Bone Magic spellbook (the Ossuary Codex: bound in bone, a skull set in its cover): 10 slots, +10% power, +200 max mana. */
+    public static final DeferredHolder<Item, Item> OSSUARY_CODEX = ITEMS.register("ossuary_codex",
+            () -> spellbook(10, ModAttributes.BONE_SPELL_POWER));
+
     /** Ritual Chalk: chooses a group ritual and draws its circle on the ground (32 circles). */
     public static final DeferredHolder<Item, Item> RITUAL_CHALK = ITEMS.register("ritual_chalk",
             () -> new com.waylays.arcanes.ritual.RitualChalkItem(new Item.Properties().stacksTo(1).durability(32).rarity(Rarity.UNCOMMON)));

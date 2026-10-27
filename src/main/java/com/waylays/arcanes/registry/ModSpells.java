@@ -136,6 +136,16 @@ import com.waylays.arcanes.spells.gem.AmethystResonanceSpell;
 import com.waylays.arcanes.spells.gem.AmethystGeodeSpell;
 import com.waylays.arcanes.spells.gem.EmeraldBloomSpell;
 import com.waylays.arcanes.spells.gem.CrownOfGemsSpell;
+import com.waylays.arcanes.spells.bone.BoneLanceSpell;
+import com.waylays.arcanes.spells.bone.BoneSpikesSpell;
+import com.waylays.arcanes.spells.bone.SpineWhipSpell;
+import com.waylays.arcanes.spells.bone.BoneVolleySpell;
+import com.waylays.arcanes.spells.bone.BoneWardSpell;
+import com.waylays.arcanes.spells.bone.RibCageSpell;
+import com.waylays.arcanes.spells.bone.OssuarySpell;
+import com.waylays.arcanes.spells.bone.SkeletalGraspSpell;
+import com.waylays.arcanes.spells.bone.BoneWyrmSpell;
+import com.waylays.arcanes.spells.bone.GashadokuroSpell;
 import com.waylays.arcanes.spells.cosmos.AsteroidBeltSpell;
 import com.waylays.arcanes.spells.cosmos.BlackHoleSpell;
 import com.waylays.arcanes.spells.cosmos.CaptiveOrbitSpell;
@@ -353,6 +363,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> CLOSING_KEEP = register(new ClosingKeepSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> GREAT_RAMPART = register(new GreatRampartSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SIEGE = register(new SiegeSpell());
+
+    // Bone Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BONE_LANCE = register(new BoneLanceSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BONE_SPIKES = register(new BoneSpikesSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SPINE_WHIP = register(new SpineWhipSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BONE_VOLLEY = register(new BoneVolleySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BONE_WARD = register(new BoneWardSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RIB_CAGE = register(new RibCageSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> OSSUARY = register(new OssuarySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SKELETAL_GRASP = register(new SkeletalGraspSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BONE_WYRM = register(new BoneWyrmSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GASHADOKURO = register(new GashadokuroSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

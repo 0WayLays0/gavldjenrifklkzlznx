@@ -45,6 +45,8 @@ PALETTES = {
     "gem": ["5a3a78", "6e4a90", "8a64aa", "3a2450", "4a3064", "e01848", "a01034", "60081c", "f2c33c", "c4961e", "7a5a10"],
     # Night-blue paper sown with stars, the writing in the TVA's orange, bronze rod ends
     "cosmos": ["1c1f4a", "252a5e", "2f3672", "121433", "181b40", "ffe7c2", "ff8a1e", "c85a10", "ffb347", "b8702a", "5c3416"],
+    # Ivory paper like old bone, the writing in crimson marrow, bone rod ends
+    "bone": ["d6caa9", "e4dabf", "f2ecdc", "a39678", "b8ac8d", "e0283c", "a8142a", "640a18", "f4eedf", "cfc3a4", "857a5e"],
 }
 
 
