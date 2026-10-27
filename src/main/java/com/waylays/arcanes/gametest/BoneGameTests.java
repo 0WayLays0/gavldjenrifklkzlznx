@@ -2,6 +2,10 @@ package com.waylays.arcanes.gametest;
 
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.bone.BoneColossus;
+import com.waylays.arcanes.entity.bone.BoneNova;
+import com.waylays.arcanes.entity.bone.BoneTempest;
+import com.waylays.arcanes.entity.bone.GiantSpike;
+import com.waylays.arcanes.item.BoneBladeItem;
 import com.waylays.arcanes.entity.bone.BoneWard;
 import com.waylays.arcanes.entity.bone.Grasp;
 import com.waylays.arcanes.entity.bone.RibCage;
@@ -24,7 +28,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Witch;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Snowball;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
@@ -88,7 +95,7 @@ public final class BoneGameTests {
                 count++;
             }
         }
-        helper.assertTrue(count == 10, "expected 10 Bone spells, found " + count);
+        helper.assertTrue(count == 15, "expected 15 Bone spells, found " + count);
         helper.assertTrue(new ItemStack(ModItems.OSSUARY_CODEX.get()).getItem() instanceof SpellBook, "the Ossuary Codex is not a spellbook");
         helper.assertTrue(new ItemStack(Items.BONE).is(ModSchools.BONE_FOCUS), "bones are not the school's focus");
         helper.succeed();
@@ -240,6 +247,80 @@ public final class BoneGameTests {
             helper.assertTrue(hurt(husk), "the skeleton's fist did not strike the husk");
             GameTestSetup.clearLeftovers(helper);
             forced.forEach(chunk -> helper.getLevel().setChunkForced(chunk.x, chunk.z, false));
+            helper.succeed();
+        });
+    }
+
+    /** The colossal spike bursts out under the husk and hurls it high. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "bone_giant_spike", timeoutTicks = 80)
+    public static void colossalSpikeHurlsHigh(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, .5, .5);
+        Husk husk = husk(helper, 4.5, 4.5);
+        double ground = husk.getY();
+        boolean[] lifted = {false};
+        GiantSpike.raise(helper.getLevel(), caster, ModSpells.COLOSSAL_SPIKE.get(), husk.position(), 10, 4);
+        helper.onEachTick(() -> lifted[0] |= husk.getY() > ground + 1);
+        helper.runAfterDelay(GiantSpike.TELEGRAPH - 2, () -> helper.assertTrue(!hurt(husk), "the husk was hurt before the spike burst"));
+        helper.runAfterDelay(GiantSpike.TELEGRAPH + 12, () -> {
+            helper.assertTrue(hurt(husk), "the spike did not impale the husk");
+            helper.assertTrue(lifted[0], "the spike did not hurl the husk up");
+            GameTestSetup.clearLeftovers(helper);
+            helper.succeed();
+        });
+    }
+
+    /** The blade is put in the empty hand, cuts like a strong sword, and crumbles once its time is up. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "bone_blade", timeoutTicks = 20)
+    public static void elbowBladeLendsAWeapon(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        cast(helper, ModSpells.ELBOW_BLADE, player);
+        ItemStack blade = player.getMainHandItem();
+        helper.assertTrue(blade.is(ModItems.BONE_BLADE.get()), "no bone blade in the empty hand, but " + blade);
+        double bare = player.getAttributeBaseValue(Attributes.ATTACK_DAMAGE);
+        helper.assertTrue(player.getAttributeValue(Attributes.ATTACK_DAMAGE) >= bare + BoneBladeItem.damage(1) - .01, "the blade does not add its damage");
+        helper.assertTrue(BoneBladeItem.expiresAt(blade) > helper.getLevel().getGameTime(), "the blade is already spent");
+        // One that is spent crumbles away at its next tick in an inventory
+        ItemStack spent = BoneBladeItem.forge(helper.getLevel(), 1, 0);
+        spent.getItem().inventoryTick(spent, helper.getLevel(), player, 0, false);
+        helper.assertTrue(spent.isEmpty(), "a spent blade did not crumble");
+        helper.succeed();
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "bone_howl", timeoutTicks = 100)
+    public static void howlingSkullBursts(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, .5);
+        Husk husk = husk(helper, 4.5, 6.5);
+        cast(helper, ModSpells.HOWLING_SKULL, caster);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(hurt(husk), "the skull did not strike the husk");
+            GameTestSetup.clearLeftovers(helper);
+        });
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "bone_nova", timeoutTicks = 40)
+    public static void boneNovaThrowsBack(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, 4.5);
+        Husk husk = husk(helper, 4.5, 6.5);
+        cast(helper, ModSpells.BONE_NOVA, caster);
+        helper.runAfterDelay(BoneNova.GROW + 2, () -> {
+            helper.assertTrue(hurt(husk), "the spikes did not strike the husk");
+            GameTestSetup.clearLeftovers(helper);
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "bone_tempest", timeoutTicks = 80)
+    public static void boneTempestLacerates(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, 4.5);
+        Husk husk = husk(helper, 4.5, 7.5);
+        cast(helper, ModSpells.BONE_TEMPEST, caster);
+        helper.runAfterDelay(BoneTempest.GROW + 10, () -> {
+            helper.assertTrue(hurt(husk), "the tempest did not lacerate the husk");
+            GameTestSetup.clearLeftovers(helper);
             helper.succeed();
         });
     }

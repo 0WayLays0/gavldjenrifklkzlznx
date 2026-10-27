@@ -137,6 +137,11 @@ import com.waylays.arcanes.spells.gem.AmethystGeodeSpell;
 import com.waylays.arcanes.spells.gem.EmeraldBloomSpell;
 import com.waylays.arcanes.spells.gem.CrownOfGemsSpell;
 import com.waylays.arcanes.spells.bone.BoneLanceSpell;
+import com.waylays.arcanes.spells.bone.ColossalSpikeSpell;
+import com.waylays.arcanes.spells.bone.ElbowBladeSpell;
+import com.waylays.arcanes.spells.bone.HowlingSkullSpell;
+import com.waylays.arcanes.spells.bone.BoneNovaSpell;
+import com.waylays.arcanes.spells.bone.BoneTempestSpell;
 import com.waylays.arcanes.spells.bone.BoneSpikesSpell;
 import com.waylays.arcanes.spells.bone.SpineWhipSpell;
 import com.waylays.arcanes.spells.bone.BoneVolleySpell;
@@ -375,6 +380,11 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SKELETAL_GRASP = register(new SkeletalGraspSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> BONE_WYRM = register(new BoneWyrmSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> GASHADOKURO = register(new GashadokuroSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> COLOSSAL_SPIKE = register(new ColossalSpikeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ELBOW_BLADE = register(new ElbowBladeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> HOWLING_SKULL = register(new HowlingSkullSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BONE_NOVA = register(new BoneNovaSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BONE_TEMPEST = register(new BoneTempestSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

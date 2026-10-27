@@ -239,6 +239,10 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.GRASP.get(), com.waylays.arcanes.client.render.GraspRenderer::new);
         event.registerEntityRenderer(ModEntities.BONE_WYRM.get(), com.waylays.arcanes.client.render.BoneWyrmRenderer::new);
         event.registerEntityRenderer(ModEntities.BONE_COLOSSUS.get(), com.waylays.arcanes.client.render.BoneColossusRenderer::new);
+        event.registerEntityRenderer(ModEntities.GIANT_SPIKE.get(), com.waylays.arcanes.client.render.GiantSpikeRenderer::new);
+        event.registerEntityRenderer(ModEntities.HOWLING_SKULL.get(), com.waylays.arcanes.client.render.HowlingSkullRenderer::new);
+        event.registerEntityRenderer(ModEntities.BONE_NOVA.get(), com.waylays.arcanes.client.render.BoneNovaRenderer::new);
+        event.registerEntityRenderer(ModEntities.BONE_TEMPEST.get(), com.waylays.arcanes.client.render.BoneTempestRenderer::new);
         event.registerEntityRenderer(ModEntities.GEM_SIGIL.get(), GemSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_SIGIL.get(), GoldSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_COINS.get(), GoldCoinsRenderer::new);
@@ -304,6 +308,8 @@ public final class ClientSetup {
         for (PlayerSkin.Model skin : event.getSkins()) {
             if (event.getSkin(skin) instanceof LivingEntityRenderer renderer) {
                 renderer.addLayer(new GoldCoatLayer(renderer));
+                // The Elbow Blade's spur of bone
+                renderer.addLayer(new com.waylays.arcanes.client.render.ElbowSpurLayer(renderer));
             }
         }
     }

@@ -222,9 +222,87 @@ def gashadokuro_icon():
     return _icon(draw, .5, .45)
 
 
+def colossal_spike_icon():
+    def draw(d, img, S):
+        _ground(d, S, .9)
+        d.ellipse((.2 * S, .84 * S, .8 * S, .96 * S), fill=CRIMSON + (200,))
+        _spike(d, S, .5, .92, .56, .04, .34)
+        for x, h in ((.2, .25), (.78, .3), (.32, .14), (.68, .16)):
+            _spike(d, S, x, .92, x + (x - .5) * .3, .92 - h, .08)
+    return _icon(draw, .5, .6)
+
+
+def elbow_blade_icon():
+    def draw(d, img, S):
+        # An arm bent at the elbow, a blade of bone splitting out of it
+        d.line((.1 * S, .9 * S, .42 * S, .62 * S), fill=(150, 110, 90, 255), width=max(2, S // 9))
+        d.line((.42 * S, .62 * S, .4 * S, .3 * S), fill=(150, 110, 90, 255), width=max(2, S // 10))
+        _spike(d, S, .44, .6, .92, .1, .13)
+        _spike(d, S, .45, .64, .7, .78, .06)
+        d.ellipse((.37 * S, .55 * S, .51 * S, .69 * S), fill=CRIMSON + (255,))
+    return _icon(draw, .5, .5)
+
+
+def howling_skull_icon():
+    def draw(d, img, S):
+        for k in range(5):
+            t = k / 5
+            r = .2 - t * .12
+            x, y = .2 + t * .2, .8 - t * .2
+            d.ellipse(((x - r) * S, (y - r) * S, (x + r) * S, (y + r) * S), fill=CRIMSON + (60 + 30 * k,))
+        _skull(d, S, .62, .38, .26)
+    return _icon(draw, .6, .4)
+
+
+def bone_nova_icon():
+    def draw(d, img, S):
+        for k in range(14):
+            a = k * math.tau / 14
+            _spike(d, S, .5 + math.cos(a) * .1, .5 + math.sin(a) * .1, .5 + math.cos(a) * .46, .5 + math.sin(a) * .46, .09)
+        d.ellipse((.36 * S, .36 * S, .64 * S, .64 * S), fill=IVORY + (255,), outline=CRIMSON + (255,), width=max(1, S // 32))
+        d.ellipse((.44 * S, .44 * S, .56 * S, .56 * S), fill=CRIMSON + (255,))
+    return _icon(draw, .5, .5)
+
+
+def bone_tempest_icon():
+    def draw(d, img, S):
+        for ring, (r, n) in enumerate(((.18, 5), (.3, 7), (.42, 9))):
+            d.ellipse(((.5 - r) * S, (.5 - r * .55) * S, (.5 + r) * S, (.5 + r * .55) * S), outline=CRIMSON + (150,), width=max(1, S // 48))
+            for k in range(n):
+                a = k * math.tau / n + ring
+                x, y = .5 + math.cos(a) * r, .5 + math.sin(a) * r * .55
+                dx, dy = math.cos(a + 1.2 + k) * .06, math.sin(a + 1.2 + k) * .06
+                _bone(d, S, x - dx, y - dy, x + dx, y + dy, .025)
+    return _icon(draw, .5, .5)
+
+
+def bone_blade_item():
+    """The Bone Blade in hand: a long curved blade of bone, its grip wrapped, a knob of bone for a pommel."""
+    return g.from_grid([
+        "..............wL",
+        ".............wLs",
+        "............wLs.",
+        "...........wLs..",
+        "..........wLs...",
+        ".........wLs....",
+        "........wLs.....",
+        ".......wLs......",
+        "..c...wLs.......",
+        "...cdwLs........",
+        "....dds.........",
+        "...rrdc.........",
+        "..rr..cc........",
+        ".rr.............",
+        "kk..............",
+        "kk..............",
+    ], {"w": IVORY_LIGHT, "L": IVORY, "s": IVORY_SHADE, "d": IVORY_DARK, "c": IVORY_SHADE, "r": CRIMSON_DARK, "k": IVORY})
+
+
 ICONS = (("bone_lance", bone_lance_icon), ("bone_spikes", bone_spikes_icon), ("spine_whip", spine_whip_icon),
          ("bone_volley", bone_volley_icon), ("bone_ward", bone_ward_icon), ("rib_cage", rib_cage_icon), ("ossuary", ossuary_icon),
-         ("skeletal_grasp", skeletal_grasp_icon), ("bone_wyrm", bone_wyrm_icon), ("gashadokuro", gashadokuro_icon))
+         ("skeletal_grasp", skeletal_grasp_icon), ("bone_wyrm", bone_wyrm_icon), ("gashadokuro", gashadokuro_icon),
+         ("colossal_spike", colossal_spike_icon), ("elbow_blade", elbow_blade_icon), ("howling_skull", howling_skull_icon),
+         ("bone_nova", bone_nova_icon), ("bone_tempest", bone_tempest_icon))
 
 
 # --------------------------------------------------------------------------------------------------- the spellbook
@@ -327,6 +405,8 @@ def main():
     g.save(ossuary_codex_icon(), "textures/item/ossuary_codex.png")
     g.save(ossuary_codex_model_texture(), "textures/item/ossuary_codex_3d.png")
     g.book_models("ossuary_codex")
+    g.save(bone_blade_item(), "textures/item/bone_blade.png")
+    g.write_json("models/item/bone_blade.json", {"parent": "minecraft:item/handheld", "textures": {"layer0": "arcanes_oublies:item/bone_blade"}})
 
 
 if __name__ == "__main__":

@@ -100,6 +100,10 @@ import com.waylays.arcanes.entity.cosmos.TemporalEcho;
 import com.waylays.arcanes.entity.cosmos.TimeLoop;
 import com.waylays.arcanes.entity.cosmos.ZeroGravityField;
 import com.waylays.arcanes.entity.bone.BoneLance;
+import com.waylays.arcanes.entity.bone.GiantSpike;
+import com.waylays.arcanes.entity.bone.HowlingSkull;
+import com.waylays.arcanes.entity.bone.BoneNova;
+import com.waylays.arcanes.entity.bone.BoneTempest;
 import com.waylays.arcanes.entity.bone.SpikeField;
 import com.waylays.arcanes.entity.bone.SpineWhip;
 import com.waylays.arcanes.entity.bone.BoneWard;
@@ -468,6 +472,14 @@ public final class ModEntities {
             EntityType.Builder.<BoneWyrm>of(BoneWyrm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<BoneColossus>> BONE_COLOSSUS = register("gashadokuro",
             EntityType.Builder.<BoneColossus>of(BoneColossus::new, MobCategory.MISC).sized(2f, 2f).clientTrackingRange(16).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GiantSpike>> GIANT_SPIKE = register("colossal_spike",
+            EntityType.Builder.<GiantSpike>of(GiantSpike::new, MobCategory.MISC).sized(2f, 2f).clientTrackingRange(14).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<HowlingSkull>> HOWLING_SKULL = register("howling_skull",
+            EntityType.Builder.<HowlingSkull>of(HowlingSkull::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BoneNova>> BONE_NOVA = register("bone_nova",
+            EntityType.Builder.<BoneNova>of(BoneNova::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BoneTempest>> BONE_TEMPEST = register("bone_tempest",
+            EntityType.Builder.<BoneTempest>of(BoneTempest::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
 
     // Cosmos
     public static final DeferredHolder<EntityType<?>, EntityType<TemporalEcho>> TEMPORAL_ECHO = register("temporal_echo",

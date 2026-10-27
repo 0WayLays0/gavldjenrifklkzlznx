@@ -68,6 +68,9 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> OSSUARY_CODEX = ITEMS.register("ossuary_codex",
             () -> spellbook(10, ModAttributes.BONE_SPELL_POWER));
 
+    /** The Bone Blade grown out of the caster's elbow by Elbow Blade: a weapon for a while (see BoneBladeItem). */
+    public static final DeferredHolder<Item, Item> BONE_BLADE = ITEMS.register("bone_blade", com.waylays.arcanes.item.BoneBladeItem::new);
+
     /** Ritual Chalk: chooses a group ritual and draws its circle on the ground (32 circles). */
     public static final DeferredHolder<Item, Item> RITUAL_CHALK = ITEMS.register("ritual_chalk",
             () -> new com.waylays.arcanes.ritual.RitualChalkItem(new Item.Properties().stacksTo(1).durability(32).rarity(Rarity.UNCOMMON)));
