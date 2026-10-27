@@ -68,6 +68,10 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> OSSUARY_CODEX = ITEMS.register("ossuary_codex",
             () -> spellbook(10, ModAttributes.BONE_SPELL_POWER));
 
+    /** Wood Magic spellbook (the Sylvan Codex: bound in bark between two boards, leaves growing out of it): 10 slots, +10% power, +200 max mana. */
+    public static final DeferredHolder<Item, Item> SYLVAN_CODEX = ITEMS.register("sylvan_codex",
+            () -> spellbook(10, ModAttributes.WOOD_SPELL_POWER));
+
     /** The Bone Blade grown out of the caster's elbow by Elbow Blade: a weapon for a while (see BoneBladeItem). */
     public static final DeferredHolder<Item, Item> BONE_BLADE = ITEMS.register("bone_blade", com.waylays.arcanes.item.BoneBladeItem::new);
 

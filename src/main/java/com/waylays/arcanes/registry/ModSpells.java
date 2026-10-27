@@ -151,6 +151,16 @@ import com.waylays.arcanes.spells.bone.OssuarySpell;
 import com.waylays.arcanes.spells.bone.SkeletalGraspSpell;
 import com.waylays.arcanes.spells.bone.BoneWyrmSpell;
 import com.waylays.arcanes.spells.bone.GashadokuroSpell;
+import com.waylays.arcanes.spells.wood.LogHurlSpell;
+import com.waylays.arcanes.spells.wood.GraspingRootsSpell;
+import com.waylays.arcanes.spells.wood.SeedPodsSpell;
+import com.waylays.arcanes.spells.wood.BrambleHedgeSpell;
+import com.waylays.arcanes.spells.wood.BarkskinSpell;
+import com.waylays.arcanes.spells.wood.FallingTreeSpell;
+import com.waylays.arcanes.spells.wood.LeafStormSpell;
+import com.waylays.arcanes.spells.wood.SuddenGroveSpell;
+import com.waylays.arcanes.spells.wood.WoodGuardianSpell;
+import com.waylays.arcanes.spells.wood.WorldTreeSpell;
 import com.waylays.arcanes.spells.cosmos.AsteroidBeltSpell;
 import com.waylays.arcanes.spells.cosmos.BlackHoleSpell;
 import com.waylays.arcanes.spells.cosmos.CaptiveOrbitSpell;
@@ -385,6 +395,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> HOWLING_SKULL = register(new HowlingSkullSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> BONE_NOVA = register(new BoneNovaSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> BONE_TEMPEST = register(new BoneTempestSpell());
+
+    // Wood Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LOG_HURL = register(new LogHurlSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GRASPING_ROOTS = register(new GraspingRootsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SEED_PODS = register(new SeedPodsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BRAMBLE_HEDGE = register(new BrambleHedgeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BARKSKIN = register(new BarkskinSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> FALLING_TREE = register(new FallingTreeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LEAF_STORM = register(new LeafStormSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SUDDEN_GROVE = register(new SuddenGroveSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> WOOD_GUARDIAN = register(new WoodGuardianSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> WORLD_TREE = register(new WorldTreeSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

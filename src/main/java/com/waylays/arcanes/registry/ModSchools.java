@@ -283,6 +283,25 @@ public final class ModSchools {
             BONE_MAGIC
     ));
 
+    /**
+     * Wood Magic: living wood called up out of the ground: logs hurled, roots that seize, brambles, bark armour, trees
+     * that sprout and fall, a storm of leaves, a guardian of wood and the World Tree; its life glows spring green.
+     */
+    public static final ResourceLocation WOOD_RESOURCE = ArcanesOublies.id("wood");
+    public static final TagKey<Item> WOOD_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("wood_focus"));
+    public static final ResourceKey<DamageType> WOOD_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("wood_magic"));
+    public static final int WOOD_COLOR = 0xB07A3E;
+
+    public static final DeferredHolder<SchoolType, SchoolType> WOOD = SCHOOLS.register(WOOD_RESOURCE.getPath(), () -> new SchoolType(
+            WOOD_RESOURCE,
+            WOOD_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".wood").withStyle(Style.EMPTY.withColor(WOOD_COLOR)),
+            ModAttributes.WOOD_SPELL_POWER,
+            ModAttributes.WOOD_MAGIC_RESIST,
+            sound(SoundEvents.WOOD_PLACE),
+            WOOD_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

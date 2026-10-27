@@ -111,6 +111,16 @@ import com.waylays.arcanes.entity.bone.RibCage;
 import com.waylays.arcanes.entity.bone.Grasp;
 import com.waylays.arcanes.entity.bone.BoneWyrm;
 import com.waylays.arcanes.entity.bone.BoneColossus;
+import com.waylays.arcanes.entity.wood.FlyingLog;
+import com.waylays.arcanes.entity.wood.RootSnare;
+import com.waylays.arcanes.entity.wood.BrambleHedge;
+import com.waylays.arcanes.entity.wood.BarkShell;
+import com.waylays.arcanes.entity.wood.FallingTree;
+import com.waylays.arcanes.entity.wood.LeafStorm;
+import com.waylays.arcanes.entity.wood.SuddenGrove;
+import com.waylays.arcanes.entity.wood.SeedPod;
+import com.waylays.arcanes.entity.wood.WorldTree;
+import com.waylays.arcanes.entity.wood.WoodGuardian;
 import com.waylays.arcanes.entity.wall.BrickBolt;
 import com.waylays.arcanes.entity.wall.BrickQuake;
 import com.waylays.arcanes.entity.wall.BrickStorm;
@@ -481,6 +491,28 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<BoneTempest>> BONE_TEMPEST = register("bone_tempest",
             EntityType.Builder.<BoneTempest>of(BoneTempest::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
 
+    // Wood Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<FlyingLog>> FLYING_LOG = register("log_hurl",
+            EntityType.Builder.<FlyingLog>of(FlyingLog::new, MobCategory.MISC).sized(.9f, .9f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RootSnare>> ROOT_SNARE = register("grasping_roots",
+            EntityType.Builder.<RootSnare>of(RootSnare::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BrambleHedge>> BRAMBLE_HEDGE = register("bramble_hedge",
+            EntityType.Builder.<BrambleHedge>of(BrambleHedge::new, MobCategory.MISC).sized(1f, .5f).clientTrackingRange(12).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BarkShell>> BARK_SHELL = register("barkskin",
+            EntityType.Builder.<BarkShell>of(BarkShell::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<FallingTree>> FALLING_TREE = register("falling_tree",
+            EntityType.Builder.<FallingTree>of(FallingTree::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(14).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<LeafStorm>> LEAF_STORM = register("leaf_storm",
+            EntityType.Builder.<LeafStorm>of(LeafStorm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(2).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<SuddenGrove>> SUDDEN_GROVE = register("sudden_grove",
+            EntityType.Builder.<SuddenGrove>of(SuddenGrove::new, MobCategory.MISC).sized(1f, .5f).clientTrackingRange(12).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<SeedPod>> SEED_POD = register("seed_pod",
+            EntityType.Builder.<SeedPod>of(SeedPod::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<WorldTree>> WORLD_TREE = register("world_tree",
+            EntityType.Builder.<WorldTree>of(WorldTree::new, MobCategory.MISC).sized(3f, 3f).clientTrackingRange(20).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<WoodGuardian>> WOOD_GUARDIAN = register("wood_guardian",
+            EntityType.Builder.<WoodGuardian>of(WoodGuardian::new, MobCategory.MISC).sized(1.4f, 3.4f).clientTrackingRange(10));
+
     // Cosmos
     public static final DeferredHolder<EntityType<?>, EntityType<TemporalEcho>> TEMPORAL_ECHO = register("temporal_echo",
             EntityType.Builder.<TemporalEcho>of(TemporalEcho::new, MobCategory.MISC).sized(.6f, 1.8f).clientTrackingRange(10).updateInterval(20).fireImmune());
@@ -543,5 +575,6 @@ public final class ModEntities {
         event.put(MANA_FALCON.get(), ManaFalcon.createAttributes().build());
         event.put(RIDDEN_COMET.get(), RiddenComet.createAttributes().build());
         event.put(STAR_LION.get(), StarLion.createAttributes().build());
+        event.put(WOOD_GUARDIAN.get(), WoodGuardian.createAttributes().build());
     }
 }

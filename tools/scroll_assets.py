@@ -47,6 +47,8 @@ PALETTES = {
     "cosmos": ["1c1f4a", "252a5e", "2f3672", "121433", "181b40", "ffe7c2", "ff8a1e", "c85a10", "ffb347", "b8702a", "5c3416"],
     # Ivory paper like old bone, the writing in crimson marrow, bone rod ends
     "bone": ["d6caa9", "e4dabf", "f2ecdc", "a39678", "b8ac8d", "e0283c", "a8142a", "640a18", "f4eedf", "cfc3a4", "857a5e"],
+    # Birch bark paper, the writing in leaf green, oak rod ends
+    "wood": ["d9c9a3", "e8dcbc", "f5efdc", "a8936a", "bfac83", "8fd14f", "4f9a2a", "2c5a16", "c8955a", "9a6b3c", "5e3e20"],
 }
 
 

@@ -243,6 +243,17 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.HOWLING_SKULL.get(), com.waylays.arcanes.client.render.HowlingSkullRenderer::new);
         event.registerEntityRenderer(ModEntities.BONE_NOVA.get(), com.waylays.arcanes.client.render.BoneNovaRenderer::new);
         event.registerEntityRenderer(ModEntities.BONE_TEMPEST.get(), com.waylays.arcanes.client.render.BoneTempestRenderer::new);
+        // Wood Magic
+        event.registerEntityRenderer(ModEntities.FLYING_LOG.get(), com.waylays.arcanes.client.render.FlyingLogRenderer::new);
+        event.registerEntityRenderer(ModEntities.ROOT_SNARE.get(), com.waylays.arcanes.client.render.RootSnareRenderer::new);
+        event.registerEntityRenderer(ModEntities.BRAMBLE_HEDGE.get(), com.waylays.arcanes.client.render.BrambleHedgeRenderer::new);
+        event.registerEntityRenderer(ModEntities.BARK_SHELL.get(), com.waylays.arcanes.client.render.BarkShellRenderer::new);
+        event.registerEntityRenderer(ModEntities.FALLING_TREE.get(), com.waylays.arcanes.client.render.FallingTreeRenderer::new);
+        event.registerEntityRenderer(ModEntities.LEAF_STORM.get(), com.waylays.arcanes.client.render.LeafStormRenderer::new);
+        event.registerEntityRenderer(ModEntities.SUDDEN_GROVE.get(), com.waylays.arcanes.client.render.SuddenGroveRenderer::new);
+        event.registerEntityRenderer(ModEntities.SEED_POD.get(), com.waylays.arcanes.client.render.SeedPodRenderer::new);
+        event.registerEntityRenderer(ModEntities.WORLD_TREE.get(), com.waylays.arcanes.client.render.WorldTreeRenderer::new);
+        event.registerEntityRenderer(ModEntities.WOOD_GUARDIAN.get(), com.waylays.arcanes.client.render.WoodGuardianRenderer::new);
         event.registerEntityRenderer(ModEntities.GEM_SIGIL.get(), GemSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_SIGIL.get(), GoldSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_COINS.get(), GoldCoinsRenderer::new);
@@ -360,6 +371,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.JEWELLERS_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.CODEX_OUT_OF_TIME.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.OSSUARY_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.SYLVAN_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }

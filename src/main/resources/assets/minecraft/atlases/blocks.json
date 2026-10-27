@@ -20,7 +20,8 @@
         "arcanes_wall": "arcanes_oublies:item/scroll_palettes/wall",
         "arcanes_gem": "arcanes_oublies:item/scroll_palettes/gem",
         "arcanes_cosmos": "arcanes_oublies:item/scroll_palettes/cosmos",
-        "arcanes_bone": "arcanes_oublies:item/scroll_palettes/bone"
+        "arcanes_bone": "arcanes_oublies:item/scroll_palettes/bone",
+        "arcanes_wood": "arcanes_oublies:item/scroll_palettes/wood"
       }
     }
   ]
