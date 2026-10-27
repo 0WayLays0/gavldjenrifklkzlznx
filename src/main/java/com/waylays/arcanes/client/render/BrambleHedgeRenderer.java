@@ -57,7 +57,7 @@ public class BrambleHedgeRenderer extends EntityRenderer<BrambleHedge> {
                 continue;
             }
             int seed = stems.get(k).seed();
-            for (int i = 2; i < POINTS; i += 2) {
+            for (int i = 2; i < shapes[k].length; i += 2) {
                 Vector3f at = shapes[k][i];
                 poseStack.pushPose();
                 poseStack.translate(at.x, at.y, at.z);
