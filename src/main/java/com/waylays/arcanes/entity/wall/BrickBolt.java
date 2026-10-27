@@ -35,13 +35,17 @@ import javax.annotation.Nullable;
  * leaves); it strikes hard and bursts.</li>
  * <li>MORTAR: a lump of bricks lobbed high; a sigil burns where it will land; it bursts there, hurting all around.</li>
  * <li>FALLING: a brick dropped from the Brick Rain's cloud, bursting where it lands.</li>
+ * <li>BOULDER: a great block of masonry hurled from the sky by the Siege, blazing; a sigil burns where it will land;
+ * it smashes everything around, throwing it up.</li>
  * </ul>
  */
 public class BrickBolt extends SpellProjectile {
-    public enum Kind { BOLT, MORTAR, FALLING }
+    public enum Kind { BOLT, MORTAR, FALLING, BOULDER }
 
     public static final float MORTAR_RADIUS = 3.5f;
     public static final float FALLING_RADIUS = 1.6f;
+    public static final float BOULDER_RADIUS = 3.4f;
+    public static final double BOULDER_GRAVITY = .07;
     public static final float BOLT_SPEED = 1.7f;
 
     private static final EntityDataAccessor<Integer> DATA_KIND = SynchedEntityData.defineId(BrickBolt.class, EntityDataSerializers.INT);
@@ -117,6 +121,7 @@ public class BrickBolt extends SpellProjectile {
             case BOLT -> 0;
             case MORTAR -> .05;
             case FALLING -> .04;
+            case BOULDER -> BOULDER_GRAVITY;
         };
     }
 
@@ -176,7 +181,11 @@ public class BrickBolt extends SpellProjectile {
                 WallFx.impact(level, at, 1, 4);
                 WallFx.sound(level, at, SoundEvents.STONE_BREAK, 1.3f, .7f);
             } else {
-                float radius = getKind() == Kind.MORTAR ? MORTAR_RADIUS : FALLING_RADIUS;
+                float radius = switch (getKind()) {
+                    case MORTAR -> MORTAR_RADIUS;
+                    case BOULDER -> BOULDER_RADIUS;
+                    default -> FALLING_RADIUS;
+                };
                 if (spell != null) {
                     for (LivingEntity e : SpellUtil.enemiesAround(level, at, radius, getOwner(), x -> true)) {
                         hurtInBlast(e, at, radius, spell);
@@ -186,12 +195,16 @@ public class BrickBolt extends SpellProjectile {
                         hurtInBlast(struck, at, radius, spell);
                     }
                 }
-                boolean mortar = getKind() == Kind.MORTAR;
-                WallFx.impact(level, at, mortar ? radius : 1.2f, mortar ? 12 : 3);
-                WallFx.slam(level, at, mortar ? 1.8f : .8f);
-                if (mortar) {
-                    level.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE, net.minecraft.sounds.SoundSource.PLAYERS, 1.2f, .8f);
-                    SpellUtil.cameraShake(level, at, 10, 14);
+                boolean big = getKind() == Kind.MORTAR || getKind() == Kind.BOULDER;
+                WallFx.impact(level, at, big ? radius : 1.2f, getKind() == Kind.BOULDER ? 16 : big ? 12 : 3);
+                WallFx.slam(level, at, big ? 1.8f : .8f);
+                if (big) {
+                    boolean boulder = getKind() == Kind.BOULDER;
+                    level.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE, net.minecraft.sounds.SoundSource.PLAYERS, boulder ? 2f : 1.2f, boulder ? .6f : .8f);
+                    SpellUtil.cameraShake(level, at, boulder ? 14 : 10, boulder ? 20 : 14);
+                    if (boulder) {
+                        WallFx.embers(level, at.add(0, .5, 0), 24, 1.4);
+                    }
                 }
             }
         }
@@ -202,11 +215,13 @@ public class BrickBolt extends SpellProjectile {
         float falloff = (float) Mth.clamp(1 - .5 * e.position().distanceTo(at) / radius, .5, 1);
         e.invulnerableTime = 0;
         DamageSources.applyDamage(e, damage * falloff, SpellUtil.damageSource(spell, this, getOwner()));
-        if (getKind() == Kind.MORTAR) {
-            e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 50, 1));
+        if (getKind() == Kind.MORTAR || getKind() == Kind.BOULDER) {
+            boolean boulder = getKind() == Kind.BOULDER;
+            e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, boulder ? 60 : 50, boulder ? 2 : 1));
             Vec3 away = e.position().subtract(at).multiply(1, 0, 1);
             away = away.lengthSqr() < 1.0E-4 ? Vec3.ZERO : away.normalize();
-            e.setDeltaMovement(e.getDeltaMovement().add(away.scale(.7)).add(0, .4, 0));
+            double resist = 1 - Mth.clamp(e.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 0, 1);
+            e.setDeltaMovement(e.getDeltaMovement().add(away.scale((boulder ? .9 : .7) * resist)).add(0, (boulder ? .7 : .4) * Math.max(.4, resist), 0));
             e.hurtMarked = true;
         }
     }

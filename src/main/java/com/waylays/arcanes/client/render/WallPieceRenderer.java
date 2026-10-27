@@ -17,8 +17,9 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * A moving or bursting wall: brick blocks flying up into place in a ripple from the middle, crenellated, the mortar
- * glowing (hotter as a burst wall is about to blow, with a shudder); sliding when it slides; then its bricks fly
- * apart: forward for a charge or a burst, up and out for the crushing walls.
+ * glowing (hotter as a burst wall is about to blow, or a great wall about to fall, with a shudder); sliding when it
+ * slides, toppling forward about its foot when it topples; then its bricks fly apart: forward for a charge or a burst,
+ * up and out for the crushing and closing walls, up off the ground where a toppled wall lies.
  */
 public class WallPieceRenderer extends EntityRenderer<WallPiece> {
     public WallPieceRenderer(EntityRendererProvider.Context context) {
@@ -37,7 +38,8 @@ public class WallPieceRenderer extends EntityRenderer<WallPiece> {
         int shattered = wall.getShattered();
         Vec3 off = wall.offset(partialTicks);
         float heat = wall.heat(partialTicks);
-        float shake = wall.getKind() == WallPiece.Kind.BURST && heat > .6f ? (heat - .6f) * .25f * Mth.sin(age * 4.3f) : 0;
+        boolean shudders = wall.getKind() == WallPiece.Kind.BURST || wall.getKind() == WallPiece.Kind.TOPPLE;
+        float shake = shudders && heat > .6f && wall.tilt(partialTicks) <= 0 ? (heat - .6f) * .25f * Mth.sin(age * 4.3f) : 0;
 
         if (age < wall.built() + 10) {
             WallRender.sigil(poseStack, buffer, width * .6f + 1, Mth.clamp(age / 5, 0, 1) * Mth.clamp(1 - (age - wall.built()) / 10, 0, 1), age * 1.4f);
@@ -45,6 +47,13 @@ public class WallPieceRenderer extends EntityRenderer<WallPiece> {
         poseStack.pushPose();
         poseStack.translate(off.x + shake, 0, off.z + shake * .7f);
         poseStack.mulPose(Axis.YP.rotationDegrees(-wall.getYRot()));
+        float tilt = wall.tilt(partialTicks);
+        if (tilt > 0 && shattered < 0) {
+            // Falling forward about its front foot
+            poseStack.translate(0, 0, WallPiece.THICK * .5f);
+            poseStack.mulPose(Axis.XP.rotation(tilt));
+            poseStack.translate(0, 0, -WallPiece.THICK * .5f);
+        }
         // Two passes, the bricks then their mortar: a buffer must not be written to again once another one has been
         // asked for (asking for it sends the first off)
         for (int pass = 0; pass < 2; pass++) {
@@ -94,7 +103,13 @@ public class WallPieceRenderer extends EntityRenderer<WallPiece> {
     private static void fly(WallPiece wall, BlockState state, PoseStack poseStack, MultiBufferSource buffer, int light, float x, float y, float t, int seed) {
         float h1 = RuneRender.hash(seed), h2 = RuneRender.hash(seed + 1), h3 = RuneRender.hash(seed + 2);
         float vx, vy, vz;
-        if (wall.getKind() == WallPiece.Kind.SLAM) {
+        if (wall.getKind() == WallPiece.Kind.TOPPLE) {
+            // Lying flat where it fell, bursting up off the ground
+            WallRender.fragment(state, poseStack, buffer, light, x, .3f, WallPiece.THICK * .5f + y, (h1 - .5f) * .3f, .3f + .35f * h2,
+                    (h3 - .3f) * .25f, t, WallPiece.SHATTER_TICKS, .55f + .3f * h1, seed);
+            return;
+        }
+        if (wall.getKind() == WallPiece.Kind.SLAM || wall.getKind() == WallPiece.Kind.HERD) {
             vx = (h1 - .5f) * .35f;
             vy = .3f + .3f * h2;
             vz = -.1f - .15f * h3;

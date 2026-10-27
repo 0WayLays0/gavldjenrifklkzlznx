@@ -170,6 +170,81 @@ def fallen_citadel_icon():
     return _icon(draw, .5, .4)
 
 
+EMBER = (255, 96, 40)
+EMBER_CORE = (255, 196, 120)
+
+
+def brick_quake_icon():
+    def draw(d, img, S):
+        _ground(d, S, .78)
+        # Rings of columns bursting up round a stamp, the near ones tall
+        d.ellipse((.36 * S, .74 * S, .64 * S, .82 * S), outline=EMBER + (255,), width=max(1, S // 32))
+        d.ellipse((.12 * S, .7 * S, .88 * S, .88 * S), outline=EMBER + (200,), width=max(1, S // 40))
+        for i, (x, top) in enumerate(((.06, .5), (.2, .4), (.34, .56), (.62, .56), (.76, .4), (.88, .5))):
+            bricks(d, S, x, top, x + .1, .8, 2 if top > .45 else 3, i + 3, cracks=False)
+        for x in (.43, .5, .57):
+            d.line((x * S, .72 * S, (x + (x - .5) * 1.5) * S, .6 * S), fill=STONE_LIGHT + (200,), width=max(1, S // 40))
+    return _icon(draw, .5, .7, (90, 60, 50))
+
+
+def closing_keep_icon():
+    def draw(d, img, S):
+        # From above: a ring of eight walls closing on a target in the middle
+        d.ellipse((.1 * S, .1 * S, .9 * S, .9 * S), outline=EMBER + (150,), width=max(1, S // 40))
+        for k in range(8):
+            a = k * math.tau / 8
+            cx, cy = .5 + math.cos(a) * .31, .5 + math.sin(a) * .31
+            ux, uy = -math.sin(a) * .1, math.cos(a) * .1
+            nx, ny = math.cos(a) * .05, math.sin(a) * .05
+            pts = [(cx + ux + nx, cy + uy + ny), (cx - ux + nx, cy - uy + ny), (cx - ux - nx, cy - uy - ny), (cx + ux - nx, cy + uy - ny)]
+            d.polygon([(x * S, y * S) for x, y in pts], fill=(STONE if k % 2 else STONE_LIGHT) + (255,), outline=MORTAR + (255,))
+            ax, ay = .5 + math.cos(a) * .2, .5 + math.sin(a) * .2
+            d.line((ax * S, ay * S, (.5 + math.cos(a) * .12) * S, (.5 + math.sin(a) * .12) * S), fill=EMBER_CORE + (255,), width=max(1, S // 32))
+        d.ellipse((.44 * S, .44 * S, .56 * S, .56 * S), fill=(220, 70, 50, 255), outline=OUTLINE + (255,))
+    return _icon(draw, .5, .5, (80, 50, 44))
+
+
+def great_rampart_icon():
+    def draw(d, img, S):
+        _ground(d, S, .86)
+        # A great crenellated wall toppling forward, half-way down, dust where it will land
+        import math as m
+        a = m.radians(32)
+        fx, fy = .08, .86
+        L, W = .66, .3
+        def at(u, v):
+            # u up the wall, v across its thickness
+            return ((fx + m.sin(a) * u + m.cos(a) * v) * S, (fy - m.cos(a) * u + m.sin(a) * v) * S)
+        d.polygon([at(0, 0), at(L, 0), at(L, W), at(0, W)], fill=STONE + (255,), outline=OUTLINE + (255,))
+        for k in range(1, 4):
+            u = L * k / 4
+            d.line((at(u, 0), at(u, W)), fill=EMBER + (255,), width=max(1, S // 40))
+        for k in range(1, 3):
+            v = W * k / 3
+            d.line((at(0, v), at(L, v)), fill=MORTAR + (255,), width=max(1, S // 48))
+        for k in range(3):
+            u0 = L + .02
+            v0 = k * W / 3 * 1.1
+            d.polygon([at(u0, v0), at(u0 + .06, v0), at(u0 + .06, v0 + W / 4), at(u0, v0 + W / 4)], fill=STONE_LIGHT + (255,))
+        for x in (.62, .74, .86):
+            d.ellipse(((x - .05) * S, .8 * S, (x + .05) * S, .9 * S), fill=STONE_LIGHT + (200,))
+        d.arc((.45 * S, .1 * S, 1.2 * S, 1.3 * S), 180, 250, fill=EMBER_CORE + (255,), width=max(1, S // 32))
+    return _icon(draw, .5, .55, (90, 60, 50))
+
+
+def siege_icon():
+    def draw(d, img, S):
+        _ground(d, S, .9)
+        # Blazing blocks of masonry falling out of the sky, a trail of fire behind each
+        for k, (x, y, s) in enumerate(((.52, .12, .3), (.2, .52, .24))):
+            d.line(((x + s * .5) * S, (y + s * .5) * S, (x + s * .5 - .3) * S, (y + s * .5 - .26) * S), fill=EMBER + (170,), width=max(2, int(S * s * .45)))
+            d.line(((x + s * .5) * S, (y + s * .5) * S, (x + s * .5 - .18) * S, (y + s * .5 - .15) * S), fill=EMBER_CORE + (230,), width=max(1, int(S * s * .2)))
+            bricks(d, S, x, y, x + s, y + s, 2, k + 4, cracks=False)
+            d.rectangle((x * S, y * S, (x + s) * S, (y + s) * S), outline=EMBER + (255,), width=max(1, S // 48))
+        d.ellipse((.1 * S, .86 * S, .5 * S, .94 * S), outline=EMBER + (255,), width=max(1, S // 40))
+    return _icon(draw, .6, .3, (100, 50, 40))
+
+
 def rampart_codex_icon():
     img = g.from_grid([
         "................",
@@ -324,7 +399,8 @@ def mason_sigil():
 ICONS = (("brick_bolt", brick_bolt_icon), ("rising_wall", rising_wall_icon), ("brick_rain", brick_rain_icon),
          ("wall_burst", wall_burst_icon), ("mortar", mortar_icon), ("crushing_walls", crushing_walls_icon),
          ("brick_cage", brick_cage_icon), ("rampart_charge", rampart_charge_icon), ("bastion", bastion_icon),
-         ("fallen_citadel", fallen_citadel_icon))
+         ("fallen_citadel", fallen_citadel_icon), ("brick_quake", brick_quake_icon), ("closing_keep", closing_keep_icon),
+         ("great_rampart", great_rampart_icon), ("siege", siege_icon))
 
 
 def main():

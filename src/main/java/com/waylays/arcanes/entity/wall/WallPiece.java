@@ -37,11 +37,15 @@ import javax.annotation.Nullable;
  * forward (the Rampart Charge).</li>
  * <li>BURST: it stands while its mortar glows hotter and hotter, shaking, then blows apart forward in a cone of
  * bricks (the Wall Burst).</li>
+ * <li>HERD: it slides forward like a slam, sweeping the enemies before it without hurting them, and bursts when it
+ * arrives (the walls of the Closing Keep, which does the crushing).</li>
+ * <li>TOPPLE: it stands, shaking, its mortar heating, then topples forward flat onto everything before it, as long
+ * as it is high, and bursts where it lands (the Great Rampart).</li>
  * </ul>
  * It never moves on its own: both sides work out where it is from its age, so it slides smoothly.
  */
 public class WallPiece extends SpellEffectEntity {
-    public enum Kind { SLAM, PUSH, BURST }
+    public enum Kind { SLAM, PUSH, BURST, HERD, TOPPLE }
 
     /** Ticks a block takes to fly into place; after the wall is built, ticks before a burst wall blows apart. */
     public static final int CELL_RISE = 5;
@@ -50,6 +54,9 @@ public class WallPiece extends SpellEffectEntity {
     /** Ticks the flying bricks last after it blows apart. */
     public static final int SHATTER_TICKS = 26;
     public static final float THICK = 1;
+    /** A toppling wall: ticks it sways once built, then ticks it takes to fall. */
+    public static final int TOPPLE_WAIT = 12;
+    public static final int TOPPLE_FALL = 12;
 
     private static final EntityDataAccessor<Integer> DATA_KIND = SynchedEntityData.defineId(WallPiece.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_WIDTH = SynchedEntityData.defineId(WallPiece.class, EntityDataSerializers.FLOAT);
@@ -140,11 +147,20 @@ public class WallPiece extends SpellEffectEntity {
 
     /** How far it has slid (0 to 1 of its travel): a slam speeds up to the end, a charge eases in and out. */
     public float travelled(float partialTicks) {
-        if (getKind() == Kind.BURST) {
+        if (getKind() == Kind.BURST || getKind() == Kind.TOPPLE) {
             return 0;
         }
         float t = Mth.clamp((tickCount + partialTicks - built()) / this.entityData.get(DATA_TRAVEL_TICKS), 0, 1);
-        return getKind() == Kind.SLAM ? t * t : t * t * (3 - 2 * t);
+        return getKind() == Kind.PUSH ? t * t * (3 - 2 * t) : t * t;
+    }
+
+    /** How far a toppling wall has fallen (radians, 0 standing to a right angle lying flat), speeding up as it goes. */
+    public float tilt(float partialTicks) {
+        if (getKind() != Kind.TOPPLE) {
+            return 0;
+        }
+        float t = Mth.clamp((tickCount + partialTicks - built() - TOPPLE_WAIT) / TOPPLE_FALL, 0, 1);
+        return t * t * Mth.HALF_PI;
     }
 
     /** Where its foot is now, from where it rose. */
@@ -157,6 +173,9 @@ public class WallPiece extends SpellEffectEntity {
         float age = tickCount + partialTicks;
         if (getKind() == Kind.BURST) {
             return .45f + .55f * Mth.clamp((age - built()) / BURST_DELAY, 0, 1);
+        }
+        if (getKind() == Kind.TOPPLE) {
+            return .45f + .55f * Mth.clamp((age - built()) / (TOPPLE_WAIT + TOPPLE_FALL), 0, 1);
         }
         return .5f + .3f * travelled(partialTicks);
     }
@@ -178,7 +197,7 @@ public class WallPiece extends SpellEffectEntity {
             }
             return;
         }
-        if (tickCount > 200) {
+        if (tickCount > 260) {
             discard();
             return;
         }
@@ -189,7 +208,8 @@ public class WallPiece extends SpellEffectEntity {
             return;
         }
         switch (getKind()) {
-            case SLAM, PUSH -> slide(level);
+            case SLAM, PUSH, HERD -> slide(level);
+            case TOPPLE -> topple(level);
             case BURST -> {
                 if (tickCount % 4 == 0) {
                     WallFx.embers(level, position().add(0, getHeight() * .5, 0), 4, getWidth() * .3);
@@ -243,7 +263,7 @@ public class WallPiece extends SpellEffectEntity {
             double resist = 1 - Mth.clamp(e.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 0, 1);
             e.setDeltaMovement(f.scale(Math.max(.35, speed * 1.4) * Math.max(.4, resist)).add(0, .12, 0));
             e.hurtMarked = true;
-            if (hit.add(e.getId())) {
+            if (getKind() != Kind.HERD && hit.add(e.getId())) {
                 hurt(e, getKind() == Kind.SLAM ? damage * .4f : damage * .6f);
             }
         }
@@ -257,10 +277,61 @@ public class WallPiece extends SpellEffectEntity {
         if (tickCount == arrival()) {
             if (getKind() == Kind.SLAM) {
                 crush(level, c);
+            } else if (getKind() == Kind.HERD) {
+                WallFx.slam(level, c, 1.2f);
+                shatter(level);
             } else {
                 blow(level, BURST_RANGE * .75f, damage);
             }
         }
+    }
+
+    /** A toppling wall sways and shudders, heating, then falls flat forward: what it lands on is crushed. */
+    private void topple(ServerLevel level) {
+        int fallen = built() + TOPPLE_WAIT + TOPPLE_FALL;
+        if (tickCount < fallen) {
+            if (tickCount % 3 == 0) {
+                WallFx.embers(level, position().add(0, getHeight() * .5, 0), 5, getWidth() * .35);
+                WallFx.sound(level, position(), SoundEvents.STONE_HIT, 1f, .4f + .4f * heat(0));
+            }
+            if (tickCount == built() + TOPPLE_WAIT) {
+                WallFx.sound(level, position(), SoundEvents.GRINDSTONE_USE, 2f, .3f);
+                WallFx.dust(level, position().add(0, .3, 0), 30, getWidth() * .4);
+            }
+            return;
+        }
+        if (tickCount != fallen) {
+            return;
+        }
+        Vec3 f = forward();
+        Vec3 foot = position().add(f.scale(THICK * .5));
+        float reach = getHeight() + .8f;
+        for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(getWidth() * .5 + reach + 2, 4, getWidth() * .5 + reach + 2))) {
+            if (!e.isAlive() || SpellUtil.isAlly(getOwner(), e)) {
+                continue;
+            }
+            double[] l = local(e, foot);
+            if (l[0] < -1 || l[0] > reach || Math.abs(l[1]) > getWidth() * .5 + e.getBbWidth() * .5 + .3 || e.getY() > foot.y + 3.5 || e.getY() < foot.y - 2.5) {
+                continue;
+            }
+            hurt(e, damage);
+            e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 3));
+            e.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 80, 0));
+            e.setDeltaMovement(e.getDeltaMovement().multiply(.2, 0, .2).add(0, -.5, 0));
+            e.hurtMarked = true;
+        }
+        // Bursts of bricks all along where it landed
+        Vec3 across = new Vec3(-f.z, 0, f.x);
+        int bursts = Math.max(2, Math.round(getWidth() / 3));
+        for (int k = 0; k < bursts; k++) {
+            float s = (k + .5f) / bursts - .5f;
+            Vec3 at = foot.add(across.scale(s * getWidth())).add(f.scale(getHeight() * .55));
+            WallFx.impact(level, at, 2.2f, 4);
+        }
+        WallFx.slam(level, foot.add(f.scale(getHeight() * .5)), 3f);
+        level.playSound(null, foot.x, foot.y, foot.z, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2f, .5f);
+        SpellUtil.cameraShake(level, foot, 22, getWidth() + 14);
+        shatter(level);
     }
 
     /** The twin walls meet: what is between them is crushed and dazed, and both walls burst. */
@@ -303,7 +374,8 @@ public class WallPiece extends SpellEffectEntity {
 
     private void shatter(ServerLevel level) {
         this.entityData.set(DATA_SHATTERED, tickCount);
-        Vec3 c = position().add(offset(0)).add(0, getHeight() * .5, 0);
+        Vec3 c = getKind() == Kind.TOPPLE ? position().add(forward().scale(getHeight() * .5)).add(0, .5, 0)
+                : position().add(offset(0)).add(0, getHeight() * .5, 0);
         WallFx.dust(level, c, 40, getWidth() * .4);
         WallFx.embers(level, c, 24, getWidth() * .4);
     }

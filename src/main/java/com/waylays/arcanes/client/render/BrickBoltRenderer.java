@@ -17,7 +17,8 @@ import net.minecraft.world.phys.Vec3;
 /**
  * A flying brick of Wall Magic, its mortar glowing, a streak of embers behind it: rising out of the ground and hovering
  * before it is hurled (a bolt), a lump of four lobbed high with a sigil burning where it will land (a mortar), or a
- * brick dropping out of the vortex (the rain).
+ * brick dropping out of the vortex (the rain), or a great blazing block of eight hurled from the sky (the siege), a
+ * sigil burning where it will land.
  */
 public class BrickBoltRenderer extends EntityRenderer<BrickBolt> {
     public BrickBoltRenderer(EntityRendererProvider.Context context) {
@@ -31,18 +32,20 @@ public class BrickBoltRenderer extends EntityRenderer<BrickBolt> {
         boolean hovering = bolt.getKind() == BrickBolt.Kind.BOLT && age < bolt.getHover();
         Vec3 motion = bolt.getDeltaMovement();
         if (!hovering && motion.lengthSqr() > 1.0E-4) {
-            Vec3 back = motion.normalize().scale(-(bolt.getKind() == BrickBolt.Kind.MORTAR ? 3 : 2.4));
+            boolean boulder = bolt.getKind() == BrickBolt.Kind.BOULDER;
+            Vec3 back = motion.normalize().scale(-(boulder ? 7 : bolt.getKind() == BrickBolt.Kind.MORTAR ? 3 : 2.4));
             Vec3 mid = new Vec3(0, bolt.getBbHeight() * .5, 0);
             VertexConsumer stroke = buffer.getBuffer(RenderType.eyes(GlyphRender.STROKE));
-            GlyphRender.beam(stroke, poseStack.last(), mid, mid.add(back), .45f, WallRender.ember(.4f, .7f));
-            GlyphRender.beam(stroke, poseStack.last(), mid, mid.add(back.scale(.6)), .18f, WallRender.ember(1, .9f));
+            GlyphRender.beam(stroke, poseStack.last(), mid, mid.add(back), boulder ? 1.5f : .45f, WallRender.ember(.4f, .7f));
+            GlyphRender.beam(stroke, poseStack.last(), mid, mid.add(back.scale(.6)), boulder ? .7f : .18f, WallRender.ember(1, .9f));
         }
-        if (bolt.getKind() == BrickBolt.Kind.MORTAR) {
+        if (bolt.getKind() == BrickBolt.Kind.MORTAR || bolt.getKind() == BrickBolt.Kind.BOULDER) {
             // Where it will land
             Vec3 at = bolt.getTarget().subtract(bolt.getPosition(partialTicks));
+            float r = bolt.getKind() == BrickBolt.Kind.BOULDER ? BrickBolt.BOULDER_RADIUS : BrickBolt.MORTAR_RADIUS;
             poseStack.pushPose();
             poseStack.translate(at.x, at.y, at.z);
-            WallRender.sigil(poseStack, buffer, BrickBolt.MORTAR_RADIUS, .55f + .25f * Mth.sin(age * .5f), -age * 3);
+            WallRender.sigil(poseStack, buffer, r, .55f + .25f * Mth.sin(age * .5f), -age * 3);
             poseStack.popPose();
         }
         poseStack.pushPose();
@@ -51,6 +54,10 @@ public class BrickBoltRenderer extends EntityRenderer<BrickBolt> {
             float rise = Mth.clamp(age / 6, 0, 1);
             poseStack.translate(0, -(1 - rise) * (1 - rise) * 1.6f + .08f * Mth.sin(age * .4f), 0);
             poseStack.mulPose(Axis.YP.rotationDegrees(age * 4 + seed));
+        } else if (bolt.getKind() == BrickBolt.Kind.BOULDER) {
+            // A great block tumbles slowly
+            poseStack.mulPose(Axis.YP.rotationDegrees(age * 5 + seed));
+            poseStack.mulPose(Axis.XP.rotationDegrees(age * 7));
         } else {
             poseStack.mulPose(Axis.YP.rotationDegrees(age * 19 + seed));
             poseStack.mulPose(Axis.XP.rotationDegrees(age * 27));
@@ -74,9 +81,29 @@ public class BrickBoltRenderer extends EntityRenderer<BrickBolt> {
                     poseStack.popPose();
                 }
             }
+            case BOULDER -> {
+                // Eight blocks, two by two by two, each a little askew
+                for (int i = 0; i < 8; i++) {
+                    float x = (i & 1) * .9f - .45f, y = ((i >> 1) & 1) * .9f - .9f, z = (i >> 2) * .9f - .45f;
+                    RuneRender.block(WallFx.brick(seed + i), poseStack, buffer, packedLight, x, y, z, .92f, .92f, .92f,
+                            (RuneRender.hash(seed + i) - .5f) * 8, (RuneRender.hash(seed + i + 9) - .5f) * 8);
+                }
+                VertexConsumer stroke = buffer.getBuffer(RenderType.eyes(GlyphRender.STROKE));
+                for (int i = 0; i < 8; i++) {
+                    poseStack.pushPose();
+                    poseStack.translate((i & 1) * .9f - .45f, ((i >> 1) & 1) * .9f - .45f, (i >> 2) * .9f - .45f);
+                    outline(stroke, poseStack, .92f, 1);
+                    poseStack.popPose();
+                }
+            }
         }
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        GlyphRender.halo(buffer, poseStack.last(), GlyphRender.GLOW, bolt.getKind() == BrickBolt.Kind.MORTAR ? 1.1f : .7f, WallRender.ember(.6f, .55f));
+        float halo = switch (bolt.getKind()) {
+            case MORTAR -> 1.1f;
+            case BOULDER -> 2.6f;
+            default -> .7f;
+        };
+        GlyphRender.halo(buffer, poseStack.last(), GlyphRender.GLOW, halo, WallRender.ember(.6f, bolt.getKind() == BrickBolt.Kind.BOULDER ? .8f : .55f));
         poseStack.popPose();
         super.render(bolt, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
@@ -109,7 +136,7 @@ public class BrickBoltRenderer extends EntityRenderer<BrickBolt> {
 
     @Override
     public boolean shouldRender(BrickBolt bolt, Frustum frustum, double x, double y, double z) {
-        return bolt.getKind() == BrickBolt.Kind.MORTAR || super.shouldRender(bolt, frustum, x, y, z);
+        return bolt.getKind() == BrickBolt.Kind.MORTAR || bolt.getKind() == BrickBolt.Kind.BOULDER || super.shouldRender(bolt, frustum, x, y, z);
     }
 
     @Override

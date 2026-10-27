@@ -148,12 +148,16 @@ import com.waylays.arcanes.spells.cosmos.ZeroGravitySpell;
 import com.waylays.arcanes.spells.wall.BastionSpell;
 import com.waylays.arcanes.spells.wall.BrickBoltSpell;
 import com.waylays.arcanes.spells.wall.BrickCageSpell;
+import com.waylays.arcanes.spells.wall.BrickQuakeSpell;
 import com.waylays.arcanes.spells.wall.BrickRainSpell;
 import com.waylays.arcanes.spells.wall.CitadelSpell;
+import com.waylays.arcanes.spells.wall.ClosingKeepSpell;
 import com.waylays.arcanes.spells.wall.CrushingWallsSpell;
+import com.waylays.arcanes.spells.wall.GreatRampartSpell;
 import com.waylays.arcanes.spells.wall.MortarSpell;
 import com.waylays.arcanes.spells.wall.RampartChargeSpell;
 import com.waylays.arcanes.spells.wall.RisingWallSpell;
+import com.waylays.arcanes.spells.wall.SiegeSpell;
 import com.waylays.arcanes.spells.wall.WallBurstSpell;
 import com.waylays.arcanes.spells.rune.CircleOfEldersSpell;
 import com.waylays.arcanes.spells.rune.EdgeRuneSpell;
@@ -344,6 +348,11 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RAMPART_CHARGE = register(new RampartChargeSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> BASTION = register(new BastionSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> FALLEN_CITADEL = register(new CitadelSpell());
+    // Wall Magic: the great area spells
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BRICK_QUAKE = register(new BrickQuakeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CLOSING_KEEP = register(new ClosingKeepSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GREAT_RAMPART = register(new GreatRampartSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SIEGE = register(new SiegeSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

@@ -1,8 +1,11 @@
 package com.waylays.arcanes.gametest;
 
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.entity.wall.BrickQuake;
 import com.waylays.arcanes.entity.wall.Citadel;
+import com.waylays.arcanes.entity.wall.Keep;
 import com.waylays.arcanes.entity.wall.Rampart;
+import com.waylays.arcanes.entity.wall.Siege;
 import com.waylays.arcanes.entity.wall.WallPiece;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
@@ -17,6 +20,7 @@ import io.redspace.ironsspellbooks.api.spells.SchoolType;
 import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
 import io.redspace.ironsspellbooks.item.SpellBook;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.effect.MobEffects;
@@ -34,6 +38,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.registries.DeferredHolder;
+
+import java.util.List;
 
 /**
  * Server-side checks run by CI for Wall Magic: the school is there; the volley, the rain, the burst, the mortar, the
@@ -108,7 +114,7 @@ public final class WallGameTests {
                 count++;
             }
         }
-        helper.assertTrue(count == 10, "expected 10 Wall spells, found " + count);
+        helper.assertTrue(count == 14, "expected 14 Wall spells, found " + count);
         helper.assertTrue(new ItemStack(ModItems.RAMPART_CODEX.get()).getItem() instanceof SpellBook, "the Rampart Codex is not a spellbook");
         helper.assertTrue(new ItemStack(Items.STONE_BRICKS).is(ModSchools.WALL_FOCUS), "stone bricks are not the school's focus");
         // No clean-up here: this test raises nothing, and it runs alongside other schools' tests whose shots it would take
@@ -297,6 +303,76 @@ public final class WallGameTests {
             helper.assertTrue(husk.getHealth() < before[0], "the fortress blowing apart did not hurt the husk");
             cleanUp(helper);
             helper.succeed();
+        });
+    }
+
+    /** The quake's first ring passes under the husk three blocks out: it is struck and thrown up. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_quake", timeoutTicks = 80)
+    public static void brickQuakeThrowsUp(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, 1.5);
+        Husk husk = husk(helper, 4.5, 4.5);
+        double ground = husk.getY();
+        boolean[] lifted = {false};
+        BrickQuake.stamp(helper.getLevel(), caster, ModSpells.BRICK_QUAKE.get(), caster.position(), 6, 4);
+        helper.onEachTick(() -> lifted[0] |= husk.getY() > ground + .3);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(hurt(husk), "the quake did not strike the husk");
+            helper.assertTrue(lifted[0], "the quake did not throw the husk up");
+            cleanUp(helper);
+        });
+    }
+
+    /** The ring of walls closes on the husk in its middle and crushes it. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_keep", timeoutTicks = 100)
+    public static void closingKeepCrushesTheMiddle(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, .5, .5);
+        Husk husk = husk(helper, 4.5, 4.5);
+        Keep keep = Keep.raise(helper.getLevel(), caster, ModSpells.CLOSING_KEEP.get(), husk.position(), 4, 6);
+        long walls = helper.getLevel().getEntitiesOfClass(WallPiece.class, husk.getBoundingBox().inflate(8)).size();
+        helper.assertTrue(walls == Keep.WALLS, "expected " + Keep.WALLS + " walls round the keep, found " + walls);
+        helper.runAfterDelay(keep.closes() - 2, () -> helper.assertTrue(!hurt(husk), "the husk was hurt before the walls met"));
+        helper.runAfterDelay(keep.closes() + 2, () -> {
+            helper.assertTrue(hurt(husk), "the closing walls did not crush the husk");
+            cleanUp(helper);
+            helper.succeed();
+        });
+    }
+
+    /** The great wall rises before the caster, sways, then falls flat on the husk six blocks ahead. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_great", timeoutTicks = 120)
+    public static void greatRampartFallsOnTheHusk(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, .5);
+        Husk husk = husk(helper, 4.5, 6.5);
+        cast(helper, ModSpells.GREAT_RAMPART, caster);
+        var found = helper.getLevel().getEntitiesOfClass(WallPiece.class, caster.getBoundingBox().inflate(8));
+        helper.assertTrue(found.size() == 1 && found.get(0).getKind() == WallPiece.Kind.TOPPLE, "no toppling wall rose");
+        WallPiece wall = found.get(0);
+        int fallen = wall.built() + WallPiece.TOPPLE_WAIT + WallPiece.TOPPLE_FALL;
+        helper.runAfterDelay(fallen - 2, () -> helper.assertTrue(!hurt(husk), "the husk was hurt before the wall fell"));
+        helper.runAfterDelay(fallen + 2, () -> {
+            helper.assertTrue(hurt(husk), "the falling wall did not crush the husk");
+            helper.assertTrue(husk.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "the husk under the wall is not slowed");
+            cleanUp(helper);
+            helper.succeed();
+        });
+    }
+
+    /** The siege hurls blocks of masonry down on the zone round the husk: they strike it. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wall_siege", timeoutTicks = 160)
+    public static void siegeStrikesTheZone(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        // The blocks set out fourteen blocks behind, past the platform's chunk: keep the chunks around ticking
+        List<ChunkPos> forced = GameTestSetup.forceChunksAround(helper, 1);
+        Witch caster = caster(helper, .5, .5);
+        Husk husk = husk(helper, 4.5, 4.5);
+        Siege.lay(helper.getLevel(), caster, ModSpells.SIEGE.get(), husk.position(), 1.5f, 4, 20, 5);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(hurt(husk), "no block of the siege struck the husk");
+            cleanUp(helper);
+            forced.forEach(chunk -> helper.getLevel().setChunkForced(chunk.x, chunk.z, false));
         });
     }
 }

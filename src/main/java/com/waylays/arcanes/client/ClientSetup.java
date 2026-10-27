@@ -227,6 +227,9 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.BRICK_STORM.get(), BrickStormRenderer::new);
         event.registerEntityRenderer(ModEntities.WALL_SIGIL.get(), WallSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.WALL_IMPACT.get(), WallImpactRenderer::new);
+        event.registerEntityRenderer(ModEntities.KEEP.get(), NoopRenderer::new);
+        event.registerEntityRenderer(ModEntities.BRICK_QUAKE.get(), com.waylays.arcanes.client.render.BrickQuakeRenderer::new);
+        event.registerEntityRenderer(ModEntities.SIEGE.get(), NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.GEM_SIGIL.get(), GemSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_SIGIL.get(), GoldSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_COINS.get(), GoldCoinsRenderer::new);

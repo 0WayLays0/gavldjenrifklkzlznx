@@ -100,10 +100,13 @@ import com.waylays.arcanes.entity.cosmos.TemporalEcho;
 import com.waylays.arcanes.entity.cosmos.TimeLoop;
 import com.waylays.arcanes.entity.cosmos.ZeroGravityField;
 import com.waylays.arcanes.entity.wall.BrickBolt;
+import com.waylays.arcanes.entity.wall.BrickQuake;
 import com.waylays.arcanes.entity.wall.BrickStorm;
 import com.waylays.arcanes.ritual.RitualCircle;
 import com.waylays.arcanes.entity.wall.Citadel;
+import com.waylays.arcanes.entity.wall.Keep;
 import com.waylays.arcanes.entity.wall.Rampart;
+import com.waylays.arcanes.entity.wall.Siege;
 import com.waylays.arcanes.entity.wall.WallImpact;
 import com.waylays.arcanes.entity.wall.WallPiece;
 import com.waylays.arcanes.entity.wall.WallSigil;
@@ -433,6 +436,12 @@ public final class ModEntities {
             EntityType.Builder.<WallSigil>of(WallSigil::new, MobCategory.MISC).sized(.5f, .1f).clientTrackingRange(10).updateInterval(40).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<WallImpact>> WALL_IMPACT = register("wall_impact",
             EntityType.Builder.<WallImpact>of(WallImpact::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Keep>> KEEP = register("closing_keep",
+            EntityType.Builder.<Keep>of(Keep::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BrickQuake>> BRICK_QUAKE = register("brick_quake",
+            EntityType.Builder.<BrickQuake>of(BrickQuake::new, MobCategory.MISC).sized(1f, .5f).clientTrackingRange(12).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Siege>> SIEGE = register("siege",
+            EntityType.Builder.<Siege>of(Siege::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(40).fireImmune());
 
     // Cosmos
     public static final DeferredHolder<EntityType<?>, EntityType<TemporalEcho>> TEMPORAL_ECHO = register("temporal_echo",
