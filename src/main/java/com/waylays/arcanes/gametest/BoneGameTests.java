@@ -277,8 +277,15 @@ public final class BoneGameTests {
         cast(helper, ModSpells.ELBOW_BLADE, player);
         ItemStack blade = player.getMainHandItem();
         helper.assertTrue(blade.is(ModItems.BONE_BLADE.get()), "no bone blade in the empty hand, but " + blade);
-        double bare = player.getAttributeBaseValue(Attributes.ATTACK_DAMAGE);
-        helper.assertTrue(player.getAttributeValue(Attributes.ATTACK_DAMAGE) >= bare + BoneBladeItem.damage(1) - .01, "the blade does not add its damage");
+        // (a mock player is never ticked, so its attributes never take up what it holds: the blade's own modifiers are read)
+        double added = 0;
+        for (var entry : blade.getOrDefault(net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS,
+                net.minecraft.world.item.component.ItemAttributeModifiers.EMPTY).modifiers()) {
+            if (entry.attribute().value() == Attributes.ATTACK_DAMAGE.value()) {
+                added += entry.modifier().amount();
+            }
+        }
+        helper.assertTrue(Math.abs(added - BoneBladeItem.damage(1)) < .01, "the blade adds " + added + " damage, not " + BoneBladeItem.damage(1));
         helper.assertTrue(BoneBladeItem.expiresAt(blade) > helper.getLevel().getGameTime(), "the blade is already spent");
         // One that is spent crumbles away at its next tick in an inventory
         ItemStack spent = BoneBladeItem.forge(helper.getLevel(), 1, 0);
