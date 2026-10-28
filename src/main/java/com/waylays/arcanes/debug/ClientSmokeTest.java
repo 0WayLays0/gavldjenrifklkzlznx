@@ -83,7 +83,8 @@ import javax.imageio.ImageIO;
  * The run ends with {@code [SmokeTest] PASS} or {@code [SmokeTest] FAIL ...} and stops the client.
  * A watchdog halts the JVM (exit code 3) if the whole run takes too long.
  * With {@code -Darcanes.shots=a,b,prefix_*,school:x} the casts of those spells are also photographed a few times, each picture
- * logged as base64 JPEG lines {@code [SmokeShot] name part/parts data}, so CI shows what they look like.
+ * logged as base64 JPEG lines {@code [SmokeShot] name part/parts data}, so CI shows what they look like
+ * ({@code world_tree_end} also photographs a World Tree's end, after the last spell).
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID, value = Dist.CLIENT)
 public final class ClientSmokeTest {
@@ -100,6 +101,13 @@ public final class ClientSmokeTest {
             .map(String::trim).filter(s -> !s.isEmpty()).toList();
     /** Ticks after the cast each picture is taken. */
     private static final int[] SHOT_DELAYS = {10, 25, 45};
+    /**
+     * With {@code world_tree_end} in {@code arcanes.shots}: after the last spell a World Tree that lives only a moment
+     * is raised, and its end photographed this many ticks into it.
+     */
+    private static final int[] TREE_END_SHOTS = {6, 28, 50, 72};
+    private static final int TREE_END_AFTER = 50;
+    private static final int TREE_END_LIFE = 40;
     private static final int SHOT_WIDTH = 640;
     private static final int SHOT_CHUNK = 8000;
 
@@ -275,8 +283,46 @@ public final class ClientSmokeTest {
             java.util.UUID id = mc.player.getUUID();
             server.execute(() -> recastOnServer(server, id));
         }
+        if (SHOTS.contains("world_tree_end") && spellIndex >= spells.size()) {
+            int since = ticks - ((spells.size() - 1) * TICKS_PER_SPELL + 1 + TREE_END_AFTER);
+            if (since == 0) {
+                java.util.UUID id = mc.player.getUUID();
+                server.execute(() -> raiseEndingTree(server, id));
+            }
+            for (int k = 0; k < TREE_END_SHOTS.length; k++) {
+                if (since == TREE_END_LIFE + TREE_END_SHOTS[k] - 2) {
+                    aim(mc, k % 2 == 0 ? 16 : -16, -22);
+                } else if (since == TREE_END_LIFE + TREE_END_SHOTS[k]) {
+                    screenshot(mc, "world_tree_end_" + (k + 1));
+                }
+            }
+        }
         if (spellIndex >= spells.size() && ticks > (spells.size() - 1) * TICKS_PER_SPELL + FINAL_TICKS) {
             finish(mc);
+        }
+    }
+
+    /** A World Tree that lives only a moment, raised in front of the player on the photo floor, to photograph its end. */
+    private static void raiseEndingTree(IntegratedServer server, java.util.UUID id) {
+        ServerPlayer player = server.getPlayerList().getPlayer(id);
+        if (player == null) {
+            return;
+        }
+        try {
+            ServerLevel level = player.serverLevel();
+            player.stopRiding();
+            toPhotoFloor(level, player);
+            for (Entity e : level.getEntities((Entity) null, player.getBoundingBox().inflate(64), x -> !(x instanceof Player))) {
+                e.discard();
+            }
+            lastDummy = null;
+            player.connection.teleport(player.getX(), player.getY(), player.getZ(), 0, -22);
+            Vec3 spot = new Vec3(player.getX(), player.getY(), player.getZ() + 12);
+            com.waylays.arcanes.entity.wood.WorldTree.raise(level, player, ModSpells.WORLD_TREE.get(), spot, TREE_END_LIFE, 0, 0, 0);
+            log("raised a World Tree to photograph its end");
+        } catch (Throwable t) {
+            failures.incrementAndGet();
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL raising the World Tree to photograph its end", t);
         }
     }
 

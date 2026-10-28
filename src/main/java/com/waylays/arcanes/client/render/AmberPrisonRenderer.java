@@ -15,14 +15,15 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 /**
- * Amber Prison: golden sap welling up round the prisoner, wobbling as it climbs, setting into a lumpy shell of amber
- * you can see the prisoner through, a warm light inside it and a leaf caught in it, drops running down it, a pool at
- * its foot; before the end pale cracks run over it, then it bursts into shards that fly and fall.
+ * Amber Prison: golden sap welling up round the prisoner, wobbling as it climbs, setting into a faceted shell of clear
+ * amber you can see the prisoner through, glints on its facets, a warm light inside it and a leaf caught in it, drops
+ * running down it, a pool at its foot; before the end pale cracks run over it, then it bursts into shards that fly and
+ * fall.
  */
 public class AmberPrisonRenderer extends EntityRenderer<AmberPrison> {
     private static final int SHARDS = 14;
-    private static final int LIQUID = 0xFFC83C;
-    private static final int SET = 0xE0861C;
+    private static final int LIQUID = 0xFFD46A;
+    private static final int SET = 0xF0A63A;
 
     public AmberPrisonRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -41,9 +42,10 @@ public class AmberPrisonRenderer extends EntityRenderer<AmberPrison> {
         float risen = prison.risen(age);
         float set = prison.hardened(age);
         int colour = GoldRender.lerp(LIQUID, SET, set);
-        float alpha = .5f + .25f * set;
+        float alpha = .3f + .16f * set;
         float wobble = (1 - set) * .06f;
-        float rx = w * .5f + .32f, ry = h * .5f + .18f;
+        // Wide enough for arms held out in front
+        float rx = w * .5f + .55f, ry = h * .5f + .22f;
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(prison.getYRot()));
         // A leaf caught in it
@@ -58,24 +60,25 @@ public class AmberPrisonRenderer extends EntityRenderer<AmberPrison> {
         VertexConsumer glow = buffer.getBuffer(RenderType.eyes(GlyphRender.GLOW));
         poseStack.pushPose();
         poseStack.translate(0, ry * risen, 0);
+        poseStack.mulPose(Axis.YP.rotationDegrees(-prison.getYRot()));
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
         RenderHelper.billboard(glow, poseStack.last(), Math.max(rx, ry) * 1.3f, RuneRender.additive(0xFF9A2A, .35f * risen), GlyphRender.FULL);
         poseStack.popPose();
-        // The shell: one great lump and a few lesser ones, rising from the ground
-        VertexConsumer amber = buffer.getBuffer(RenderType.entityTranslucent(WoodRender.AMBER));
-        PoseStack.Pose p = poseStack.last();
+        // The shell, rising from the ground: one faceted lump of amber, seen through (only its near side is drawn, so
+        // it stays as clear as one layer)
+        VertexConsumer amber = buffer.getBuffer(RenderType.entityTranslucentCull(WoodRender.AMBER));
         int argb = RuneRender.alpha(colour, alpha);
         float lift = ry * risen;
-        BoneRender.blob(amber, p, new Vector3f(0, lift, 0),
+        // (the blob's faces wind inwards: mirrored, the side kept is the near one)
+        poseStack.pushPose();
+        poseStack.scale(-1, 1, 1);
+        BoneRender.blob(amber, poseStack.last(), new Vector3f(0, lift, 0),
                 new Vector3f(rx * (1 + wobble * Mth.sin(age * .5f)), 0, 0), new Vector3f(0, ry * risen, 0), new Vector3f(0, 0, rx * (1 + wobble * Mth.cos(age * .45f))),
                 7, 5, light, argb);
-        for (int k = 0; k < 3; k++) {
-            float a = WoodFx.hash(seed + k) * Mth.TWO_PI;
-            float y = (.35f + .5f * WoodFx.hash(seed + k + 3)) * h * risen;
-            float r = rx * (.45f + .2f * WoodFx.hash(seed + k + 5));
-            Vector3f c = new Vector3f(Mth.cos(a) * rx * .6f, y, Mth.sin(a) * rx * .6f);
-            BoneRender.blob(amber, p, c, new Vector3f(r, 0, 0), new Vector3f(0, r * .9f * risen, 0), new Vector3f(0, 0, r), 6, 4, light, argb);
-        }
+        poseStack.popPose();
+        // Drops and the pool are seen from both sides
+        amber = buffer.getBuffer(RenderType.entityTranslucent(WoodRender.AMBER));
+        PoseStack.Pose p = poseStack.last();
         // Drops running down it
         for (int k = 0; k < 5; k++) {
             float a = k * Mth.TWO_PI / 5 + WoodFx.hash(seed + k * 7);
@@ -91,6 +94,22 @@ public class AmberPrisonRenderer extends EntityRenderer<AmberPrison> {
         poseStack.translate(0, .03f, 0);
         RenderHelper.groundQuad(amber, poseStack.last(), rx + .5f, RuneRender.alpha(colour, .55f * risen), light);
         poseStack.popPose();
+        // Glints on its facets
+        if (set > .5f) {
+            VertexConsumer glint = buffer.getBuffer(RenderType.eyes(GlyphRender.GLOW));
+            for (int k = 0; k < 5; k++) {
+                float a = WoodFx.hash(seed + k * 19) * Mth.TWO_PI;
+                float yy = (WoodFx.hash(seed + k * 19 + 1) - .3f) * 1.2f;
+                float ring = Mth.sqrt(Math.max(0, 1 - yy * yy));
+                float twinkle = Mth.clamp(Mth.sin(age * .15f + k * 1.7f), 0, 1);
+                poseStack.pushPose();
+                poseStack.translate(Mth.cos(a) * rx * ring * 1.02f, lift + yy * ry, Mth.sin(a) * rx * ring * 1.02f);
+                poseStack.mulPose(Axis.YP.rotationDegrees(-prison.getYRot()));
+                poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+                RenderHelper.billboard(glint, poseStack.last(), .12f, RuneRender.additive(0xFFF0C8, twinkle * .9f * (set - .5f) * 2), GlyphRender.FULL);
+                poseStack.popPose();
+            }
+        }
         // Pale cracks running over it before it bursts
         float cracked = prison.cracked(age);
         if (cracked > 0) {

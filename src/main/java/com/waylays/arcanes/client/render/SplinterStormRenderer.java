@@ -19,19 +19,22 @@ import org.joml.Vector3f;
  * Splinter Cyclone: a funnel of wood, narrow at its foot and wide at its top, everything in it climbing as it whirls:
  * curled shavings of every wood (pale birch, oak, dark oak, spruce, cherry) turning over, chips tumbling, splinters
  * flying point first, flakes of bark, split planks and broken sticks heavier and slower near the top, a haze of
- * sawdust; streaks of dusty wind spiralling with them; chips skidding round its foot over a ring of stirred dust, a
- * faint green thread of life up its middle. When it bursts everything flies outwards and falls.
+ * sawdust; a body of dust twisting up round it in bands, streaks of dusty wind spiralling with it; chips skidding round
+ * its foot over a ring of stirred dust. When it bursts everything flies outwards and falls.
  */
 public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
-    private static final int SHAVINGS = 80;
-    private static final int CHIPS = 90;
-    private static final int SPLINTERS = 50;
-    private static final int FLAKES = 30;
+    private static final int SHAVINGS = 130;
+    private static final int CHIPS = 150;
+    private static final int SPLINTERS = 80;
+    private static final int FLAKES = 45;
     private static final int PLANKS = 9;
     private static final int STICKS = 7;
-    private static final int SKIDDERS = 30;
-    private static final int SAWDUST = 160;
-    private static final int STREAKS = 7;
+    private static final int SKIDDERS = 40;
+    private static final int SAWDUST = 260;
+    private static final int STREAKS = 9;
+    /** Bands of dust making the funnel's body: around and up. */
+    private static final int AROUND = 28;
+    private static final int UP = 10;
     /** Woods: birch, oak, dark oak, spruce, cherry, jungle. */
     private static final int[] WOODS = {0xFFF4EAD2, 0xFFE8C48C, 0xFF9A7048, 0xFFC08A58, 0xFFF2BCB4, 0xFFD8A070};
 
@@ -40,7 +43,7 @@ public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
     }
 
     private static float funnel(float t) {
-        return .5f + (SplinterStorm.RADIUS + .7f) * (float) Math.pow(t, 1.25);
+        return .45f + SplinterStorm.RADIUS * (float) Math.pow(t, 1.4);
     }
 
     private static int wood(int seed) {
@@ -80,7 +83,7 @@ public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
         VertexConsumer grain = WoodRender.grain(buffer);
         for (int i = 0; i < CHIPS * shown; i++) {
             int s = seed + i * 13;
-            float[] o = orbit(s, age, .005f + .004f * WoodFx.hash(s + 5), 0, 1, .5f, scatter);
+            float[] o = orbit(s, age, .005f + .004f * WoodFx.hash(s + 5), 0, 1, .3f, scatter);
             poseStack.pushPose();
             poseStack.translate(o[0], o[1], o[2]);
             poseStack.mulPose(Axis.YP.rotation(-o[3]));
@@ -93,7 +96,7 @@ public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
         PoseStack.Pose p = poseStack.last();
         for (int i = 0; i < SPLINTERS * shown; i++) {
             int s = seed + i * 17 + 5000;
-            float[] o = orbit(s, age, .006f + .004f * WoodFx.hash(s + 5), .05f, 1, .4f, scatter);
+            float[] o = orbit(s, age, .006f + .004f * WoodFx.hash(s + 5), .05f, 1, .25f, scatter);
             // Point first along the whirl
             float a = o[3];
             Vector3f along = new Vector3f(-Mth.sin(a), .25f, Mth.cos(a)).normalize();
@@ -126,7 +129,7 @@ public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
         }
         for (int i = 0; i < SAWDUST * shown; i++) {
             int s = seed + i * 31 + 15000;
-            float[] o = orbit(s, age, .008f + .006f * WoodFx.hash(s + 5), 0, 1, .9f, scatter);
+            float[] o = orbit(s, age, .008f + .006f * WoodFx.hash(s + 5), 0, 1, .45f, scatter);
             poseStack.pushPose();
             poseStack.translate(o[0], o[1], o[2]);
             poseStack.mulPose(camera);
@@ -138,7 +141,7 @@ public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
         VertexConsumer shaving = buffer.getBuffer(RenderType.entityCutoutNoCull(WoodRender.SHAVING));
         for (int i = 0; i < SHAVINGS * shown; i++) {
             int s = seed + i * 37 + 20000;
-            float[] o = orbit(s, age, .004f + .004f * WoodFx.hash(s + 5), 0, 1, .55f, scatter);
+            float[] o = orbit(s, age, .004f + .004f * WoodFx.hash(s + 5), 0, 1, .3f, scatter);
             poseStack.pushPose();
             poseStack.translate(o[0], o[1], o[2]);
             poseStack.mulPose(Axis.YP.rotation(-o[3]));
@@ -153,7 +156,7 @@ public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
         VertexConsumer bark = WoodRender.bark(buffer);
         for (int i = 0; i < FLAKES * shown; i++) {
             int s = seed + i * 41 + 25000;
-            float[] o = orbit(s, age, .004f + .003f * WoodFx.hash(s + 5), .1f, 1, .5f, scatter);
+            float[] o = orbit(s, age, .004f + .003f * WoodFx.hash(s + 5), .1f, 1, .3f, scatter);
             poseStack.pushPose();
             poseStack.translate(o[0], o[1], o[2]);
             poseStack.mulPose(Axis.YP.rotation(-o[3]));
@@ -207,12 +210,40 @@ public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
             poseStack.popPose();
         }
 
-        // A faint green thread of life up its middle
-        VertexConsumer glow = buffer.getBuffer(RenderType.eyes(GlyphRender.STROKE));
-        float pulse = .25f + .1f * Mth.sin(age * .3f);
-        GlyphRender.beam(glow, poseStack.last(), new net.minecraft.world.phys.Vec3(0, .2, 0), new net.minecraft.world.phys.Vec3(0, SplinterStorm.HEIGHT * .9, 0), .5f,
-                RuneRender.additive(WoodFx.LIFE, pulse * strength));
+        // The funnel's body: two layers of dusty bands twisting up round it, turning
+        VertexConsumer body = buffer.getBuffer(RenderType.entityTranslucent(WoodRender.WIND));
+        p = poseStack.last();
+        funnelBody(body, p, age * .05f, 1, .34f * strength, 0xC9AE86, light, scatter);
+        funnelBody(body, p, -age * .035f + .5f, .78f, .26f * strength, 0xA88660, light, scatter);
         super.render(storm, entityYaw, partialTicks, poseStack, buffer, light);
+    }
+
+    /**
+     * A see-through cone round the axis, the wind texture wrapped on it in bands that twist as they rise and turn with
+     * {@code turn}; {@code scale} shrinks it inside the other.
+     */
+    private static void funnelBody(VertexConsumer c, PoseStack.Pose p, float turn, float scale, float alpha, int rgb, int light, float scatter) {
+        if (alpha <= .005f) {
+            return;
+        }
+        for (int j = 0; j < UP; j++) {
+            float t0 = (float) j / UP, t1 = (float) (j + 1) / UP;
+            float r0 = funnel(t0) * scale + scatter * 6, r1 = funnel(t1) * scale + scatter * 6;
+            float y0 = t0 * SplinterStorm.HEIGHT * .95f, y1 = t1 * SplinterStorm.HEIGHT * .95f;
+            // Fading out at its foot and its top
+            float a0 = alpha * Mth.sin(Mth.PI * Math.min(1, .15f + t0)), a1 = alpha * Mth.sin(Mth.PI * Math.min(1, .15f + t1));
+            int c0 = RuneRender.alpha(rgb, a0), c1 = RuneRender.alpha(rgb, a1);
+            for (int i = 0; i < AROUND; i++) {
+                float b0 = i * Mth.TWO_PI / AROUND, b1 = (i + 1) * Mth.TWO_PI / AROUND;
+                // Six bands round it, twisting a third of a turn from foot to top
+                float u0 = (float) i / AROUND * 6 + turn, u1 = (float) (i + 1) / AROUND * 6 + turn;
+                float tw0 = t0 * 2, tw1 = t1 * 2;
+                RenderHelper.vertex(c, p, Mth.cos(b0) * r0, y0, Mth.sin(b0) * r0, u0 + tw0, 1 - t0, c0, light, Mth.cos(b0), 0, Mth.sin(b0));
+                RenderHelper.vertex(c, p, Mth.cos(b0) * r1, y1, Mth.sin(b0) * r1, u0 + tw1, 1 - t1, c1, light, Mth.cos(b0), 0, Mth.sin(b0));
+                RenderHelper.vertex(c, p, Mth.cos(b1) * r1, y1, Mth.sin(b1) * r1, u1 + tw1, 1 - t1, c1, light, Mth.cos(b1), 0, Mth.sin(b1));
+                RenderHelper.vertex(c, p, Mth.cos(b1) * r0, y0, Mth.sin(b1) * r0, u1 + tw0, 1 - t0, c0, light, Mth.cos(b1), 0, Mth.sin(b1));
+            }
+        }
     }
 
     /**
