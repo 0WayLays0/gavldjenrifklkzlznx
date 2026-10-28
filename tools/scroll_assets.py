@@ -49,6 +49,8 @@ PALETTES = {
     "bone": ["d6caa9", "e4dabf", "f2ecdc", "a39678", "b8ac8d", "e0283c", "a8142a", "640a18", "f4eedf", "cfc3a4", "857a5e"],
     # Birch bark paper, the writing in leaf green, oak rod ends
     "wood": ["d9c9a3", "e8dcbc", "f5efdc", "a8936a", "bfac83", "8fd14f", "4f9a2a", "2c5a16", "c8955a", "9a6b3c", "5e3e20"],
+    # Pale sea-foam paper, the writing in deep sea blue, pearl rod ends
+    "water": ["bfe4ef", "d2eef6", "e8f8fc", "8cc0d2", "a6d2e2", "2e9fe0", "1f6fb8", "0e3a66", "f4f1ea", "cfcac0", "8e887c"],
 }
 
 

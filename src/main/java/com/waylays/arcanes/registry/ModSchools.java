@@ -284,8 +284,9 @@ public final class ModSchools {
     ));
 
     /**
-     * Wood Magic: living wood called up out of the ground: logs hurled, roots that seize, brambles, bark armour, trees
-     * that sprout and fall, a storm of leaves, a guardian of wood and the World Tree; its life glows spring green.
+     * Wood Magic: living wood called up out of the ground: a rolling log, roots that seize, brambles and seed pods, a
+     * vine that yanks, a saw of tree rings, a cyclone of splinters, amber that sets round its prey, a guardian of
+     * braided wood and the World Tree; its life glows spring green.
      */
     public static final ResourceLocation WOOD_RESOURCE = ArcanesOublies.id("wood");
     public static final TagKey<Item> WOOD_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("wood_focus"));
@@ -300,6 +301,26 @@ public final class ModSchools {
             ModAttributes.WOOD_MAGIC_RESIST,
             sound(SoundEvents.WOOD_PLACE),
             WOOD_MAGIC
+    ));
+
+    /**
+     * Water Magic: the sea answering a call: lances of spiralling water, a jet that cuts, geysers, bubbles that carry
+     * their prey off, a cleansing rain, a maelstrom, glowing jellyfish, a typhoon, a tidal wave, and the Abyssal Dome
+     * that drowns the land.
+     */
+    public static final ResourceLocation WATER_RESOURCE = ArcanesOublies.id("water");
+    public static final TagKey<Item> WATER_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("water_focus"));
+    public static final ResourceKey<DamageType> WATER_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("water_magic"));
+    public static final int WATER_COLOR = 0x2E9FE0;
+
+    public static final DeferredHolder<SchoolType, SchoolType> WATER = SCHOOLS.register(WATER_RESOURCE.getPath(), () -> new SchoolType(
+            WATER_RESOURCE,
+            WATER_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".water").withStyle(Style.EMPTY.withColor(WATER_COLOR)),
+            ModAttributes.WATER_SPELL_POWER,
+            ModAttributes.WATER_MAGIC_RESIST,
+            sound(SoundEvents.BUCKET_EMPTY),
+            WATER_MAGIC
     ));
 
     private ModSchools() {}

@@ -121,6 +121,17 @@ import com.waylays.arcanes.entity.wood.AmberPrison;
 import com.waylays.arcanes.entity.wood.SeedPod;
 import com.waylays.arcanes.entity.wood.WorldTree;
 import com.waylays.arcanes.entity.wood.WoodGuardian;
+import com.waylays.arcanes.entity.water.SplashCrown;
+import com.waylays.arcanes.entity.water.TideLance;
+import com.waylays.arcanes.entity.water.WaterJet;
+import com.waylays.arcanes.entity.water.Geyser;
+import com.waylays.arcanes.entity.water.WaterBubble;
+import com.waylays.arcanes.entity.water.RainCloud;
+import com.waylays.arcanes.entity.water.Maelstrom;
+import com.waylays.arcanes.entity.water.Jellyfish;
+import com.waylays.arcanes.entity.water.Typhoon;
+import com.waylays.arcanes.entity.water.TidalWave;
+import com.waylays.arcanes.entity.water.AbyssalDome;
 import com.waylays.arcanes.entity.wall.BrickBolt;
 import com.waylays.arcanes.entity.wall.BrickQuake;
 import com.waylays.arcanes.entity.wall.BrickStorm;
@@ -512,6 +523,30 @@ public final class ModEntities {
             EntityType.Builder.<WorldTree>of(WorldTree::new, MobCategory.MISC).sized(3f, 3f).clientTrackingRange(20).updateInterval(40).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<WoodGuardian>> WOOD_GUARDIAN = register("wood_guardian",
             EntityType.Builder.<WoodGuardian>of(WoodGuardian::new, MobCategory.MISC).sized(1.4f, 3.4f).clientTrackingRange(10));
+
+    // Water Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<SplashCrown>> SPLASH_CROWN = register("splash_crown",
+            EntityType.Builder.<SplashCrown>of(SplashCrown::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TideLance>> TIDE_LANCE = register("tide_lance",
+            EntityType.Builder.<TideLance>of(TideLance::new, MobCategory.MISC).sized(.4f, .4f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<WaterJet>> WATER_JET = register("pressure_jet",
+            EntityType.Builder.<WaterJet>of(WaterJet::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Geyser>> GEYSER = register("geyser",
+            EntityType.Builder.<Geyser>of(Geyser::new, MobCategory.MISC).sized(1.2f, 1f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<WaterBubble>> WATER_BUBBLE = register("bubble_prison",
+            EntityType.Builder.<WaterBubble>of(WaterBubble::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RainCloud>> RAIN_CLOUD = register("cleansing_rain",
+            EntityType.Builder.<RainCloud>of(RainCloud::new, MobCategory.MISC).sized(2f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Maelstrom>> MAELSTROM = register("maelstrom",
+            EntityType.Builder.<Maelstrom>of(Maelstrom::new, MobCategory.MISC).sized(2f, .5f).clientTrackingRange(12).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Jellyfish>> JELLYFISH = register("jellyfish",
+            EntityType.Builder.<Jellyfish>of(Jellyfish::new, MobCategory.MISC).sized(.8f, .8f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Typhoon>> TYPHOON = register("typhoon",
+            EntityType.Builder.<Typhoon>of(Typhoon::new, MobCategory.MISC).sized(2f, 3f).clientTrackingRange(16).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<TidalWave>> TIDAL_WAVE = register("tidal_wave",
+            EntityType.Builder.<TidalWave>of(TidalWave::new, MobCategory.MISC).sized(2f, 2f).clientTrackingRange(16).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<AbyssalDome>> ABYSSAL_DOME = register("abyssal_dome",
+            EntityType.Builder.<AbyssalDome>of(AbyssalDome::new, MobCategory.MISC).sized(2f, 2f).clientTrackingRange(20).updateInterval(40).fireImmune());
 
     // Cosmos
     public static final DeferredHolder<EntityType<?>, EntityType<TemporalEcho>> TEMPORAL_ECHO = register("temporal_echo",

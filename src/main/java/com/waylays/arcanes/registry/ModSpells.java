@@ -194,6 +194,16 @@ import com.waylays.arcanes.spells.rune.RunicBulwarkSpell;
 import com.waylays.arcanes.spells.rune.RunicPathSpell;
 import com.waylays.arcanes.spells.rune.SnareRuneSpell;
 import com.waylays.arcanes.spells.rune.WardRuneSpell;
+import com.waylays.arcanes.spells.water.TideLanceSpell;
+import com.waylays.arcanes.spells.water.PressureJetSpell;
+import com.waylays.arcanes.spells.water.GeyserSpell;
+import com.waylays.arcanes.spells.water.BubblePrisonSpell;
+import com.waylays.arcanes.spells.water.CleansingRainSpell;
+import com.waylays.arcanes.spells.water.MaelstromSpell;
+import com.waylays.arcanes.spells.water.JellyfishSwarmSpell;
+import com.waylays.arcanes.spells.water.TyphoonSpell;
+import com.waylays.arcanes.spells.water.TidalWaveSpell;
+import com.waylays.arcanes.spells.water.AbyssalDomeSpell;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -407,6 +417,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> AMBER_PRISON = register(new AmberPrisonSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> WOOD_GUARDIAN = register(new WoodGuardianSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> WORLD_TREE = register(new WorldTreeSpell());
+
+    // Water Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TIDE_LANCE = register(new TideLanceSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PRESSURE_JET = register(new PressureJetSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GEYSER = register(new GeyserSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BUBBLE_PRISON = register(new BubblePrisonSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CLEANSING_RAIN = register(new CleansingRainSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MAELSTROM = register(new MaelstromSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> JELLYFISH_SWARM = register(new JellyfishSwarmSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TYPHOON = register(new TyphoonSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TIDAL_WAVE = register(new TidalWaveSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ABYSSAL_DOME = register(new AbyssalDomeSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());
