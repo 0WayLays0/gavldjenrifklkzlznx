@@ -49,7 +49,8 @@ public class AbyssalDomeSpell extends WaterSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         float drown = drown(spellLevel, caster);
         return List.of(
-                Component.translatable("ui.arcanes_oublies.drown_damage", Utils.stringTruncation(drown, 1), Utils.timeFromTicks(AbyssalDome.DROWN_TICKS, 1)),
+                Component.translatable("ui.arcanes_oublies.depth_crush", Utils.stringTruncation(drown * AbyssalDome.CRUSH, 1), Utils.timeFromTicks(AbyssalDome.DROWN_TICKS, 1)),
+                Component.translatable("ui.arcanes_oublies.drown_damage", Utils.stringTruncation(drown, 1)),
                 Component.translatable("ui.arcanes_oublies.crash_damage", Utils.stringTruncation(drown * 2.5f, 1)),
                 Component.translatable("ui.arcanes_oublies.dome_allies"),
                 Component.translatable("ui.arcanes_oublies.slows_shots"),

@@ -2,10 +2,12 @@ package com.waylays.arcanes.spells.water;
 
 import com.waylays.arcanes.spells.SpellUtil;
 import net.minecraft.core.particles.DustParticleOptions;
+import io.redspace.ironsspellbooks.damage.DamageSources;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -52,6 +54,18 @@ public final class WaterFx {
     public static void soak(LivingEntity e, int ticks) {
         e.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, ticks, 0, false, true));
         e.clearFire();
+    }
+
+    /**
+     * Hurts {@code e} without knocking it back, so the current holding it keeps holding it (a hit's knockback would throw
+     * it out of a whirlpool or a waterspout).
+     */
+    public static void hurtInPlace(LivingEntity e, float amount, DamageSource source) {
+        Vec3 v = e.getDeltaMovement();
+        e.invulnerableTime = 0;
+        DamageSources.applyDamage(e, amount, source);
+        e.setDeltaMovement(v);
+        e.hurtMarked = true;
     }
 
     /** A wave of water crashing. */

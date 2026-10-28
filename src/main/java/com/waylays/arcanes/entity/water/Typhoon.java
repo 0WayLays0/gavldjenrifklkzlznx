@@ -142,8 +142,7 @@ public class Typhoon extends SpellEffectEntity {
                 e.fallDistance = 0;
                 WaterFx.soak(e, 30);
                 if (spell != null && tickCount % 10 == 0) {
-                    e.invulnerableTime = 0;
-                    DamageSources.applyDamage(e, damage, SpellUtil.damageSource(spell, this, caster));
+                    WaterFx.hurtInPlace(e, damage, SpellUtil.damageSource(spell, this, caster));
                 }
             }
             e.hurtMarked = true;

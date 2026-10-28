@@ -396,9 +396,9 @@ def geyser_icon():
 def bubble_prison_icon():
     def draw(d, img, S):
         # A figure caught in a great bubble, a rainbow sheen round its rim
-        d.ellipse((.42 * S, .36 * S, .58 * S, .52 * S), fill=(120, 100, 96, 255))
-        d.rectangle((.44 * S, .5 * S, .56 * S, .74 * S), fill=(104, 86, 82, 255))
-        d.ellipse((.12 * S, .12 * S, .88 * S, .88 * S), fill=_a(SHALLOW, 70))
+        d.ellipse((.12 * S, .12 * S, .88 * S, .88 * S), fill=_a(SHALLOW, 90))
+        d.ellipse((.4 * S, .3 * S, .6 * S, .5 * S), fill=(214, 178, 140, 255), outline=_a(OUTLINE), width=max(1, S // 48))
+        d.rectangle((.42 * S, .48 * S, .58 * S, .74 * S), fill=(176, 120, 72, 255), outline=_a(OUTLINE), width=max(1, S // 48))
         for k, col in enumerate([(255, 160, 200), (255, 230, 150), (160, 255, 200), (150, 210, 255)]):
             d.arc(((.12 + k * .01) * S, (.12 + k * .01) * S, (.88 - k * .01) * S, (.88 - k * .01) * S), 200 + k * 30, 300 + k * 30, fill=_a(col, 220),
                   width=max(1, S // 32))

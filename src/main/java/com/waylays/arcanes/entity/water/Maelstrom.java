@@ -107,8 +107,7 @@ public class Maelstrom extends SpellEffectEntity {
                 e.setAirSupply(Math.max(-20, e.getAirSupply() - 8));
             }
             if (spell != null && tickCount % 10 == 0) {
-                e.invulnerableTime = 0;
-                DamageSources.applyDamage(e, damage * (float) (.5 + close), SpellUtil.damageSource(spell, this, caster));
+                WaterFx.hurtInPlace(e, damage * (float) (.5 + close), SpellUtil.damageSource(spell, this, caster));
             }
         }
     }

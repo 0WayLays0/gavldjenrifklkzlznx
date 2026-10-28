@@ -29,13 +29,15 @@ import javax.annotation.Nullable;
  * The Abyssal Dome (Water Magic's ultimate): the sea itself rises round the caster in a great dome of deep water, the
  * light from above rippling over the ground in it, shoals of fish and a manta ray gliding through it, kelp swaying at
  * its rim. Under it the caster's side breathe as fish do and move through it with ease, mending; their enemies are
- * slowed, run out of air and drown, and their shots crawl through the water. At its end the dome collapses, the sea
- * crashing down on all the enemies under it.
+ * slowed and crushed by the weight of the deep, those that breathe air run out of it and drown (harder), and their
+ * shots crawl through the water. At its end the dome collapses, the sea crashing down on all the enemies under it.
  */
 public class AbyssalDome extends SpellEffectEntity {
     public static final int FORM = 30;
     public static final int COLLAPSE = 24;
     public static final int DROWN_TICKS = 10;
+    /** The share of the drowning damage dealt to enemies not (or not yet) drowning: the weight of the deep. */
+    public static final float CRUSH = .4f;
 
     private static final EntityDataAccessor<Integer> DATA_LIFE = SynchedEntityData.defineId(AbyssalDome.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_RADIUS = SynchedEntityData.defineId(AbyssalDome.class, EntityDataSerializers.FLOAT);
@@ -148,17 +150,20 @@ public class AbyssalDome extends SpellEffectEntity {
                 }
                 continue;
             }
-            // Their enemies wade, short of breath, and drown
+            // Their enemies wade, crushed by the weight of the deep; those that breathe air run out of it and drown
             if (tickCount % 20 == 0) {
                 e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1, false, true));
                 e.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 40, 1, false, true));
                 e.clearFire();
             }
+            boolean drowning = false;
             if (!e.canBreatheUnderwater()) {
                 e.setAirSupply(Math.max(-20, e.getAirSupply() - 8));
-                if (e.getAirSupply() <= 0 && tickCount % DROWN_TICKS == 0 && spell != null) {
-                    e.invulnerableTime = 0;
-                    DamageSources.applyDamage(e, damage, SpellUtil.damageSource(spell, this, caster));
+                drowning = e.getAirSupply() <= 0;
+            }
+            if (tickCount % DROWN_TICKS == 0 && spell != null) {
+                WaterFx.hurtInPlace(e, drowning ? damage : damage * CRUSH, SpellUtil.damageSource(spell, this, caster));
+                if (drowning) {
                     WaterFx.bubbles(level, e.getEyePosition(), 10, .2);
                 }
             }

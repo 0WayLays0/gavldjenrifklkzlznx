@@ -27,6 +27,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.item.ItemStack;
@@ -40,8 +41,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
  * Server-side checks run by CI for Water Magic: the school is there; the lance runs through a line of enemies; the jet
  * cuts; the geyser throws up what stands on it; the bubble carries its prisoner up and drowns it; the rain washes its
  * caster clean; the whirlpool draws in and batters; the jellyfish sting; the typhoon lifts and batters; the tidal wave
- * sweeps its catch along; under the dome the caster breathes water and enemies drown. Each test runs in a batch of its
- * own.
+ * sweeps its catch along; under the dome the caster breathes water, enemies are crushed and those out of air drown.
+ * Each test runs in a batch of its own.
  */
 @GameTestHolder(ArcanesOublies.MODID)
 @PrefixGameTestTemplate(false)
@@ -66,6 +67,11 @@ public final class WaterGameTests {
 
     private static Husk husk(GameTestHelper helper, double x, double z) {
         return helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, 2, z));
+    }
+
+    /** A creature that breathes air (husks, being undead, breathe water): for the drowning checks. */
+    private static Pig breather(GameTestHelper helper, double x, double z) {
+        return helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(x, 2, z));
     }
 
     private static void cast(GameTestHelper helper, DeferredHolder<AbstractSpell, AbstractSpell> spell, LivingEntity caster) {
@@ -137,21 +143,21 @@ public final class WaterGameTests {
         });
     }
 
-    /** The bubble closes round the husk, carries it up and drowns it, then bursts. */
+    /** The bubble closes round its prisoner, carries it up and drowns it, then bursts. */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "water_bubble", timeoutTicks = 120)
     public static void bubbleCarriesAndDrowns(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, .5, .5);
-        Husk husk = husk(helper, 4.5, 4.5);
-        double floor = husk.getY();
-        int air = husk.getAirSupply();
-        WaterBubble bubble = WaterBubble.trap(helper.getLevel(), caster, ModSpells.BUBBLE_PRISON.get(), husk, 60, 3);
+        Pig prisoner = breather(helper, 4.5, 4.5);
+        double floor = prisoner.getY();
+        int air = prisoner.getAirSupply();
+        WaterBubble bubble = WaterBubble.trap(helper.getLevel(), caster, ModSpells.BUBBLE_PRISON.get(), prisoner, 60, 3);
         helper.runAfterDelay(WaterBubble.FORM + 30, () -> {
-            helper.assertTrue(husk.getY() > floor + 1, "the bubble did not carry the husk up");
-            helper.assertTrue(husk.getAirSupply() < air, "the husk did not run short of air in the bubble");
+            helper.assertTrue(prisoner.getY() > floor + 1, "the bubble did not carry the pig up");
+            helper.assertTrue(prisoner.getAirSupply() < air, "the pig did not run short of air in the bubble");
         });
         helper.runAfterDelay(bubble.burstTick() + 3, () -> {
-            helper.assertTrue(hurt(husk), "the bubble did not hurt the husk when it burst");
+            helper.assertTrue(hurt(prisoner), "the bubble did not hurt the pig when it burst");
             GameTestSetup.clearLeftovers(helper);
             helper.succeed();
         });
@@ -196,7 +202,8 @@ public final class WaterGameTests {
         Jellyfish.release(helper.getLevel(), caster, ModSpells.JELLYFISH_SWARM.get(), caster.position().add(0, 2, 1), 0, 200, 2);
         helper.succeedWhen(() -> {
             helper.assertTrue(hurt(husk), "the jellyfish did not sting the husk");
-            helper.assertTrue(husk.hasEffect(MobEffects.POISON), "the sting did not poison the husk");
+            // Husks are undead, so poison does not take on them: the numbing does
+            helper.assertTrue(husk.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "the sting did not numb the husk");
             GameTestSetup.clearLeftovers(helper);
         });
     }
@@ -235,17 +242,22 @@ public final class WaterGameTests {
         });
     }
 
-    /** Under the dome the caster breathes water and the husk, out of air, drowns. */
+    /**
+     * Under the dome the caster breathes water, a pig out of air drowns, and a husk (undead, it breathes water) is
+     * crushed by the deep.
+     */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "water_dome", timeoutTicks = 120)
     public static void abyssalDomeDrowns(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, 4.5);
-        Husk husk = husk(helper, 4.5, 7.5);
-        husk.setAirSupply(10);
+        Pig pig = breather(helper, 4.5, 7.5);
+        Husk husk = husk(helper, 1.5, 4.5);
+        pig.setAirSupply(10);
         AbyssalDome.raise(helper.getLevel(), caster, ModSpells.ABYSSAL_DOME.get(), caster.position(), 8, 200, 2);
         helper.succeedWhen(() -> {
             helper.assertTrue(caster.hasEffect(MobEffects.WATER_BREATHING), "the caster does not breathe water under the dome");
-            helper.assertTrue(hurt(husk), "the husk did not drown under the dome");
+            helper.assertTrue(pig.getAirSupply() <= 0 && hurt(pig), "the pig did not drown under the dome");
+            helper.assertTrue(hurt(husk), "the deep did not crush the husk under the dome");
             GameTestSetup.clearLeftovers(helper);
         });
     }
