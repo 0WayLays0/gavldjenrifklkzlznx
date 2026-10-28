@@ -7,6 +7,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestServer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -33,12 +35,15 @@ final class GameTestSetup {
 
     /**
      * Clears what earlier tests left on this spot: spell effects that outlast their test (a token storm, a wall, a
-     * dome) stay where the next batch's platform is placed, and some of them stop shots. Only for a test alone in
-     * its batch, as it would also clear its neighbours'.
+     * dome) stay where the next batch's platform is placed, and some of them stop shots; creatures thrown off their
+     * platform stay alive round it. Only for a test alone in its batch, as it would also clear its neighbours'.
      */
     static void clearLeftovers(GameTestHelper helper) {
         helper.getLevel().getEntitiesOfClass(Entity.class, helper.getBounds().inflate(16),
-                e -> e instanceof SpellEffectEntity || e instanceof SpellProjectile).forEach(Entity::discard);
+                e -> e instanceof SpellEffectEntity || e instanceof SpellProjectile
+                        // Creatures thrown off their platform by an earlier test stay alive next to it: a spell that picks
+                        // among the enemies in range could pick them instead of the test's own
+                        || e instanceof LivingEntity && !(e instanceof Player)).forEach(Entity::discard);
     }
 
     /** Force-loads the chunks within {@code radius} of the platform's middle (those not already forced) and returns them. */
