@@ -114,10 +114,10 @@ import com.waylays.arcanes.entity.bone.BoneColossus;
 import com.waylays.arcanes.entity.wood.FlyingLog;
 import com.waylays.arcanes.entity.wood.RootSnare;
 import com.waylays.arcanes.entity.wood.BrambleHedge;
-import com.waylays.arcanes.entity.wood.BarkShell;
-import com.waylays.arcanes.entity.wood.FallingTree;
-import com.waylays.arcanes.entity.wood.LeafStorm;
-import com.waylays.arcanes.entity.wood.SuddenGrove;
+import com.waylays.arcanes.entity.wood.VineLash;
+import com.waylays.arcanes.entity.wood.RingSaw;
+import com.waylays.arcanes.entity.wood.SplinterStorm;
+import com.waylays.arcanes.entity.wood.AmberPrison;
 import com.waylays.arcanes.entity.wood.SeedPod;
 import com.waylays.arcanes.entity.wood.WorldTree;
 import com.waylays.arcanes.entity.wood.WoodGuardian;
@@ -498,14 +498,14 @@ public final class ModEntities {
             EntityType.Builder.<RootSnare>of(RootSnare::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(40).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<BrambleHedge>> BRAMBLE_HEDGE = register("bramble_hedge",
             EntityType.Builder.<BrambleHedge>of(BrambleHedge::new, MobCategory.MISC).sized(1f, .5f).clientTrackingRange(12).updateInterval(40).fireImmune());
-    public static final DeferredHolder<EntityType<?>, EntityType<BarkShell>> BARK_SHELL = register("barkskin",
-            EntityType.Builder.<BarkShell>of(BarkShell::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
-    public static final DeferredHolder<EntityType<?>, EntityType<FallingTree>> FALLING_TREE = register("falling_tree",
-            EntityType.Builder.<FallingTree>of(FallingTree::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(14).updateInterval(40).fireImmune());
-    public static final DeferredHolder<EntityType<?>, EntityType<LeafStorm>> LEAF_STORM = register("leaf_storm",
-            EntityType.Builder.<LeafStorm>of(LeafStorm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(2).fireImmune());
-    public static final DeferredHolder<EntityType<?>, EntityType<SuddenGrove>> SUDDEN_GROVE = register("sudden_grove",
-            EntityType.Builder.<SuddenGrove>of(SuddenGrove::new, MobCategory.MISC).sized(1f, .5f).clientTrackingRange(12).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<VineLash>> VINE_LASH = register("vine_lash",
+            EntityType.Builder.<VineLash>of(VineLash::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<RingSaw>> RING_SAW = register("ring_saw",
+            EntityType.Builder.<RingSaw>of(RingSaw::new, MobCategory.MISC).sized(.8f, .3f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<SplinterStorm>> SPLINTER_STORM = register("splinter_storm",
+            EntityType.Builder.<SplinterStorm>of(SplinterStorm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(2).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<AmberPrison>> AMBER_PRISON = register("amber_prison",
+            EntityType.Builder.<AmberPrison>of(AmberPrison::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(40).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<SeedPod>> SEED_POD = register("seed_pod",
             EntityType.Builder.<SeedPod>of(SeedPod::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<WorldTree>> WORLD_TREE = register("world_tree",

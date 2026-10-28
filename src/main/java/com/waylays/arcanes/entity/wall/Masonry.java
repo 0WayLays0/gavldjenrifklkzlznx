@@ -93,12 +93,13 @@ public final class Masonry {
         return true;
     }
 
-    /** Takes every laid block away, putting back what was there (unless someone changed the block since). */
+    /** Takes every laid block away, putting back what was there (unless someone put another block there since). */
     public void restore(ServerLevel level) {
         Map<BlockPos, BlockState> live = live(level);
         for (Laid l : laid) {
             live.remove(l.pos());
-            if (level.isLoaded(l.pos()) && level.getBlockState(l.pos()) == l.state()) {
+            // The same block (its state may have changed by itself: leaves, walls and panes join up with their neighbours)
+            if (level.isLoaded(l.pos()) && level.getBlockState(l.pos()).is(l.state().getBlock())) {
                 level.setBlock(l.pos(), l.before(), Block.UPDATE_ALL);
             }
         }

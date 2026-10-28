@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Wood Magic art: the bark, vine and leaf textures the spells' wood is drawn with, the spell icons, the Sylvan Codex
+"""Wood Magic art: the bark, vine, leaf, cut log end, split wood, shaving and amber textures the spells are drawn with
+(and a streak of wind and a puff of dust), the spell icons, the Sylvan Codex
 (icon and 3D book texture) and its affinity ring.
 
 Called by gen_assets.py (run that one). Oak bark, spring-green leaves, the life in the wood glowing green. Original art.
@@ -103,6 +104,97 @@ def leaf_texture():
     return Image.fromarray(a, "RGBA")
 
 
+def log_end_texture():
+    """64 x 64 cut end of a log, laid on a disc: rings (pale early wood, darker late wood) wavering round a dark heart,
+    short cracks running in from a rim of bark."""
+    S = 64
+    ys, xs = np.mgrid[0:S, 0:S]
+    dx, dy = (xs + .5) / S - .5, (ys + .5) / S - .5
+    r = np.hypot(dx, dy) * 2
+    a = np.arctan2(dy, dx)
+    warp = .025 * np.sin(a * 3 + 1) + .015 * np.sin(a * 7) + (_noise(S, S, (6, 6), 41) - .5) * .05
+    rings = r + warp
+    band = (rings * 11) % 1
+    late = np.clip((band - .72) / .2, 0, 1) * np.clip((1 - band) / .08, 0, 1)
+    t = .75 - .45 * late + .12 * (_noise(S, S, (24, 24), 42) - .5) - .12 * r
+    rgb = _ramp(t, [(120, 78, 40), (176, 124, 70), (214, 170, 110), (232, 196, 140)])
+    heart = r < .08
+    rgb[heart] = np.array((110, 70, 36))
+    # Checks: short cracks running in from the bark, as a cut log dries
+    for ca, r0 in ((.6, .5), (2.4, .62), (3.9, .45), (5.3, .66)):
+        crack = (np.abs(((a - ca + np.pi) % (2 * np.pi)) - np.pi) < .028 / np.maximum(r, .1)) & (r > r0) & (r < .87)
+        rgb[crack] = np.array((92, 58, 30))
+    bark = r > .88
+    ridge = .5 + .5 * np.sin(a * 22 + _noise(S, S, (8, 8), 43) * 3)
+    rgb[bark] = _ramp(.25 + .4 * ridge[bark], [BARK_DARK, BARK, BARK_LIGHT])
+    edge = (r > .86) & (r <= .9)
+    rgb[edge] = np.array(BARK_DARK)
+    return Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+
+
+def grain_texture():
+    """32 x 32 pale split wood (tinted in game for each wood), its grain running along v."""
+    S = 32
+    ys, xs = np.mgrid[0:S, 0:S]
+    u = (xs + .5) / S
+    wav = (_noise(S, S, (2, 4), 51) - .5) * .25
+    lines = .5 + .5 * np.sin((u + wav) * math.tau * 5)
+    t = .7 + .18 * lines ** 3 + .1 * (_noise(S, S, (16, 4), 52) - .5)
+    rgb = _ramp(t, [(170, 150, 120), (215, 200, 172), (240, 230, 208), (252, 246, 232)])
+    return Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+
+
+def shaving_texture():
+    """32 x 16 shaving, u along the strip: pale wood with its grain along it, darker thin edges, ragged."""
+    W, H = 32, 16
+    ys, xs = np.mgrid[0:H, 0:W]
+    v = (ys + .5) / H
+    lines = .5 + .5 * np.sin(v * math.tau * 3 + _noise(W, H, (4, 2), 61) * 2)
+    t = .75 + .15 * lines + .1 * (_noise(W, H, (16, 4), 62) - .5) - .35 * (np.abs(v - .5) > .38)
+    rgb = _ramp(t, [(150, 118, 80), (210, 190, 156), (238, 226, 200), (250, 244, 228)])
+    alpha = np.where((np.abs(v - .5) < .44 + .06 * (_noise(W, H, (12, 2), 63) - .5)), 255, 0)
+    out = np.dstack([np.clip(rgb, 0, 255), alpha]).astype(np.uint8)
+    return Image.fromarray(out, "RGBA")
+
+
+def wind_texture():
+    """32 x 32 soft streak of wind: white, see-through at its edges (u across it), a little streaky along it."""
+    S = 32
+    ys, xs = np.mgrid[0:S, 0:S]
+    u = (xs + .5) / S
+    streak = .7 + .3 * _noise(S, S, (3, 6), 71)
+    alpha = np.exp(-((u - .5) ** 2) / .03) * streak * 230
+    out = np.dstack([np.full((S, S), 255), np.full((S, S), 255), np.full((S, S), 255), alpha]).astype(np.uint8)
+    return Image.fromarray(out, "RGBA")
+
+
+def dust_texture():
+    """64 x 64 ring of stirred dust: white, cloudy, see-through at its middle and its rim."""
+    S = 64
+    ys, xs = np.mgrid[0:S, 0:S]
+    r = np.hypot((xs + .5) / S - .5, (ys + .5) / S - .5) * 2
+    cloud = .55 + .45 * _noise(S, S, (8, 8), 81)
+    alpha = np.clip(np.exp(-((r - .62) ** 2) / .06), 0, 1) * cloud * 220 * (r < 1)
+    out = np.dstack([np.full((S, S), 255), np.full((S, S), 255), np.full((S, S), 255), alpha]).astype(np.uint8)
+    return Image.fromarray(out, "RGBA")
+
+
+def amber_texture():
+    """32 x 32 amber (its colour and see-through set in game): warm gold, flowing darker streaks, little bubbles."""
+    S = 32
+    ys, xs = np.mgrid[0:S, 0:S]
+    u, v = (xs + .5) / S, (ys + .5) / S
+    flow = .5 + .5 * np.sin((v * 3 + _noise(S, S, (3, 3), 91) * 1.5) * math.tau)
+    t = .62 + .2 * flow + .12 * (_noise(S, S, (8, 8), 92) - .5)
+    rgb = _ramp(t, [(200, 120, 40), (235, 170, 70), (255, 214, 120), (255, 240, 190)])
+    rnd = np.random.default_rng(93)
+    for _ in range(9):
+        x, y = rnd.integers(1, S - 1), rnd.integers(1, S - 1)
+        rgb[y, x] = (255, 250, 225)
+        rgb[y, x + 1] = (255, 236, 180)
+    return Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+
+
 # ------------------------------------------------------------------------------------------------------- the icons
 
 
@@ -159,14 +251,6 @@ def _crown(d, S, cx, cy, r, seed, pink=True):
             d.ellipse(((x - q) * S, (y - q) * S, (x + q) * S, (y + q) * S), fill=_rgba(PINK))
 
 
-def _tree(d, S, x, base, h, crown, seed, lean=0.0):
-    top_x, top_y = x + lean * h, base - h
-    _log(d, S, x, base, top_x, top_y + crown * .3, .07 + h * .05, ring=False)
-    for s in (-1, 1):
-        d.line((x * S, (base - .01) * S, (x + s * .07) * S, (base + .02) * S), fill=_rgba(BARK), width=max(2, S // 28))
-    _crown(d, S, top_x, top_y, crown, seed)
-
-
 def _ground(d, S, y=.86):
     d.rectangle((0, y * S, S, S), fill=(34, 26, 14, 255))
     d.line((0, y * S, S, y * S), fill=_rgba(LIFE), width=max(1, S // 32))
@@ -179,14 +263,98 @@ def _thorny(d, S, pts, w):
         d.polygon([((x - .015) * S, y * S), ((x + .015) * S, y * S), ((x + .02) * S, (y - .06) * S)], fill=_rgba((110, 82, 54)))
 
 
+def _rings(d, S, cx, cy, r):
+    d.ellipse(((cx - r) * S, (cy - r) * S, (cx + r) * S, (cy + r) * S), fill=_rgba(WOOD_PALE), outline=_rgba(BARK_DARK), width=max(1, S // 32))
+    for k in (.72, .48, .25):
+        d.ellipse(((cx - r * k) * S, (cy - r * k) * S, (cx + r * k) * S, (cy + r * k) * S), outline=_rgba(BARK_LIGHT), width=max(1, S // 64))
+
+
 def log_hurl_icon():
     def draw(d, img, S):
+        _ground(d, S, .84)
         for k in range(4):
-            t = k / 4
-            d.line(((.06 + t * .2) * S, (.86 - t * .16) * S, (.16 + t * .2) * S, (.8 - t * .16) * S), fill=_rgba(LIFE, 90 + 35 * k), width=max(1, S // 22))
-        _log(d, S, .22, .76, .78, .3, .2)
-        _leaf(d, S, .5, .44, .14, -2.3, LEAF_LIGHT)
-    return _icon(draw, .6, .4)
+            y = .5 + k * .08
+            d.line((.04 * S, y * S, (.24 + .05 * k) * S, y * S), fill=_rgba(WOOD_PALE, 110 + 30 * k), width=max(1, S // 28))
+        # A log rolling towards the viewer's right: its body and its ringed end
+        d.rounded_rectangle((.3 * S, .44 * S, .84 * S, .82 * S), radius=S // 8, fill=_rgba(BARK), outline=_rgba(BARK_DARK), width=max(1, S // 40))
+        for x in (.42, .56, .7):
+            d.line((x * S, .46 * S, (x - .03) * S, .8 * S), fill=_rgba(BARK_DARK), width=max(1, S // 48))
+        d.line((.36 * S, .52 * S, .8 * S, .5 * S), fill=_rgba(LEAF), width=max(1, S // 40))
+        _rings(d, S, .78, .63, .19)
+        for x in (.36, .55):
+            d.ellipse(((x - .03) * S, .86 * S, (x + .05) * S, .92 * S), fill=_rgba((110, 90, 70)))
+    return _icon(draw, .6, .55)
+
+
+def vine_lash_icon():
+    def draw(d, img, S):
+        pts = [(.12 + .76 * t, .82 - .62 * t + .1 * math.sin(t * math.pi * 3)) for t in [k / 14 for k in range(15)]]
+        _thorny(d, S, pts, .05)
+        for i in (3, 7, 11):
+            x, y = pts[i]
+            _leaf(d, S, x, y, .11, -1.2 + i * .4, LEAF_LIGHT if i % 2 else LEAF)
+        # The catch: coils round a figure
+        d.ellipse((.74 * S, .08 * S, .9 * S, .22 * S), fill=(150, 110, 110, 255))
+        d.rectangle((.77 * S, .2 * S, .87 * S, .42 * S), fill=(130, 96, 96, 255))
+        for k in range(3):
+            y = .24 + k * .06
+            d.arc((.72 * S, (y - .03) * S, .92 * S, (y + .04) * S), 0, 180, fill=_rgba((72, 140, 40)), width=max(1, S // 24))
+    return _icon(draw, .5, .5)
+
+
+def ring_saw_icon():
+    def draw(d, img, S):
+        d.arc((.04 * S, .1 * S, .9 * S, .96 * S), 120, 230, fill=_rgba(LIFE, 160), width=max(1, S // 32))
+        cx, cy, r = .56, .48, .3
+        for k in range(14):
+            a = k * math.tau / 14
+            b = a - .4
+            d.polygon([((cx + math.cos(a - .14) * r) * S, (cy + math.sin(a - .14) * r) * S), ((cx + math.cos(a + .14) * r) * S, (cy + math.sin(a + .14) * r) * S),
+                       ((cx + math.cos(b) * (r + .12)) * S, (cy + math.sin(b) * (r + .12)) * S)], fill=_rgba((94, 58, 38)))
+        d.ellipse(((cx - r) * S, (cy - r) * S, (cx + r) * S, (cy + r) * S), fill=_rgba(BARK), outline=_rgba(BARK_DARK))
+        _rings(d, S, cx, cy, r * .86)
+        g.glow_spot(img, cx * S, cy * S, S * .06, LIFE, 1.2)
+    return _icon(draw, .5, .5)
+
+
+def splinter_storm_icon():
+    def draw(d, img, S):
+        d.ellipse((.2 * S, .84 * S, .8 * S, .96 * S), fill=(120, 100, 76, 180))
+        for k in range(5):
+            y = .18 + k * .15
+            w = .38 - k * .06
+            d.arc(((.5 - w) * S, (y - .04) * S, (.5 + w) * S, (y + .05) * S), 200, 520, fill=(216, 196, 160, 170), width=max(1, S // 40))
+        rnd = np.random.default_rng(5)
+        for k in range(26):
+            t = rnd.random()
+            w = .38 - t * .3
+            a = rnd.random() * math.tau
+            x, y = .5 + math.cos(a) * w * (1 - .7 * t + .6), .2 + t * .66
+            x = .5 + (x - .5) * .9
+            col = [(244, 234, 210), (232, 196, 140), (154, 112, 72), (192, 138, 88)][k % 4]
+            if k % 3 == 0:
+                d.arc(((x - .04) * S, (y - .03) * S, (x + .04) * S, (y + .03) * S), 0, 300, fill=_rgba(col), width=max(1, S // 40))
+            else:
+                dx, dy = math.cos(a + k) * .04, math.sin(a + k) * .025
+                d.line(((x - dx) * S, (y - dy) * S, (x + dx) * S, (y + dy) * S), fill=_rgba(col), width=max(1, S // 28))
+    return _icon(draw, .5, .5)
+
+
+def amber_prison_icon():
+    def draw(d, img, S):
+        _ground(d, S, .88)
+        d.ellipse((.2 * S, .82 * S, .8 * S, .94 * S), fill=(220, 140, 40, 200))
+        d.ellipse((.42 * S, .26 * S, .58 * S, .42 * S), fill=(140, 100, 100, 255))
+        d.rectangle((.44 * S, .4 * S, .56 * S, .84 * S), fill=(120, 88, 88, 255))
+        amber = Image.new("RGBA", img.size, (0, 0, 0, 0))
+        ad = ImageDraw.Draw(amber)
+        ad.ellipse((.2 * S, .14 * S, .8 * S, .9 * S), fill=(236, 150, 34, 150), outline=(255, 214, 120, 230), width=max(1, S // 32))
+        ad.ellipse((.28 * S, .2 * S, .42 * S, .4 * S), fill=(255, 236, 180, 110))
+        img.alpha_composite(amber)
+        d2 = ImageDraw.Draw(img)
+        for x, y in ((.3, .62), (.68, .5), (.62, .76)):
+            d2.ellipse(((x - .02) * S, (y - .02) * S, (x + .02) * S, (y + .02) * S), fill=(255, 246, 220, 255))
+    return _icon(draw, .5, .55)
 
 
 def grasping_roots_icon():
@@ -225,54 +393,6 @@ def bramble_hedge_icon():
         for x, y in ((.28, .5), (.62, .46), (.86, .56)):
             d.ellipse(((x - .035) * S, (y - .035) * S, (x + .035) * S, (y + .035) * S), fill=_rgba(PINK))
     return _icon(draw, .5, .7)
-
-
-def barkskin_icon():
-    def draw(d, img, S):
-        d.ellipse((.4 * S, .14 * S, .6 * S, .32 * S), fill=(150, 120, 100, 255))
-        for k in range(3):
-            y0 = .32 + k * .19
-            for i in range(4):
-                x0 = .26 + i * .12 + (k % 2) * .03
-                d.rounded_rectangle((x0 * S, y0 * S, (x0 + .11) * S, (y0 + .18) * S), radius=max(1, S // 32), fill=_rgba(g.lerp(BARK, BARK_LIGHT, (i + k) % 3 / 2)),
-                                    outline=_rgba(BARK_DARK))
-        for x in (.37, .49, .61):
-            d.line((x * S, .34 * S, x * S, .88 * S), fill=_rgba(LIFE, 200), width=max(1, S // 48))
-        for x, y in ((.22, .42), (.78, .5), (.2, .7), (.8, .74)):
-            d.polygon([(x * S, y * S), ((x + (.06 if x < .5 else -.06)) * S, (y - .02) * S), (x * S, (y + .04) * S)], fill=_rgba((110, 82, 54)))
-    return _icon(draw, .5, .5)
-
-
-def falling_tree_icon():
-    def draw(d, img, S):
-        _ground(d, S, .88)
-        d.arc((.12 * S, .1 * S, 1.3 * S, 1.6 * S), 200, 250, fill=_rgba(LIFE, 160), width=max(1, S // 40))
-        _log(d, S, .2, .88, .6, .36, .11, ring=False)
-        _crown(d, S, .7, .3, .2, 7)
-        for k in range(3):
-            d.line(((.62 + k * .08) * S, (.06 + k * .02) * S, (.7 + k * .08) * S, (.12 + k * .02) * S), fill=_rgba(LIFE_CORE, 160), width=max(1, S // 48))
-    return _icon(draw, .6, .5)
-
-
-def leaf_storm_icon():
-    def draw(d, img, S):
-        for k in range(26):
-            t = k / 25
-            a = t * math.tau * 2.4
-            r = .08 + .34 * t
-            x, y = .5 + math.cos(a) * r, .9 - t * .78 + math.sin(a) * r * .25
-            _leaf(d, S, x, y, .07 + .05 * t, a + 1.4, PINK if k % 7 == 3 else g.lerp(LEAF_DARK, LEAF_LIGHT, (k * 37 % 10) / 10))
-    return _icon(draw, .5, .5)
-
-
-def sudden_grove_icon():
-    def draw(d, img, S):
-        _ground(d, S, .84)
-        d.ellipse((.06 * S, .76 * S, .94 * S, .94 * S), outline=_rgba(LIFE, 200), width=max(1, S // 32))
-        _tree(d, S, .2, .84, .42, .14, 3)
-        _tree(d, S, .8, .84, .44, .14, 4)
-        _tree(d, S, .5, .86, .58, .18, 5)
-    return _icon(draw, .5, .6)
 
 
 def wood_guardian_icon():
@@ -314,8 +434,8 @@ def world_tree_icon():
 
 
 ICONS = (("log_hurl", log_hurl_icon), ("grasping_roots", grasping_roots_icon), ("seed_pods", seed_pods_icon),
-         ("bramble_hedge", bramble_hedge_icon), ("barkskin", barkskin_icon), ("falling_tree", falling_tree_icon),
-         ("leaf_storm", leaf_storm_icon), ("sudden_grove", sudden_grove_icon), ("wood_guardian", wood_guardian_icon),
+         ("bramble_hedge", bramble_hedge_icon), ("vine_lash", vine_lash_icon), ("ring_saw", ring_saw_icon),
+         ("splinter_storm", splinter_storm_icon), ("amber_prison", amber_prison_icon), ("wood_guardian", wood_guardian_icon),
          ("world_tree", world_tree_icon))
 
 
@@ -419,6 +539,12 @@ def main():
     g.save(bark_texture(), "textures/entity/wood/bark.png")
     g.save(vine_texture(), "textures/entity/wood/vine.png")
     g.save(leaf_texture(), "textures/entity/wood/leaf.png")
+    g.save(log_end_texture(), "textures/entity/wood/log_end.png")
+    g.save(grain_texture(), "textures/entity/wood/grain.png")
+    g.save(shaving_texture(), "textures/entity/wood/shaving.png")
+    g.save(wind_texture(), "textures/entity/wood/wind.png")
+    g.save(dust_texture(), "textures/entity/wood/dust.png")
+    g.save(amber_texture(), "textures/entity/wood/amber.png")
     for name, icon in ICONS:
         g.save(icon(), f"textures/gui/spell_icons/{name}.png")
     g.save(affinity_ring_wood(), "textures/item/affinity_ring_wood.png")

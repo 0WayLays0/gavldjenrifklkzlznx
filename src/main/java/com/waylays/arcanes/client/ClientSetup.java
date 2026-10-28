@@ -247,10 +247,10 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.FLYING_LOG.get(), com.waylays.arcanes.client.render.FlyingLogRenderer::new);
         event.registerEntityRenderer(ModEntities.ROOT_SNARE.get(), com.waylays.arcanes.client.render.RootSnareRenderer::new);
         event.registerEntityRenderer(ModEntities.BRAMBLE_HEDGE.get(), com.waylays.arcanes.client.render.BrambleHedgeRenderer::new);
-        event.registerEntityRenderer(ModEntities.BARK_SHELL.get(), com.waylays.arcanes.client.render.BarkShellRenderer::new);
-        event.registerEntityRenderer(ModEntities.FALLING_TREE.get(), com.waylays.arcanes.client.render.FallingTreeRenderer::new);
-        event.registerEntityRenderer(ModEntities.LEAF_STORM.get(), com.waylays.arcanes.client.render.LeafStormRenderer::new);
-        event.registerEntityRenderer(ModEntities.SUDDEN_GROVE.get(), com.waylays.arcanes.client.render.SuddenGroveRenderer::new);
+        event.registerEntityRenderer(ModEntities.VINE_LASH.get(), com.waylays.arcanes.client.render.VineLashRenderer::new);
+        event.registerEntityRenderer(ModEntities.RING_SAW.get(), com.waylays.arcanes.client.render.RingSawRenderer::new);
+        event.registerEntityRenderer(ModEntities.SPLINTER_STORM.get(), com.waylays.arcanes.client.render.SplinterStormRenderer::new);
+        event.registerEntityRenderer(ModEntities.AMBER_PRISON.get(), com.waylays.arcanes.client.render.AmberPrisonRenderer::new);
         event.registerEntityRenderer(ModEntities.SEED_POD.get(), com.waylays.arcanes.client.render.SeedPodRenderer::new);
         event.registerEntityRenderer(ModEntities.WORLD_TREE.get(), com.waylays.arcanes.client.render.WorldTreeRenderer::new);
         event.registerEntityRenderer(ModEntities.WOOD_GUARDIAN.get(), com.waylays.arcanes.client.render.WoodGuardianRenderer::new);

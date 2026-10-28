@@ -1,12 +1,11 @@
 package com.waylays.arcanes.gametest;
 
 import com.waylays.arcanes.ArcanesOublies;
-import com.waylays.arcanes.entity.wood.BarkShell;
+import com.waylays.arcanes.entity.wood.AmberPrison;
 import com.waylays.arcanes.entity.wood.BrambleHedge;
-import com.waylays.arcanes.entity.wood.FallingTree;
 import com.waylays.arcanes.entity.wood.RootSnare;
 import com.waylays.arcanes.entity.wood.SeedPod;
-import com.waylays.arcanes.entity.wood.SuddenGrove;
+import com.waylays.arcanes.entity.wood.VineLash;
 import com.waylays.arcanes.entity.wood.WoodGuardian;
 import com.waylays.arcanes.entity.wood.WorldTree;
 import com.waylays.arcanes.registry.ModItems;
@@ -21,7 +20,6 @@ import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.SchoolType;
 import io.redspace.ironsspellbooks.item.SpellBook;
-import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
@@ -31,7 +29,6 @@ import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -41,10 +38,10 @@ import java.util.List;
 
 /**
  * Server-side checks run by CI for Wood Magic: the school is there; the hurled log strikes; the roots hold their
- * prisoner and crush it; the brambles tear what is in them; the seed pod bursts and leaves a thicket; the bark takes
- * the edge off a blow and tears the striker; the falling tree crushes what it lands on; the leaf storm cuts; the grove's
- * trees grow as real blocks, mend the caster and are gone at the end; the guardian answers its summoner and strikes;
- * the world tree's quake strikes and its crown heals. Each test runs in a batch of its own.
+ * prisoner and crush it; the brambles tear what is in them; the seed pod bursts and leaves a thicket; the vine yanks
+ * its catch to the caster; the ring saw cuts; the splinter cyclone shreds; the amber holds its prisoner and bursts;
+ * the guardian answers its summoner and strikes; the world tree's quake strikes and its crown heals. Each test runs in
+ * a batch of its own.
  */
 @GameTestHolder(ArcanesOublies.MODID)
 @PrefixGameTestTemplate(false)
@@ -75,16 +72,6 @@ public final class WoodGameTests {
         spell.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
     }
 
-    private static int logsAround(GameTestHelper helper, BlockPos centre, int r) {
-        int n = 0;
-        for (BlockPos pos : BlockPos.betweenClosed(centre.offset(-r, -2, -r), centre.offset(r, 10, r))) {
-            if (helper.getLevel().getBlockState(pos).is(Blocks.OAK_LOG)) {
-                n++;
-            }
-        }
-        return n;
-    }
-
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
     public static void woodSchoolIsRegistered(GameTestHelper helper) {
         SchoolType school = SchoolRegistry.getSchool(ModSchools.WOOD_RESOURCE);
@@ -103,6 +90,7 @@ public final class WoodGameTests {
         helper.succeed();
     }
 
+    /** The log is torn up, hurled, and bowls the husk over. */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wood_log", timeoutTicks = 60)
     public static void logHurlStrikes(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
@@ -158,73 +146,59 @@ public final class WoodGameTests {
         });
     }
 
-    /** Through the bark a blow does far less, and the striker is torn by the thorns. */
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wood_bark", timeoutTicks = 60)
-    public static void barkskinGuardsAndTears(GameTestHelper helper) {
+    /** The vine catches the husk and yanks it to the caster. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wood_vine", timeoutTicks = 60)
+    public static void vineLashYanks(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
-        Witch caster = caster(helper, 4.5, 2.5);
-        Husk husk = husk(helper, 4.5, 4);
-        cast(helper, ModSpells.BARKSKIN, caster);
-        helper.assertTrue(BarkShell.of(helper.getLevel(), caster) != null, "no bark grew on the caster");
-        helper.runAfterDelay(BarkShell.GROW + 2, () -> {
-            float before = caster.getHealth();
-            caster.invulnerableTime = 0;
-            caster.hurt(helper.getLevel().damageSources().mobAttack(husk), 10);
-            float lost = before - caster.getHealth();
-            helper.assertTrue(lost > 0 && lost < 7, "the bark did not take the edge off the blow (lost " + lost + ")");
-            helper.assertTrue(hurt(husk), "the thorns did not tear the striker");
+        Witch caster = caster(helper, 4.5, .5);
+        Husk husk = husk(helper, 4.5, 7.5);
+        double before = husk.distanceTo(caster);
+        cast(helper, ModSpells.VINE_LASH, caster);
+        helper.runAfterDelay(VineLash.REACH + VineLash.PULL, () -> {
+            helper.assertTrue(hurt(husk), "the vine did not tear the husk");
+            helper.assertTrue(husk.distanceTo(caster) < before - 2, "the vine did not yank the husk in (" + before + " -> " + husk.distanceTo(caster) + ")");
             GameTestSetup.clearLeftovers(helper);
             helper.succeed();
         });
     }
 
-    /** The tree grows beside the caster and falls on the husk ahead. */
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wood_tree", timeoutTicks = 100)
-    public static void fallingTreeCrushes(GameTestHelper helper) {
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wood_saw", timeoutTicks = 60)
+    public static void ringSawCuts(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
-        List<ChunkPos> forced = GameTestSetup.forceChunksAround(helper, 1);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 6.5);
-        cast(helper, ModSpells.FALLING_TREE, caster);
-        helper.runAfterDelay(FallingTree.impact() + 3, () -> {
-            helper.assertTrue(hurt(husk), "the tree did not crush the husk");
-            helper.assertTrue(!hurt(caster), "the tree fell on its caster");
+        cast(helper, ModSpells.RING_SAW, caster);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(hurt(husk), "the saw did not cut the husk");
             GameTestSetup.clearLeftovers(helper);
-            forced.forEach(chunk -> helper.getLevel().setChunkForced(chunk.x, chunk.z, false));
-            helper.succeed();
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wood_storm", timeoutTicks = 80)
-    public static void leafStormCuts(GameTestHelper helper) {
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wood_cyclone", timeoutTicks = 80)
+    public static void splinterCycloneShreds(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 5.5);
-        cast(helper, ModSpells.LEAF_STORM, caster);
+        cast(helper, ModSpells.SPLINTER_STORM, caster);
         helper.succeedWhen(() -> {
-            helper.assertTrue(hurt(husk), "the leaves did not cut the husk");
+            helper.assertTrue(hurt(husk), "the splinters did not shred the husk");
             GameTestSetup.clearLeftovers(helper);
         });
     }
 
-    /** The grove's trees grow as real blocks, the caster is mended inside it, and the trees are gone at the end. */
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wood_grove", timeoutTicks = 140)
-    public static void groveGrowsMendsAndGoes(GameTestHelper helper) {
+    /** The amber holds its prisoner where it stood, then bursts and cuts it. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "wood_amber", timeoutTicks = 100)
+    public static void amberHoldsAndBursts(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
-        List<ChunkPos> forced = GameTestSetup.forceChunksAround(helper, 1);
-        Witch caster = caster(helper, 4.5, 4.5);
-        caster.setHealth(10);
-        BlockPos centre = caster.blockPosition();
-        SuddenGrove grove = SuddenGrove.plant(helper.getLevel(), caster, ModSpells.SUDDEN_GROVE.get(), 5, 80, 4, 2);
-        helper.runAfterDelay(4 + 5 * SuddenGrove.GAP + 10, () -> {
-            helper.assertTrue(logsAround(helper, centre, 8) >= 8, "the grove's trees did not grow (" + logsAround(helper, centre, 8) + " logs)");
-            helper.assertTrue(caster.getHealth() > 10, "the grove did not mend its caster");
-        });
-        helper.runAfterDelay(85, () -> {
-            helper.assertTrue(logsAround(helper, centre, 8) == 0, "the grove's trees were left behind");
-            helper.assertTrue(grove.isRemoved() || grove.tickCount > 80, "the grove did not end");
+        Witch caster = caster(helper, .5, .5);
+        Husk husk = husk(helper, 4.5, 4.5);
+        Vec3 at = husk.position();
+        AmberPrison prison = AmberPrison.encase(helper.getLevel(), caster, ModSpells.AMBER_PRISON.get(), husk, 30, 4);
+        helper.runAfterDelay(AmberPrison.RISE + 2, () -> husk.setDeltaMovement(1, .5, 0));
+        helper.runAfterDelay(AmberPrison.RISE + 12, () -> helper.assertTrue(husk.position().distanceTo(at) < .5, "the husk got out of the amber"));
+        helper.runAfterDelay(prison.burstTick() + 2, () -> {
+            helper.assertTrue(hurt(husk), "the amber did not cut the husk when it burst");
             GameTestSetup.clearLeftovers(helper);
-            forced.forEach(chunk -> helper.getLevel().setChunkForced(chunk.x, chunk.z, false));
             helper.succeed();
         });
     }

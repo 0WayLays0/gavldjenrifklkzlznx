@@ -15,28 +15,34 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-/** Log Hurl: a log of oak is torn out of nothing and hurled end over end, slamming its foe far back (see FlyingLog). */
+/** Log Hurl: a great log torn up out of the ground is hurled and rolls on, bowling over every enemy in its way (see FlyingLog). */
 @AutoSpellConfig
 public class LogHurlSpell extends WoodSpell {
     public LogHurlSpell() {
-        super("log_hurl", SpellRarity.COMMON, 10, 3, CastType.INSTANT, SpellAnimations.ONE_HANDED_HORIZONTAL_SWING_ANIMATION);
+        super("log_hurl", SpellRarity.COMMON, 10, 6, CastType.INSTANT, SpellAnimations.ONE_HANDED_HORIZONTAL_SWING_ANIMATION);
         this.manaCostPerLevel = 2;
         this.baseSpellPower = 7;
         this.spellPowerPerLevel = 1;
         this.castTime = 0;
-        this.baseManaCost = 20;
+        this.baseManaCost = 25;
+    }
+
+    /** How far the log rolls once it is down. */
+    public static float roll(int spellLevel) {
+        return 10 + spellLevel;
     }
 
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getPower(spellLevel, caster), 1)),
+                Component.translatable("ui.arcanes_oublies.rolls_for", Utils.stringTruncation(roll(spellLevel), 1)),
                 Component.translatable("ui.irons_spellbooks.aoe_damage", Utils.stringTruncation(getPower(spellLevel, caster) * .5f, 1)));
     }
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
-        FlyingLog.hurl(level, entity, this, getPower(spellLevel, entity));
+        FlyingLog.hurl(level, entity, this, getPower(spellLevel, entity), roll(spellLevel));
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
 }

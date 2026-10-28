@@ -37,7 +37,7 @@ public class WorldTree extends SpellEffectEntity {
     public static final int RISE = 50;
     /** The tick its trunk breaks out of the ground. */
     public static final int BREAK_OUT = 14;
-    public static final int WITHER = 40;
+    public static final int WITHER = 90;
     public static final float HEIGHT = 24;
     public static final float CROWN = 11;
     public static final float REACH = 18;
@@ -133,14 +133,8 @@ public class WorldTree extends SpellEffectEntity {
             }
             return;
         }
-        if (tickCount == getLife()) {
-            WoodFx.leaves(level, position().add(0, HEIGHT * .8, 0), 120, CROWN * .6);
-            WoodFx.creak(level, position().add(0, 6, 0), 3);
-        }
         if (tickCount >= getLife()) {
-            if (tickCount % 4 == 0) {
-                WoodFx.leaves(level, position().add(0, HEIGHT * .7, 0), 20, CROWN * .7);
-            }
+            dying(level, tickCount - getLife());
             return;
         }
         if (tickCount % 20 == 0) {
@@ -151,6 +145,52 @@ public class WorldTree extends SpellEffectEntity {
         }
         if ((tickCount - RISE) % LASH_EVERY == 0 && spell != null) {
             lash(level, caster, spell);
+        }
+    }
+
+    /**
+     * Its end, {@code t} ticks in (drawn by its renderer): the crown turns and its leaves fall, branches snap, the trunk
+     * sinks back into the earth, and a last breath of life rises.
+     */
+    private void dying(ServerLevel level, int t) {
+        Vec3 crown = position().add(0, HEIGHT * .78, 0);
+        if (t == 0) {
+            WoodFx.creak(level, position().add(0, 8, 0), 3);
+            WoodFx.sound(level, crown, SoundEvents.AZALEA_LEAVES_BREAK, 2, .4f);
+        }
+        if (t >= 14 && t < 60 && t % 2 == 0) {
+            // Leaves raining down from all over the crown
+            for (int k = 0; k < 3; k++) {
+                double a = random.nextDouble() * Math.PI * 2, r = random.nextDouble() * CROWN;
+                Vec3 at = crown.add(Math.cos(a) * r, (random.nextDouble() - .5) * 4, Math.sin(a) * r);
+                WoodFx.leaves(level, at, 6, 1.2);
+                SpellUtil.particles(level, net.minecraft.core.particles.ParticleTypes.CHERRY_LEAVES, at.x, at.y, at.z, 2, 1, .5, 1, 0);
+            }
+            if (t % 8 == 0) {
+                WoodFx.sound(level, crown, SoundEvents.AZALEA_LEAVES_FALL, 1.6f, .6f);
+            }
+        }
+        if (t >= 35 && t < 62 && t % 5 == 0) {
+            // A branch snapping
+            double a = random.nextDouble() * Math.PI * 2;
+            Vec3 at = crown.add(Math.cos(a) * 6, -2, Math.sin(a) * 6);
+            WoodFx.sound(level, at, SoundEvents.CHERRY_WOOD_BREAK, 2, .5f + random.nextFloat() * .2f);
+            WoodFx.chips(level, at, 12, .8);
+        }
+        if (t >= 50 && t < 88 && t % 3 == 0) {
+            // Sinking back into the earth
+            WoodFx.chips(level, position().add(0, .5, 0), 16, 3);
+            WoodFx.sound(level, position(), SoundEvents.ROOTED_DIRT_BREAK, 1.6f, .4f);
+            if (t % 9 == 0) {
+                WoodFx.creak(level, position().add(0, 3, 0), 2);
+                SpellUtil.cameraShake(level, position(), 6, 24);
+            }
+        }
+        if (t == 72) {
+            // A last breath of life
+            WoodFx.life(level, position().add(0, 1, 0), 80, 5);
+            WoodFx.sound(level, position(), SoundEvents.AMETHYST_BLOCK_RESONATE, 2, .6f);
+            WoodFx.sound(level, position(), SoundEvents.BEACON_DEACTIVATE, 1.2f, .8f);
         }
     }
 
