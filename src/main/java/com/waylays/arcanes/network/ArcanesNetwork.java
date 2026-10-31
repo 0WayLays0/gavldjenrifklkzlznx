@@ -19,6 +19,7 @@ public final class ArcanesNetwork {
         PayloadRegistrar registrar = event.registrar(VERSION);
         registrar.playToClient(PlayAnimationPacket.TYPE, PlayAnimationPacket.STREAM_CODEC, PlayAnimationPacket::handle);
         registrar.playToClient(GoldCoatPacket.TYPE, GoldCoatPacket.STREAM_CODEC, GoldCoatPacket::handle);
+        registrar.playToServer(AltarRitualPacket.TYPE, AltarRitualPacket.STREAM_CODEC, AltarRitualPacket::handle);
     }
 
     /** Plays the player animation {@code animation} on {@code player}, for them and everyone around. */

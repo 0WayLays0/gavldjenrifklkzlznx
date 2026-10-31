@@ -70,9 +70,11 @@ import com.waylays.arcanes.entity.verdigris.SporePatch;
 import com.waylays.arcanes.entity.verdigris.SunkenTemple;
 import com.waylays.arcanes.entity.verdigris.ToppleWall;
 import com.waylays.arcanes.entity.verdigris.VineSnare;
+import com.waylays.arcanes.entity.ritual.AmethystBridge;
 import com.waylays.arcanes.entity.ritual.Meteor;
 import com.waylays.arcanes.entity.ritual.RitualDome;
 import com.waylays.arcanes.entity.ritual.RitualPortal;
+import com.waylays.arcanes.entity.ritual.StoneColossus;
 import com.waylays.arcanes.entity.ritual.StormCloud;
 import com.waylays.arcanes.entity.gem.GemSigil;
 import com.waylays.arcanes.entity.gem.GemShatter;
@@ -621,6 +623,10 @@ public final class ModEntities {
             EntityType.Builder.<StormCloud>of(StormCloud::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(20).updateInterval(40).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<RitualPortal>> RITUAL_PORTAL = register("ritual_portal",
             EntityType.Builder.<RitualPortal>of(RitualPortal::new, MobCategory.MISC).sized(1.4f, 2.8f).clientTrackingRange(12).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<AmethystBridge>> AMETHYST_BRIDGE = register("amethyst_bridge",
+            EntityType.Builder.<AmethystBridge>of(AmethystBridge::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(20).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<StoneColossus>> STONE_COLOSSUS = register("stone_colossus",
+            EntityType.Builder.<StoneColossus>of(StoneColossus::new, MobCategory.MISC).sized(2.6f, 6.2f).clientTrackingRange(16).fireImmune());
 
     private ModEntities() {}
 
@@ -631,6 +637,7 @@ public final class ModEntities {
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(GOLDEN_SENTINEL.get(), GoldenSentinel.createAttributes().build());
+        event.put(STONE_COLOSSUS.get(), StoneColossus.createAttributes().build());
         event.put(FLYING_GRIMOIRE.get(), FlyingGrimoire.createAttributes().build());
         event.put(FLYING_STACK.get(), FlyingStack.createAttributes().build());
         event.put(MANA_RAT.get(), ManaRat.createAttributes().build());

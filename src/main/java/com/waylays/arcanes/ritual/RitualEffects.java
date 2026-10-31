@@ -1,14 +1,15 @@
 package com.waylays.arcanes.ritual;
 
-import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.entity.ritual.AmethystBridge;
 import com.waylays.arcanes.entity.ritual.Meteor;
 import com.waylays.arcanes.entity.ritual.RitualDome;
 import com.waylays.arcanes.entity.ritual.RitualPortal;
+import com.waylays.arcanes.entity.ritual.StoneColossus;
 import com.waylays.arcanes.entity.ritual.StormCloud;
 import com.waylays.arcanes.spells.SpellUtil;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -17,29 +18,19 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
 /** What each ritual does once it is cast. */
-@EventBusSubscriber(modid = ArcanesOublies.MODID)
 public final class RitualEffects {
     public static final float BLESSING_RADIUS = 24;
     public static final int BLESSING_TICKS = 20 * 60 * 5;
-    public static final int COLOSSUS_TICKS = 20 * 60 * 3;
-    public static final float COLOSSUS_SCALE = 2.5f;
-    private static final String COLOSSUS_UNTIL = "arcanes_oublies.colossus_until";
 
     private RitualEffects() {}
 
@@ -51,8 +42,29 @@ public final class RitualEffects {
             case STORM -> StormCloud.gather(level, c, StormCloud.RADIUS, (int) (StormCloud.LIFE * power), allies, power);
             case PORTAL -> portal(level, circle);
             case BLESSING -> blessing(level, c, power);
-            case COLOSSUS -> colossus(level, c, power);
+            case COLOSSUS -> StoneColossus.raise(level, c, circle.getOwnerUUID(), allies, power);
+            case BRIDGE -> AmethystBridge.raise(level, bridgeStart(circle), lookTarget(level, circle, 56, 40), power);
         }
+    }
+
+    /** Where the bridge sets out from: the edge of the figure, the way the leader looks. */
+    private static Vec3 bridgeStart(RitualCircle circle) {
+        Vec3 to = circle.getOwner() != null ? circle.getOwner().getLookAngle() : Vec3.directionFromRotation(0, circle.getYRot());
+        Vec3 flat = new Vec3(to.x, 0, to.z);
+        flat = flat.lengthSqr() < 1.0E-4 ? new Vec3(0, 0, 1) : flat.normalize();
+        return circle.position().add(flat.scale(RitualCircle.RADIUS + 1));
+    }
+
+    /** Where the leader looks (up to {@code range} blocks away), else {@code ahead} blocks ahead of the figure at its height. */
+    private static Vec3 lookTarget(ServerLevel level, RitualCircle circle, double range, double ahead) {
+        Entity leader = circle.getOwner();
+        if (leader != null && leader.distanceToSqr(circle) < 40 * 40) {
+            Vec3 eye = leader.getEyePosition();
+            Vec3 end = eye.add(leader.getLookAngle().scale(range));
+            HitResult hit = level.clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, leader));
+            return hit.getType() == HitResult.Type.MISS ? new Vec3(end.x, circle.getY(), end.z) : hit.getLocation();
+        }
+        return circle.position().add(Vec3.directionFromRotation(0, circle.getYRot()).scale(ahead));
     }
 
     /** Where the leader looks (up to 64 blocks away), else 16 blocks ahead of the circle. */
@@ -82,7 +94,11 @@ public final class RitualEffects {
                 toLevel = other;
             }
         }
-        RitualPortal.open(level, circle.position(), toLevel, to, RitualPortal.LIFE);
+        // Drawn on a wall, it opens in the wall; else it stands over the figure
+        Direction wall = circle.getWall();
+        float yaw = wall != null ? wall.toYRot() : circle.getYRot();
+        Vec3 at = wall != null ? circle.position().add(Vec3.atLowerCornerOf(wall.getNormal()).scale(.3)) : circle.position();
+        RitualPortal.open(level, at, yaw, toLevel, to, RitualPortal.LIFE);
     }
 
     /** Every player around is healed, cleansed and strengthened for five minutes. */
@@ -106,43 +122,5 @@ public final class RitualEffects {
         }
         SpellUtil.particles(level, ParticleTypes.END_ROD, c.x, c.y + 3, c.z, 120, 2, 6, 2, .05);
         level.playSound(null, c.x, c.y, c.z, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.5f, .8f);
-    }
-
-    /** A colossus of stone (a giant iron golem made by the players) wakes and fights for them for three minutes. */
-    public static IronGolem colossus(ServerLevel level, Vec3 c, float power) {
-        IronGolem golem = EntityType.IRON_GOLEM.create(level);
-        if (golem == null) {
-            return null;
-        }
-        golem.moveTo(c.x, c.y, c.z, level.random.nextFloat() * 360, 0);
-        golem.setPlayerCreated(true);
-        golem.getAttribute(Attributes.SCALE).setBaseValue(COLOSSUS_SCALE);
-        golem.getAttribute(Attributes.MAX_HEALTH).setBaseValue(300 * power);
-        golem.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(25 * power);
-        golem.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
-        golem.setHealth(golem.getMaxHealth());
-        golem.setCustomName(Component.translatable("entity.arcanes_oublies.colossus"));
-        golem.getPersistentData().putLong(COLOSSUS_UNTIL, level.getGameTime() + COLOSSUS_TICKS);
-        level.addFreshEntity(golem);
-        SpellUtil.particles(level, ParticleTypes.EXPLOSION, c.x, c.y + 2, c.z, 8, 1.5, 2, 1.5, 0);
-        SpellUtil.particles(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, c.x, c.y + 1, c.z, 40, 2, 1, 2, .03);
-        level.playSound(null, c.x, c.y, c.z, SoundEvents.IRON_GOLEM_REPAIR, SoundSource.PLAYERS, 3f, .4f);
-        level.playSound(null, c.x, c.y, c.z, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 2f, .4f);
-        return golem;
-    }
-
-    /** The colossus crumbles when its time is up. */
-    @SubscribeEvent
-    public static void onEntityTick(EntityTickEvent.Post event) {
-        Entity entity = event.getEntity();
-        if (!(entity instanceof IronGolem) || !(entity.level() instanceof ServerLevel level) || entity.tickCount % 20 != 0) {
-            return;
-        }
-        long until = entity.getPersistentData().getLong(COLOSSUS_UNTIL);
-        if (until > 0 && level.getGameTime() > until) {
-            SpellUtil.particles(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, entity.getX(), entity.getY() + 2, entity.getZ(), 40, 1.5, 2, 1.5, .03);
-            level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.IRON_GOLEM_DEATH, SoundSource.PLAYERS, 2f, .5f);
-            entity.discard();
-        }
     }
 }

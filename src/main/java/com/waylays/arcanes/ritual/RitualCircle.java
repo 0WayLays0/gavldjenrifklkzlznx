@@ -5,6 +5,7 @@ import com.waylays.arcanes.registry.ModEntities;
 import com.waylays.arcanes.spells.SpellUtil;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -57,9 +58,12 @@ public class RitualCircle extends SpellEffectEntity {
 
     private static final EntityDataAccessor<Integer> DATA_RITUAL = SynchedEntityData.defineId(RitualCircle.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(RitualCircle.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Integer> DATA_SINCE = SynchedEntityData.defineId(RitualCircle.class, EntityDataSerializers.INT);
+    /** The game time it entered its current state (so a client that starts watching late sees it as it is). */
+    private static final EntityDataAccessor<Long> DATA_SINCE = SynchedEntityData.defineId(RitualCircle.class, EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Integer> DATA_OCCUPIED = SynchedEntityData.defineId(RitualCircle.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_CHORUS = SynchedEntityData.defineId(RitualCircle.class, EntityDataSerializers.INT);
+    /** The way the wall it is drawn on faces (a horizontal direction), or -1 for a figure drawn on the ground. */
+    private static final EntityDataAccessor<Integer> DATA_WALL = SynchedEntityData.defineId(RitualCircle.class, EntityDataSerializers.INT);
 
     @Nullable
     private Vec3 anchor;
@@ -73,12 +77,26 @@ public class RitualCircle extends SpellEffectEntity {
 
     public static RitualCircle draw(ServerLevel level, @Nullable LivingEntity leader, Ritual ritual, Vec3 at, float yaw,
                                     @Nullable Vec3 anchor, @Nullable ResourceLocation anchorLevel) {
+        return draw(level, leader, ritual, at, yaw, null, anchor, anchorLevel);
+    }
+
+    /**
+     * Draws a ritual's figure at {@code at}: on the ground, or (with {@code wall}) upright on the face of a wall that
+     * faces {@code wall}, {@code at} then being the foot of the wall's face.
+     */
+    public static RitualCircle draw(ServerLevel level, @Nullable LivingEntity leader, Ritual ritual, Vec3 at, float yaw, @Nullable Direction wall,
+                                    @Nullable Vec3 anchor, @Nullable ResourceLocation anchorLevel) {
         RitualCircle circle = new RitualCircle(ModEntities.RITUAL_CIRCLE.get(), level);
+        if (wall != null) {
+            circle.entityData.set(DATA_WALL, wall.get2DDataValue());
+            yaw = wall.toYRot();
+        }
         circle.setOwner(leader);
         circle.moveTo(at.x, at.y, at.z, yaw, 0);
         circle.anchor = anchor;
         circle.anchorLevel = anchorLevel;
         circle.entityData.set(DATA_RITUAL, ritual.ordinal());
+        circle.entityData.set(DATA_SINCE, level.getGameTime());
         level.addFreshEntity(circle);
         level.playSound(null, at.x, at.y, at.z, SoundEvents.CALCITE_PLACE, SoundSource.PLAYERS, 1.2f, .7f);
         return circle;
@@ -88,9 +106,10 @@ public class RitualCircle extends SpellEffectEntity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_RITUAL, 0);
         builder.define(DATA_STATE, 0);
-        builder.define(DATA_SINCE, 0);
+        builder.define(DATA_SINCE, 0L);
         builder.define(DATA_OCCUPIED, 0);
         builder.define(DATA_CHORUS, 0);
+        builder.define(DATA_WALL, -1);
     }
 
     public Ritual getRitual() {
@@ -104,12 +123,12 @@ public class RitualCircle extends SpellEffectEntity {
 
     /** Ticks since the circle entered its current state. */
     public float sinceState(float partialTicks) {
-        return tickCount + partialTicks - this.entityData.get(DATA_SINCE);
+        return level().getGameTime() - this.entityData.get(DATA_SINCE) + partialTicks;
     }
 
     private void setState(State state) {
         this.entityData.set(DATA_STATE, state.ordinal());
-        this.entityData.set(DATA_SINCE, tickCount);
+        this.entityData.set(DATA_SINCE, level().getGameTime());
     }
 
     /** Which stations have someone on them (one bit per station). */
@@ -135,9 +154,26 @@ public class RitualCircle extends SpellEffectEntity {
         };
     }
 
-    /** Where station {@code i} is, relative to the middle. */
+    /** The way the wall its figure is drawn on faces, or null if it lies on the ground. */
+    @Nullable
+    public Direction getWall() {
+        int wall = this.entityData.get(DATA_WALL);
+        return wall < 0 ? null : Direction.from2DDataValue(wall);
+    }
+
+    /**
+     * Where station {@code i} is, relative to the middle: round the figure on the ground, or in a row before the wall
+     * for a figure drawn on one.
+     */
     public Vec3 station(int i) {
-        float a = getYRot() * Mth.DEG_TO_RAD + i * Mth.TWO_PI / getRitual().participants;
+        int n = getRitual().participants;
+        Direction wall = getWall();
+        if (wall != null) {
+            Vec3 out = Vec3.atLowerCornerOf(wall.getNormal());
+            Vec3 along = Vec3.atLowerCornerOf(wall.getClockWise().getNormal());
+            return out.scale(2.4).add(along.scale((i - (n - 1) * .5) * 3));
+        }
+        float a = getYRot() * Mth.DEG_TO_RAD + i * Mth.TWO_PI / n;
         return new Vec3(Mth.cos(a) * RADIUS, 0, Mth.sin(a) * RADIUS);
     }
 
@@ -167,7 +203,7 @@ public class RitualCircle extends SpellEffectEntity {
     private LivingEntity[] onStations(ServerLevel level) {
         int n = getRitual().participants;
         LivingEntity[] out = new LivingEntity[n];
-        List<LivingEntity> near = level.getEntitiesOfClass(LivingEntity.class, new AABB(position(), position()).inflate(RADIUS + 2, 3, RADIUS + 2),
+        List<LivingEntity> near = level.getEntitiesOfClass(LivingEntity.class, new AABB(position(), position()).inflate(RADIUS + 3, 3, RADIUS + 3),
                 RitualCircle::kneeling);
         for (int i = 0; i < n; i++) {
             Vec3 s = position().add(station(i));
@@ -195,8 +231,9 @@ public class RitualCircle extends SpellEffectEntity {
     /** The players kneeling inside the circle but off its stations. */
     private List<Player> chorus(ServerLevel level, LivingEntity[] stations) {
         List<Player> out = new ArrayList<>();
-        for (Player p : level.getEntitiesOfClass(Player.class, new AABB(position(), position()).inflate(RADIUS, 2, RADIUS))) {
-            if (kneeling(p) && !contains(stations, p) && p.distanceToSqr(getX(), p.getY(), getZ()) < RADIUS * RADIUS) {
+        Vec3 middle = getWall() == null ? position() : position().add(Vec3.atLowerCornerOf(getWall().getNormal()).scale(2.4));
+        for (Player p : level.getEntitiesOfClass(Player.class, new AABB(middle, middle).inflate(RADIUS, 2, RADIUS))) {
+            if (kneeling(p) && !contains(stations, p) && p.distanceToSqr(middle.x, p.getY(), middle.z) < RADIUS * RADIUS) {
                 out.add(p);
             }
         }

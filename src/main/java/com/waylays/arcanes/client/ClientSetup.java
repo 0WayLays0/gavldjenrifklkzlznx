@@ -308,6 +308,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.RITUAL_DOME.get(), RitualDomeRenderer::new);
         event.registerEntityRenderer(ModEntities.STORM_CLOUD.get(), StormCloudRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_PORTAL.get(), RitualPortalRenderer::new);
+        event.registerEntityRenderer(ModEntities.STONE_COLOSSUS.get(), com.waylays.arcanes.client.render.StoneColossusRenderer::new);
+        event.registerEntityRenderer(ModEntities.AMETHYST_BRIDGE.get(), com.waylays.arcanes.client.render.AmethystBridgeRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaRatModel(context.bakeLayer(ManaRatModel.LAYER)), .25f, 1.2f, true));

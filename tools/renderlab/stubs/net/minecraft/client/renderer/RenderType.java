@@ -40,7 +40,7 @@ public class RenderType {
     }
 
     public static RenderType eyes(ResourceLocation tex) {
-        return new RenderType("eyes", tex, "add", false);
+        return new RenderType("eyes", tex, "add", true);
     }
 
     public static RenderType energySwirl(ResourceLocation tex, float u, float v) {

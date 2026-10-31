@@ -12,6 +12,10 @@ import com.waylays.arcanes.client.render.fire.PyreModel;
 import com.waylays.arcanes.client.render.fire.WispModel;
 import com.waylays.arcanes.client.render.fire.FireBurstModel;
 import com.waylays.arcanes.client.render.fire.FirePillarModel;
+import com.waylays.arcanes.client.render.ritual.ColossusModel;
+import com.waylays.arcanes.client.render.ritual.PortalModel;
+import com.waylays.arcanes.client.render.ritual.RitualFigureModel;
+import com.waylays.arcanes.client.render.ritual.RitualMesh;
 import com.waylays.arcanes.client.render.water.BubbleModel;
 import com.waylays.arcanes.client.render.water.GeyserModel;
 import com.waylays.arcanes.client.render.water.RainCloudModel;
@@ -181,6 +185,69 @@ public final class Scenes {
                 caster(ctx, 0, 0);
                 Vector3f o = new Vector3f();
                 PyreModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, tier, .5f, 1, 0, 6, 14, 3, LIGHT);
+            }
+            case "colossus" -> {
+                // tier: 0 standing/walking, 1 striking (age since the blow), 2 falling apart (age since)
+                husk(ctx, 0, 0, 7);
+                Vector3f o = new Vector3f(0, 0, 4);
+                int[] tint = {0x8C8C8C, 0x6E8A5A, 0xA0A0A0, 0x9A9A96, 0x4A4A50, 0x7E7A6A};
+                ColossusModel.Stones sink = (ps, kind) -> {
+                    var c = ctx.rec().getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(RitualMesh.MENHIR));
+                    RitualMesh.block(c, ps.last(), new Vector3f(), new Vector3f(1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, 0, 1), 0, 0, 0, 1, 1, 1, .5f,
+                            0xFF000000 | tint[kind], LIGHT);
+                };
+                float assembled = tier == 0 ? age : 200;
+                ColossusModel.draw(Lab.at(o), ctx.rec(), sink, Lab.view(ctx, o), assembled, tier == 0 ? age * .3f : 0, tier == 0 && age > 80 ? 1 : 0,
+                        tier == 1 ? age : 1000, tier == 2 ? age : -1, 9, LIGHT);
+            }
+            case "portal" -> {
+                caster(ctx, 1.5f, 1);
+                Vector3f o = new Vector3f(0, 0, 4);
+                float open = Math.min(1, age / 30), closing = Math.max(0, Math.min(1, (age - 200) / 30));
+                PortalModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, open, closing, 0xC27BFF, 5, LIGHT);
+            }
+            case "rite" -> {
+                // tier: the figure. Age: drawn over 60, waits 40, channels 600, then cast
+                int state;
+                float since, drawn = Math.min(1, age / 60), progress = 0;
+                if (age < 60) {
+                    state = RitualFigureModel.DRAWING;
+                    since = age;
+                } else if (age < 100) {
+                    state = RitualFigureModel.WAITING;
+                    since = age - 60;
+                } else if (age < 700) {
+                    state = RitualFigureModel.CHANNELING;
+                    since = age - 100;
+                    progress = since / 600;
+                } else {
+                    state = RitualFigureModel.DONE;
+                    since = age - 700;
+                }
+                int[] colours = {0xFF7A2E, 0x7FD8FF, 0x9FA8FF, 0xC27BFF, 0xFFE27A, 0xB8B0A0, 0xB27AFF};
+                Vector3f o = new Vector3f(0, 0, 4);
+                RitualMesh.Plane plane;
+                Vector3f[] stations;
+                if (tier == 3) {
+                    ctx.rec().box(-5, 0, 4, 5, 6, 5, 0x8A8A8A);
+                    o = new Vector3f(0, 0, 3.98f);
+                    plane = RitualMesh.Plane.wall(0, -1);
+                    stations = new Vector3f[] {new Vector3f(-1.5f, 0, -2.4f), new Vector3f(1.5f, 0, -2.4f)};
+                } else {
+                    plane = RitualMesh.Plane.ground(0);
+                    stations = new Vector3f[] {new Vector3f(3.5f, 0, 0), new Vector3f(-3.5f, 0, 0)};
+                    if (tier >= 5) {
+                        ctx.rec().box(-.5, 0, 3.5, .5, 1, 4.5, 0x3E3C48);
+                    }
+                }
+                int occupied = age >= 80 ? 3 : age >= 70 ? 1 : 0;
+                for (int i = 0; i < 2; i++) {
+                    if ((occupied & (1 << i)) != 0) {
+                        ctx.rec().box(o.x + stations[i].x - .3, 0, o.z + stations[i].z - .3, o.x + stations[i].x + .3, 1.5, o.z + stations[i].z + .3, 0x6A4A8A);
+                    }
+                }
+                RitualFigureModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), tier, plane, stations, occupied, state, since, drawn, progress, age,
+                        colours[tier], 7, LIGHT);
             }
             default -> throw new IllegalArgumentException("no scene " + scene);
         }

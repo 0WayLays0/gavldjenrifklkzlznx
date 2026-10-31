@@ -106,6 +106,22 @@ public final class Masonry {
         laid.clear();
     }
 
+    /** Takes the one block laid at {@code pos} away (if it was laid), putting back what was there. Returns whether it was. */
+    public boolean takeUp(ServerLevel level, BlockPos pos) {
+        for (int i = 0; i < laid.size(); i++) {
+            Laid l = laid.get(i);
+            if (l.pos().equals(pos)) {
+                laid.remove(i);
+                live(level).remove(l.pos());
+                if (level.isLoaded(l.pos()) && level.getBlockState(l.pos()).is(l.state().getBlock())) {
+                    level.setBlock(l.pos(), l.before(), Block.UPDATE_ALL);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void save(CompoundTag tag) {
         ListTag list = new ListTag();
         for (Laid l : laid) {

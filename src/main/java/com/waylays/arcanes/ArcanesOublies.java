@@ -6,6 +6,7 @@ import com.waylays.arcanes.registry.ModAttributes;
 import com.waylays.arcanes.registry.ModCreativeTabs;
 import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModEntities;
+import com.waylays.arcanes.registry.ModBlocks;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
@@ -31,6 +32,7 @@ public class ArcanesOublies {
         ModAttributes.ATTRIBUTES.register(modBus);
         ModSchools.SCHOOLS.register(modBus);
         ModSpells.SPELLS.register(modBus);
+        ModBlocks.BLOCKS.register(modBus);
         ModItems.ITEMS.register(modBus);
         ModEntities.ENTITIES.register(modBus);
         ModEffects.EFFECTS.register(modBus);

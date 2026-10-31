@@ -87,6 +87,10 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> RITUAL_CHALK = ITEMS.register("ritual_chalk",
             () -> new com.waylays.arcanes.ritual.RitualChalkItem(new Item.Properties().stacksTo(1).durability(32).rarity(Rarity.UNCOMMON)));
 
+    /** The Altar of Rites (see AltarOfRitesBlock). */
+    public static final DeferredHolder<Item, Item> ALTAR_OF_RITES = ITEMS.register("altar_of_rites",
+            () -> new net.minecraft.world.item.BlockItem(ModBlocks.ALTAR_OF_RITES.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
+
     private ModItems() {}
 
     /** A legendary school spellbook, like Iron's own: +10% power in its school and +200 max mana. */

@@ -15,8 +15,9 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 /**
- * The Portal: a swirling gate standing over the circle for a minute, and its twin at the anchor marked with the
- * leader's chalk. A player who steps into one comes out of the other.
+ * The Portal: a swirling gate standing upright for a minute, over the figure or in the wall it was drawn on, and its
+ * twin at the anchor marked with the leader's chalk. A player who steps into one comes out of the other, a step out in
+ * front of it (or wherever there is room). It faces its yaw.
  */
 public class RitualPortal extends RitualEntity {
     public static final int LIFE = 20 * 60;
@@ -32,15 +33,15 @@ public class RitualPortal extends RitualEntity {
     }
 
     /** Opens a portal at {@code at} leading to {@code to} in {@code toLevel}, and its twin there leading back. */
-    public static void open(ServerLevel level, Vec3 at, ServerLevel toLevel, Vec3 to, int life) {
+    public static void open(ServerLevel level, Vec3 at, float yaw, ServerLevel toLevel, Vec3 to, int life) {
         RitualPortal here = new RitualPortal(ModEntities.RITUAL_PORTAL.get(), level);
-        here.moveTo(at.x, at.y, at.z, 0, 0);
+        here.moveTo(at.x, at.y, at.z, yaw, 0);
         here.setup(life, 1, Set.of(), 1);
         here.target = to;
         here.targetLevel = toLevel.dimension();
         level.addFreshEntity(here);
         RitualPortal there = new RitualPortal(ModEntities.RITUAL_PORTAL.get(), toLevel);
-        there.moveTo(to.x, to.y, to.z, 0, 0);
+        there.moveTo(to.x, to.y, to.z, yaw, 0);
         there.setup(life, 1, Set.of(), 1);
         there.target = at;
         there.targetLevel = level.dimension();
@@ -75,11 +76,27 @@ public class RitualPortal extends RitualEntity {
                 continue;
             }
             player.getPersistentData().putLong(COOLDOWN_KEY, now + COOLDOWN);
-            // Out a step beside the twin, so as not to walk straight back in
-            Vec3 out = target.add(1.6, 0, 0);
-            player.teleportTo(destination, out.x, out.y, out.z, Set.of(), player.getYRot(), player.getXRot());
+            Vec3 out = exit(destination, player);
+            float facing = (float) Math.toDegrees(Math.atan2(-(out.x - target.x), out.z - target.z));
+            player.teleportTo(destination, out.x, out.y, out.z, Set.of(), facing, 0);
             destination.playSound(null, out.x, out.y, out.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, .8f);
         }
+    }
+
+    /**
+     * Where a player comes out of the twin: a step in front of it so as not to walk straight back in, else behind it
+     * or beside it, wherever there is room for them.
+     */
+    private Vec3 exit(ServerLevel destination, Player player) {
+        Vec3 front = Vec3.directionFromRotation(0, getYRot());
+        Vec3 side = new Vec3(-front.z, 0, front.x);
+        for (Vec3 way : new Vec3[] {front, front.reverse(), side, side.reverse()}) {
+            Vec3 out = target.add(way.scale(1.8));
+            if (destination.noCollision(player, player.getDimensions(player.getPose()).makeBoundingBox(out))) {
+                return out;
+            }
+        }
+        return target.add(front.scale(1.8));
     }
 
     @Override
