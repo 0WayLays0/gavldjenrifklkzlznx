@@ -1,6 +1,17 @@
 package renderlab;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.waylays.arcanes.client.render.fire.BrandModel;
+import com.waylays.arcanes.client.render.fire.BreathModel;
+import com.waylays.arcanes.client.render.fire.CrescentModel;
+import com.waylays.arcanes.client.render.fire.EmberBoltModel;
+import com.waylays.arcanes.client.render.fire.FlameRingModel;
+import com.waylays.arcanes.client.render.fire.NovaModel;
+import com.waylays.arcanes.client.render.fire.PhoenixModel;
+import com.waylays.arcanes.client.render.fire.PyreModel;
+import com.waylays.arcanes.client.render.fire.WispModel;
+import com.waylays.arcanes.client.render.fire.FireBurstModel;
+import com.waylays.arcanes.client.render.fire.FirePillarModel;
 import com.waylays.arcanes.client.render.water.BubbleModel;
 import com.waylays.arcanes.client.render.water.GeyserModel;
 import com.waylays.arcanes.client.render.water.RainCloudModel;
@@ -30,6 +41,11 @@ public final class Scenes {
     }
 
     public static void draw(String scene, float age, Ctx ctx) {
+        int tier = 0;
+        if (scene.contains(":")) {
+            tier = Integer.parseInt(scene.substring(scene.indexOf(':') + 1));
+            scene = scene.substring(0, scene.indexOf(':'));
+        }
         switch (scene) {
             case "jet" -> {
                 caster(ctx, 0, 0);
@@ -94,6 +110,77 @@ public final class Scenes {
                 husk(ctx, 0, 1.2f, 4);
                 Vector3f o = new Vector3f(0, 2.2f, 4);
                 BubbleModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 1.3f, 0, Math.max(0, (age - 60) / 8), 3, LIGHT);
+            }
+            case "fbolt" -> {
+                // Six bolts side by side, one of each heat
+                for (int t = 0; t < 6; t++) {
+                    Vector3f o = new Vector3f(-5 + t * 2, 1.5f, 5);
+                    EmberBoltModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, t, t * 7, LIGHT);
+                }
+            }
+            case "fburst" -> {
+                Vector3f o = new Vector3f(0, 0, 5);
+                FireBurstModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age / 20, 1.6f, tier, 3, LIGHT);
+            }
+            case "fpillar" -> {
+                caster(ctx, 0, 0);
+                for (int t = 0; t < 6; t++) {
+                    if (tier >= 0 && t != tier && scene.equals("fpillar") && tier < 6) {
+                        continue;
+                    }
+                }
+                Vector3f o = new Vector3f(0, 0, 5);
+                float warn = Math.min(1, age / 12), rise = Math.min(1, Math.max(0, (age - 12) / 5)), end = Math.min(1, Math.max(0, (age - 47) / 10));
+                FirePillarModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, warn, rise, end, 7, 1.1f, tier, 5, LIGHT);
+            }
+            case "fpillars" -> {
+                for (int t = 0; t < 6; t++) {
+                    Vector3f o = new Vector3f(-7.5f + t * 3, 0, 8);
+                    FirePillarModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 1, 1, 0, 6, 1, t, t * 5, LIGHT);
+                }
+            }
+            case "fbreath" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 0, 0, 6);
+                Vector3f o = new Vector3f();
+                BreathModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 1.3f, .7f), new Vector3f(0, -.05f, 1).normalize(), 8, age, tier, 3, LIGHT);
+            }
+            case "fring" -> {
+                caster(ctx, 0, 0);
+                Vector3f o = new Vector3f();
+                FlameRingModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 1 + age * .35f, 1.6f, Math.max(0, (age - 18) / 8), tier, 3, LIGHT);
+            }
+            case "fwisp" -> {
+                caster(ctx, 0, 0);
+                for (int t = 0; t < 6; t++) {
+                    Vector3f o = new Vector3f(-3.75f + t * 1.5f, 2.2f, 2.5f);
+                    WispModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(1, 0, 0), age + t * 5, 0, t, t * 3, LIGHT);
+                }
+            }
+            case "fcrescent" -> {
+                caster(ctx, 0, 0);
+                Vector3f o = new Vector3f(0, 1.3f, 4);
+                CrescentModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), 3.2f, .15f, age, 0, tier, 3, LIGHT);
+            }
+            case "fbrand" -> {
+                husk(ctx, 0, 0, 3);
+                Vector3f o = new Vector3f(0, 2.6f, 3);
+                BrandModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, Math.min(1, age / 60), 2.6f, tier, 3, LIGHT);
+            }
+            case "fnova" -> {
+                caster(ctx, 0, 0);
+                Vector3f o = new Vector3f();
+                NovaModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age / 24, 3 + 1.5f * tier, tier, 3, LIGHT);
+            }
+            case "fphoenix" -> {
+                caster(ctx, 0, 0);
+                Vector3f o = new Vector3f(0, 3, 6);
+                PhoenixModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 0, 0, 1, tier, 3, LIGHT);
+            }
+            case "fpyre" -> {
+                caster(ctx, 0, 0);
+                Vector3f o = new Vector3f();
+                PyreModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, tier, .5f, 1, 0, 6, 14, 3, LIGHT);
             }
             default -> throw new IllegalArgumentException("no scene " + scene);
         }

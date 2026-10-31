@@ -17,6 +17,7 @@ import com.waylays.arcanes.effect.ReactiveShieldEffect;
 import com.waylays.arcanes.effect.RuneEdgeEffect;
 import com.waylays.arcanes.effect.RustedEffect;
 import com.waylays.arcanes.effect.SilenceEffect;
+import com.waylays.arcanes.effect.StellarHeatEffect;
 import com.waylays.arcanes.effect.SunderedEffect;
 import com.waylays.arcanes.effect.VolatileBrandEffect;
 import com.waylays.arcanes.effect.WeightlessEffect;
@@ -55,6 +56,8 @@ public final class ModEffects {
     // Cosmos
     public static final DeferredHolder<MobEffect, MobEffect> WEIGHTLESS = EFFECTS.register("weightless", WeightlessEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> LOW_GRAVITY = EFFECTS.register("low_gravity", LowGravityEffect::new);
+    // Stellar Fire: how hot its caster burns
+    public static final DeferredHolder<MobEffect, MobEffect> STELLAR_HEAT = EFFECTS.register("stellar_heat", StellarHeatEffect::new);
 
     private ModEffects() {}
 }

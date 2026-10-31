@@ -20,8 +20,8 @@ public final class TidalWaveModel {
     private static final int ACROSS = 30;
     /** The body's profile, from the foot of its face up over the crest and down its back: (forward, up), a wave one high. */
     private static final float[][] BODY = {
-            {.62f, 0}, {.44f, .16f}, {.36f, .34f}, {.38f, .52f}, {.46f, .7f}, {.52f, .84f}, {.42f, .96f}, {.2f, 1.01f}, {-.1f, .97f},
-            {-.38f, .86f}, {-.68f, .68f}, {-.98f, .48f}, {-1.28f, .28f}, {-1.56f, .11f}, {-1.85f, 0}};
+            {.62f, 0}, {.44f, .16f}, {.36f, .34f}, {.38f, .52f}, {.46f, .7f}, {.52f, .84f}, {.42f, .96f}, {.2f, 1.01f}, {-.06f, .97f},
+            {-.25f, .86f}, {-.45f, .68f}, {-.65f, .48f}, {-.85f, .28f}, {-1.04f, .11f}, {-1.22f, 0}};
     private static final int TOP = 7;
     private static final int LIP = 9;
 

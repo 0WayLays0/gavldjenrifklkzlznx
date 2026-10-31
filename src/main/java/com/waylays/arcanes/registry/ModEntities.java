@@ -132,6 +132,17 @@ import com.waylays.arcanes.entity.water.Jellyfish;
 import com.waylays.arcanes.entity.water.Typhoon;
 import com.waylays.arcanes.entity.water.TidalWave;
 import com.waylays.arcanes.entity.water.AbyssalDome;
+import com.waylays.arcanes.entity.fire.FireBurst;
+import com.waylays.arcanes.entity.fire.EmberBolt;
+import com.waylays.arcanes.entity.fire.StellarBreath;
+import com.waylays.arcanes.entity.fire.Corona;
+import com.waylays.arcanes.entity.fire.FirePillar;
+import com.waylays.arcanes.entity.fire.Wisp;
+import com.waylays.arcanes.entity.fire.FlameCrescent;
+import com.waylays.arcanes.entity.fire.SearingBrand;
+import com.waylays.arcanes.entity.fire.Phoenix;
+import com.waylays.arcanes.entity.fire.Supernova;
+import com.waylays.arcanes.entity.fire.StellarPyre;
 import com.waylays.arcanes.entity.wall.BrickBolt;
 import com.waylays.arcanes.entity.wall.BrickQuake;
 import com.waylays.arcanes.entity.wall.BrickStorm;
@@ -547,6 +558,30 @@ public final class ModEntities {
             EntityType.Builder.<TidalWave>of(TidalWave::new, MobCategory.MISC).sized(2f, 2f).clientTrackingRange(16).updateInterval(1).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<AbyssalDome>> ABYSSAL_DOME = register("abyssal_dome",
             EntityType.Builder.<AbyssalDome>of(AbyssalDome::new, MobCategory.MISC).sized(2f, 2f).clientTrackingRange(20).updateInterval(40).fireImmune());
+
+    // Stellar Fire
+    public static final DeferredHolder<EntityType<?>, EntityType<FireBurst>> FIRE_BURST = register("fire_burst",
+            EntityType.Builder.<FireBurst>of(FireBurst::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<EmberBolt>> EMBER_BOLT = register("ember_bolt",
+            EntityType.Builder.<EmberBolt>of(EmberBolt::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<StellarBreath>> STELLAR_BREATH = register("stellar_breath",
+            EntityType.Builder.<StellarBreath>of(StellarBreath::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Corona>> CORONA = register("corona",
+            EntityType.Builder.<Corona>of(Corona::new, MobCategory.MISC).sized(1f, .5f).clientTrackingRange(12).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<FirePillar>> FIRE_PILLAR = register("fire_pillar",
+            EntityType.Builder.<FirePillar>of(FirePillar::new, MobCategory.MISC).sized(1.2f, 1f).clientTrackingRange(10).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Wisp>> WISP = register("will_o_wisp",
+            EntityType.Builder.<Wisp>of(Wisp::new, MobCategory.MISC).sized(.6f, .6f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<FlameCrescent>> FLAME_CRESCENT = register("flame_crescent",
+            EntityType.Builder.<FlameCrescent>of(FlameCrescent::new, MobCategory.MISC).sized(1f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<SearingBrand>> SEARING_BRAND = register("searing_brand",
+            EntityType.Builder.<SearingBrand>of(SearingBrand::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Phoenix>> PHOENIX = register("phoenix",
+            EntityType.Builder.<Phoenix>of(Phoenix::new, MobCategory.MISC).sized(1.5f, 1f).clientTrackingRange(16).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Supernova>> SUPERNOVA = register("supernova",
+            EntityType.Builder.<Supernova>of(Supernova::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(40).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<StellarPyre>> STELLAR_PYRE = register("stellar_pyre",
+            EntityType.Builder.<StellarPyre>of(StellarPyre::new, MobCategory.MISC).sized(2f, 2f).clientTrackingRange(20).updateInterval(1).fireImmune());
 
     // Cosmos
     public static final DeferredHolder<EntityType<?>, EntityType<TemporalEcho>> TEMPORAL_ECHO = register("temporal_echo",

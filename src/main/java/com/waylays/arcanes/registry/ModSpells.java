@@ -194,6 +194,16 @@ import com.waylays.arcanes.spells.rune.RunicBulwarkSpell;
 import com.waylays.arcanes.spells.rune.RunicPathSpell;
 import com.waylays.arcanes.spells.rune.SnareRuneSpell;
 import com.waylays.arcanes.spells.rune.WardRuneSpell;
+import com.waylays.arcanes.spells.fire.EmberBoltSpell;
+import com.waylays.arcanes.spells.fire.StellarBreathSpell;
+import com.waylays.arcanes.spells.fire.CoronaSpell;
+import com.waylays.arcanes.spells.fire.FirePillarsSpell;
+import com.waylays.arcanes.spells.fire.WillOWispsSpell;
+import com.waylays.arcanes.spells.fire.FlameCrescentSpell;
+import com.waylays.arcanes.spells.fire.SearingBrandSpell;
+import com.waylays.arcanes.spells.fire.PhoenixSpell;
+import com.waylays.arcanes.spells.fire.SupernovaSpell;
+import com.waylays.arcanes.spells.fire.StellarPyreSpell;
 import com.waylays.arcanes.spells.water.TideLanceSpell;
 import com.waylays.arcanes.spells.water.PressureJetSpell;
 import com.waylays.arcanes.spells.water.GeyserSpell;
@@ -429,6 +439,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> TYPHOON = register(new TyphoonSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> TIDAL_WAVE = register(new TidalWaveSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> ABYSSAL_DOME = register(new AbyssalDomeSpell());
+
+    // Stellar Fire
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> EMBER_BOLT = register(new EmberBoltSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> STELLAR_BREATH = register(new StellarBreathSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CORONA = register(new CoronaSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> FIRE_PILLARS = register(new FirePillarsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> WILL_O_WISPS = register(new WillOWispsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> FLAME_CRESCENT = register(new FlameCrescentSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SEARING_BRAND = register(new SearingBrandSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PHOENIX = register(new PhoenixSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SUPERNOVA = register(new SupernovaSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> STELLAR_PYRE = register(new StellarPyreSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

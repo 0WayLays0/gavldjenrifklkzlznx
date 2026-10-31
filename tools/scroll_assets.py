@@ -51,6 +51,8 @@ PALETTES = {
     "wood": ["d9c9a3", "e8dcbc", "f5efdc", "a8936a", "bfac83", "8fd14f", "4f9a2a", "2c5a16", "c8955a", "9a6b3c", "5e3e20"],
     # Pale sea-foam paper, the writing in deep sea blue, pearl rod ends
     "water": ["bfe4ef", "d2eef6", "e8f8fc", "8cc0d2", "a6d2e2", "2e9fe0", "1f6fb8", "0e3a66", "f4f1ea", "cfcac0", "8e887c"],
+    # Smoke-blackened paper, the writing in fire orange, brass rod ends
+    "starfire": ["4a3a34", "5c4840", "76605a", "2e2420", "3c2e2a", "ff9a3a", "f0401c", "7e1206", "e6bc72", "c4964a", "7a5a26"],
 }
 
 

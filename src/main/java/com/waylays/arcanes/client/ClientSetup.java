@@ -265,6 +265,17 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.TYPHOON.get(), com.waylays.arcanes.client.render.TyphoonRenderer::new);
         event.registerEntityRenderer(ModEntities.TIDAL_WAVE.get(), com.waylays.arcanes.client.render.TidalWaveRenderer::new);
         event.registerEntityRenderer(ModEntities.ABYSSAL_DOME.get(), com.waylays.arcanes.client.render.AbyssalDomeRenderer::new);
+        event.registerEntityRenderer(ModEntities.FIRE_BURST.get(), com.waylays.arcanes.client.render.FireBurstRenderer::new);
+        event.registerEntityRenderer(ModEntities.EMBER_BOLT.get(), com.waylays.arcanes.client.render.EmberBoltRenderer::new);
+        event.registerEntityRenderer(ModEntities.STELLAR_BREATH.get(), com.waylays.arcanes.client.render.StellarBreathRenderer::new);
+        event.registerEntityRenderer(ModEntities.CORONA.get(), com.waylays.arcanes.client.render.CoronaRenderer::new);
+        event.registerEntityRenderer(ModEntities.FIRE_PILLAR.get(), com.waylays.arcanes.client.render.FirePillarRenderer::new);
+        event.registerEntityRenderer(ModEntities.WISP.get(), com.waylays.arcanes.client.render.WispRenderer::new);
+        event.registerEntityRenderer(ModEntities.FLAME_CRESCENT.get(), com.waylays.arcanes.client.render.FlameCrescentRenderer::new);
+        event.registerEntityRenderer(ModEntities.SEARING_BRAND.get(), com.waylays.arcanes.client.render.SearingBrandRenderer::new);
+        event.registerEntityRenderer(ModEntities.PHOENIX.get(), com.waylays.arcanes.client.render.PhoenixRenderer::new);
+        event.registerEntityRenderer(ModEntities.SUPERNOVA.get(), com.waylays.arcanes.client.render.SupernovaRenderer::new);
+        event.registerEntityRenderer(ModEntities.STELLAR_PYRE.get(), com.waylays.arcanes.client.render.StellarPyreRenderer::new);
         event.registerEntityRenderer(ModEntities.GEM_SIGIL.get(), GemSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_SIGIL.get(), GoldSigilRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_COINS.get(), GoldCoinsRenderer::new);
@@ -384,6 +395,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.OSSUARY_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.SYLVAN_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.TIDE_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.STARFIRE_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }

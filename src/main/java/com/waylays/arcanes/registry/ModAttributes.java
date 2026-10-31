@@ -50,6 +50,8 @@ public final class ModAttributes {
     public static final DeferredHolder<Attribute, Attribute> WOOD_MAGIC_RESIST = resistanceAttribute("wood");
     public static final DeferredHolder<Attribute, Attribute> WATER_SPELL_POWER = powerAttribute("water");
     public static final DeferredHolder<Attribute, Attribute> WATER_MAGIC_RESIST = resistanceAttribute("water");
+    public static final DeferredHolder<Attribute, Attribute> STARFIRE_SPELL_POWER = powerAttribute("starfire");
+    public static final DeferredHolder<Attribute, Attribute> STARFIRE_MAGIC_RESIST = resistanceAttribute("starfire");
 
     private ModAttributes() {}
 

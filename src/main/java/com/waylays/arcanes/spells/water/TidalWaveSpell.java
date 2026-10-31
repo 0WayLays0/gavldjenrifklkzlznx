@@ -50,7 +50,7 @@ public class TidalWaveSpell extends WaterSpell {
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         float yaw = entity.getYRot();
-        Vec3 ahead = entity.position().add(-Mth.sin(yaw * Mth.DEG_TO_RAD) * 2.5, 0, Mth.cos(yaw * Mth.DEG_TO_RAD) * 2.5);
+        Vec3 ahead = entity.position().add(-Mth.sin(yaw * Mth.DEG_TO_RAD) * 5, 0, Mth.cos(yaw * Mth.DEG_TO_RAD) * 5);
         TidalWave.raise(level, entity, this, SpellUtil.groundAt(level, ahead, 4, 2), yaw, run(spellLevel), getPower(spellLevel, entity));
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }

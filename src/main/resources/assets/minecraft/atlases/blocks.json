@@ -22,7 +22,8 @@
         "arcanes_cosmos": "arcanes_oublies:item/scroll_palettes/cosmos",
         "arcanes_bone": "arcanes_oublies:item/scroll_palettes/bone",
         "arcanes_wood": "arcanes_oublies:item/scroll_palettes/wood",
-        "arcanes_water": "arcanes_oublies:item/scroll_palettes/water"
+        "arcanes_water": "arcanes_oublies:item/scroll_palettes/water",
+        "arcanes_starfire": "arcanes_oublies:item/scroll_palettes/starfire"
       }
     }
   ]

@@ -323,6 +323,25 @@ public final class ModSchools {
             WATER_MAGIC
     ));
 
+    /**
+     * Stellar Fire: flames that burn in the colours of the stars, hotter and stronger with each spell cast: red, orange,
+     * yellow, white, blue and violet (see {@link com.waylays.arcanes.spells.fire.Heat}).
+     */
+    public static final ResourceLocation STARFIRE_RESOURCE = ArcanesOublies.id("starfire");
+    public static final TagKey<Item> STARFIRE_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("starfire_focus"));
+    public static final ResourceKey<DamageType> STARFIRE_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("starfire_magic"));
+    public static final int STARFIRE_COLOR = 0xFF8A1E;
+
+    public static final DeferredHolder<SchoolType, SchoolType> STARFIRE = SCHOOLS.register(STARFIRE_RESOURCE.getPath(), () -> new SchoolType(
+            STARFIRE_RESOURCE,
+            STARFIRE_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".starfire").withStyle(Style.EMPTY.withColor(STARFIRE_COLOR)),
+            ModAttributes.STARFIRE_SPELL_POWER,
+            ModAttributes.STARFIRE_MAGIC_RESIST,
+            sound(SoundEvents.FIRECHARGE_USE),
+            STARFIRE_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */
