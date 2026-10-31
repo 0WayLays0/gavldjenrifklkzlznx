@@ -125,7 +125,7 @@ public class Citadel extends SpellEffectEntity {
         }
     }
 
-    /** The next tower lobs a mortar at an enemy in range. */
+    /** The next tower lobs a mortar at an enemy in range, taking them in turn from the nearest out. */
     private void shell(ServerLevel level, @Nullable LivingEntity caster) {
         AbstractSpell spell = spellId == null ? null : SpellRegistry.getSpell(spellId);
         if (spell == null || caster == null) {
@@ -135,8 +135,12 @@ public class Citadel extends SpellEffectEntity {
         if (foes.isEmpty()) {
             return;
         }
-        int t = volley++ % TOWERS;
-        LivingEntity target = foes.get(random.nextInt(foes.size()));
+        // Each volley at the next enemy out from the middle, the nearest first: inside the walls before beyond them
+        int n = volley++;
+        int t = n % TOWERS;
+        Vec3 middle = position();
+        foes.sort(java.util.Comparator.comparingDouble(e -> e.distanceToSqr(middle)));
+        LivingEntity target = foes.get(n % foes.size());
         Vec3 from = position().add(tower(t)).add(0, TOWER_HEIGHT + 1, 0);
         Vec3 to = target.position();
         int ticks = 18;
