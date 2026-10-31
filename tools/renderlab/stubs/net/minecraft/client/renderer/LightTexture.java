@@ -1,0 +1,22 @@
+package net.minecraft.client.renderer;
+
+/** Render lab stand-in for Minecraft's LightTexture packing. */
+public final class LightTexture {
+    public static final int FULL_BRIGHT = 0xF000F0;
+    public static final int FULL_SKY = 0xF00000;
+    public static final int FULL_BLOCK = 0xF0;
+
+    private LightTexture() {}
+
+    public static int pack(int block, int sky) {
+        return block << 4 | sky << 20;
+    }
+
+    public static int block(int packed) {
+        return (packed & 0xFFFF) >> 4;
+    }
+
+    public static int sky(int packed) {
+        return packed >> 20 & 0xFFFF;
+    }
+}

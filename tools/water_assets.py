@@ -325,6 +325,155 @@ def ray_texture():
     return _rgba(rgb, np.full((h, w), 255))
 
 
+# ------------------------------------------------------------------------------- the new water (pixel style)
+
+
+def _quant(t, levels):
+    return np.round(np.clip(t, 0, 1) * (levels - 1)) / (levels - 1)
+
+
+def flow_texture():
+    """32 x 32, tiling: running water, pale (tinted in game), its streaks along V the way it flows: brighter threads,
+    darker troughs, a few white glints; a little more see-through in the troughs. Shaded in bands, like a block's."""
+    S = 32
+    ys, xs = np.mgrid[0:S, 0:S]
+    threads = _tnoise(S, S, (12, 2), 201) * .6 + _tnoise(S, S, (24, 3), 202) * .4
+    swell = _tnoise(S, S, (3, 2), 203)
+    t = _quant(.55 + .55 * (threads - .5) + .25 * (swell - .5), 6)
+    rgb = _ramp(t, [(150, 186, 214), (186, 214, 236), (214, 234, 248), (240, 250, 255)])
+    rnd = np.random.default_rng(204)
+    for _ in range(14):
+        x, y, L = rnd.integers(0, S), rnd.integers(0, S), rnd.integers(2, 5)
+        for k in range(L):
+            rgb[(y + k) % S, x] = (255, 255, 255)
+    alpha = 150 + 105 * _quant(.4 + .7 * (threads - .3), 4)
+    return _rgba(rgb, alpha)
+
+
+def foam2_texture():
+    """32 x 32, tiling: white water: bubbles packed together, their rims bright, the gaps between them see-through,
+    pale blue in their shade."""
+    S = 32
+    f1, f2 = _worley(S, 26, 211)
+    rim = np.clip(1 - (f2 - f1) / .05, 0, 1)
+    fill = _tnoise(S, S, (5, 5), 212)
+    body = np.clip((fill - .32) * 2.2, 0, 1)
+    t = np.clip(rim * .85 + body * .8, 0, 1)
+    a = _quant(t, 5)
+    shade = _quant(.6 + .4 * (1 - f1 / max(1e-6, f1.max())), 4)
+    rgb = _ramp(shade, [(176, 210, 232), (214, 236, 250), (255, 255, 255)])
+    return _rgba(rgb, a ** .8 * 245)
+
+
+def spray_texture():
+    """64 x 64: four clumps of spray (2 x 2), each a churning cluster of white blobs, shaded pale blue underneath,
+    with a few loose drops round it; ragged, pixel edges."""
+    out = np.zeros((64, 64, 4))
+    for k in range(4):
+        S = 32
+        rnd = np.random.default_rng(220 + k)
+        ys, xs = np.mgrid[0:S, 0:S]
+        x, y = (xs + .5) / S - .5, (ys + .5) / S - .5
+        field = np.zeros((S, S))
+        for _ in range(7 + k):
+            cx, cy = rnd.normal(0, .12, 2)
+            r = rnd.uniform(.09, .2)
+            field = np.maximum(field, 1 - np.hypot(x - cx, y - cy) / r)
+        field += (_tnoise(S, S, (6, 6), 230 + k) - .5) * .5
+        body = field > .05
+        for _ in range(6):
+            dx, dy = rnd.uniform(-.45, .45, 2)
+            if np.hypot(dx, dy) > .3:
+                body |= np.hypot(x - dx, y - dy) < .03
+        shade = _quant(.55 - y * 1.2 + .25 * np.clip(field, 0, 1), 4)
+        rgb = _ramp(shade, [(150, 192, 222), (196, 226, 246), (236, 248, 255), (255, 255, 255)])
+        a = np.where(body, _quant(.75 + .5 * np.clip(field, 0, 1), 3), 0)
+        ox, oy = (k & 1) * 32, (k >> 1) * 32
+        out[oy:oy + S, ox:ox + S, :3] = rgb
+        out[oy:oy + S, ox:ox + S, 3] = a * 255
+    return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGBA")
+
+
+def streak_texture():
+    """8 x 32: a drop flying, drawn stretched along V: a bright round head at the top, its tail fading out."""
+    w, h = 8, 32
+    ys, xs = np.mgrid[0:h, 0:w]
+    u, v = (xs + .5) / w, (ys + .5) / h
+    width = .32 * (1 - v) ** .5 + .05
+    core = np.abs(u - .5) < width * .5
+    head = np.hypot((u - .5) * 1.0, (v - .07) * 4) < .3
+    a = np.where(core, (1 - v) ** 1.3, 0)
+    a = np.maximum(a, np.where(head, 1, 0))
+    rgb = np.dstack([np.full((h, w), 240), np.full((h, w), 250), np.full((h, w), 255)])
+    rgb[head] = 255
+    return _rgba(rgb, _quant(a, 6) * 245)
+
+
+def mist_texture():
+    """32 x 32 soft puff of mist or steam, white, thinning out at its edge."""
+    S = 32
+    ys, xs = np.mgrid[0:S, 0:S]
+    x, y = (xs + .5) / S - .5, (ys + .5) / S - .5
+    r = np.hypot(x, y) * 2
+    billow = _tnoise(S, S, (4, 4), 241)
+    a = np.clip((1 - r) * 1.4 + (billow - .5) * .6, 0, 1) ** 1.5
+    rgb = np.full((S, S, 3), 255.0)
+    return _rgba(rgb, a * 200)
+
+
+def cloud2_texture():
+    """64 x 64 puff of cumulus: billowing lobes, white where the sun catches their tops, grey underneath, ragged
+    edge; shaded in a few bands."""
+    S = 64
+    ys, xs = np.mgrid[0:S, 0:S]
+    x, y = (xs + .5) / S - .5, (ys + .5) / S - .5
+    rnd = np.random.default_rng(251)
+    field = np.zeros((S, S))
+    for _ in range(9):
+        cx, cy = rnd.uniform(-.22, .22), rnd.uniform(-.15, .2)
+        r = rnd.uniform(.14, .26)
+        field = np.maximum(field, 1 - np.hypot(x - cx, (y - cy) * 1.1) / r)
+    field += (_tnoise(S, S, (8, 8), 252) - .5) * .35
+    body = np.clip(field * 3, 0, 1)
+    light = _quant(np.clip(.65 - y * 1.6 + .25 * np.clip(field, 0, 1), 0, 1), 5)
+    rgb = _ramp(light, [(120, 130, 146), (170, 178, 192), (214, 220, 230), (244, 247, 252), (255, 255, 255)])
+    return _rgba(rgb, _quant(body, 4) * 250)
+
+
+def bolt_texture():
+    """8 x 16: a bolt of light, across U bright white-blue in its middle fading to black at its edges (additive)."""
+    w, h = 8, 16
+    u = (np.arange(w) + .5) / w
+    k = np.exp(-((u - .5) ** 2) / .03)[None, :].repeat(h, 0)
+    rgb = np.dstack([k * 230, k * 240, k * 255])
+    return _rgba(rgb, np.full((h, w), 255))
+
+
+def bubble2_texture():
+    """64 x 32 soap film (U round it, V top to bottom): bands of thin-film colour (gold, magenta, blue, green) swirling
+    over it, pale, in pixel bands; its see-through set in game."""
+    w, h = 64, 32
+    ys, xs = np.mgrid[0:h, 0:w]
+    u, v = xs / w, (ys + .5) / h
+    swirl = _tnoise(w, h, (4, 2), 261) * 1.4 + .25 * np.sin(u * math.tau * 2)
+    phase = _quant((v * 2.2 + swirl) % 1, 8)
+    stops = [(255, 236, 170), (255, 190, 214), (214, 170, 255), (164, 206, 255), (170, 240, 220), (236, 255, 190), (255, 236, 170)]
+    rgb = _ramp(phase, stops)
+    a = 150 + 80 * _quant(.5 + .5 * np.sin((v * 5 + swirl * 2) * math.tau), 3)
+    return _rgba(rgb, a)
+
+
+def rainbow_texture():
+    """32 x 8: a rainbow's bands across U (red at U 0, violet at U 1), fading at both edges; it repeats along V."""
+    w, h = 32, 8
+    u = (np.arange(w) + .5) / w
+    bands = [(232, 64, 56), (246, 140, 48), (246, 214, 64), (92, 200, 92), (64, 150, 232), (96, 88, 210), (150, 84, 200)]
+    idx = np.minimum((u - .1) / .8 * len(bands), len(bands) - 1).clip(0).astype(int)
+    rgb = np.array([bands[i] for i in idx], float)[None, :, :].repeat(h, 0)
+    a = np.clip(np.minimum(u - .05, .95 - u) * 6, 0, 1)[None, :].repeat(h, 0)
+    return _rgba(rgb, a * 255)
+
+
 # ------------------------------------------------------------------------------------------------------- the icons
 
 
@@ -620,12 +769,18 @@ def affinity_ring_water():
 
 def main():
     g.save(water_texture(), "textures/entity/water/water.png")
-    g.save(foam_texture(), "textures/entity/water/foam.png")
+    g.save(foam2_texture(), "textures/entity/water/foam.png")
+    g.save(flow_texture(), "textures/entity/water/flow.png")
+    g.save(spray_texture(), "textures/entity/water/spray.png")
+    g.save(streak_texture(), "textures/entity/water/streak.png")
+    g.save(mist_texture(), "textures/entity/water/mist.png")
+    g.save(rainbow_texture(), "textures/entity/water/rainbow.png")
+    g.save(bolt_texture(), "textures/entity/water/bolt.png")
     g.save(caustics_texture(), "textures/entity/water/caustics.png")
     g.save(drop_texture(), "textures/entity/water/drop.png")
     g.save(rain_texture(), "textures/entity/water/rain.png")
-    g.save(cloud_texture(), "textures/entity/water/cloud.png")
-    g.save(bubble_texture(), "textures/entity/water/bubble.png")
+    g.save(cloud2_texture(), "textures/entity/water/cloud.png")
+    g.save(bubble2_texture(), "textures/entity/water/bubble.png")
     g.save(jelly_texture(), "textures/entity/water/jelly.png")
     g.save(fish_texture(), "textures/entity/water/fish.png")
     g.save(manta_texture(), "textures/entity/water/manta.png")
