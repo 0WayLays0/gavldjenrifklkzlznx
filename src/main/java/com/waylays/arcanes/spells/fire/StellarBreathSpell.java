@@ -17,28 +17,20 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Stellar Breath: held, a cone of fire roars from the hand; it stokes the caster's heat as it starts and again every
- * two seconds it is held, so it burns hotter and hotter (see StellarBreath).
- */
+/** Stellar Breath: held, a cone of fire roars from the hand (see StellarBreath). */
 @AutoSpellConfig
 public class StellarBreathSpell extends StarfireSpell {
-    public static final int STOKE_TICKS = 40;
-
-    public StellarBreathSpell() {
-        super("stellar_breath", SpellRarity.UNCOMMON, 8, 10, CastType.CONTINUOUS, null);
+    public StellarBreathSpell(int tier) {
+        super("stellar_breath", tier, SpellRarity.UNCOMMON, 8, 10, CastType.CONTINUOUS, null);
         this.manaCostPerLevel = 1;
         this.baseSpellPower = 4;
         this.spellPowerPerLevel = 1;
         this.castTime = 100;
         this.baseManaCost = 4;
+        costsByHeat();
     }
 
     /** Iron's calls onCast over and over while it is held: the heat is stoked by the time held instead. */
-    @Override
-    protected int stokes() {
-        return 0;
-    }
 
     @Override
     public Optional<SoundEvent> getCastFinishSound() {
@@ -54,16 +46,12 @@ public class StellarBreathSpell extends StarfireSpell {
         return List.of(
                 heatLine(caster),
                 Component.translatable("ui.arcanes_oublies.damage_per_second", Utils.stringTruncation(damage(spellLevel, caster) * 20f / StellarBreath.HIT_TICKS, 1)),
-                Component.translatable("ui.arcanes_oublies.stokes_while_held", Utils.timeFromTicks(STOKE_TICKS, 1)),
                 Component.translatable("ui.irons_spellbooks.distance", Utils.stringTruncation(StellarBreath.RANGE, 1)));
     }
 
     @Override
     public void onServerCastTick(Level level, int spellLevel, LivingEntity entity, @org.jetbrains.annotations.Nullable MagicData playerMagicData) {
-        StellarBreath breath = StellarBreath.hold(level, entity, this, damage(spellLevel, entity), heat(entity));
-        if (breath.tickCount % STOKE_TICKS == 1) {
-            Heat.stoke(entity, 1);
-        }
+        StellarBreath.hold(level, entity, this, damage(spellLevel, entity), heat(entity));
     }
 
     @Override

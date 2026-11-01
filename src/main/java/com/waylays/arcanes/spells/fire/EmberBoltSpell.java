@@ -18,13 +18,14 @@ import java.util.List;
 /** Ember Bolt: a ball of Stellar Fire flung from the hand, bursting on what it strikes (see EmberBolt). */
 @AutoSpellConfig
 public class EmberBoltSpell extends StarfireSpell {
-    public EmberBoltSpell() {
-        super("ember_bolt", SpellRarity.COMMON, 10, 2, CastType.INSTANT, SpellAnimations.ONE_HANDED_HORIZONTAL_SWING_ANIMATION);
+    public EmberBoltSpell(int tier) {
+        super("ember_bolt", tier, SpellRarity.COMMON, 10, 2, CastType.INSTANT, SpellAnimations.ONE_HANDED_HORIZONTAL_SWING_ANIMATION);
         this.manaCostPerLevel = 2;
         this.baseSpellPower = 6;
         this.spellPowerPerLevel = 1;
         this.castTime = 0;
         this.baseManaCost = 18;
+        costsByHeat();
     }
 
     @Override

@@ -25,7 +25,7 @@ public class StellarPyreRenderer extends EntityRenderer<StellarPyre> {
         Vec3 shift = owner != null && age < StellarPyre.LIFE ? owner.getPosition(partialTicks).subtract(e.getPosition(partialTicks)) : Vec3.ZERO;
         poseStack.pushPose();
         poseStack.translate(shift.x, shift.y, shift.z);
-        PyreModel.draw(poseStack, buffer, WaterViews.of(this.entityRenderDispatcher, e, partialTicks, shift, null), age, StellarPyre.tier(age), StellarPyre.step(age),
+        PyreModel.draw(poseStack, buffer, WaterViews.of(this.entityRenderDispatcher, e, partialTicks, shift, null), age, e.getTier(), StellarPyre.stage(age), StellarPyre.step(age),
                 StellarPyre.grow(age), StellarPyre.faded(age), StellarPyre.RADIUS, StellarPyre.HEIGHT, e.getId() * 71, light);
         poseStack.popPose();
         super.render(e, entityYaw, partialTicks, poseStack, buffer, light);

@@ -25,18 +25,18 @@ public final class EmberBoltModel {
         FireMesh.halo(glow, poseStack, view, 0, 0, 0, 2.6f, FireMesh.glowOf(tier), .8f, light);
         FireMesh.halo(glow, poseStack, view, 0, 0, 0, .9f, FireMesh.core(tier), 1, light);
         // The tail: tongues of flame streaming back
-        VertexConsumer flames = FireMesh.flames(buffer, tier);
+        FireMesh.Batch fire = new FireMesh.Batch(view, tier, age, light);
         PoseStack.Pose p = poseStack.last();
         for (int k = 0; k < 14; k++) {
             float t = (age * .25f + hash(seed + k * 3)) % 1;
             Vector3f at = new Vector3f(f).mul(-t * 1.8f * grow).add((hash(seed + k) - .5f) * .2f * t, (hash(seed + k * 5) - .5f) * .2f * t, (hash(seed + k * 7) - .5f) * .2f * t);
             float h = .75f * (1 - t) + .2f;
-            FireMesh.tongue(flames, p, eye, at.x, at.y - h * .45f, at.z, h * .8f, h, 0, FireMesh.frame(age, k), argb(0xFFFFFF, 1 - t * t), light);
+            fire.lick(at.x, at.y - h * .45f, at.z, h * .8f, h, 0, seed + 31 * (k), 1 - t * t);
         }
         // Its ball of flame
         for (int k = 0; k < 4; k++) {
             float a = k * Mth.HALF_PI + age * .4f;
-            FireMesh.tongue(flames, p, eye, Mth.cos(a) * .08f, -.32f, Mth.sin(a) * .08f, .6f, .75f, Mth.sin(a) * .1f, FireMesh.frame(age, k + 7), argb(0xFFFFFF, 1), light);
+            fire.lick(Mth.cos(a) * .08f, -.32f, Mth.sin(a) * .08f, .6f, .75f, Mth.sin(a) * .1f, seed + 31 * (k + 7), 1);
         }
         // A thread of smoke behind
         VertexConsumer smoke = WaterMesh.translucent(buffer, FireMesh.SMOKE);
@@ -56,5 +56,6 @@ public final class EmberBoltModel {
             Vector3f tail = new Vector3f(head).add(new Vector3f(f).mul(.35f));
             streak(sparks, p, eye, tail, head, .07f, glow(FireMesh.core(tier), 1 - t), light);
         }
+        fire.flush(buffer, poseStack);
     }
 }

@@ -35,74 +35,60 @@ public final class PhoenixModel {
         FireMesh.halo(glow, poseStack, view, 0, 0, .2f * s, 1.8f * s, FireMesh.core(tier), alive, light);
         FireMesh.halo(glow, poseStack, view, 0, .35f * s, 1.25f * s, .8f * s, FireMesh.core(tier), alive, light);
 
-        VertexConsumer walls = FireMesh.walls(buffer, tier);
+        FireMesh.Batch fire = new FireMesh.Batch(view, tier, age, light);
         PoseStack.Pose p = poseStack.last();
-        // The wings: a surface from the leading edge (dense fire) back to the trailing edge (tongues streaming off it)
+        // The wings: flames along the leading edge streaming back across them, more off their middle
         for (int side = -1; side <= 1; side += 2) {
-            Vector3f[][] pts = new Vector3f[SPAN][CHORD];
-            float[][] u = new float[SPAN][CHORD], v = new float[SPAN][CHORD];
-            int[][] col = new int[SPAN][CHORD];
+            Vector3f[] lead = new Vector3f[SPAN], mid = new Vector3f[SPAN];
+            Vector3f[] back = new Vector3f[SPAN], back2 = new Vector3f[SPAN];
+            float[] a1 = new float[SPAN], a2 = new float[SPAN];
             for (int i = 0; i < SPAN; i++) {
                 float e = (float) i / (SPAN - 1);
                 float spanX = (.25f + 3.1f * e) * s;
                 // The wing bends as it beats: the further out, the higher (or lower) it goes
                 float lift = beat * (.25f * e + .9f * e * e) * s + .12f * Mth.sin(age * .6f + e * 4) * e * s;
-                float lead = (.55f - .5f * e * e) * s;
+                float leadZ = (.55f - .5f * e * e) * s;
                 float chord = (1.5f - 1.05f * e) * s;
-                for (int j = 0; j < CHORD; j++) {
-                    float c = (float) j / (CHORD - 1);
-                    float flutter = .08f * Mth.sin(age * .8f + i + j * 2) * c * s;
-                    pts[i][j] = new Vector3f(side * spanX, lift + flutter - .1f * c * s, lead - chord * c - .35f * e * c * s);
-                    u[i][j] = e * 2.4f + age * .02f;
-                    v[i][j] = 1 - c * .95f;
-                    col[i][j] = argb(0xFFFFFF, alive * (.95f - .15f * c));
-                }
+                lead[i] = new Vector3f(side * spanX, lift, leadZ);
+                Vector3f trail = new Vector3f(side * spanX, lift - .1f * s, leadZ - chord - .35f * e * s);
+                back[i] = new Vector3f(trail).sub(lead[i]).mul(1.35f).add(0, .1f * s, 0);
+                mid[i] = new Vector3f(lead[i]).lerp(trail, .5f);
+                back2[i] = new Vector3f(trail).sub(lead[i]).mul(.9f).add(0, .15f * s, 0);
+                a1[i] = alive;
+                a2[i] = alive * .8f;
             }
-            grid(walls, p, pts, u, v, col, light, 1);
+            fire.sheet(lead, back, a1, .2f * s, seed + side * 101);
+            fire.sheet(mid, back2, a2, .28f * s, seed + side * 307);
         }
-        // The tail: three broad streamers of fire rippling behind
+        // The tail: three streamers of fire rippling behind
         for (int k = -1; k <= 1; k++) {
             int n = 9;
-            Vector3f[][] pts = new Vector3f[n][2];
-            float[][] u = new float[n][2], v = new float[n][2];
-            int[][] col = new int[n][2];
             for (int i = 0; i < n; i++) {
                 float t = (float) i / (n - 1);
                 float ripple = Mth.sin(age * .35f - t * 5 + k) * .35f * t * s;
-                float x = (k * .35f * t * 2.2f) * s + ripple * .4f;
-                float y = (-.15f - .35f * t) * s + ripple;
-                float z = (-.6f - 3.4f * t) * s;
-                float half = (.32f + .2f * Mth.sin(t * Mth.PI)) * s;
-                pts[i][0] = new Vector3f(x - half, y, z);
-                pts[i][1] = new Vector3f(x + half, y, z);
-                for (int j = 0; j < 2; j++) {
-                    u[i][j] = j * .6f + k * .3f;
-                    v[i][j] = 1 - t * .95f;
-                    col[i][j] = argb(0xFFFFFF, alive * (1 - t * .3f));
-                }
+                Vector3f at = new Vector3f((k * .35f * t * 2.2f) * s + ripple * .4f, (-.15f - .35f * t) * s + ripple, (-.6f - 3.4f * t) * s);
+                Vector3f dir = new Vector3f(k * .25f, -.1f + .2f * Mth.cos(age * .35f - t * 5 + k), -1).normalize();
+                fire.lickAlong(at, dir, (.55f + .3f * Mth.sin(t * Mth.PI)) * s, (.9f - .3f * t) * s, seed + 500 + k * 37 + i, alive * (1 - t * .3f));
             }
-            grid(walls, p, pts, u, v, col, light, 1);
         }
         // Its body and head of flame, the crest, the long primaries at each wingtip
-        VertexConsumer flames = FireMesh.flames(buffer, tier);
         p = poseStack.last();
         Vector3f back = new Vector3f(0, .1f, -1).normalize();
         for (int k = 0; k < 8; k++) {
             float z = (-.6f + 1.9f * k / 7) * s;
             float h = (1.2f - .35f * Math.abs(k - 4) / 4) * s;
-            FireMesh.tongueAlong(flames, p, eye, new Vector3f(0, -.15f * s, z + h * .35f), back, h * .75f, h, FireMesh.frame(age, k), argb(0xFFFFFF, alive), light);
+            fire.lickAlong(new Vector3f(0, -.15f * s, z + h * .35f), back, h * .75f, h, seed + 31 * (k), alive);
         }
         for (int k = 0; k < 3; k++) {
             Vector3f dir = new Vector3f((k - 1) * .35f, .8f, -.5f).normalize();
-            FireMesh.tongueAlong(flames, p, eye, new Vector3f(0, .35f * s, 1.2f * s), dir, .35f * s, (.9f - .2f * Math.abs(k - 1)) * s, FireMesh.frame(age, k + 3),
-                    argb(0xFFFFFF, alive), light);
+            fire.lickAlong(new Vector3f(0, .35f * s, 1.2f * s), dir, .35f * s, (.9f - .2f * Math.abs(k - 1)) * s, seed + 31 * (k + 3), alive);
         }
         for (int side = -1; side <= 1; side += 2) {
             float tipLift = beat * 1.15f * s;
             for (int k = 0; k < 4; k++) {
                 Vector3f at = new Vector3f(side * 3.2f * s, tipLift, (.05f - .3f * k) * s);
                 Vector3f dir = new Vector3f(side * .55f, beat * .2f, -1 - .2f * k).normalize();
-                FireMesh.tongueAlong(flames, p, eye, at, dir, .4f * s, (1.3f - .15f * k) * s, FireMesh.frame(age, k + 5), argb(0xFFFFFF, alive), light);
+                fire.lickAlong(at, dir, .4f * s, (1.3f - .15f * k) * s, seed + 31 * (k + 5), alive);
             }
         }
         // Flames shed off it, sparks in its wake
@@ -110,7 +96,7 @@ public final class PhoenixModel {
             float t = (age * .15f + hash(seed + k * 3)) % 1;
             Vector3f c = new Vector3f((hash(seed + k * 5) - .5f) * 5 * s, -.6f * t * s, -(.5f + 3.5f * t) * s);
             float h = .7f * (1 - t) * s;
-            FireMesh.tongue(flames, p, eye, c.x, c.y - h * .4f, c.z, h * .7f, h, 0, FireMesh.frame(age, k + 4), argb(0xFFFFFF, (1 - t) * alive), light);
+            fire.lick(c.x, c.y - h * .4f, c.z, h * .7f, h, 0, seed + 31 * (k + 4), (1 - t) * alive);
         }
         VertexConsumer sparks = FireMesh.light(buffer, FireMesh.SPARK);
         p = poseStack.last();
@@ -119,5 +105,6 @@ public final class PhoenixModel {
             Vector3f head = new Vector3f((hash(seed + k * 11) - .5f) * 6 * s, -1.5f * t * t * s, -(1 + 5 * t) * s);
             streak(sparks, p, eye, head, new Vector3f(head).add(0, .35f, .25f), .07f, glow(FireMesh.core(tier), (1 - t) * alive), light);
         }
+        fire.flush(buffer, poseStack);
     }
 }

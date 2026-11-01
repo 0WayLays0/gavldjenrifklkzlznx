@@ -20,13 +20,14 @@ import java.util.List;
 public class WillOWispsSpell extends StarfireSpell {
     public static final int LIFE = 400;
 
-    public WillOWispsSpell() {
-        super("will_o_wisps", SpellRarity.RARE, 6, 20, CastType.INSTANT, SpellAnimations.SELF_CAST_ANIMATION);
+    public WillOWispsSpell(int tier) {
+        super("will_o_wisps", tier, SpellRarity.RARE, 6, 20, CastType.INSTANT, SpellAnimations.SELF_CAST_ANIMATION);
         this.manaCostPerLevel = 8;
         this.baseSpellPower = 6;
         this.spellPowerPerLevel = 1;
         this.castTime = 0;
         this.baseManaCost = 50;
+        costsByHeat();
     }
 
     public static int count(int spellLevel) {

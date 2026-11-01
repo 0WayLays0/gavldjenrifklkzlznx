@@ -33,7 +33,7 @@ public final class BreathModel {
             FireMesh.halo(glow, poseStack, view, c.x, c.y, c.z, 1.6f + d * .9f, FireMesh.glowOf(tier), .55f * (1 - (float) k / 7), light);
         }
         // Tongues tumbling out along it, spreading
-        VertexConsumer flames = FireMesh.flames(buffer, tier);
+        FireMesh.Batch fire = new FireMesh.Batch(view, tier, age, light);
         PoseStack.Pose p = poseStack.last();
         for (int k = 0; k < 56; k++) {
             float t = (age * .14f + hash(seed + k * 3)) % 1;
@@ -45,8 +45,7 @@ public final class BreathModel {
             // Carried along the stream, rising a little as it slows
             Vector3f along = new Vector3f(dir).add(0, .25f + .6f * t, 0).normalize();
             float h = .5f + 1.6f * t * (.7f + .6f * hash(seed + k));
-            FireMesh.tongueAlong(flames, p, eye, new Vector3f(c).sub(new Vector3f(along).mul(h * .35f)), along, h * .7f, h, FireMesh.frame(age, k),
-                    argb(0xFFFFFF, Math.min(1, (1 - t) * 1.6f)), light);
+            fire.lickAlong(new Vector3f(c).sub(new Vector3f(along).mul(h * .35f)), along, h * .7f, h, seed + 31 * (k), Math.min(1, (1 - t) * 1.6f));
         }
         // Smoke curling off its far end
         VertexConsumer smoke = WaterMesh.translucent(buffer, FireMesh.SMOKE);
@@ -67,5 +66,6 @@ public final class BreathModel {
             Vector3f tail = new Vector3f(head).sub(new Vector3f(dir).mul(.6f));
             streak(sparks, p, eye, head, tail, .07f, glow(FireMesh.core(tier), 1 - t), light);
         }
+        fire.flush(buffer, poseStack);
     }
 }

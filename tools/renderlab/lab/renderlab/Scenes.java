@@ -184,7 +184,7 @@ public final class Scenes {
             case "fpyre" -> {
                 caster(ctx, 0, 0);
                 Vector3f o = new Vector3f();
-                PyreModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, tier, .5f, 1, 0, 6, 14, 3, LIGHT);
+                PyreModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, tier, Math.min(5, (int) (age / 40)), .5f, 1, 0, 6, 14, 3, LIGHT);
             }
             case "colossus" -> {
                 // tier: 0 standing/walking, 1 striking (age since the blow), 2 falling apart (age since)

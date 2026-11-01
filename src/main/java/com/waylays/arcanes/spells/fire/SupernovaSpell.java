@@ -19,18 +19,19 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 /**
- * Supernova: all the caster's heat let go at once in a blast of flame round them, the wider and stronger the hotter
- * they burned (from a red puff to a violet blast); their heat is spent (see Supernova).
+ * Supernova: a blast of flame round the caster, the wider and stronger the hotter its heat (from a red flare to a
+ * violet blast, see Supernova).
  */
 @AutoSpellConfig
 public class SupernovaSpell extends StarfireSpell {
-    public SupernovaSpell() {
-        super("supernova", SpellRarity.EPIC, 5, 25, CastType.INSTANT, SpellAnimations.SELF_CAST_ANIMATION);
+    public SupernovaSpell(int tier) {
+        super("supernova", tier, SpellRarity.EPIC, 5, 25, CastType.INSTANT, SpellAnimations.SELF_CAST_ANIMATION);
         this.manaCostPerLevel = 12;
         this.baseSpellPower = 8;
         this.spellPowerPerLevel = 2;
         this.castTime = 0;
         this.baseManaCost = 80;
+        costsByHeat();
     }
 
     public static float radius(int tier) {
@@ -38,19 +39,14 @@ public class SupernovaSpell extends StarfireSpell {
     }
 
     public float blast(int spellLevel, LivingEntity caster) {
-        return getPower(spellLevel, caster) * (1 + .5f * heat(caster));
+        return getPower(spellLevel, caster) * (1 + .5f * tier);
     }
 
-    @Override
-    protected int stokes() {
-        return 0;
-    }
 
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 heatLine(caster),
-                Component.translatable("ui.arcanes_oublies.spends_heat"),
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(blast(spellLevel, caster), 1)),
                 Component.translatable("ui.irons_spellbooks.radius", Utils.stringTruncation(radius(heat(caster)), 1)));
     }
@@ -67,9 +63,6 @@ public class SupernovaSpell extends StarfireSpell {
             double resist = 1 - Mth.clamp(e.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 0, 1);
             e.setDeltaMovement(away.scale((.8 + .2 * tier) * resist).add(0, .45 * resist, 0));
             e.hurtMarked = true;
-        }
-        if (!level.isClientSide) {
-            Heat.quench(entity);
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }

@@ -18,13 +18,14 @@ import java.util.List;
 /** Corona: a ring of fire races out from the caster over the ground, burning and throwing back all it passes (see Corona). */
 @AutoSpellConfig
 public class CoronaSpell extends StarfireSpell {
-    public CoronaSpell() {
-        super("corona", SpellRarity.UNCOMMON, 8, 12, CastType.INSTANT, SpellAnimations.SELF_CAST_ANIMATION);
+    public CoronaSpell(int tier) {
+        super("corona", tier, SpellRarity.UNCOMMON, 8, 12, CastType.INSTANT, SpellAnimations.SELF_CAST_ANIMATION);
         this.manaCostPerLevel = 5;
         this.baseSpellPower = 6;
         this.spellPowerPerLevel = 1;
         this.castTime = 0;
         this.baseManaCost = 40;
+        costsByHeat();
     }
 
     public static float radius(int spellLevel) {

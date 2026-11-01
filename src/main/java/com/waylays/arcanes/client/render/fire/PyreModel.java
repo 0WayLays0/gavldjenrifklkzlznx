@@ -23,13 +23,13 @@ public final class PyreModel {
      * {@code grow} (0 to 1) how far it has risen, {@code fade} (0 to 1) how far it has died away; {@code radius},
      * {@code height} its full size.
      */
-    public static void draw(PoseStack poseStack, MultiBufferSource buffer, View view, float age, int tier, float step, float grow, float fade, float radius,
-                            float height, int seed, int light) {
+    public static void draw(PoseStack poseStack, MultiBufferSource buffer, View view, float age, int tier, int stage, float step, float grow, float fade,
+                            float radius, float height, int seed, int light) {
         Vector3f eye = view.eye();
         float alive = (1 - fade) * grow;
-        float h = height * (.6f + .08f * tier) * grow * (1 - .5f * fade);
+        float h = height * (.6f + .08f * stage) * grow * (1 - .5f * fade);
         float flare = Math.max(0, 1 - step * 5);
-        float spin = age * (.06f + .012f * tier);
+        float spin = age * (.06f + .012f * stage);
         // Its light
         VertexConsumer glow = FireMesh.light(buffer, FireMesh.GLOW);
         for (int k = 0; k < 5; k++) {
@@ -39,44 +39,43 @@ public final class PyreModel {
         VertexConsumer ring = FireMesh.light(buffer, FireMesh.RING);
         FireMesh.groundRing(ring, poseStack.last(), .06f, radius * 1.16f, FireMesh.core(tier), alive, light);
         // Three walls of flame wound round it in a spiral
-        VertexConsumer walls = FireMesh.walls(buffer, tier);
+        FireMesh.Batch fire = new FireMesh.Batch(view, tier, age, light);
         PoseStack.Pose p = poseStack.last();
         int n = 40;
         for (int arm = 0; arm < 3; arm++) {
             Vector3f[] base = new Vector3f[n];
             float[] hh = new float[n];
-            int[] col = new int[n];
+            float[] col = new float[n];
             for (int i = 0; i < n; i++) {
                 float u = (float) i / (n - 1);
                 float a = arm * Mth.TWO_PI / 3 + spin + u * 4.5f;
                 float r = radius * (.35f + .65f * u) * (1 + .08f * Mth.sin(age * .2f + u * 7));
                 base[i] = new Vector3f(Mth.cos(a) * r, u * h * .8f, Mth.sin(a) * r);
                 hh[i] = h * .32f * (.7f + .3f * Mth.sin(u * Mth.PI));
-                col[i] = argb(0xFFFFFF, .9f * alive * Mth.clamp(Math.min(u, 1 - u) * 6, 0, 1));
+                col[i] = .9f * alive * Mth.clamp(Math.min(u, 1 - u) * 6, 0, 1);
             }
-            FireMesh.curtain(walls, p, base, hh, col, 1.6f, age * .03f, light);
+            fire.curtain(base, hh, col, .8f, seed + arm * 1000);
         }
         // The ring of fire at its foot
         Vector3f[] base = new Vector3f[49];
         float[] hh = new float[49];
-        int[] col = new int[49];
+        float[] col = new float[49];
         for (int i = 0; i <= 48; i++) {
             float a = i * Mth.TWO_PI / 48;
             base[i] = new Vector3f(Mth.cos(a) * radius, 0, Mth.sin(a) * radius);
-            hh[i] = (1.4f + .8f * noise(a * 3, age * .15f, seed)) * alive;
-            col[i] = argb(0xFFFFFF, .95f * alive);
+            hh[i] = (1.6f + .9f * noise(a * 3, age * .15f, seed)) * alive;
+            col[i] = .95f * alive;
         }
-        FireMesh.curtain(walls, p, base, hh, col, 1.3f, -age * .02f, light);
+        fire.curtain(base, hh, col, .7f, seed + 5000);
         // Tongues streaming up it in a whirl
-        VertexConsumer flames = FireMesh.flames(buffer, tier);
         p = poseStack.last();
-        for (int k = 0; k < 70; k++) {
+        for (int k = 0; k < 40; k++) {
             float t = (age * .05f + hash(seed + k * 3)) % 1;
             float a = hash(seed + k * 5) * Mth.TWO_PI + spin * 2 + t * 5;
             float r = radius * (.3f + .8f * t) * (.6f + .5f * hash(seed + k * 7));
             float y = h * t;
             float th = (1.2f + 1.6f * hash(seed + k)) * (1 - t * .4f) * (1 + .4f * flare);
-            FireMesh.tongue(flames, p, eye, Mth.cos(a) * r, y, Mth.sin(a) * r, th * .6f, th, 0, FireMesh.frame(age, k), argb(0xFFFFFF, (1 - t * t) * alive), light);
+            fire.lick(Mth.cos(a) * r, y, Mth.sin(a) * r, th * .6f, th, 0, seed + 31 * (k), (1 - t * t) * alive);
         }
         // Smoke only while it burns cool
         VertexConsumer smoke = WaterMesh.translucent(buffer, FireMesh.SMOKE);
@@ -98,5 +97,6 @@ public final class PyreModel {
             Vector3f tail = new Vector3f(Mth.cos(a - .25f) * r, head.y - .5f, Mth.sin(a - .25f) * r);
             streak(sparks, p, eye, head, tail, .1f, glow(FireMesh.core(tier), (1 - t) * alive), light);
         }
+        fire.flush(buffer, poseStack);
     }
 }

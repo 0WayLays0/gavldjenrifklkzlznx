@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Stellar Fire art: tongues of flame and curtains of fire in each of the six heats (red, orange, yellow, white, blue,
-violet: the colours of the star classes M, K, G, F, B and O), a halo, a spark, smoke, a ring of light, the heat
-effect's icon, the spell icons, the Starfire Codex (icon and 3D book texture) and its affinity ring.
+"""Stellar Fire art: the filaments flames are drawn with (tinted in game in each of the six heats: red, orange, yellow,
+white, blue, violet, the colours of the star classes M, K, G, F, B and O), an ember, a halo, a spark, smoke, a ring of
+light, each spell's icon in each heat, the Starfire Codex (icon and 3D book texture) and its affinity ring.
 
 Called by gen_assets.py (run that one). Pixel style, shaded in bands. Original art.
 """
@@ -21,56 +21,65 @@ SOOT = (40, 30, 28)
 NIGHT = (14, 10, 12)
 
 
-def _heat_ramp(T, tier):
-    """Colour of a flame by its temperature (0 its cool edge, 1 its white heart) for a heat."""
-    return _ramp(T, [TIP[tier], TIP[tier], BODY[tier], BODY[tier], CORE[tier]])
+def _vnoise(x, y, cx, cy, seed):
+    """Smooth value noise at (x, y) in [0, 1) (both tile), cx by cy cells, in [0, 1]."""
+    grid = np.random.default_rng(seed).random((cy, cx))
+    gx, gy = (x % 1) * cx, (y % 1) * cy
+    x0, y0 = np.floor(gx).astype(int), np.floor(gy).astype(int)
+    fx, fy = gx - x0, gy - y0
+    fx, fy = fx * fx * (3 - 2 * fx), fy * fy * (3 - 2 * fy)
+    x1, y1 = (x0 + 1) % cx, (y0 + 1) % cy
+    x0, y0 = x0 % cx, y0 % cy
+    return (grid[y0, x0] * (1 - fx) + grid[y0, x1] * fx) * (1 - fy) + (grid[y1, x0] * (1 - fx) + grid[y1, x1] * fx) * fy
 
 
-def _tongue_field(S, seed, lean=0.0):
-    """One tongue of flame, S x S: its temperature 0 to 1, wide and hot at its foot, licking up into split tips."""
+def _fbm(x, y, seed, cx=3, cy=2, octaves=4):
+    out, amp, total = 0, 1, 0
+    for o in range(octaves):
+        out = out + amp * _vnoise(x, y, cx << o, cy << o, seed + o)
+        total += amp
+        amp *= .5
+    return out / total
+
+
+def _fire_field(W, H, seed):
+    """Turbulent flame filaments, tiling: bright licks running up V, twisting and breaking, 0 to 1."""
+    ys, xs = np.mgrid[0:H, 0:W]
+    u, v = (xs + .5) / W, (ys + .5) / H
+    # Warp the space twice, more across than along (flames stream up, twisting)
+    w1 = _fbm(u, v, seed, 2, 2, 3)
+    w2 = _fbm(u + .3, v + .7, seed + 10, 2, 2, 3)
+    x = u + (w1 - .5) * .55
+    y = v + (w2 - .5) * .25
+    n = _fbm(x, y, seed + 20, 3, 2, 4)
+    ridge = 1 - np.abs(n * 2 - 1)
+    lick = np.clip((ridge - .62) / .36, 0, 1) ** 1.3
+    fine = _fbm(x, y, seed + 30, 6, 3, 3)
+    f = lick * (.7 + .5 * fine) + .18 * np.clip(fine * 2 - .8, 0, 1)
+    return np.clip(f, 0, 1)
+
+
+def flame_noise_texture():
+    """32 x 64, tiling both ways: flame filaments, white on black (drawn added, tinted per vertex, scrolled up)."""
+    f = _quant(_fire_field(32, 64, 801), 10)
+    return _rgba(np.dstack([f * 255] * 3), np.full((64, 32), 255))
+
+
+def flame_body_texture():
+    """32 x 64, tiling both ways: the body of a flame, white (tinted per vertex), its see-through-ness following the
+    filaments, so that it has substance in daylight (drawn see-through, scrolled up)."""
+    f = _fire_field(32, 64, 811)
+    a = _quant(np.clip(.35 + f * .9, 0, 1), 8)
+    return _rgba(np.full((64, 32, 3), 255.0), a * 255)
+
+
+def ember_texture():
+    """16 x 16 ember: a hot point in a soft glow, white on black (drawn added)."""
+    S = 16
     ys, xs = np.mgrid[0:S, 0:S]
-    x = (xs + .5) / S * 2 - 1
-    y = 1 - (ys + .5) / S
-    n1 = _tnoise(S, S, (4, 3), seed) - .5
-    n2 = _tnoise(S, S, (8, 6), seed + 1) - .5
-    disp = n1 * .5 * y + lean * y * y
-    width = .62 * np.clip(1 - y, 0, 1) ** .65 + .04
-    shape = np.clip(1 - np.abs(x - disp) / width, 0, 1)
-    holes = np.clip(n2 * 2.2 * y, 0, 1)
-    T = np.clip(shape * (1.15 - .75 * y) - holes * .8, 0, 1)
-    return T
-
-
-def flame_texture(tier):
-    """64 x 64: four tongues of flame (2 x 2 frames) in the colours of a heat, each flickering differently."""
-    out = np.zeros((64, 64, 4))
-    for k in range(4):
-        T = _tongue_field(32, 300 + k * 7, lean=(k - 1.5) * .15)
-        Tq = _quant(T, 6)
-        rgb = _heat_ramp(Tq, tier)
-        a = np.where(T > .08, _quant(np.clip(T * 2.2, 0, 1), 4), 0)
-        ox, oy = (k & 1) * 32, (k >> 1) * 32
-        out[oy:oy + 32, ox:ox + 32, :3] = rgb
-        out[oy:oy + 32, ox:ox + 32, 3] = a * 255
-    return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGBA")
-
-
-def wall_texture(tier):
-    """32 x 32, tiling along U: a curtain of fire, dense and white-hot at its foot (V 1), licking up into tips (V 0)."""
-    S = 32
-    ys, xs = np.mgrid[0:S, 0:S]
-    u = xs / S
-    y = 1 - (ys + .5) / S
-    n1 = _tnoise(S, S, (6, 3), 331)
-    n2 = _tnoise(S, S, (12, 6), 332)
-    tongues = .5 + .5 * np.sin((u * 4 + (n1 - .5) * .6) * math.tau)
-    height = .45 + .45 * tongues + .2 * (n2 - .5)
-    T = np.clip((height - y) / np.maximum(height, .1) * 1.3, 0, 1)
-    T = np.clip(T - np.clip((n2 - .55) * 2.5 * y, 0, 1), 0, 1)
-    Tq = _quant(T, 6)
-    rgb = _heat_ramp(Tq, tier)
-    a = np.where(T > .06, _quant(np.clip(T * 2, 0, 1), 4), 0)
-    return _rgba(rgb, a * 255)
+    r = np.hypot((xs + .5) / S - .5, (ys + .5) / S - .5) * 2
+    k = np.clip(1 - r * 3, 0, 1) ** .7 + .45 * np.clip(1 - r, 0, 1) ** 2.5
+    return _rgba(np.dstack([_quant(np.clip(k, 0, 1), 8) * 255] * 3), np.full((S, S), 255))
 
 
 def glow_texture():
@@ -149,123 +158,128 @@ def _glow(img, S, x, y, r, tier, k=1.0):
     g.glow_spot(img, x * S, y * S, r * S, CORE[tier], k)
 
 
-def ember_bolt_icon():
+def _bg(t):
+    """An icon's dark ground, tinged with the heat's colour."""
+    return tuple(int(NIGHT[i] * .55 + TIP[t][i] * .32) for i in range(3))
+
+
+def ember_bolt_icon(t):
     def draw(d, img, S):
         for k in range(5):
-            t = k / 4
-            _tongue(d, S, .26 + .3 * t, .72 - .3 * t, .2 - .03 * k, .3, 1, lean=-.6)
-        d.ellipse((.56 * S, .2 * S, .84 * S, .48 * S), fill=_a(BODY[1]))
-        d.ellipse((.62 * S, .26 * S, .78 * S, .42 * S), fill=_a(CORE[1]))
-        _glow(img, S, .7, .34, .22, 1)
-    return _icon(draw, .65, .35)
+            u = k / 4
+            _tongue(d, S, .26 + .3 * u, .72 - .3 * u, .2 - .03 * k, .3, t, lean=-.6)
+        d.ellipse((.56 * S, .2 * S, .84 * S, .48 * S), fill=_a(BODY[t]))
+        d.ellipse((.62 * S, .26 * S, .78 * S, .42 * S), fill=_a(CORE[t]))
+        _glow(img, S, .7, .34, .22, t)
+    return _icon(draw, .65, .35, _bg(t))
 
 
-def stellar_breath_icon():
+def stellar_breath_icon(t):
     def draw(d, img, S):
         d.ellipse((.04 * S, .42 * S, .2 * S, .6 * S), fill=_a((120, 90, 80)))
         for k in range(9):
-            t = k / 8
-            _tongue(d, S, .2 + .65 * t, .62 + .1 * math.sin(k * 2.3), .12 + .18 * t, .18 + .3 * t, 2 if k < 3 else (1 if k < 6 else 0), lean=-.3)
-        _glow(img, S, .22, .5, .16, 3)
-    return _icon(draw, .3, .5)
+            u = k / 8
+            _tongue(d, S, .2 + .65 * u, .62 + .1 * math.sin(k * 2.3), .12 + .18 * u, .18 + .3 * u, t, lean=-.3)
+        _glow(img, S, .22, .5, .16, t)
+    return _icon(draw, .3, .5, _bg(t))
 
 
-def corona_icon():
+def corona_icon(t):
     def draw(d, img, S):
-        d.ellipse((.12 * S, .5 * S, .88 * S, .9 * S), outline=_a(BODY[4]), width=max(2, S // 16))
+        d.ellipse((.12 * S, .5 * S, .88 * S, .9 * S), outline=_a(BODY[t]), width=max(2, S // 16))
         for k in range(12):
             a = k * math.tau / 12
             x, y = .5 + math.cos(a) * .38, .7 + math.sin(a) * .2
-            _tongue(d, S, x, y, .1, .22 + .08 * math.sin(a), 4)
-        _glow(img, S, .5, .66, .2, 4, .8)
+            _tongue(d, S, x, y, .1, .22 + .08 * math.sin(a), t)
+        _glow(img, S, .5, .66, .2, t, .8)
         d.rectangle((.46 * S, .5 * S, .54 * S, .7 * S), fill=_a((90, 70, 110)))
-    return _icon(draw, .5, .65, (16, 24, 52))
+    return _icon(draw, .5, .65, _bg(t))
 
 
-def fire_pillars_icon():
+def fire_pillars_icon(t):
     def draw(d, img, S):
         d.rectangle((0, .86 * S, S, S), fill=_a((50, 36, 30)))
         for k, (x, h) in enumerate(((.2, .45), (.45, .62), (.72, .78))):
-            _tongue(d, S, x, .88, .2, h, 2 + (k == 2))
-            _glow(img, S, x, .86, .1, 2)
-    return _icon(draw, .5, .7)
+            _tongue(d, S, x, .88, .2, h, t)
+            _glow(img, S, x, .86, .1, t)
+    return _icon(draw, .5, .7, _bg(t))
 
 
-def will_o_wisps_icon():
+def will_o_wisps_icon(t):
     def draw(d, img, S):
-        for x, y, t in ((.28, .62, 1), (.7, .4, 4), (.42, .3, 5)):
+        for x, y in ((.28, .62), (.7, .4), (.42, .3)):
             _tongue(d, S, x, y + .1, .14, .22, t)
             _glow(img, S, x, y, .12, t, 1.2)
-        d.arc((.15 * S, .2 * S, .85 * S, .8 * S), 200, 340, fill=_a((255, 210, 150), 120), width=max(1, S // 40))
-    return _icon(draw, .5, .5, (20, 16, 36))
+        d.arc((.15 * S, .2 * S, .85 * S, .8 * S), 200, 340, fill=_a(CORE[t], 120), width=max(1, S // 40))
+    return _icon(draw, .5, .5, _bg(t))
 
 
-def flame_crescent_icon():
+def flame_crescent_icon(t):
     def draw(d, img, S):
         for k, w in enumerate((.11, .07, .035)):
-            col = (BODY[2], (255, 236, 160), CORE[2])[k]
+            col = (BODY[t], tuple((BODY[t][i] + CORE[t][i]) // 2 for i in range(3)), CORE[t])[k]
             d.arc((.12 * S, .16 * S, .9 * S, .94 * S), 200, 340, fill=_a(col), width=max(1, int(w * S)))
         for k in range(6):
             a = math.radians(205 + k * 25)
             x, y = .51 + math.cos(a) * .39, .55 + math.sin(a) * .39
-            _tongue(d, S, x, y + .12, .09, .14, 2, lean=-.3)
-    return _icon(draw, .5, .4)
+            _tongue(d, S, x, y + .12, .09, .14, t, lean=-.3)
+    return _icon(draw, .5, .4, _bg(t))
 
 
-def searing_brand_icon():
+def searing_brand_icon(t):
     def draw(d, img, S):
         d.rectangle((.42 * S, .52 * S, .58 * S, .92 * S), fill=_a((92, 80, 64)))
         d.ellipse((.4 * S, .4 * S, .6 * S, .56 * S), fill=_a((110, 96, 76)))
-        d.ellipse((.18 * S, .14 * S, .82 * S, .34 * S), outline=_a(BODY[3]), width=max(2, S // 20))
+        d.ellipse((.18 * S, .14 * S, .82 * S, .34 * S), outline=_a(BODY[t]), width=max(2, S // 20))
         for k in range(6):
             a = k * math.tau / 6
-            d.line((.5 * S, .24 * S, (.5 + math.cos(a) * .3) * S, (.24 + math.sin(a) * .09) * S), fill=_a(CORE[3]), width=max(1, S // 40))
-        _glow(img, S, .5, .24, .2, 3, 1.2)
+            d.line((.5 * S, .24 * S, (.5 + math.cos(a) * .3) * S, (.24 + math.sin(a) * .09) * S), fill=_a(CORE[t]), width=max(1, S // 40))
+        _glow(img, S, .5, .24, .2, t, 1.2)
         for x in (.3, .7):
-            _tongue(d, S, x, .3, .08, .12, 3)
-    return _icon(draw, .5, .3)
+            _tongue(d, S, x, .3, .08, .12, t)
+    return _icon(draw, .5, .3, _bg(t))
 
 
-def phoenix_icon():
+def phoenix_icon(t):
     def draw(d, img, S):
         for side in (-1, 1):
             for k in range(5):
-                t = k / 4
-                pts = [(.5 * S, .5 * S), ((.5 + side * (.15 + .3 * t)) * S, (.2 + .2 * t) * S), ((.5 + side * (.2 + .28 * t)) * S, (.32 + .2 * t) * S)]
-                d.polygon(pts, fill=_a(BODY[0] if k % 2 else TIP[0]))
+                u = k / 4
+                pts = [(.5 * S, .5 * S), ((.5 + side * (.15 + .3 * u)) * S, (.2 + .2 * u) * S), ((.5 + side * (.2 + .28 * u)) * S, (.32 + .2 * u) * S)]
+                d.polygon(pts, fill=_a(BODY[t] if k % 2 else TIP[t]))
         for k in range(3):
-            _tongue(d, S, .5 + (k - 1) * .06, .95, .1, .38, 1, lean=(k - 1) * .2)
-        d.ellipse((.42 * S, .4 * S, .58 * S, .62 * S), fill=_a(BODY[1]))
-        d.ellipse((.45 * S, .3 * S, .55 * S, .42 * S), fill=_a(CORE[1]))
-        _glow(img, S, .5, .45, .18, 1, 1.2)
-    return _icon(draw, .5, .45)
+            _tongue(d, S, .5 + (k - 1) * .06, .95, .1, .38, t, lean=(k - 1) * .2)
+        d.ellipse((.42 * S, .4 * S, .58 * S, .62 * S), fill=_a(BODY[t]))
+        d.ellipse((.45 * S, .3 * S, .55 * S, .42 * S), fill=_a(CORE[t]))
+        _glow(img, S, .5, .45, .18, t, 1.2)
+    return _icon(draw, .5, .45, _bg(t))
 
 
-def supernova_icon():
+def supernova_icon(t):
     def draw(d, img, S):
         for k in range(16):
             a = k * math.tau / 16
             r1 = .18 if k % 2 else .24
-            d.line((.5 * S, .5 * S, (.5 + math.cos(a) * (r1 + .22)) * S, (.5 + math.sin(a) * (r1 + .22)) * S), fill=_a(BODY[5]), width=max(1, S // 28))
-        d.ellipse((.22 * S, .22 * S, .78 * S, .78 * S), outline=_a(BODY[5]), width=max(2, S // 18))
-        d.ellipse((.34 * S, .34 * S, .66 * S, .66 * S), fill=_a(BODY[5]))
-        d.ellipse((.42 * S, .42 * S, .58 * S, .58 * S), fill=_a(CORE[5]))
-        _glow(img, S, .5, .5, .3, 5, 1.2)
-    return _icon(draw, .5, .5, (24, 12, 48))
+            d.line((.5 * S, .5 * S, (.5 + math.cos(a) * (r1 + .22)) * S, (.5 + math.sin(a) * (r1 + .22)) * S), fill=_a(BODY[t]), width=max(1, S // 28))
+        d.ellipse((.22 * S, .22 * S, .78 * S, .78 * S), outline=_a(BODY[t]), width=max(2, S // 18))
+        d.ellipse((.34 * S, .34 * S, .66 * S, .66 * S), fill=_a(BODY[t]))
+        d.ellipse((.42 * S, .42 * S, .58 * S, .58 * S), fill=_a(CORE[t]))
+        _glow(img, S, .5, .5, .3, t, 1.2)
+    return _icon(draw, .5, .5, _bg(t))
 
 
-def stellar_pyre_icon():
+def stellar_pyre_icon(t):
     def draw(d, img, S):
         d.rectangle((0, .88 * S, S, S), fill=_a((40, 30, 30)))
         for k in range(6):
-            t = k / 5
-            y = .86 - .62 * t
-            w = .5 - .2 * t
-            d.arc(((.5 - w) * S, (y - .06) * S, (.5 + w) * S, (y + .06) * S), 0, 180, fill=_a(BODY[k]), width=max(2, S // 18))
+            u = k / 5
+            y = .86 - .62 * u
+            w = .5 - .2 * u
+            d.arc(((.5 - w) * S, (y - .06) * S, (.5 + w) * S, (y + .06) * S), 0, 180, fill=_a(BODY[t] if k % 2 else CORE[t]), width=max(2, S // 18))
         for k in range(6):
-            _tongue(d, S, .3 + .08 * k, .9, .12, .25 + .05 * k, k)
-        _glow(img, S, .5, .4, .25, 5, .7)
-    return _icon(draw, .5, .5, (28, 14, 30))
+            _tongue(d, S, .3 + .08 * k, .9, .12, .25 + .05 * k, t)
+        _glow(img, S, .5, .4, .25, t, .7)
+    return _icon(draw, .5, .5, _bg(t))
 
 
 ICONS = [
@@ -280,16 +294,8 @@ ICONS = [
     ("supernova", supernova_icon),
     ("stellar_pyre", stellar_pyre_icon),
 ]
-
-
-def stellar_heat_effect_icon():
-    def draw(d, img, S):
-        for k in range(6):
-            a = math.pi * (1.1 + .8 * k / 5)
-            x, y = .5 + math.cos(a) * .3, .72 + math.sin(a) * .3
-            _tongue(d, S, x, y + .12, .14, .24, k)
-        _glow(img, S, .5, .6, .2, 3, .8)
-    return g.painted(72, draw, None, 18)
+#: The six heats, coolest to hottest, as the spells are named (see HeatColors.ID).
+HEAT_IDS = ["red", "orange", "yellow", "white", "blue", "violet"]
 
 
 # --------------------------------------------------------------------------------------------------- the spellbook
@@ -390,17 +396,17 @@ def affinity_ring_starfire():
 
 
 def main():
-    for t in range(6):
-        g.save(flame_texture(t), f"textures/entity/starfire/flame_{t}.png")
-        g.save(wall_texture(t), f"textures/entity/starfire/wall_{t}.png")
     g.save(glow_texture(), "textures/entity/starfire/glow.png")
+    g.save(flame_noise_texture(), "textures/entity/starfire/flame_noise.png")
+    g.save(flame_body_texture(), "textures/entity/starfire/flame_body.png")
+    g.save(ember_texture(), "textures/entity/starfire/ember.png")
     g.save(spark_texture(), "textures/entity/starfire/spark.png")
     g.save(ring_texture(), "textures/entity/starfire/ring.png")
     g.save(beam_texture(), "textures/entity/starfire/beam.png")
     g.save(smoke_texture(), "textures/entity/starfire/smoke.png")
     for name, icon in ICONS:
-        g.save(icon(), f"textures/gui/spell_icons/{name}.png")
-    g.save(stellar_heat_effect_icon(), "textures/mob_effect/stellar_heat.png")
+        for t, heat in enumerate(HEAT_IDS):
+            g.save(icon(t), f"textures/gui/spell_icons/{name}_{heat}.png")
     g.save(affinity_ring_starfire(), "textures/item/affinity_ring_starfire.png")
     g.write_json("models/item/affinity_ring_starfire.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_starfire"}})
     g.save(starfire_codex_icon(), "textures/item/starfire_codex.png")

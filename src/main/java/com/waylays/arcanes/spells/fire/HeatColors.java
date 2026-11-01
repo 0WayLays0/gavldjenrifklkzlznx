@@ -21,6 +21,8 @@ public final class HeatColors {
     /** The star class of each heat, and its temperature. */
     public static final String[] CLASS = {"M", "K", "G", "F", "B", "O"};
     public static final int[] KELVIN = {3000, 4500, 5800, 8000, 20000, 40000};
+    /** Each heat's name in ids and lang keys. */
+    public static final String[] ID = {"red", "orange", "yellow", "white", "blue", "violet"};
 
     private HeatColors() {}
 

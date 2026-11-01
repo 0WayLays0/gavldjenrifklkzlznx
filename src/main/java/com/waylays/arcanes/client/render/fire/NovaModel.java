@@ -42,7 +42,7 @@ public final class NovaModel {
         com.waylays.arcanes.client.render.RenderHelper.vertex(ring, rp, -q, q, 0, 0, 0, c, light, 0, 1, 0);
         poseStack.popPose();
         // The sphere of flame
-        VertexConsumer flames = FireMesh.flames(buffer, tier);
+        FireMesh.Batch fire = new FireMesh.Batch(view, tier, t * 30, light);
         PoseStack.Pose p = poseStack.last();
         for (int k = 0; k < 60; k++) {
             float a = hash(seed + k * 3) * Mth.TWO_PI, b = (float) Math.acos(1 - 2 * hash(seed + k * 5));
@@ -52,7 +52,7 @@ public final class NovaModel {
                 continue;
             }
             float h = (1.2f + 1.4f * hash(seed + k)) * (.5f + radius * .1f) * fade;
-            FireMesh.tongue(flames, p, eye, x, Math.max(0, y - h * .4f), z, h * .7f, h, 0, FireMesh.frame(t * 30, k), argb(0xFFFFFF, Math.min(1, fade * 1.5f)), light);
+            fire.lick(x, Math.max(0, y - h * .4f), z, h * .7f, h, 0, seed + 31 * (k), Math.min(1, fade * 1.5f));
         }
         // Smoke after, for the coolest heats
         VertexConsumer smoke = WaterMesh.translucent(buffer, FireMesh.SMOKE);
@@ -71,5 +71,6 @@ public final class NovaModel {
             Vector3f head = new Vector3f(dir).mul(r * 1.3f).add(0, 1, 0);
             streak(sparks, p, eye, head, new Vector3f(dir).mul(r * 1.3f - 1.2f).add(0, 1, 0), .12f, glow(FireMesh.core(tier), fade), light);
         }
+        fire.flush(buffer, poseStack);
     }
 }

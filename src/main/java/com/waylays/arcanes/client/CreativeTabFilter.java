@@ -148,7 +148,7 @@ public final class CreativeTabFilter {
         List<ItemStack> items = screen.getMenu().items;
         items.clear();
         for (ItemStack stack : ModCreativeTabs.MAIN.get().getDisplayItems()) {
-            if (section == null || ModCreativeTabs.sectionOf(stack) == section) {
+            if (section == null || ModCreativeTabs.shows(section, stack)) {
                 items.add(stack);
             }
         }
@@ -174,12 +174,18 @@ public final class CreativeTabFilter {
     // ------------------------------------------------------------------ what an entry is
 
     private static Component name(@Nullable ModCreativeTabs.Section section) {
-        return section == null ? Component.translatable("gui." + ArcanesOublies.MODID + ".creative.all") : section.school().get().getDisplayName();
+        if (section == null) {
+            return Component.translatable("gui." + ArcanesOublies.MODID + ".creative.all");
+        }
+        return section.title() != null ? section.title().get() : section.school().get().getDisplayName();
     }
 
     private static int color(@Nullable ModCreativeTabs.Section section) {
         if (section == null) {
             return GOLD;
+        }
+        if (section.color() >= 0) {
+            return section.color();
         }
         TextColor color = section.school().get().getDisplayName().getStyle().getColor();
         return color == null ? LAVENDER : color.getValue() & 0xFFFFFF;
@@ -194,7 +200,7 @@ public final class CreativeTabFilter {
         int count = 0;
         for (var entry : ModSpells.SPELLS.getEntries()) {
             AbstractSpell spell = entry.get();
-            if (spell.isEnabled() && (section == null || spell.getSchoolType() == section.school().get())) {
+            if (spell.isEnabled() && (section == null || ModCreativeTabs.covers(section, spell))) {
                 count++;
             }
         }
@@ -475,7 +481,15 @@ public final class CreativeTabFilter {
             if (chosen) {
                 g.fill(x + 3, y + 3, x + ENTRY_SIZE - 3, y + ENTRY_SIZE - 3, argb(rgb, .35f));
             }
-            g.renderItem(icon(section), x + 3, y + 3);
+            if (section != null && section.picture() != null) {
+                g.blit(section.picture(), x + 3, y + 3, 0, 0, 16, 16, 16, 16);
+            } else {
+                g.renderItem(icon(section), x + 3, y + 3);
+            }
+            if (section != null && section.sub()) {
+                // A heat of its school: a thread of its colour down the edge, tying it to the school above
+                g.fill(x - 3, y - 2, x - 2, y + ENTRY_SIZE - 2, argb(rgb, .8f));
+            }
             if (wide) {
                 int textX = x + ENTRY_SIZE + 4;
                 label(g, font, name(section).getString(), textX, y + 3, rowWidth - ENTRY_SIZE - 8, chosen || hover,

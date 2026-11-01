@@ -3,8 +3,6 @@ package com.waylays.arcanes.spells.fire;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.registry.ModSchools;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
-import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -21,19 +19,24 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
 
 /**
- * Base of the Stellar Fire spells: the school, the config, the caster's gesture, and the heat: each is cast at the
- * caster's heat (its colour, {@link #hot} its strength) and then stokes it ({@link #stokes} steps).
+ * Base of the Stellar Fire spells: the school, the config, the caster's gesture, and the heat. Every spell comes in
+ * the six heats, each its own spell ({@code <name>_<heat>}: red, orange, yellow, white, blue, violet): it burns in
+ * that colour and strikes the harder the hotter it is ({@link HeatColors#POWER}), for a little more mana.
  */
 public abstract class StarfireSpell extends AbstractSpell {
     private final ResourceLocation spellId;
+    /** The heat it burns at (0 red to 5 violet). */
+    protected final int tier;
     private final DefaultConfig defaultConfig;
     private final CastType castType;
     @Nullable
     private final AnimationHolder animation;
 
     /** {@code animation} null: Iron's own for the cast type. */
-    protected StarfireSpell(String name, SpellRarity minRarity, int maxLevel, int cooldownSeconds, CastType castType, @Nullable AnimationHolder animation) {
-        this.spellId = ArcanesOublies.id(name);
+    protected StarfireSpell(String name, int tier, SpellRarity minRarity, int maxLevel, int cooldownSeconds, CastType castType,
+                            @Nullable AnimationHolder animation) {
+        this.tier = HeatColors.clamp(tier);
+        this.spellId = ArcanesOublies.id(name + "_" + HeatColors.ID[this.tier]);
         this.defaultConfig = new DefaultConfig()
                 .setMinRarity(minRarity)
                 .setSchoolResource(ModSchools.STARFIRE_RESOURCE)
@@ -73,35 +76,32 @@ public abstract class StarfireSpell extends AbstractSpell {
         return getSpellPower(spellLevel, caster);
     }
 
-    /** The caster's heat now (0 red to 5 violet). */
-    public static int heat(@Nullable LivingEntity caster) {
-        return caster == null ? 0 : Heat.of(caster);
+    /** The heat it burns at (0 red to 5 violet). */
+    public int tier() {
+        return tier;
     }
 
-    /** The spell's power at the caster's heat now. */
+    /** The heat it burns at: the same whoever casts it. */
+    public int heat(@Nullable LivingEntity caster) {
+        return tier;
+    }
+
+    /** The spell's power at its heat. */
     public float hot(int spellLevel, @Nullable LivingEntity caster) {
-        return getPower(spellLevel, caster) * HeatColors.POWER[heat(caster)];
+        return getPower(spellLevel, caster) * HeatColors.POWER[tier];
     }
 
-    /** How many steps casting it stokes the caster's heat. */
-    protected int stokes() {
-        return 1;
+    /** The hotter, the dearer: subclasses call it once their mana costs are set. */
+    protected void costsByHeat() {
+        float k = 1 + .12f * tier;
+        this.baseManaCost = Math.round(this.baseManaCost * k);
+        this.manaCostPerLevel = Math.round(this.manaCostPerLevel * k);
     }
 
-    /** The tooltip line giving the caster's heat now and how much harder it makes the spell strike. */
-    public static MutableComponent heatLine(@Nullable LivingEntity caster) {
-        int tier = heat(caster);
-        return Component.translatable("ui.arcanes_oublies.heat_now", Component.translatable("heat.arcanes_oublies." + tier),
-                Utils.stringTruncation(HeatColors.POWER[tier], 2)).withStyle(s -> s.withColor(HeatColors.BODY[tier]));
-    }
-
-    /** Subclasses call this last, once their flames are out at the old heat: it stokes it. */
-    @Override
-    public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
-        if (!level.isClientSide && stokes() > 0) {
-            Heat.stoke(entity, stokes());
-        }
-        super.onCast(level, spellLevel, entity, castSource, playerMagicData);
+    /** The tooltip line giving its heat (its star class and temperature) and how much harder it makes the spell strike. */
+    public MutableComponent heatLine(@Nullable LivingEntity caster) {
+        return Component.translatable("ui.arcanes_oublies.heat_of", Component.translatable("heat.arcanes_oublies." + tier), HeatColors.CLASS[tier],
+                HeatColors.KELVIN[tier], Utils.stringTruncation(HeatColors.POWER[tier], 2)).withStyle(s -> s.withColor(HeatColors.BODY[tier]));
     }
 
     /** The enemy the caster looks at within {@code range}, if any. */

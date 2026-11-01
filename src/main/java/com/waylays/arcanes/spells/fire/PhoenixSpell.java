@@ -21,13 +21,14 @@ import java.util.Optional;
 /** Phoenix: a great bird of fire takes wing from the caster's hand, sweeps out and back, burning all it flies through (see Phoenix). */
 @AutoSpellConfig
 public class PhoenixSpell extends StarfireSpell {
-    public PhoenixSpell() {
-        super("phoenix", SpellRarity.EPIC, 5, 35, CastType.LONG, SpellAnimations.CHARGE_RAISED_HAND);
+    public PhoenixSpell(int tier) {
+        super("phoenix", tier, SpellRarity.EPIC, 5, 35, CastType.LONG, SpellAnimations.CHARGE_RAISED_HAND);
         this.manaCostPerLevel = 15;
         this.baseSpellPower = 9;
         this.spellPowerPerLevel = 2;
         this.castTime = 20;
         this.baseManaCost = 100;
+        costsByHeat();
     }
 
     @Override

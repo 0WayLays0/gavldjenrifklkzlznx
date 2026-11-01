@@ -50,27 +50,23 @@ public final class CrescentModel {
         PoseStack.Pose p = poseStack.last();
         ribbon(beam, p, arc, band, w2, c2, .5f, 0, light, true);
         ribbon(beam, p, arc, edge, w2, c2, .5f, 0, light, true);
-        // The blade: a curtain of fire streaming back off its edge, in two crossed sheets
-        VertexConsumer walls = FireMesh.walls(buffer, tier);
-        p = poseStack.last();
-        Vector3f[] back = new Vector3f[POINTS], back2 = new Vector3f[POINTS];
-        int[] wc = new int[POINTS];
+        // The blade: flames streaming back off its whole edge
+        FireMesh.Batch fire = new FireMesh.Batch(view, tier, age, light);
+        Vector3f[] back = new Vector3f[POINTS];
+        float[] wc = new float[POINTS];
         for (int i = 0; i < POINTS; i++) {
             float s = (float) i / (POINTS - 1) * 2 - 1;
             float taper = 1 - s * s;
-            back[i] = new Vector3f(f).mul(-(1.3f * taper + .2f)).add(new Vector3f(band[i]).mul(-.25f * taper));
-            back2[i] = new Vector3f(back[i]).add(new Vector3f(normal).mul(.35f * taper));
-            wc[i] = argb(0xFFFFFF, alive * (.35f + .65f * taper));
+            back[i] = new Vector3f(f).mul(-(1.5f * taper + .25f)).add(new Vector3f(band[i]).mul(-.25f * taper)).add(0, .2f * taper, 0);
+            wc[i] = alive * (.35f + .65f * taper);
         }
-        FireMesh.sheet(walls, p, arc, back, wc, .9f, age * .05f, light);
-        FireMesh.sheet(walls, p, arc, back2, wc, .9f, -age * .04f + .5f, light);
+        fire.sheet(arc, back, wc, .16f * span / 3, seed);
         // Its white-hot edge
         beam = FireMesh.light(buffer, FireMesh.BEAM);
         p = poseStack.last();
         ribbon(beam, p, arc, band, w, c1, .5f, 0, light, true);
         ribbon(beam, p, arc, edge, w, c1, .5f, 0, light, true);
         // Flames streaming back off it
-        VertexConsumer flames = FireMesh.flames(buffer, tier);
         p = poseStack.last();
         Vector3f behind = new Vector3f(f).negate();
         for (int k = 0; k < 22; k++) {
@@ -79,7 +75,7 @@ public final class CrescentModel {
             float t = (age * .3f + hash(seed + k * 5)) % 1;
             Vector3f c = new Vector3f(arc[i]).sub(new Vector3f(f).mul(t * 1.4f));
             float h = (1.1f * (1 - s * s) + .3f) * (1 - t * .6f);
-            FireMesh.tongueAlong(flames, p, eye, c, behind, h * .6f, h, FireMesh.frame(age, k), argb(0xFFFFFF, (1 - t) * alive), light);
+            fire.lickAlong(c, behind, h * .6f, h, seed + 31 * (k), (1 - t) * alive);
         }
         VertexConsumer sparks = FireMesh.light(buffer, FireMesh.SPARK);
         p = poseStack.last();
@@ -89,5 +85,6 @@ public final class CrescentModel {
             Vector3f head = new Vector3f(horn).sub(new Vector3f(f).mul(.3f + 1.6f * t)).add((hash(seed + k) - .5f) * t, -.3f * t * t, (hash(seed + k * 3) - .5f) * t);
             streak(sparks, p, eye, head, new Vector3f(head).add(new Vector3f(f).mul(.3f)), .06f, glow(FireMesh.core(tier), (1 - t) * alive), light);
         }
+        fire.flush(buffer, poseStack);
     }
 }

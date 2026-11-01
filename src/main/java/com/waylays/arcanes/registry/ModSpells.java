@@ -219,6 +219,8 @@ import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+
 /**
  * Spells added to Iron's spell registry. Every spell class also needs {@code @AutoSpellConfig} and a no-arg
  * constructor, a spell icon at textures/gui/spell_icons/{@code <spell>}.png and its lang keys.
@@ -440,17 +442,17 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> TIDAL_WAVE = register(new TidalWaveSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> ABYSSAL_DOME = register(new AbyssalDomeSpell());
 
-    // Stellar Fire
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> EMBER_BOLT = register(new EmberBoltSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> STELLAR_BREATH = register(new StellarBreathSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> CORONA = register(new CoronaSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> FIRE_PILLARS = register(new FirePillarsSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> WILL_O_WISPS = register(new WillOWispsSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> FLAME_CRESCENT = register(new FlameCrescentSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> SEARING_BRAND = register(new SearingBrandSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> PHOENIX = register(new PhoenixSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> SUPERNOVA = register(new SupernovaSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> STELLAR_PYRE = register(new StellarPyreSpell());
+    // Stellar Fire: every spell in each of the six heats, red to violet (each list in that order)
+    public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> EMBER_BOLT = heats(EmberBoltSpell::new);
+    public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> STELLAR_BREATH = heats(StellarBreathSpell::new);
+    public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> CORONA = heats(CoronaSpell::new);
+    public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> FIRE_PILLARS = heats(FirePillarsSpell::new);
+    public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> WILL_O_WISPS = heats(WillOWispsSpell::new);
+    public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> FLAME_CRESCENT = heats(FlameCrescentSpell::new);
+    public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> SEARING_BRAND = heats(SearingBrandSpell::new);
+    public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> PHOENIX = heats(PhoenixSpell::new);
+    public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> SUPERNOVA = heats(SupernovaSpell::new);
+    public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> STELLAR_PYRE = heats(StellarPyreSpell::new);
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());
@@ -483,5 +485,14 @@ public final class ModSpells {
 
     private static DeferredHolder<AbstractSpell, AbstractSpell> register(AbstractSpell spell) {
         return SPELLS.register(spell.getSpellName(), () -> spell);
+    }
+
+    /** A Stellar Fire spell in each of the six heats, red to violet. */
+    private static List<DeferredHolder<AbstractSpell, AbstractSpell>> heats(java.util.function.IntFunction<AbstractSpell> make) {
+        List<DeferredHolder<AbstractSpell, AbstractSpell>> out = new java.util.ArrayList<>();
+        for (int tier = 0; tier < com.waylays.arcanes.spells.fire.HeatColors.TIERS; tier++) {
+            out.add(register(make.apply(tier)));
+        }
+        return List.copyOf(out);
     }
 }

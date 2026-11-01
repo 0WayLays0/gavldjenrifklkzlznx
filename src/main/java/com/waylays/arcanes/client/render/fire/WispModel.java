@@ -30,19 +30,18 @@ public final class WispModel {
             FireMesh.halo(glow, poseStack, view, Mth.cos(a) * .5f, .1f * Mth.sin(a * 2), Mth.sin(a) * .5f, .25f, FireMesh.core(tier), alive, light);
         }
         // Its crown of tongues, and the tail streaming behind
-        VertexConsumer flames = FireMesh.flames(buffer, tier);
+        FireMesh.Batch fire = new FireMesh.Batch(view, tier, age, light);
         PoseStack.Pose p = poseStack.last();
         for (int k = 0; k < 5; k++) {
             float a = k * Mth.TWO_PI / 5 + age * .2f;
-            FireMesh.tongue(flames, p, eye, Mth.cos(a) * .12f, -.3f, Mth.sin(a) * .12f, .45f, .65f * pulse, Mth.sin(a) * .08f, FireMesh.frame(age, k + seed),
-                    argb(0xFFFFFF, alive), light);
+            fire.lick(Mth.cos(a) * .12f, -.3f, Mth.sin(a) * .12f, .45f, .65f * pulse, Mth.sin(a) * .08f, seed + 31 * (k + seed), alive);
         }
         Vector3f back = new Vector3f(trail).normalize().negate();
         for (int k = 0; k < 7; k++) {
             float t = (age * .2f + hash(seed + k * 3)) % 1;
             Vector3f c = new Vector3f(back).mul(t * 1.6f).add(0, .25f * t, 0);
             float h = .5f * (1 - t) + .1f;
-            FireMesh.tongue(flames, p, eye, c.x, c.y - h * .4f, c.z, h * .7f, h, 0, FireMesh.frame(age, k), argb(0xFFFFFF, (1 - t) * alive), light);
+            fire.lick(c.x, c.y - h * .4f, c.z, h * .7f, h, 0, seed + 31 * (k), (1 - t) * alive);
         }
         VertexConsumer sparks = FireMesh.light(buffer, FireMesh.SPARK);
         p = poseStack.last();
@@ -51,5 +50,6 @@ public final class WispModel {
             Vector3f head = new Vector3f(back).mul(.2f + 1.8f * t).add((hash(seed + k) - .5f) * .5f * t, .3f * t, (hash(seed + k * 5) - .5f) * .5f * t);
             streak(sparks, p, eye, head, new Vector3f(head).add(new Vector3f(back).mul(.3f)), .05f, WaterMesh.glow(FireMesh.core(tier), (1 - t) * alive), light);
         }
+        fire.flush(buffer, poseStack);
     }
 }

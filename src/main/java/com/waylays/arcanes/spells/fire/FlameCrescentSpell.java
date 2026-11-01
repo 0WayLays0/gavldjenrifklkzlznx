@@ -19,13 +19,14 @@ import java.util.List;
 /** Flame Crescent: three slashes of fire fly out from the caster's hand, cutting through every enemy in their way (see FlameCrescent). */
 @AutoSpellConfig
 public class FlameCrescentSpell extends StarfireSpell {
-    public FlameCrescentSpell() {
-        super("flame_crescent", SpellRarity.RARE, 6, 8, CastType.INSTANT, SpellAnimations.ONE_HANDED_HORIZONTAL_SWING_ANIMATION);
+    public FlameCrescentSpell(int tier) {
+        super("flame_crescent", tier, SpellRarity.RARE, 6, 8, CastType.INSTANT, SpellAnimations.ONE_HANDED_HORIZONTAL_SWING_ANIMATION);
         this.manaCostPerLevel = 5;
         this.baseSpellPower = 7;
         this.spellPowerPerLevel = 1;
         this.castTime = 0;
         this.baseManaCost = 45;
+        costsByHeat();
     }
 
     @Override

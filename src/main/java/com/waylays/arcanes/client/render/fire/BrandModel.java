@@ -40,18 +40,18 @@ public final class BrandModel {
         VertexConsumer glow = FireMesh.light(buffer, FireMesh.GLOW);
         FireMesh.halo(glow, poseStack, view, 0, 0, 0, .8f + .8f * fuse, FireMesh.core(tier), bright, light);
         // Tongues round its rim, and licking up the creature
-        VertexConsumer flames = FireMesh.flames(buffer, tier);
+        FireMesh.Batch fire = new FireMesh.Batch(view, tier, age, light);
         p = poseStack.last();
         for (int k = 0; k < 8; k++) {
             float a = k * Mth.TWO_PI / 8 + spin;
-            FireMesh.tongue(flames, p, eye, Mth.cos(a) * r, 0, Mth.sin(a) * r, .3f, .45f + .3f * fuse, 0, FireMesh.frame(age, k), argb(0xFFFFFF, .9f), light);
+            fire.lick(Mth.cos(a) * r, 0, Mth.sin(a) * r, .3f, .45f + .3f * fuse, 0, seed + 31 * (k), .9f);
         }
         for (int k = 0; k < 6; k++) {
             float t = (age * .1f + hash(seed + k)) % 1;
             float a = hash(seed + k * 3) * Mth.TWO_PI;
             float h = (.3f + .5f * fuse) * (1 - t * .5f);
-            FireMesh.tongue(flames, p, eye, Mth.cos(a) * .35f, -tall + tall * t, Mth.sin(a) * .35f, h * .7f, h, 0, FireMesh.frame(age, k + 3),
-                    argb(0xFFFFFF, fuse * (1 - t)), light);
+            fire.lick(Mth.cos(a) * .35f, -tall + tall * t, Mth.sin(a) * .35f, h * .7f, h, 0, seed + 31 * (k + 3), fuse * (1 - t));
         }
+        fire.flush(buffer, poseStack);
     }
 }

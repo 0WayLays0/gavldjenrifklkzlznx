@@ -22,13 +22,14 @@ public class FirePillarsSpell extends StarfireSpell {
     public static final int STAGGER = 4;
     public static final float SPACING = 2.4f;
 
-    public FirePillarsSpell() {
-        super("fire_pillars", SpellRarity.UNCOMMON, 8, 10, CastType.INSTANT, SpellAnimations.TOUCH_GROUND_ANIMATION);
+    public FirePillarsSpell(int tier) {
+        super("fire_pillars", tier, SpellRarity.UNCOMMON, 8, 10, CastType.INSTANT, SpellAnimations.TOUCH_GROUND_ANIMATION);
         this.manaCostPerLevel = 5;
         this.baseSpellPower = 7;
         this.spellPowerPerLevel = 1;
         this.castTime = 0;
         this.baseManaCost = 40;
+        costsByHeat();
     }
 
     public static int count(int spellLevel) {

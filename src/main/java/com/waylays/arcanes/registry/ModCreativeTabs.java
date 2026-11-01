@@ -6,7 +6,10 @@ import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.api.spells.SchoolType;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import net.minecraft.core.registries.Registries;
+import com.waylays.arcanes.spells.fire.HeatColors;
+import com.waylays.arcanes.spells.fire.StarfireSpell;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,19 +17,47 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 /**
  * One creative tab for the whole addon, laid out school by school (its spellbook first, then a scroll of each of its
- * spells at every level, in the order they were added). The bar of schools beside the tab (client/CreativeTabFilter)
- * shows one school at a time.
+ * spells at every level, in the order they were added). Stellar Fire is laid out by heat, coolest to hottest: a part
+ * for each of its six heats (red to violet), each with every spell of that heat at every level. The bar of schools
+ * beside the tab (client/CreativeTabFilter) shows one school (or one heat) at a time.
  */
 public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ArcanesOublies.MODID);
 
-    /** A school's part of the tab: its spellbooks, then its scrolls. */
-    public record Section(Supplier<SchoolType> school, Supplier<ItemStack> icon, List<Supplier<? extends Item>> books) {}
+    /**
+     * A part of the tab: its spellbooks, then the scrolls of the spells it takes ({@code takes}); a part of another
+     * ({@code parent}, shown with it) has its own {@code title} and {@code color}, else the school's.
+     */
+    public record Section(Supplier<SchoolType> school, Supplier<ItemStack> icon, List<Supplier<? extends Item>> books, Predicate<AbstractSpell> takes,
+                          @Nullable Section parent, @Nullable Supplier<Component> title, int color, @Nullable ResourceLocation picture) {
+        /** A school's part: every spell of the school. */
+        public Section(Supplier<SchoolType> school, Supplier<ItemStack> icon, List<Supplier<? extends Item>> books) {
+            this(school, icon, books, spell -> spell.getSchoolType() == school.get(), null, null, -1, null);
+        }
+
+        public boolean sub() {
+            return parent != null;
+        }
+    }
+
+    /** Stellar Fire's own part: its codex (its spells are in its heats' parts, shown with it). */
+    public static final Section STARFIRE = new Section(ModSchools.STARFIRE, () -> new ItemStack(ModItems.STARFIRE_CODEX.get()),
+            List.of(ModItems.STARFIRE_CODEX), spell -> false, null, null, -1, null);
+
+    /** A part for heat {@code tier} of Stellar Fire: every spell of that heat. */
+    private static Section heat(int tier) {
+        return new Section(ModSchools.STARFIRE, () -> new ItemStack(ModItems.STARFIRE_CODEX.get()), List.of(),
+                spell -> spell instanceof StarfireSpell fire && fire.tier() == tier, STARFIRE,
+                () -> Component.translatable("gui." + ArcanesOublies.MODID + ".creative.heat", Component.translatable("heat." + ArcanesOublies.MODID + "." + tier),
+                        HeatColors.CLASS[tier]), HeatColors.BODY[tier],
+                ArcanesOublies.id("textures/gui/spell_icons/ember_bolt_" + HeatColors.ID[tier] + ".png"));
+    }
 
     public static final List<Section> SECTIONS = List.of(
             new Section(ModSchools.GOLD, () -> new ItemStack(ModItems.GOLDEN_GRIMOIRE.get()), List.of(ModItems.GOLDEN_GRIMOIRE)),
@@ -45,7 +76,7 @@ public final class ModCreativeTabs {
             new Section(ModSchools.BONE, () -> new ItemStack(ModItems.OSSUARY_CODEX.get()), List.of(ModItems.OSSUARY_CODEX)),
             new Section(ModSchools.WOOD, () -> new ItemStack(ModItems.SYLVAN_CODEX.get()), List.of(ModItems.SYLVAN_CODEX)),
             new Section(ModSchools.WATER, () -> new ItemStack(ModItems.TIDE_CODEX.get()), List.of(ModItems.TIDE_CODEX)),
-            new Section(ModSchools.STARFIRE, () -> new ItemStack(ModItems.STARFIRE_CODEX.get()), List.of(ModItems.STARFIRE_CODEX)));
+            STARFIRE, heat(0), heat(1), heat(2), heat(3), heat(4), heat(5));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup." + ArcanesOublies.MODID))
@@ -63,7 +94,7 @@ public final class ModCreativeTabs {
                     section.books().forEach(book -> output.accept(book.get()));
                     for (var entry : ModSpells.SPELLS.getEntries()) {
                         AbstractSpell spell = entry.get();
-                        if (!spell.isEnabled() || spell.getSchoolType() != section.school().get()) {
+                        if (!spell.isEnabled() || !section.takes().test(spell)) {
                             continue;
                         }
                         for (int level = spell.getMinLevel(); level <= spell.getMaxLevel(); level++) {
@@ -76,17 +107,33 @@ public final class ModCreativeTabs {
 
     private ModCreativeTabs() {}
 
-    /** The section a stack of the tab belongs to: a scroll by its spell's school, a spellbook by the section listing it. */
+    /** The section a stack of the tab belongs to: a scroll by the section taking its spell, a spellbook by the section listing it. */
     @Nullable
     public static Section sectionOf(ItemStack stack) {
-        SchoolType school = stack.is(ItemRegistry.SCROLL.get()) && ISpellContainer.isSpellContainer(stack)
-                ? ISpellContainer.get(stack).getSpellAtIndex(0).getSpell().getSchoolType() : null;
+        AbstractSpell spell = stack.is(ItemRegistry.SCROLL.get()) && ISpellContainer.isSpellContainer(stack)
+                ? ISpellContainer.get(stack).getSpellAtIndex(0).getSpell() : null;
         for (Section section : SECTIONS) {
-            if (section.school().get() == school || section.books().stream().anyMatch(book -> stack.is(book.get()))) {
+            if (spell != null ? section.takes().test(spell) : section.books().stream().anyMatch(book -> stack.is(book.get()))) {
                 return section;
             }
         }
         return null;
+    }
+
+    /** Whether choosing {@code section} shows {@code stack}: it is the section's own, or one of its parts'. */
+    public static boolean shows(Section section, ItemStack stack) {
+        Section of = sectionOf(stack);
+        return of == section || of != null && of.parent() == section;
+    }
+
+    /** Whether {@code section} (or one of its parts) takes {@code spell}. */
+    public static boolean covers(Section section, AbstractSpell spell) {
+        for (Section s : SECTIONS) {
+            if ((s == section || s.parent() == section) && s.takes().test(spell)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static ItemStack scroll(AbstractSpell spell, int level) {

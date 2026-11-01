@@ -24,13 +24,14 @@ import java.util.List;
 public class SearingBrandSpell extends StarfireSpell {
     public static final double RANGE = 24;
 
-    public SearingBrandSpell() {
-        super("searing_brand", SpellRarity.RARE, 6, 14, CastType.INSTANT, SpellAnimations.ANIMATION_INSTANT_CAST);
+    public SearingBrandSpell(int tier) {
+        super("searing_brand", tier, SpellRarity.RARE, 6, 14, CastType.INSTANT, SpellAnimations.ANIMATION_INSTANT_CAST);
         this.manaCostPerLevel = 6;
         this.baseSpellPower = 9;
         this.spellPowerPerLevel = 2;
         this.castTime = 0;
         this.baseManaCost = 45;
+        costsByHeat();
     }
 
     @Override

@@ -28,27 +28,25 @@ public final class FlameRingModel {
         VertexConsumer glow = FireMesh.light(buffer, FireMesh.GLOW);
         FireMesh.groundRing(glow, poseStack.last(), .04f, radius * 1.2f, FireMesh.glowOf(tier), .45f * alive, light);
         // The wall of flame on its edge
-        VertexConsumer walls = FireMesh.walls(buffer, tier);
+        FireMesh.Batch fire = new FireMesh.Batch(view, tier, age, light);
         Vector3f[] base = new Vector3f[SEGS + 1];
         float[] h = new float[SEGS + 1];
-        int[] col = new int[SEGS + 1];
+        float[] col = new float[SEGS + 1];
         for (int i = 0; i <= SEGS; i++) {
             float a = i * Mth.TWO_PI / SEGS;
             base[i] = new Vector3f(Mth.cos(a) * radius, 0, Mth.sin(a) * radius);
             h[i] = height * (.75f + .35f * noise(a * 3, age * .15f, seed)) * alive;
-            col[i] = argb(0xFFFFFF, .95f * alive);
+            col[i] = alive;
         }
-        FireMesh.curtain(walls, poseStack.last(), base, h, col, 1.4f, age * .02f, light);
+        fire.curtain(base, h, col, Math.max(.35f, radius * .09f), seed);
         // Tongues leaping off it
-        VertexConsumer flames = FireMesh.flames(buffer, tier);
         PoseStack.Pose p = poseStack.last();
         for (int k = 0; k < 40; k++) {
             float a = hash(seed + k * 3) * Mth.TWO_PI;
             float t = (age * .12f + hash(seed + k * 5)) % 1;
             float rr = radius + (hash(seed + k * 7) - .5f) * .6f;
             float hh = height * (.8f + 1.1f * hash(seed + k)) * (1 - t * .5f) * alive;
-            FireMesh.tongue(flames, p, eye, Mth.cos(a) * rr, height * .4f * t, Mth.sin(a) * rr, hh * .6f, hh, 0, FireMesh.frame(age, k), argb(0xFFFFFF, (1 - t) * alive),
-                    light);
+            fire.lick(Mth.cos(a) * rr, height * .4f * t, Mth.sin(a) * rr, hh * .6f, hh, 0, seed + 31 * (k), (1 - t) * alive);
         }
         // Sparks thrown out ahead
         VertexConsumer sparks = FireMesh.light(buffer, FireMesh.SPARK);
@@ -61,5 +59,6 @@ public final class FlameRingModel {
             Vector3f tail = new Vector3f(Mth.cos(a) * (rr - .5f), head.y - .2f, Mth.sin(a) * (rr - .5f));
             streak(sparks, p, eye, head, tail, .07f, glow(FireMesh.core(tier), (1 - t) * alive), light);
         }
+        fire.flush(buffer, poseStack);
     }
 }

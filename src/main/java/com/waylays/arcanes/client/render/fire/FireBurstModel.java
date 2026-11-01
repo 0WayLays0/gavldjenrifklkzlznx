@@ -29,7 +29,7 @@ public final class FireBurstModel {
         FireMesh.groundRing(ring, poseStack.last(), .06f, size * (.5f + 2.2f * bloom), FireMesh.glowOf(tier), fade * .9f, light);
 
         // The ball of flame tongues, blooming out and rising
-        VertexConsumer flames = FireMesh.flames(buffer, tier);
+        FireMesh.Batch fire = new FireMesh.Batch(view, tier, t * 20, light);
         PoseStack.Pose p = poseStack.last();
         for (int k = 0; k < 26; k++) {
             float a = hash(seed + k * 3) * Mth.TWO_PI, b = hash(seed + k * 5) * Mth.PI * .8f;
@@ -37,7 +37,7 @@ public final class FireBurstModel {
             float x = Mth.cos(a) * Mth.sin(b) * out, z = Mth.sin(a) * Mth.sin(b) * out;
             float y = size * .3f + Mth.cos(b) * out * .6f + size * t * .8f;
             float h = size * (.9f + .7f * hash(seed + k)) * (1 - t * .6f);
-            FireMesh.tongue(flames, p, eye, x, y - h * .3f, z, h * .6f, h, (hash(seed + k * 11) - .5f) * .4f, FireMesh.frame(t * 20, k), argb(0xFFFFFF, fade), light);
+            fire.lick(x, y - h * .3f, z, h * .6f, h, (hash(seed + k * 11) - .5f) * .4f, seed + 31 * (k), fade);
         }
         // Smoke rolling up off it
         VertexConsumer smoke = WaterMesh.translucent(buffer, FireMesh.SMOKE);
@@ -59,5 +59,6 @@ public final class FireBurstModel {
             Vector3f head = thrown(from, vel, age, .02f);
             streak(sparks, p, eye, head, thrown(from, vel, Math.max(0, age - 2), .02f), .08f, glow(FireMesh.core(tier), fade), light);
         }
+        fire.flush(buffer, poseStack);
     }
 }

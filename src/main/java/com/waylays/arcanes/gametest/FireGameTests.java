@@ -10,7 +10,7 @@ import com.waylays.arcanes.entity.fire.Wisp;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
-import com.waylays.arcanes.spells.fire.Heat;
+import com.waylays.arcanes.spells.fire.HeatColors;
 import com.waylays.arcanes.spells.fire.StarfireSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -32,10 +32,13 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
+import java.util.List;
+
 /**
- * Server-side checks run by CI for Stellar Fire: the school is there; casting stokes the caster's heat, which cools a
- * step at a time; the bolt, the corona, the pillars, the wisps, the crescent, the brand, the phoenix and the pyre burn
- * what they reach; the supernova burns and spends all the caster's heat. Each test runs in a batch of its own.
+ * Server-side checks run by CI for Stellar Fire: the school is there with every spell in each of the six heats; a
+ * hotter heat strikes harder and the heat does not change with casting; the bolt, the corona, the pillars, the wisps,
+ * the crescent, the brand, the phoenix, the supernova and the pyre burn what they reach. Each test runs in a batch of
+ * its own.
  */
 @GameTestHolder(ArcanesOublies.MODID)
 @PrefixGameTestTemplate(false)
@@ -66,6 +69,11 @@ public final class FireGameTests {
         spell.get().onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
     }
 
+    /** A spell in heat {@code tier} (0 red to 5 violet). */
+    private static AbstractSpell at(List<DeferredHolder<AbstractSpell, AbstractSpell>> heats, int tier) {
+        return heats.get(tier).get();
+    }
+
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
     public static void starfireSchoolIsRegistered(GameTestHelper helper) {
         SchoolType school = SchoolRegistry.getSchool(ModSchools.STARFIRE_RESOURCE);
@@ -78,25 +86,36 @@ public final class FireGameTests {
                 count++;
             }
         }
-        helper.assertTrue(count == 10, "expected 10 Stellar Fire spells, found " + count);
+        helper.assertTrue(count == 10 * HeatColors.TIERS, "expected 10 Stellar Fire spells in 6 heats, found " + count);
+        for (int tier = 0; tier < HeatColors.TIERS; tier++) {
+            StarfireSpell bolt = (StarfireSpell) at(ModSpells.EMBER_BOLT, tier);
+            helper.assertTrue(bolt.tier() == tier, "the ember bolt at " + tier + " burns at heat " + bolt.tier());
+            helper.assertTrue(bolt.getSpellName().equals("ember_bolt_" + HeatColors.ID[tier]), "the ember bolt at " + tier + " is named " + bolt.getSpellName());
+        }
         helper.assertTrue(new ItemStack(ModItems.STARFIRE_CODEX.get()).getItem() instanceof SpellBook, "the Starfire Codex is not a spellbook");
         helper.assertTrue(new ItemStack(Items.BLAZE_POWDER).is(ModSchools.STARFIRE_FOCUS), "blaze powder is not the school's focus");
         helper.succeed();
     }
 
-    /** Casting stokes the caster's heat a step; left alone it cools a step at a time. */
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "fire_heat", timeoutTicks = Heat.COOL + 40)
-    public static void heatStokesAndCools(GameTestHelper helper) {
+    /** Each heat strikes harder than the one below, costs a little more, and casting changes nothing for the next cast. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
+    public static void hotterStrikesHarder(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
-        cast(helper, ModSpells.EMBER_BOLT, caster);
-        helper.assertTrue(Heat.of(caster) == 1, "casting did not stoke the heat (" + Heat.of(caster) + ")");
-        Heat.set(caster, 4);
-        helper.runAfterDelay(Heat.COOL + 10, () -> {
-            helper.assertTrue(Heat.of(caster) == 3, "the heat did not cool a single step (" + Heat.of(caster) + ")");
-            GameTestSetup.clearLeftovers(helper);
-            helper.succeed();
-        });
+        for (int tier = 1; tier < HeatColors.TIERS; tier++) {
+            StarfireSpell cooler = (StarfireSpell) at(ModSpells.CORONA, tier - 1), hotter = (StarfireSpell) at(ModSpells.CORONA, tier);
+            helper.assertTrue(hotter.hot(1, caster) > cooler.hot(1, caster), "heat " + tier + " does not strike harder than heat " + (tier - 1));
+            helper.assertTrue(hotter.getManaCost(1) >= cooler.getManaCost(1), "heat " + tier + " costs less than heat " + (tier - 1));
+            helper.assertTrue(hotter.getMinLevel() == cooler.getMinLevel() && hotter.getMaxLevel() == cooler.getMaxLevel(),
+                    "the heats of the corona do not share their levels");
+        }
+        StarfireSpell red = (StarfireSpell) at(ModSpells.EMBER_BOLT, 0);
+        float before = red.hot(1, caster);
+        red.onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        red.onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+        helper.assertTrue(red.hot(1, caster) == before, "casting made the next cast stronger");
+        GameTestSetup.clearLeftovers(helper);
+        helper.succeed();
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "fire_bolt", timeoutTicks = 60)
@@ -104,7 +123,7 @@ public final class FireGameTests {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 5.5);
-        cast(helper, ModSpells.EMBER_BOLT, caster);
+        cast(helper, ModSpells.EMBER_BOLT.get(2), caster);
         helper.succeedWhen(() -> {
             helper.assertTrue(hurt(husk), "the bolt did not burn the husk");
             GameTestSetup.clearLeftovers(helper);
@@ -116,7 +135,7 @@ public final class FireGameTests {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, 4.5);
         Husk husk = husk(helper, 4.5, 7.5);
-        cast(helper, ModSpells.CORONA, caster);
+        cast(helper, ModSpells.CORONA.get(2), caster);
         helper.succeedWhen(() -> {
             helper.assertTrue(hurt(husk), "the corona did not burn the husk");
             GameTestSetup.clearLeftovers(helper);
@@ -130,7 +149,7 @@ public final class FireGameTests {
         Witch caster = caster(helper, .5, .5);
         Husk husk = husk(helper, 4.5, 4.5);
         double floor = husk.getY();
-        FirePillar.raise(helper.getLevel(), caster, ModSpells.FIRE_PILLARS.get(), husk.position(), 0, true, 3, 2);
+        FirePillar.raise(helper.getLevel(), caster, at(ModSpells.FIRE_PILLARS, 2), husk.position(), 0, true, 3, 2);
         double[] highest = {floor};
         helper.onEachTick(() -> highest[0] = Math.max(highest[0], husk.getY()));
         helper.runAfterDelay(FirePillar.WARN + 8, () -> {
@@ -146,7 +165,7 @@ public final class FireGameTests {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 6.5);
-        Wisp.kindle(helper.getLevel(), caster, ModSpells.WILL_O_WISPS.get(), 0, 200, 2, 1);
+        Wisp.kindle(helper.getLevel(), caster, at(ModSpells.WILL_O_WISPS, 2), 0, 200, 2, 1);
         helper.succeedWhen(() -> {
             helper.assertTrue(hurt(husk), "the wisp did not burn the husk");
             GameTestSetup.clearLeftovers(helper);
@@ -158,7 +177,7 @@ public final class FireGameTests {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 6.5);
-        FlameCrescent.slash(helper.getLevel(), caster, ModSpells.FLAME_CRESCENT.get(), caster.position().add(0, 1, 1), new Vec3(0, 0, 1), 0, 3, 2);
+        FlameCrescent.slash(helper.getLevel(), caster, at(ModSpells.FLAME_CRESCENT, 2), caster.position().add(0, 1, 1), new Vec3(0, 0, 1), 0, 3, 2);
         helper.succeedWhen(() -> {
             helper.assertTrue(hurt(husk), "the crescent did not cut the husk");
             GameTestSetup.clearLeftovers(helper);
@@ -171,7 +190,7 @@ public final class FireGameTests {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, .5, .5);
         Husk husk = husk(helper, 4.5, 4.5);
-        SearingBrand.mark(helper.getLevel(), caster, ModSpells.SEARING_BRAND.get(), husk, 3, 3);
+        SearingBrand.mark(helper.getLevel(), caster, at(ModSpells.SEARING_BRAND, 2), husk, 3, 3);
         helper.runAfterDelay(SearingBrand.FUSE - 5, () -> helper.assertTrue(!hurt(husk), "the brand burst before its fuse ran out"));
         helper.runAfterDelay(SearingBrand.FUSE + 8, () -> {
             helper.assertTrue(hurt(husk), "the brand's pillar did not burn the husk");
@@ -185,34 +204,32 @@ public final class FireGameTests {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         Husk husk = husk(helper, 4.5, 6.5);
-        Phoenix.rise(helper.getLevel(), caster, ModSpells.PHOENIX.get(), 3, 0);
+        Phoenix.rise(helper.getLevel(), caster, at(ModSpells.PHOENIX, 2), 3, 0);
         helper.succeedWhen(() -> {
             helper.assertTrue(hurt(husk), "the phoenix did not burn the husk");
             GameTestSetup.clearLeftovers(helper);
         });
     }
 
-    /** The supernova burns what is round the caster and spends all their heat. */
+    /** The supernova burns what is round the caster. */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "fire_nova", timeoutTicks = 40)
-    public static void supernovaSpendsHeat(GameTestHelper helper) {
+    public static void supernovaBurns(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, 4.5);
         Husk husk = husk(helper, 4.5, 7.5);
-        Heat.set(caster, 4);
-        cast(helper, ModSpells.SUPERNOVA, caster);
+        cast(helper, ModSpells.SUPERNOVA.get(2), caster);
         helper.assertTrue(hurt(husk), "the supernova did not burn the husk");
-        helper.assertTrue(Heat.of(caster) == 0, "the supernova did not spend the caster's heat (" + Heat.of(caster) + ")");
         GameTestSetup.clearLeftovers(helper);
         helper.succeed();
     }
 
-    /** The pyre burns what stands in it and lifts its caster's heat. */
+    /** The pyre burns what stands in it. */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "fire_pyre", timeoutTicks = 60)
     public static void pyreBurns(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, 4.5);
         Husk husk = husk(helper, 4.5, 7.5);
-        StellarPyre.kindle(helper.getLevel(), caster, ModSpells.STELLAR_PYRE.get(), 2);
+        StellarPyre.kindle(helper.getLevel(), caster, at(ModSpells.STELLAR_PYRE, 2), 2, 2);
         helper.succeedWhen(() -> {
             helper.assertTrue(hurt(husk), "the pyre did not burn the husk");
             GameTestSetup.clearLeftovers(helper);

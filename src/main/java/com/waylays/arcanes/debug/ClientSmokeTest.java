@@ -221,7 +221,11 @@ public final class ClientSmokeTest {
     }
 
     private static void cast(Minecraft mc) {
-        List<DeferredHolder<AbstractSpell, ? extends AbstractSpell>> spells = List.copyOf(ModSpells.SPELLS.getEntries());
+        // Stellar Fire's spells come in six heats sharing their code: its coolest and its hottest are cast
+        List<DeferredHolder<AbstractSpell, ? extends AbstractSpell>> spells = ModSpells.SPELLS.getEntries().stream()
+                .filter(e -> !(e.get() instanceof com.waylays.arcanes.spells.fire.StarfireSpell fire) || fire.tier() == 0
+                        || fire.tier() == com.waylays.arcanes.spells.fire.HeatColors.TIERS - 1)
+                .toList();
         IntegratedServer server = mc.getSingleplayerServer();
         if (server == null || mc.player == null) {
             failures.incrementAndGet();
@@ -508,7 +512,7 @@ public final class ClientSmokeTest {
                     creativeShot = section.school().get().getId().getPath();
                     if (mc.screen instanceof CreativeModeInventoryScreen screen) {
                         var items = screen.getMenu().items;
-                        if (items.isEmpty() || items.stream().anyMatch(stack -> ModCreativeTabs.sectionOf(stack) != section)) {
+                        if (items.isEmpty() || items.stream().anyMatch(stack -> !ModCreativeTabs.shows(section, stack))) {
                             failures.incrementAndGet();
                             ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the {} button of the creative tab shows other items ({} items)",
                                     section.school().get().getId(), items.size());
