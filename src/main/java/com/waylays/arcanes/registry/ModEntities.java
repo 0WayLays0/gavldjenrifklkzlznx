@@ -83,7 +83,7 @@ import com.waylays.arcanes.entity.wind.Skyfall;
 import com.waylays.arcanes.entity.wind.Hurricane;
 import com.waylays.arcanes.entity.echo.EchoScene;
 import com.waylays.arcanes.entity.echo.SoundWave;
-import com.waylays.arcanes.entity.sand.GlassShard;
+import com.waylays.arcanes.entity.sand.SandLance;
 import com.waylays.arcanes.entity.sand.SandScene;
 import com.waylays.arcanes.entity.ritual.Meteor;
 import com.waylays.arcanes.entity.ritual.RitualDome;
@@ -671,8 +671,8 @@ public final class ModEntities {
             EntityType.Builder.<EchoScene>of(EchoScene::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(2).fireImmune());
 
     // Sand Magic
-    public static final DeferredHolder<EntityType<?>, EntityType<GlassShard>> GLASS_SHARD = register("glass_shard",
-            EntityType.Builder.<GlassShard>of(GlassShard::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<SandLance>> SAND_LANCE = register("sand_lance",
+            EntityType.Builder.<SandLance>of(SandLance::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8).updateInterval(1).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<SandScene>> SAND_SCENE = register("sand_scene",
             EntityType.Builder.<SandScene>of(SandScene::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
 

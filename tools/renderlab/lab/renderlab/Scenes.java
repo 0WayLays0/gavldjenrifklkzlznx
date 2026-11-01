@@ -469,62 +469,58 @@ public final class Scenes {
                 Vector3f o = new Vector3f(0, 0, 0);
                 RequiemModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 14, age, 140, 30, 12, 5, 3, LIGHT);
             }
-            case "sblast" -> {
+            case "slance" -> {
                 caster(ctx, 0, 0);
-                husk(ctx, 1, 0, 5);
-                Vector3f o = new Vector3f(0, 1.4f, .4f);
-                BlastModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, -.1f, 1).normalize(), 6, .5f, age, 3, LIGHT);
+                husk(ctx, 0, 0, 9);
+                Vector3f o = new Vector3f(0, 1.4f, 3);
+                LanceModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 3, LIGHT);
             }
-            case "sshard" -> {
-                caster(ctx, 0, 0);
-                for (int k = 0; k < 3; k++) {
-                    Vector3f o = new Vector3f(-1 + k, 1.4f, 3 + k);
-                    GlassShardModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(-.2f + .2f * k, 0, 1).normalize(), age + k * 4, 3 + k, LIGHT);
-                }
+            case "sswarm" -> {
+                husk(ctx, 1.2f, 0, .5f);
+                Vector3f o = new Vector3f(0, 1.2f, 0);
+                SwarmModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 100, age % 10, new Vector3f(1.2f, .1f, .5f), 3, LIGHT);
             }
-            case "squick" -> {
-                husk(ctx, .5f, -.6f, 0);
-                Vector3f o = new Vector3f(0, 0, 0);
-                QuicksandModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 3.5f, age, 120, 3, LIGHT);
-            }
-            case "spillar" -> {
-                husk(ctx, 0, Math.min(5, age * .4f), 0);
-                Vector3f o = new Vector3f(0, 0, 0);
-                PillarModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 4, age, 60, 3, LIGHT);
-            }
-            case "sstorm" -> {
-                caster(ctx, 0, 0);
-                husk(ctx, 4, 0, 3);
-                Vector3f o = new Vector3f(0, 0, 0);
-                SandstormModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 7, age, 200, 3, LIGHT);
-            }
-            case "swave" -> {
-                caster(ctx, 0, -2);
-                husk(ctx, 1, 0, 8);
-                Vector3f o = new Vector3f(0, 0, Math.min(14, age * .5f));
-                DuneWaveModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), 6, 2.8f, age, 1, 3, LIGHT);
-            }
-            case "sworm" -> {
-                caster(ctx, -6, -6);
+            case "sgrasp" -> {
                 husk(ctx, 0, 0, 0);
                 Vector3f o = new Vector3f(0, 0, 0);
-                WormModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), 1.4f, age, 3, LIGHT);
+                GraspModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 70, 1.6f, 10, 12, 3, LIGHT);
             }
-            case "ssarco" -> {
-                husk(ctx, 0, 0, 0);
+            case "sveil" -> {
+                caster(ctx, 0, 0);
                 Vector3f o = new Vector3f(0, 0, 0);
-                SarcophagusModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 2.1f, age, 90, 3, LIGHT);
+                VeilModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 2.4f, age, 200, age % 20, new Vector3f(2, 1.3f, 1), 3, LIGHT);
             }
-            case "sobelisk" -> {
-                husk(ctx, 4, 0, 5);
+            case "shourglass" -> {
+                husk(ctx, 2, 0, 1);
+                husk(ctx, -1.5f, 0, -2);
                 Vector3f o = new Vector3f(0, 0, 0);
-                ObeliskModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 5.5f, age, 220, age % 20, new Vector3f(4, 1, 5), 3, LIGHT);
+                HourglassModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 5, 3.2f, age, 140, 12, 3, LIGHT);
             }
-            case "spyramid" -> {
-                caster(ctx, -12, -8);
-                husk(ctx, 1, 0, 1);
+            case "sserpent" -> {
+                husk(ctx, 0, 0, 2.5f);
                 Vector3f o = new Vector3f(0, 0, 0);
-                PyramidModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 6, 8, age, age - 90, 3, LIGHT);
+                SerpentModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 200, age % 30, 3, LIGHT);
+            }
+            case "slens" -> {
+                husk(ctx, .6f, 0, .3f);
+                Vector3f o = new Vector3f(0, 0, 0);
+                LensModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 7, age, 140, 3, LIGHT);
+            }
+            case "sfall" -> {
+                husk(ctx, .8f, 0, .5f);
+                Vector3f o = new Vector3f(0, 0, 0);
+                SandfallModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 3.5f, 10, age, 80, 3, LIGHT);
+            }
+            case "sdjinn" -> {
+                caster(ctx, 1.3f, 1.4f);
+                husk(ctx, -3, 0, 6);
+                Vector3f o = new Vector3f(0, 0, 0);
+                DjinnModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 300, age % 30, new Vector3f(-3, 1, 6), 3, LIGHT);
+            }
+            case "ssimoom" -> {
+                husk(ctx, 3, 2, 2);
+                Vector3f o = new Vector3f(0, 0, 0);
+                SimoomModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 5, age, 240, age % 25, new Vector3f(2.5f, 0, -1.5f), 3, LIGHT);
             }
             default -> throw new IllegalArgumentException("no scene " + scene);
         }

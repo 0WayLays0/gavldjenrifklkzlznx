@@ -6,7 +6,6 @@ import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
-import com.waylays.arcanes.spells.sand.PyramidSpell;
 import com.waylays.arcanes.spells.sand.SandSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -32,10 +31,10 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import org.joml.Vector3f;
 
 /**
- * Server-side checks run by CI for Sand Magic: the school is there with its ten spells; the blast blinds, the shards
- * cut, quicksand holds, the pillar hurls up, the storm scours, the dune wave carries off, the worm bursts out, the
- * sarcophagus binds, the obelisk burns, the pyramid walls in and falls. Each test that looses sand runs in a batch of
- * its own.
+ * Server-side checks run by CI for Sand Magic: the school is there with its ten spells; the lance drills through three,
+ * the scarabs bite, the hand holds then crushes, the veil hardens and scours, the hourglass slows then shatters, the
+ * serpent bites, the lens burns, the sand falls and buries, the djinn hurls bolts, the simoom whirls. Each test that
+ * looses sand runs in a batch of its own.
  */
 @GameTestHolder(ArcanesOublies.MODID)
 @PrefixGameTestTemplate(false)
@@ -67,8 +66,8 @@ public final class SandGameTests {
     }
 
     private static SandScene scene(GameTestHelper helper, LivingEntity caster, DeferredHolder<AbstractSpell, AbstractSpell> spell, SandScene.Kind kind,
-                                   double x, double z, float size, int life, float damage) {
-        return SandScene.spawn(helper.getLevel(), caster, spell.get(), kind, helper.absoluteVec(new Vec3(x, 2, z)), new Vector3f(0, 0, 1), size, life, damage);
+                                   double x, double y, double z, float size, int life, float damage) {
+        return SandScene.spawn(helper.getLevel(), caster, spell.get(), kind, helper.absoluteVec(new Vec3(x, y, z)), new Vector3f(0, 0, 1), size, life, damage);
     }
 
     private static void done(GameTestHelper helper) {
@@ -96,150 +95,157 @@ public final class SandGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_blast", timeoutTicks = 40)
-    public static void sandBlastBlindsTheConeAhead(GameTestHelper helper) {
+    /** The lance drills through three enemies, slowing them, and stops there. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_lance", timeoutTicks = 60)
+    public static void sandLanceDrillsThroughThree(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
-        Husk ahead = husk(helper, 4.5, 3.5);
-        Husk aside = husk(helper, 8.5, 1.5);
-        cast(helper, ModSpells.SAND_BLAST, caster);
-        helper.assertTrue(hurt(ahead) && ahead.hasEffect(MobEffects.BLINDNESS), "the husk ahead is not hurt and blinded");
-        helper.assertTrue(!hurt(aside), "the sand blast hit a husk off to the side");
-        done(helper);
+        Husk[] line = {husk(helper, 4.5, 2.5), husk(helper, 4.5, 4.5), husk(helper, 4.5, 6.5), husk(helper, 4.5, 8.5)};
+        cast(helper, ModSpells.SAND_LANCE, caster);
+        helper.runAfterDelay(20, () -> {
+            for (int k = 0; k < 3; k++) {
+                helper.assertTrue(hurt(line[k]), "the lance did not drill through husk " + (k + 1));
+                helper.assertTrue(line[k].hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "husk " + (k + 1) + " is not slowed");
+            }
+            helper.assertTrue(!hurt(line[3]), "the lance went through a fourth husk");
+            done(helper);
+        });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_glass", timeoutTicks = 40)
-    public static void glassShardsCut(GameTestHelper helper) {
+    /** The scarabs fly to their prey and bite it. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_swarm", timeoutTicks = 80)
+    public static void scarabsBiteTheirPrey(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
-        Husk husk = husk(helper, 4.5, 5.5);
-        cast(helper, ModSpells.GLASS_SHARD, caster);
+        Husk husk = husk(helper, 4.5, 6.5);
+        scene(helper, caster, ModSpells.SCARAB_SWARM, SandScene.Kind.SWARM, 4.5, 3, 1.5, .7f, 100, 2);
+        helper.runAfterDelay(45, () -> {
+            helper.assertTrue(hurt(husk), "the scarabs never bit the husk");
+            helper.assertTrue(!hurt(caster), "the scarabs bit their caster");
+            done(helper);
+        });
+    }
+
+    /** The hand holds its victim fast, then closes its fist on it. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_grasp", timeoutTicks = 80)
+    public static void graspHoldsThenCrushes(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 1.5, .5);
+        Husk husk = husk(helper, 4.5, 4.5);
+        scene(helper, caster, ModSpells.DESERT_GRASP, SandScene.Kind.GRASP, 4.5, 2, 4.5, 1.6f, 40, 6).follow(husk);
+        float[] afterRise = new float[1];
+        helper.runAfterDelay(SandScene.GRASP_RISE + 2, () -> {
+            helper.assertTrue(husk.hasEffect(ModEffects.ENTANGLED), "the hand does not hold the husk");
+            afterRise[0] = husk.getHealth();
+        });
+        helper.runAfterDelay(40 - SandScene.GRASP_CRUSH + 3, () -> {
+            helper.assertTrue(husk.getHealth() < afterRise[0], "the fist did not close on the husk");
+            done(helper);
+        });
+    }
+
+    /** The veil hardens its wearer and scours what comes close. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_veil", timeoutTicks = 60)
+    public static void veilHardensAndScours(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, 4.5);
+        Husk husk = husk(helper, 4.5, 6.0);
+        cast(helper, ModSpells.SAND_VEIL, caster);
+        helper.runAfterDelay(22, () -> {
+            helper.assertTrue(caster.hasEffect(MobEffects.DAMAGE_RESISTANCE), "the veil gave its wearer no resistance");
+            helper.assertTrue(hurt(husk), "the veil did not scour the husk beside it");
+            helper.assertTrue(!hurt(caster), "the veil hurt its wearer");
+            done(helper);
+        });
+    }
+
+    /** The hourglass slows what is under it, and shatters on it when its sand has run. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_hourglass", timeoutTicks = 100)
+    public static void hourglassSlowsThenShatters(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, .5, .5);
+        Husk husk = husk(helper, 5.5, 5.5);
+        scene(helper, caster, ModSpells.HOURGLASS, SandScene.Kind.HOURGLASS, 4.5, 2, 4.5, 5, 60, 6);
+        helper.runAfterDelay(12, () -> {
+            helper.assertTrue(husk.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "the husk under the hourglass is not slowed");
+            helper.assertTrue(!hurt(husk), "the hourglass struck before it shattered");
+        });
+        helper.runAfterDelay(60 - 12 + 3, () -> {
+            helper.assertTrue(hurt(husk), "the hourglass did not shatter on the husk");
+            done(helper);
+        });
+    }
+
+    /** The serpent slides to its prey and bites it, again and again. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_serpent", timeoutTicks = 160)
+    public static void serpentHuntsAndBites(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 1.5, .5);
+        Husk husk = husk(helper, 4.5, 6.5);
+        SandScene serpent = scene(helper, caster, ModSpells.DUNE_SERPENT, SandScene.Kind.SERPENT, 2.5, 2, 1.5, .8f, 200, 2);
         helper.succeedWhen(() -> {
-            helper.assertTrue(hurt(husk), "no shard of glass cut the husk");
+            helper.assertTrue(serpent.bites() >= 2, "the serpent has bitten " + serpent.bites() + " times");
+            helper.assertTrue(hurt(husk), "the serpent's bites did not hurt the husk");
+            helper.assertTrue(!hurt(caster), "the serpent bit its caster");
             GameTestSetup.clearLeftovers(helper);
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_quicksand", timeoutTicks = 60)
-    public static void quicksandHoldsAndHurts(GameTestHelper helper) {
+    /** The lens's burning point slides after the nearest enemy and sets it alight. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_lens", timeoutTicks = 100)
+    public static void lensBurnsTheNearest(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, .5, .5);
-        Husk husk = husk(helper, 5.5, 4.5);
-        scene(helper, caster, ModSpells.QUICKSAND, SandScene.Kind.QUICKSAND, 4.5, 4.5, 3.5f, 100, 2);
-        helper.runAfterDelay(22, () -> {
-            helper.assertTrue(husk.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "the husk in the quicksand is not slowed");
-            helper.assertTrue(hurt(husk), "the quicksand did not hurt the husk");
+        Husk husk = husk(helper, 5.5, 5.5);
+        scene(helper, caster, ModSpells.SUN_LENS, SandScene.Kind.LENS, 3.5, 2, 3.5, 1.6f, 90, 2);
+        helper.runAfterDelay(55, () -> {
+            helper.assertTrue(hurt(husk), "the lens never burnt the husk");
+            helper.assertTrue(husk.getRemainingFireTicks() > 0 || !husk.isAlive(), "the husk is not on fire");
+            helper.assertTrue(!hurt(caster), "the lens burnt its caster");
             done(helper);
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_pillar", timeoutTicks = 40)
-    public static void pillarHurlsUp(GameTestHelper helper) {
-        GameTestSetup.clearLeftovers(helper);
-        Witch caster = caster(helper, .5, .5);
-        Husk husk = husk(helper, 4.5, 4.5);
-        double y0 = husk.getY();
-        double[] highest = {y0};
-        helper.onEachTick(() -> highest[0] = Math.max(highest[0], husk.getY()));
-        scene(helper, caster, ModSpells.SANDSTONE_PILLAR, SandScene.Kind.PILLAR, 4.5, 4.5, 4, 60, 2);
-        helper.runAfterDelay(12, () -> {
-            helper.assertTrue(hurt(husk), "the pillar did not strike the husk");
-            helper.assertTrue(highest[0] > y0 + 1.5, "the pillar did not hurl the husk up (" + (highest[0] - y0) + ")");
-            done(helper);
-        });
-    }
-
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_storm", timeoutTicks = 40)
-    public static void sandstormScoursAroundItsCaster(GameTestHelper helper) {
-        GameTestSetup.clearLeftovers(helper);
-        Witch caster = caster(helper, 4.5, 4.5);
-        Husk husk = husk(helper, 7, 4.5);
-        cast(helper, ModSpells.SANDSTORM, caster);
-        helper.runAfterDelay(12, () -> {
-            helper.assertTrue(hurt(husk) && husk.hasEffect(MobEffects.BLINDNESS), "the husk in the sandstorm is not hurt and blinded");
-            helper.assertTrue(!hurt(caster), "the sandstorm hurt its caster");
-            done(helper);
-        });
-    }
-
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_wave", timeoutTicks = 40)
-    public static void duneWaveCarriesOff(GameTestHelper helper) {
-        GameTestSetup.clearLeftovers(helper);
-        Witch caster = caster(helper, 4.5, .5);
-        Husk husk = husk(helper, 4.5, 4);
-        double z0 = husk.getZ();
-        cast(helper, ModSpells.DUNE_WAVE, caster);
-        helper.runAfterDelay(10, () -> {
-            helper.assertTrue(hurt(husk), "the dune wave did not strike the husk");
-            helper.assertTrue(husk.getZ() > z0 + 1, "the dune wave did not carry the husk along (" + (husk.getZ() - z0) + ")");
-            done(helper);
-        });
-    }
-
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_worm", timeoutTicks = 60)
-    public static void sandwormBurstsOut(GameTestHelper helper) {
+    /** The sand falling buries what is under it: hurt, blinded, weighed down. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_fall", timeoutTicks = 60)
+    public static void sandfallBuriesWhatIsUnder(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, .5, .5);
         Husk husk = husk(helper, 4.5, 4.5);
-        scene(helper, caster, ModSpells.SAND_WORM, SandScene.Kind.WORM, 4.5, 4.5, 1.4f, 80, 3);
-        helper.runAfterDelay(SandScene.WORM_BURST - 3, () -> helper.assertTrue(!hurt(husk), "the worm struck before it burst out"));
-        helper.runAfterDelay(SandScene.WORM_BURST + 3, () -> {
-            helper.assertTrue(hurt(husk), "the worm did not strike the husk standing over it");
+        scene(helper, caster, ModSpells.SANDFALL, SandScene.Kind.SANDFALL, 4.5, 2, 4.5, 3.5f, 60, 2);
+        helper.runAfterDelay(SandScene.POUR_EVERY * 2 + 3, () -> {
+            helper.assertTrue(hurt(husk), "the sand did not bury the husk");
+            helper.assertTrue(husk.hasEffect(MobEffects.BLINDNESS), "the husk is not blinded");
+            helper.assertTrue(!hurt(caster), "the sand fell on its caster");
             done(helper);
         });
     }
 
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_sarcophagus", timeoutTicks = 60)
-    public static void sarcophagusBindsItsVictim(GameTestHelper helper) {
+    /** The djinn at its master's shoulder hurls a bolt of sand at the nearest enemy. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_djinn", timeoutTicks = 80)
+    public static void djinnHurlsBolts(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
-        Witch caster = caster(helper, 4.5, .5);
-        Husk husk = husk(helper, 4.5, 4.5);
-        cast(helper, ModSpells.SARCOPHAGUS, caster);
-        helper.runAfterDelay(22, () -> {
-            helper.assertTrue(husk.hasEffect(ModEffects.ENTANGLED), "the husk is not bound");
-            helper.assertTrue(hurt(husk), "the sarcophagus did not wither the husk");
-            done(helper);
-        });
-    }
-
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_obelisk", timeoutTicks = 60)
-    public static void obeliskBurnsTheNearestFoe(GameTestHelper helper) {
-        GameTestSetup.clearLeftovers(helper);
-        Witch caster = caster(helper, .5, .5);
+        Witch caster = caster(helper, 2.5, 2.5);
         Husk husk = husk(helper, 6.5, 6.5);
-        scene(helper, caster, ModSpells.OBELISK, SandScene.Kind.OBELISK, 2.5, 2.5, 5.5f, 200, 2);
-        helper.runAfterDelay(SandScene.OBELISK_EVERY + 3, () -> {
-            helper.assertTrue(hurt(husk), "the obelisk's beam did not strike the husk");
-            helper.assertTrue(husk.isOnFire() || !husk.isAlive(), "the obelisk's beam did not set the husk burning");
+        scene(helper, caster, ModSpells.SAND_DJINN, SandScene.Kind.DJINN, 2.5, 2, 2.5, 1, 120, 3).follow(caster);
+        helper.runAfterDelay(SandScene.DJINN_EVERY + 4, () -> {
+            helper.assertTrue(hurt(husk), "the djinn's bolt did not strike the husk");
+            helper.assertTrue(!hurt(caster), "the djinn struck its master");
             done(helper);
         });
     }
 
-    /** Aimed at an enemy close by, the pyramid rises far enough on that its ground leaves its caster out. */
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_pyramid_clear")
-    public static void pyramidRisesClearOfItsCaster(GameTestHelper helper) {
-        GameTestSetup.clearLeftovers(helper);
-        Witch caster = caster(helper, 4.5, .5);
-        Vec3 near = caster.position().add(0, 0, 3);
-        double reach = PyramidSpell.clearOfCaster(helper.getLevel(), caster, near).z - caster.getZ();
-        helper.assertTrue(reach > PyramidSpell.HALF, "the pyramid would rise round its caster (" + reach + " blocks ahead)");
-        Vec3 far = caster.position().add(0, 0, 8);
-        helper.assertTrue(PyramidSpell.clearOfCaster(helper.getLevel(), caster, far).equals(far), "a pyramid already clear of its caster was moved");
-        done(helper);
-    }
-
-    /** The pyramid blinds what it walls in, then falls in on it. */
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_pyramid", timeoutTicks = 140)
-    public static void pyramidWallsInThenFalls(GameTestHelper helper) {
+    /** The simoom whirls and blinds what it catches, and spares its caster. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_simoom", timeoutTicks = 60)
+    public static void simoomWhirlsAndBlinds(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, .5, .5);
-        Husk husk = husk(helper, 4.5, 4.5);
-        scene(helper, caster, ModSpells.PYRAMID, SandScene.Kind.PYRAMID, 4.5, 4.5, 3, SandScene.PYRAMID_RISE + SandScene.PYRAMID_HOLD + 32, 6);
-        helper.runAfterDelay(SandScene.PYRAMID_RISE + 4, () -> helper.assertTrue(husk.hasEffect(MobEffects.BLINDNESS), "the husk walled in is not blinded"));
-        int fall = SandScene.PYRAMID_RISE + SandScene.PYRAMID_HOLD;
-        helper.runAfterDelay(fall + 3, () -> {
-            helper.assertTrue(hurt(husk), "the pyramid did not fall in on the husk");
-            helper.assertTrue(!hurt(caster), "the pyramid hurt its caster");
+        Husk husk = husk(helper, 6.5, 4.5);
+        scene(helper, caster, ModSpells.SIMOOM, SandScene.Kind.SIMOOM, 4.5, 2, 4.5, 5, 120, 2);
+        helper.runAfterDelay(23, () -> {
+            helper.assertTrue(hurt(husk), "the simoom did not scour the husk");
+            helper.assertTrue(husk.hasEffect(MobEffects.BLINDNESS), "the husk caught in the simoom is not blinded");
+            helper.assertTrue(!hurt(caster), "the simoom hurt its caster");
             done(helper);
         });
     }

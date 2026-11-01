@@ -223,16 +223,16 @@ import com.waylays.arcanes.spells.wind.CycloneSpell;
 import com.waylays.arcanes.spells.wind.VacuumSpell;
 import com.waylays.arcanes.spells.wind.WindWallSpell;
 import com.waylays.arcanes.spells.wind.BladeStormSpell;
-import com.waylays.arcanes.spells.sand.SandBlastSpell;
-import com.waylays.arcanes.spells.sand.GlassShardSpell;
-import com.waylays.arcanes.spells.sand.QuicksandSpell;
-import com.waylays.arcanes.spells.sand.SandstonePillarSpell;
-import com.waylays.arcanes.spells.sand.SandstormSpell;
-import com.waylays.arcanes.spells.sand.DuneWaveSpell;
-import com.waylays.arcanes.spells.sand.SandWormSpell;
-import com.waylays.arcanes.spells.sand.SarcophagusSpell;
-import com.waylays.arcanes.spells.sand.ObeliskSpell;
-import com.waylays.arcanes.spells.sand.PyramidSpell;
+import com.waylays.arcanes.spells.sand.SandLanceSpell;
+import com.waylays.arcanes.spells.sand.ScarabSwarmSpell;
+import com.waylays.arcanes.spells.sand.DesertGraspSpell;
+import com.waylays.arcanes.spells.sand.SandVeilSpell;
+import com.waylays.arcanes.spells.sand.HourglassSpell;
+import com.waylays.arcanes.spells.sand.DuneSerpentSpell;
+import com.waylays.arcanes.spells.sand.SunLensSpell;
+import com.waylays.arcanes.spells.sand.SandfallSpell;
+import com.waylays.arcanes.spells.sand.SandDjinnSpell;
+import com.waylays.arcanes.spells.sand.SimoomSpell;
 import com.waylays.arcanes.spells.echo.SoundWaveSpell;
 import com.waylays.arcanes.spells.echo.ShriekSpell;
 import com.waylays.arcanes.spells.echo.EchoStepSpell;
@@ -529,16 +529,16 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> REQUIEM = register(new RequiemSpell());
 
     // Sand Magic
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> SAND_BLAST = register(new SandBlastSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> GLASS_SHARD = register(new GlassShardSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> QUICKSAND = register(new QuicksandSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> SANDSTONE_PILLAR = register(new SandstonePillarSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> SANDSTORM = register(new SandstormSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> DUNE_WAVE = register(new DuneWaveSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> SAND_WORM = register(new SandWormSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> SARCOPHAGUS = register(new SarcophagusSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> OBELISK = register(new ObeliskSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> PYRAMID = register(new PyramidSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SAND_LANCE = register(new SandLanceSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SCARAB_SWARM = register(new ScarabSwarmSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> DESERT_GRASP = register(new DesertGraspSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SAND_VEIL = register(new SandVeilSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> HOURGLASS = register(new HourglassSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> DUNE_SERPENT = register(new DuneSerpentSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SUN_LENS = register(new SunLensSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SANDFALL = register(new SandfallSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SAND_DJINN = register(new SandDjinnSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SIMOOM = register(new SimoomSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());
