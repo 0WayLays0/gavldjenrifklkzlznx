@@ -23,9 +23,9 @@ public class TideLanceRenderer extends EntityRenderer<TideLance> {
     @Override
     public void render(TideLance lance, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int light) {
         float age = lance.tickCount + partialTicks;
-        Quaternionf turn = Axis.YP.rotationDegrees(Mth.lerp(partialTicks, lance.yRotO, lance.getYRot()))
-                .mul(Axis.XP.rotationDegrees(-Mth.lerp(partialTicks, lance.xRotO, lance.getXRot())));
-        Vector3f forward = turn.transform(new Vector3f(0, 0, 1));
+        // Its heading is the way it flies (its rotations follow vanilla's projectile convention, not the model's)
+        Vec3 v = lance.getDeltaMovement();
+        Vector3f forward = v.lengthSqr() > 1.0E-6 ? new Vector3f((float) v.x, (float) v.y, (float) v.z).normalize() : new Vector3f(0, 0, 1);
         float mid = lance.getBbHeight() * .5f;
         poseStack.pushPose();
         poseStack.translate(0, mid, 0);
