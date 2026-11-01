@@ -31,7 +31,7 @@ import java.util.Optional;
 
 /**
  * Aurum Blade: a giant golden sword is forged from molten gold in the sky above the target and plunges into it,
- * gilding all around, then rings out an aftershock (see {@link AurumBladeEntity}).
+ * crushing all around, then rings out an aftershock (see {@link AurumBladeEntity}).
  */
 @AutoSpellConfig
 public class AurumBladeSpell extends AbstractSpell {
@@ -60,8 +60,7 @@ public class AurumBladeSpell extends AbstractSpell {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2)),
                 Component.translatable("ui.irons_spellbooks.radius", Utils.stringTruncation(RADIUS, 1)),
-                Component.translatable("ui.arcanes_oublies.aftershock", Utils.stringTruncation(getDamage(spellLevel, caster) * AurumBladeEntity.AFTERSHOCK, 2)),
-                Component.translatable("ui.arcanes_oublies.gilds", 2)
+                Component.translatable("ui.arcanes_oublies.aftershock", Utils.stringTruncation(getDamage(spellLevel, caster) * AurumBladeEntity.AFTERSHOCK, 2))
         );
     }
 

@@ -32,15 +32,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Gilded Chains: golden chains burst out of the ground around the target, pin it in place and lay two coats of gold on
- * it, then one more every two seconds it stays bound. Works like Iron's Root: the target rides an immobile
+ * Gilded Chains: golden chains burst out of the ground around the target and pin it in place, drawing tight every two
+ * seconds it stays bound. Works like Iron's Root: the target rides an immobile
  * {@link GildedChainsEntity} it cannot dismount.
  */
 @AutoSpellConfig
 public class GildedChainsSpell extends AbstractSpell {
-    /** Coats of gold the chains lay as they bind. */
-    public static final int GILDS = 2;
-
     private final ResourceLocation spellId = ArcanesOublies.id("gilded_chains");
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
@@ -62,9 +59,7 @@ public class GildedChainsSpell extends AbstractSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.effect_length", Utils.timeFromTicks(getDuration(spellLevel, caster), 1)),
-                Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2)),
-                Component.translatable("ui.arcanes_oublies.gilds", GILDS),
-                Component.translatable("ui.arcanes_oublies.gild_every", Utils.timeFromTicks(GildedChainsEntity.GILD_EVERY, 1))
+                Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2))
         );
     }
 
@@ -124,7 +119,6 @@ public class GildedChainsSpell extends AbstractSpell {
                 target.stopRiding();
                 target.startRiding(chains, true);
                 DamageSources.applyDamage(target, getDamage(spellLevel, entity), ModSpells.GILDED_CHAINS.get().getDamageSource(chains, entity));
-                GoldFx.gild(target, GILDS);
             }
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);

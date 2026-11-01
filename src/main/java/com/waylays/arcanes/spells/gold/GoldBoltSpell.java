@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Gold Bolt: an ingot of gold hurled spinning that gilds what it strikes and ricochets from enemy to enemy (see
+ * Gold Bolt: an ingot of gold hurled spinning that strikes and ricochets from enemy to enemy (see
  * {@link GoldBoltProjectile}): once, and once more every four levels.
  */
 @AutoSpellConfig
@@ -57,8 +57,7 @@ public class GoldBoltSpell extends AbstractSpell {
         float damage = getDamage(spellLevel, caster);
         return List.of(
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(damage, 2)),
-                Component.translatable("ui.arcanes_oublies.ricochets", ricochets(spellLevel), (int) (GoldBoltProjectile.RICOCHET_DAMAGE * 100)),
-                Component.translatable("ui.arcanes_oublies.gilds", 1)
+                Component.translatable("ui.arcanes_oublies.ricochets", ricochets(spellLevel), (int) (GoldBoltProjectile.RICOCHET_DAMAGE * 100))
         );
     }
 

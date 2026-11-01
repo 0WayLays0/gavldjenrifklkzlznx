@@ -225,7 +225,7 @@ public final class ClientSmokeTest {
     }
 
     private static void cast(Minecraft mc) {
-        // Stellar Fire's spells come in six heats sharing their code: its coolest and its hottest are cast
+        // Stellar Fire's spells come in seven colours sharing their code: its first (red) and its last (green) are cast
         List<DeferredHolder<AbstractSpell, ? extends AbstractSpell>> spells = ModSpells.SPELLS.getEntries().stream()
                 .filter(e -> !(e.get() instanceof com.waylays.arcanes.spells.fire.StarfireSpell fire) || fire.tier() == 0
                         || fire.tier() == com.waylays.arcanes.spells.fire.HeatColors.TIERS - 1)

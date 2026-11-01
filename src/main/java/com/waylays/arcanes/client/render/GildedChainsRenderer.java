@@ -47,8 +47,8 @@ public class GildedChainsRenderer extends EntityRenderer<GildedChainsEntity> {
 
         // Gold glints: the chains are lit as if by a torch even in the dark, and flash as they gild
         int light = LightTexture.pack(Math.max(10, LightTexture.block(packedLight)), LightTexture.sky(packedLight));
-        float since = age % GildedChainsEntity.GILD_EVERY;
-        float pulse = entity.tickCount >= GildedChainsEntity.GILD_EVERY ? Math.max(0, 1 - since / 8f) : 0;
+        float since = age % GildedChainsEntity.TIGHTEN_EVERY;
+        float pulse = entity.tickCount >= GildedChainsEntity.TIGHTEN_EVERY ? Math.max(0, 1 - since / 8f) : 0;
         int rgb = GlyphRender.whiten(GoldRender.GOLD, pulse * .6f);
         VertexConsumer metal = GoldRender.metal(buffer);
         float waist = width * .5f + .08f;

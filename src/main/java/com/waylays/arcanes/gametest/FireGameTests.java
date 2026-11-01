@@ -12,6 +12,7 @@ import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.fire.HeatColors;
 import com.waylays.arcanes.spells.fire.StarfireSpell;
+import com.waylays.arcanes.spells.fire.SupernovaSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
@@ -35,8 +36,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import java.util.List;
 
 /**
- * Server-side checks run by CI for Stellar Fire: the school is there with every spell in each of the six heats; a
- * hotter heat strikes harder and the heat does not change with casting; the bolt, the corona, the pillars, the wisps,
+ * Server-side checks run by CI for Stellar Fire: the school is there with every spell in each of the seven colours;
+ * every colour strikes as hard and the colour does not change with casting; the bolt, the corona, the pillars, the wisps,
  * the crescent, the brand, the phoenix, the supernova and the pyre burn what they reach. Each test runs in a batch of
  * its own.
  */
@@ -86,7 +87,7 @@ public final class FireGameTests {
                 count++;
             }
         }
-        helper.assertTrue(count == 10 * HeatColors.TIERS, "expected 10 Stellar Fire spells in 6 heats, found " + count);
+        helper.assertTrue(count == 10 * HeatColors.TIERS, "expected 10 Stellar Fire spells in " + HeatColors.TIERS + " colours, found " + count);
         for (int tier = 0; tier < HeatColors.TIERS; tier++) {
             StarfireSpell bolt = (StarfireSpell) at(ModSpells.EMBER_BOLT, tier);
             helper.assertTrue(bolt.tier() == tier, "the ember bolt at " + tier + " burns at heat " + bolt.tier());
@@ -98,18 +99,19 @@ public final class FireGameTests {
     }
 
     /**
-     * Each heat strikes harder than the one below and costs a little more; a spell's strength is its own, whoever casts
-     * it and whatever they cast before. Nothing is cast here: this test shares its batch with many others.
+     * Every colour strikes as hard as the others and costs the same; a spell's strength is its own, whoever casts it and
+     * whatever they cast before. Nothing is cast here: this test shares its batch with many others.
      */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
-    public static void hotterStrikesHarder(GameTestHelper helper) {
+    public static void everyColourStrikesAlike(GameTestHelper helper) {
         Witch caster = caster(helper, 4.5, .5);
         for (int tier = 1; tier < HeatColors.TIERS; tier++) {
-            StarfireSpell cooler = (StarfireSpell) at(ModSpells.CORONA, tier - 1), hotter = (StarfireSpell) at(ModSpells.CORONA, tier);
-            helper.assertTrue(hotter.hot(1, caster) > cooler.hot(1, caster), "heat " + tier + " does not strike harder than heat " + (tier - 1));
-            helper.assertTrue(hotter.getManaCost(1) >= cooler.getManaCost(1), "heat " + tier + " costs less than heat " + (tier - 1));
-            helper.assertTrue(hotter.getMinLevel() == cooler.getMinLevel() && hotter.getMaxLevel() == cooler.getMaxLevel(),
-                    "the heats of the corona do not share their levels");
+            StarfireSpell red = (StarfireSpell) at(ModSpells.CORONA, 0), other = (StarfireSpell) at(ModSpells.CORONA, tier);
+            helper.assertTrue(other.hot(1, caster) == red.hot(1, caster), HeatColors.ID[tier] + " does not strike as hard as red");
+            helper.assertTrue(other.getManaCost(1) == red.getManaCost(1), HeatColors.ID[tier] + " does not cost what red costs");
+            helper.assertTrue(other.getMinLevel() == red.getMinLevel() && other.getMaxLevel() == red.getMaxLevel(),
+                    "the colours of the corona do not share their levels");
+            helper.assertTrue(SupernovaSpell.radius(tier) == SupernovaSpell.radius(0), "the " + HeatColors.ID[tier] + " supernova is not as wide as the red");
         }
         StarfireSpell red = (StarfireSpell) at(ModSpells.EMBER_BOLT, 0);
         helper.assertTrue(red.hot(1, caster) == red.hot(1, null), "the ember bolt's strength depends on who casts it");

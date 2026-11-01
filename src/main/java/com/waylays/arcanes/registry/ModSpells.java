@@ -492,7 +492,7 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> TIDAL_WAVE = register(new TidalWaveSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> ABYSSAL_DOME = register(new AbyssalDomeSpell());
 
-    // Stellar Fire: every spell in each of the six heats, red to violet (each list in that order)
+    // Stellar Fire: every spell in each of the seven colours, red to violet then green (each list in that order)
     public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> EMBER_BOLT = heats(EmberBoltSpell::new);
     public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> STELLAR_BREATH = heats(StellarBreathSpell::new);
     public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> CORONA = heats(CoronaSpell::new);
@@ -573,7 +573,7 @@ public final class ModSpells {
         return SPELLS.register(spell.getSpellName(), () -> spell);
     }
 
-    /** A Stellar Fire spell in each of the six heats, red to violet. */
+    /** A Stellar Fire spell in each of the seven colours, red to violet then green. */
     private static List<DeferredHolder<AbstractSpell, AbstractSpell>> heats(java.util.function.IntFunction<AbstractSpell> make) {
         List<DeferredHolder<AbstractSpell, AbstractSpell>> out = new java.util.ArrayList<>();
         for (int tier = 0; tier < com.waylays.arcanes.spells.fire.HeatColors.TIERS; tier++) {

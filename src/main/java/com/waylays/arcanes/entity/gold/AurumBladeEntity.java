@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
  * Aurum Blade: a giant golden sword, forged in the sky from molten gold poured out of the sun vault, that plunges
  * into the ground at the strike point. The entity sits on the ground there; the renderer draws the sword. Timeline
  * (ticks): forged and hovering until {@link #PLUNGE_START}, impact at {@link #STRIKE_TICK} (the nearest enemy takes the
- * full blow and two coats of gold, the others less and one coat), the planted blade rings out an aftershock at
+ * full blow, the others less), the planted blade rings out an aftershock at
  * {@link #RING_TICK}, and melts into coins at {@link #END_TICK}.
  */
 public class AurumBladeEntity extends Entity implements AntiMagicSusceptible {
@@ -115,7 +115,6 @@ public class AurumBladeEntity extends Entity implements AntiMagicSusceptible {
         for (LivingEntity e : SpellUtil.enemiesAround(level(), at.add(0, 1, 0), AurumBladeSpell.RADIUS, owner, x -> true)) {
             float amount = e == closest ? damage : damage * AurumBladeSpell.SPLASH_RATIO;
             if (DamageSources.applyDamage(e, amount, SpellUtil.damageSource(ModSpells.AURUM_BLADE.get(), this, owner))) {
-                GoldFx.gild(e, e == closest ? 2 : 1);
                 Vec3 push = e.position().subtract(at).multiply(1, 0, 1);
                 push = push.lengthSqr() < 1.0E-4 ? Vec3.ZERO : push.normalize().scale(.6);
                 e.push(push.x, .35, push.z);
@@ -136,9 +135,7 @@ public class AurumBladeEntity extends Entity implements AntiMagicSusceptible {
         Entity owner = getOwner();
         Vec3 at = position();
         for (LivingEntity e : SpellUtil.enemiesAround(level(), at.add(0, 1, 0), AurumBladeSpell.RADIUS + 1.2, owner, x -> true)) {
-            if (DamageSources.applyDamage(e, damage * AFTERSHOCK, SpellUtil.damageSource(ModSpells.AURUM_BLADE.get(), this, owner))) {
-                GoldFx.gild(e, 1);
-            }
+            DamageSources.applyDamage(e, damage * AFTERSHOCK, SpellUtil.damageSource(ModSpells.AURUM_BLADE.get(), this, owner));
         }
         SpellUtil.particles(level(), GoldFx.PALE_DUST, at.x, at.y + .2, at.z, 30, 2.2, .05, 2.2, .02);
         SpellUtil.cameraShake(level(), at, 5, 10);

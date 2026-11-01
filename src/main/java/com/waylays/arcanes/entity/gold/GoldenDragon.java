@@ -37,8 +37,8 @@ import java.util.UUID;
 /**
  * The Golden Dragon of Eldorado: a long dragon of gold, horned and maned, that pours out of a giant sun above its
  * summoner (see {@link DragonSun}) and hunts what they fight (or the monsters around them). It circles its prey, then either breathes a
- * stream of molten gold at it or coils round it, climbing in a tight spiral that holds it fast and gilds it before a
- * roar throws everything back; then it dives through its prey and climbs again. Everything it hurts it gilds. At the
+ * stream of molten gold at it or coils round it, climbing in a tight spiral that holds it fast before a
+ * roar throws everything back; then it dives through its prey and climbs again. At the
  * end of its time it melts away into a cascade of coins, tail first; sent away (casting the spell again), it bursts
  * into coins at once. It cannot be hurt; anti-magic sends it away too.
  * <p>
@@ -348,7 +348,7 @@ public class GoldenDragon extends SpellEffectEntity implements OwnedSummon {
         return position().add(getHeading(1).scale(HEAD_REACH));
     }
 
-    /** A stream of molten gold: burns and gilds everything in front of its jaws. */
+    /** A stream of molten gold: burns everything in front of its jaws. */
     private void breathe(LivingEntity owner, Vec3 prey) {
         Vec3 head = headPosition();
         Vec3 aim = prey.subtract(head).normalize();
@@ -360,14 +360,13 @@ public class GoldenDragon extends SpellEffectEntity implements OwnedSummon {
             e.invulnerableTime = 0;
             if (DamageSources.applyDamage(e, damage * .3f, SpellUtil.damageSource(ModSpells.GOLDEN_DRAGON.get(), this, owner))) {
                 e.igniteForSeconds(2);
-                GoldFx.gildEvery(e, 10);
             }
         }
         level().playSound(null, head.x, head.y, head.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.2f, .5f + random.nextFloat() * .2f);
         level().playSound(null, head.x, head.y, head.z, SoundEvents.LAVA_POP, SoundSource.PLAYERS, 1.5f, .7f);
     }
 
-    /** Coiled round its prey: it holds it fast, crushes it and gilds it. */
+    /** Coiled round its prey: it holds it fast and crushes it. */
     private void coil(LivingEntity owner) {
         if (target == null) {
             return;
@@ -375,20 +374,17 @@ public class GoldenDragon extends SpellEffectEntity implements OwnedSummon {
         target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 4, false, false, true));
         if (phaseTicks % 10 == 0) {
             target.invulnerableTime = 0;
-            if (DamageSources.applyDamage(target, damage * .35f, SpellUtil.damageSource(ModSpells.GOLDEN_DRAGON.get(), this, owner))) {
-                GoldFx.gildEvery(target, 20);
-            }
+            DamageSources.applyDamage(target, damage * .35f, SpellUtil.damageSource(ModSpells.GOLDEN_DRAGON.get(), this, owner));
             level().playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.CHAIN_HIT, SoundSource.PLAYERS, 1.5f, .6f);
         }
     }
 
-    /** Uncoiling, it roars: a burst of gold throws everything around back and gilds it. */
+    /** Uncoiling, it roars: a burst of gold throws everything around back. */
     private void roar(LivingEntity owner) {
         Vec3 c = target != null ? target.getBoundingBox().getCenter() : position();
         for (LivingEntity e : SpellUtil.enemiesAround(level(), c, ROAR_RADIUS, owner, e -> !(e instanceof ArmorStand))) {
             e.invulnerableTime = 0;
             if (DamageSources.applyDamage(e, damage * .8f, SpellUtil.damageSource(ModSpells.GOLDEN_DRAGON.get(), this, owner))) {
-                GoldFx.gild(e, 1);
                 Vec3 push = e.position().subtract(c).multiply(1, 0, 1);
                 push = push.lengthSqr() < 1.0E-4 ? new Vec3(1, 0, 0) : push.normalize();
                 e.push(push.x * 1.1, .6, push.z * 1.1);
@@ -411,7 +407,6 @@ public class GoldenDragon extends SpellEffectEntity implements OwnedSummon {
             }
             e.invulnerableTime = 0;
             if (DamageSources.applyDamage(e, damage * 1.4f, SpellUtil.damageSource(ModSpells.GOLDEN_DRAGON.get(), this, owner))) {
-                GoldFx.gild(e, 1);
                 Vec3 push = velocity.multiply(1, 0, 1);
                 push = push.lengthSqr() < 1.0E-4 ? Vec3.ZERO : push.normalize().scale(.9);
                 e.setDeltaMovement(e.getDeltaMovement().add(push).add(0, .55, 0));

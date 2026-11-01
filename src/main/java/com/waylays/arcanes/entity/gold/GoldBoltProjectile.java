@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Gold Bolt: an ingot of gold hurled spinning, hot at the edges. It strikes, lays a coat of gold on what it struck
+ * Gold Bolt: an ingot of gold hurled spinning, hot at the edges. It strikes what it meets
  * and throws out a spray of coins; then it ricochets to the nearest other enemy in sight (a quarter weaker each time),
  * as many times as it has ricochets left. When it has none, or meets a wall, it bursts in coins and shards.
  */
@@ -72,7 +72,6 @@ public class GoldBoltProjectile extends SpellProjectile {
             at = target.getBoundingBox().inflate(.3).clip(from, from.add(getDeltaMovement())).orElse(target.getBoundingBox().getCenter());
             target.invulnerableTime = 0;
             DamageSources.applyDamage(target, getDamage(), SpellUtil.damageSource(ModSpells.GOLD_BOLT.get(), this, owner));
-            GoldFx.gild(target, 1);
             GoldFx.coins(level(), at, 6, .3f);
             level().playSound(null, at.x, at.y, at.z, SoundEvents.ANVIL_LAND, SoundSource.NEUTRAL, .35f, 1.9f);
             level().playSound(null, at.x, at.y, at.z, SoundEvents.ARMOR_EQUIP_GOLD.value(), SoundSource.NEUTRAL, 1.5f, .8f + .15f * struck.size());

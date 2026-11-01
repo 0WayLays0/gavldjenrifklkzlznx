@@ -34,7 +34,7 @@ import java.util.UUID;
 /**
  * Midas Curse: the victim turns to gold from the feet up (drawn on its own body, see {@link GoldCoat}). It gets slower
  * and slower until it is frozen as a golden statue, and when the curse runs out the statue shatters in coins and
- * shards that gild everything around it. A victim already gilded through is a statue at once. Milk (or any other cure)
+ * shards that hurt everything around it. Milk (or any other cure)
  * removes it without the shatter.
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID)
@@ -51,13 +51,10 @@ public class MidasCurseEffect extends MobEffect {
     public static final float TURNED = .66f;
 
     /**
-     * Remembers who cast the curse and how hard the statue shatters (stored on the victim, survives a save). A victim
-     * already gilded through (five coats of Gilding) is a statue at once.
+     * Remembers who cast the curse and how hard the statue shatters (stored on the victim, survives a save).
      */
     public static void curse(LivingEntity victim, LivingEntity caster, int spellLevel, int duration, float shatterDamage) {
-        // Every coat of gold it already wears is that much of the way to the statue: gilded through, it is one at once
-        int head = (int) (duration * TURNED * GildedEffect.coats(victim) / GildedEffect.MAX_COATS);
-        int left = Math.max(20, duration - head);
+        int left = Math.max(20, duration);
         CompoundTag tag = new CompoundTag();
         tag.putUUID("Caster", caster.getUUID());
         tag.putFloat("Damage", shatterDamage);
@@ -68,7 +65,7 @@ public class MidasCurseEffect extends MobEffect {
         GoldCoat.syncLater(victim);
     }
 
-    /** The game time the curse began (as if from the start, for a victim cursed already gilded). */
+    /** The game time the curse began (as if from the start, for a victim turned to a statue at once). */
     public static long start(LivingEntity entity) {
         return entity.getPersistentData().getCompound(TAG).getLong("Start");
     }
@@ -162,9 +159,8 @@ public class MidasCurseEffect extends MobEffect {
         level.playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.HOSTILE, 2.5f, .6f);
         level.playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 1.5f, .7f);
         level.playSound(null, victim.getX(), victim.getY(), victim.getZ(), SoundEvents.ANVIL_LAND, SoundSource.HOSTILE, .6f, 1.4f);
-        // The statue's shards gild everything around it
+        // The statue's shards hurt everything around it
         for (LivingEntity near : SpellUtil.enemiesAround(level, victim.position().add(0, victim.getBbHeight() * .5, 0), 4, caster, e -> e != victim)) {
-            GoldCoat.gild(near, 2);
             if (caster != null) {
                 DamageSources.applyDamage(near, damage * .4f, SpellUtil.damageSource(ModSpells.MIDAS_CURSE.get(), caster, caster));
             }

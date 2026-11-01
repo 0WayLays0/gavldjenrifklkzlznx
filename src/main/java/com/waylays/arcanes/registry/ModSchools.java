@@ -324,8 +324,8 @@ public final class ModSchools {
     ));
 
     /**
-     * Stellar Fire: flames that burn in the colours of the stars, each spell in each of six heats, stronger the hotter:
-     * red, orange, yellow, white, blue and violet (see {@link com.waylays.arcanes.spells.fire.HeatColors}).
+     * Stellar Fire: flames that burn in the colours of the stars and of copper, each spell in each of seven colours that
+     * all strike alike: red, orange, yellow, white, blue, violet and green (see {@link com.waylays.arcanes.spells.fire.HeatColors}).
      */
     public static final ResourceLocation STARFIRE_RESOURCE = ArcanesOublies.id("starfire");
     public static final TagKey<Item> STARFIRE_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("starfire_focus"));

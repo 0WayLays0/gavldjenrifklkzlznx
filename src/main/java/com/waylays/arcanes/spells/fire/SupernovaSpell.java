@@ -19,8 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 /**
- * Supernova: a blast of flame round the caster, the wider and stronger the hotter its heat (from a red flare to a
- * violet blast, see Supernova).
+ * Supernova: a blast of flame round the caster, in the colour of its fire (see Supernova).
  */
 @AutoSpellConfig
 public class SupernovaSpell extends StarfireSpell {
@@ -34,12 +33,14 @@ public class SupernovaSpell extends StarfireSpell {
         costsByHeat();
     }
 
+    public static final float RADIUS = 7;
+
     public static float radius(int tier) {
-        return 3 + 1.6f * tier;
+        return RADIUS;
     }
 
     public float blast(int spellLevel, LivingEntity caster) {
-        return getPower(spellLevel, caster) * (1 + .5f * tier);
+        return getPower(spellLevel, caster) * 2.25f;
     }
 
 
@@ -61,7 +62,7 @@ public class SupernovaSpell extends StarfireSpell {
             Vec3 away = e.position().subtract(entity.position()).multiply(1, 0, 1);
             away = away.lengthSqr() < 1.0E-4 ? new Vec3(1, 0, 0) : away.normalize();
             double resist = 1 - Mth.clamp(e.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 0, 1);
-            e.setDeltaMovement(away.scale((.8 + .2 * tier) * resist).add(0, .45 * resist, 0));
+            e.setDeltaMovement(away.scale(1.3 * resist).add(0, .45 * resist, 0));
             e.hurtMarked = true;
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);

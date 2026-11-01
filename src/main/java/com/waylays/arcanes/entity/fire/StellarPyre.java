@@ -31,7 +31,9 @@ import javax.annotation.Nullable;
  */
 public class StellarPyre extends SpellEffectEntity {
     public static final int STAGE = 40;
-    public static final int LIFE = STAGE * HeatColors.TIERS;
+    /** How many times it flares higher. */
+    public static final int STAGES = 6;
+    public static final int LIFE = STAGE * STAGES;
     public static final int FADE = 16;
     public static final float RADIUS = 6;
     public static final float HEIGHT = 14;
@@ -80,7 +82,7 @@ public class StellarPyre extends SpellEffectEntity {
 
     /** How many times it has flared at {@code age} (0 to 5): it climbs higher with each. */
     public static int stage(float age) {
-        return HeatColors.clamp((int) (age / STAGE));
+        return Mth.clamp((int) (age / STAGE), 0, STAGES - 1);
     }
 
     /** How far into its stage it is at {@code age} (0 to 1). */
@@ -114,7 +116,7 @@ public class StellarPyre extends SpellEffectEntity {
         int tier = getTier();
         float rising = .55f + .09f * stage(tickCount);
         if (tickCount == LIFE) {
-            Supernova.at(level, position(), NOVA * (.7f + .06f * tier), tier);
+            Supernova.at(level, position(), NOVA * .85f, tier);
             for (LivingEntity e : SpellUtil.enemiesAround(level, position().add(0, 1, 0), NOVA, caster, x -> true)) {
                 FireFx.burn(e, damage * 3, spell, this, caster, tier);
             }

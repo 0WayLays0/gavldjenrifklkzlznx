@@ -1,7 +1,6 @@
 package com.waylays.arcanes.gametest;
 
 import com.waylays.arcanes.ArcanesOublies;
-import com.waylays.arcanes.effect.GildedEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.entity.gold.AurumBladeEntity;
 import com.waylays.arcanes.entity.gold.DragonSun;
@@ -17,8 +16,6 @@ import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
-import com.waylays.arcanes.spells.gold.GildedChainsSpell;
-import com.waylays.arcanes.spells.gold.GoldFx;
 import com.waylays.arcanes.spells.gold.GoldenSentinelsSpell;
 import com.waylays.arcanes.spells.gold.GoldfallSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -29,6 +26,7 @@ import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.SchoolType;
 import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
 import io.redspace.ironsspellbooks.item.SpellBook;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -90,7 +88,7 @@ public final class GoldGameTests {
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, timeoutTicks = 100)
-    public static void goldBoltGildsThenRicochets(GameTestHelper helper) {
+    public static void goldBoltStrikesThenRicochets(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(4.5, 2, 1.5));
         Pig target = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 6.5));
         Pig bystander = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(5.8, 2, 7.0));
@@ -105,8 +103,6 @@ public final class GoldGameTests {
             helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 5f, "direct hit did not deal its damage" + state);
             helper.assertTrue(bystander.getHealth() < bystander.getMaxHealth(), "the bolt did not ricochet on to the bystander" + state);
             helper.assertTrue(bystander.getHealth() > target.getHealth(), "the ricochet is as strong as the direct hit" + state);
-            helper.assertTrue(GildedEffect.coats(target) == 1 && GildedEffect.coats(bystander) == 1, "struck pigs are not gilded once"
-                    + " (coats " + GildedEffect.coats(target) + ", " + GildedEffect.coats(bystander) + ")");
         });
     }
 
@@ -127,7 +123,6 @@ public final class GoldGameTests {
         helper.assertTrue(target.getVehicle() instanceof GildedChainsEntity, "target is not bound by the chains");
         GildedChainsEntity chains = (GildedChainsEntity) target.getVehicle();
         helper.assertTrue(target.getHealth() < target.getMaxHealth(), "binding did not hurt the target");
-        helper.assertTrue(GildedEffect.coats(target) == GildedChainsSpell.GILDS, "binding did not gild the target (" + GildedEffect.coats(target) + " coats)");
         target.stopRiding();
         helper.assertTrue(target.getVehicle() == chains, "target slipped out of the chains");
 
@@ -150,7 +145,6 @@ public final class GoldGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(ingot.isRemoved(), "ingot has not melted away (planted: " + ingot.isPlanted() + ")");
             helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 4f, "impact did not hurt the target [" + describe(helper, target) + "]");
-            helper.assertTrue(GildedEffect.coats(target) >= 1, "the impact did not gild the target");
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the caster was hurt by its own ingot");
         });
     }
@@ -210,7 +204,6 @@ public final class GoldGameTests {
                 helper.assertTrue(target.getHealth() == target.getMaxHealth(), "the blade struck before plunging"));
         helper.succeedWhen(() -> {
             helper.assertTrue(target.getHealth() <= target.getMaxHealth() - 5f, "the blade did not strike [" + describe(helper, target) + "]");
-            helper.assertTrue(GildedEffect.coats(target) >= 2, "the blade did not lay two coats of gold on its target");
         });
     }
 
@@ -231,7 +224,6 @@ public final class GoldGameTests {
         helper.succeedWhen(() -> {
             helper.assertTrue(target.getHealth() < target.getMaxHealth(), "molten gold did not hurt the pig [" + describe(helper, target) + "]");
             helper.assertTrue(target.getRemainingFireTicks() > 0 || target.getHealth() <= target.getMaxHealth() - 3f, "the pig was not set on fire");
-            helper.assertTrue(GildedEffect.coats(target) >= 1, "molten gold did not gild the pig");
             int pools = helper.getLevel().getEntitiesOfClass(MoltenPool.class, caster.getBoundingBox().inflate(12)).size();
             helper.assertTrue(pools >= 1, "no molten pool on the floor");
         });
@@ -269,7 +261,6 @@ public final class GoldGameTests {
             }
             state.append("]");
             helper.assertTrue(enemy.getHealth() < enemy.getMaxHealth(), "the sentinels did not attack the husk" + state);
-            helper.assertTrue(GildedEffect.coats(enemy) >= 1, "the sentinels' blows did not gild the husk" + state);
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "a sentinel hurt its summoner");
         });
     }
@@ -284,7 +275,6 @@ public final class GoldGameTests {
         EldoradoSun sun = suns.get(0);
         helper.runAfterDelay(EldoradoSun.FIRST_VOLLEY + 15, () -> {
             helper.assertTrue(enemy.getHealth() < enemy.getMaxHealth(), "the sun's beams missed [" + describe(helper, enemy) + "]");
-            helper.assertTrue(GildedEffect.coats(enemy) >= 1, "the sun's beams did not gild the golem");
         });
         helper.succeedWhen(() -> {
             helper.assertTrue(sun.isRemoved(), "the sun has not exploded yet");
@@ -293,32 +283,25 @@ public final class GoldGameTests {
         });
     }
 
+    /** Gold magic no longer lays coats of gold on whoever it strikes: the Gilding effect is gone. */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
-    public static void gildingPilesUpToFiveCoats(GameTestHelper helper) {
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
-        double baseSpeed = pig.getAttributeValue(Attributes.MOVEMENT_SPEED);
-        helper.assertTrue(GoldFx.gild(pig, 2) == 2 && GildedEffect.coats(pig) == 2, "two coats did not make two");
-        helper.assertTrue(pig.getAttributeValue(Attributes.MOVEMENT_SPEED) < baseSpeed, "gold does not slow the pig");
-        helper.assertTrue(GoldFx.gild(pig, 9) == GildedEffect.MAX_COATS, "gilding went past " + GildedEffect.MAX_COATS + " coats");
+    public static void goldMagicNoLongerGilds(GameTestHelper helper) {
+        helper.assertTrue(!BuiltInRegistries.MOB_EFFECT.containsKey(ArcanesOublies.id("gilded")), "the Gilding effect is still registered");
         helper.succeed();
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
-    public static void midasCurseTurnsTheGildedThroughAtOnce(GameTestHelper helper) {
+    public static void midasCurseStartsFromTheFeet(GameTestHelper helper) {
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
-        Pig plain = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
-        Pig gilded = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(6.5, 2, 6.5));
-        GoldFx.gild(gilded, GildedEffect.MAX_COATS);
-        MidasCurseEffect.curse(plain, caster, 1, 100, 5f);
-        MidasCurseEffect.curse(gilded, caster, 1, 100, 5f);
-        helper.assertTrue(MidasCurseEffect.progress(plain) < .05f, "a plain pig started its curse " + MidasCurseEffect.progress(plain) + " of the way");
-        helper.assertTrue(MidasCurseEffect.progress(gilded) >= MidasCurseEffect.TURNED - .02f,
-                "a pig gilded through is not a statue at once (" + MidasCurseEffect.progress(gilded) + ")");
+        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(4.5, 2, 4.5));
+        MidasCurseEffect.curse(pig, caster, 1, 100, 5f);
+        helper.assertTrue(MidasCurseEffect.progress(pig) < .05f, "the curse started " + MidasCurseEffect.progress(pig) + " of the way");
+        helper.assertTrue(pig.hasEffect(ModEffects.MIDAS_CURSE), "the pig is not cursed");
         helper.succeed();
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "gold_dragon", timeoutTicks = 360)
-    public static void goldenDragonComesOutOfItsSunAndGildsItsPrey(GameTestHelper helper) {
+    public static void goldenDragonComesOutOfItsSunAndHuntsItsPrey(GameTestHelper helper) {
         // The dragon circles well past the platform's chunk: keep the chunks around ticking or it freezes there
         List<ChunkPos> forced = GameTestSetup.forceChunksAround(helper, 1);
         Witch caster = helper.spawnWithNoFreeWill(EntityType.WITCH, new Vec3(1.5, 2, 1.5));
@@ -333,7 +316,6 @@ public final class GoldGameTests {
         helper.assertTrue(suns.size() == 1, "the dragon did not come out of a sun (" + suns.size() + " suns around it)");
         helper.succeedWhen(() -> {
             helper.assertTrue(golem.getHealth() < golem.getMaxHealth(), "the dragon never hurt its prey [" + describe(helper, golem) + "]");
-            helper.assertTrue(GildedEffect.coats(golem) >= 1, "the dragon did not gild its prey");
             helper.assertTrue(caster.getHealth() == caster.getMaxHealth(), "the dragon hurt its summoner");
             dragon.dismissSummon();
             helper.assertTrue(dragon.isRemoved(), "the dragon is still there after being sent away");

@@ -28,7 +28,7 @@ import java.util.Optional;
 
 /**
  * Golden Spikes: a wave of gold crystal clusters bursts out of the ground in a line in front of the caster, each one
- * gilding and tossing what it strikes, and the wave breaks in a crown of spikes at its end (see {@link GoldSpikeEntity}).
+ * hurting and tossing what it strikes, and the wave breaks in a crown of spikes at its end (see {@link GoldSpikeEntity}).
  */
 @AutoSpellConfig
 public class GoldenSpikesSpell extends AbstractSpell {
@@ -56,8 +56,7 @@ public class GoldenSpikesSpell extends AbstractSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2)),
-                Component.translatable("ui.arcanes_oublies.length", Utils.stringTruncation(getSpikeCount(spellLevel) * SPACING, 1)),
-                Component.translatable("ui.arcanes_oublies.gilds", 1)
+                Component.translatable("ui.arcanes_oublies.length", Utils.stringTruncation(getSpikeCount(spellLevel) * SPACING, 1))
         );
     }
 

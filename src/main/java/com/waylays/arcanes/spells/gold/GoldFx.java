@@ -51,15 +51,7 @@ public final class GoldFx {
         }
     }
 
-    /** Lays {@code coats} coats of gold on {@code target} (see {@link GoldCoat}); returns how many it wears now. */
-    public static int gild(LivingEntity target, int coats) {
-        return GoldCoat.gild(target, coats);
-    }
 
-    /** One coat of gold, at most every {@code every} ticks for gold that trickles on (see {@link GoldCoat#gildEvery}). */
-    public static int gildEvery(LivingEntity target, int every) {
-        return GoldCoat.gildEvery(target, every);
-    }
 
     public static ParticleOptions sparks() {
         return new SparkParticleOptions(GOLD);

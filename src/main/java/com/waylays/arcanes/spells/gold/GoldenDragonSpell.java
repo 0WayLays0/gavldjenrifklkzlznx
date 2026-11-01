@@ -29,7 +29,7 @@ import java.util.Optional;
 
 /**
  * Golden Dragon (bonus, legendary): a giant sun blazes up in the sky over the caster and the Golden Dragon of Eldorado
- * pours out of it to hunt their enemies for a while, burning and gilding them with its molten breath, coiling round
+ * pours out of it to hunt their enemies for a while, burning them with its molten breath, coiling round
  * them and diving through them (see {@link GoldenDragon}). Casting the spell again sends it away (see
  * {@link SummoningSpell}).
  */

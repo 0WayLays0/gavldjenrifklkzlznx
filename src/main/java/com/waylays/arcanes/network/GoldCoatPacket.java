@@ -9,14 +9,13 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
- * Server to client: how much gold covers a body (see {@link com.waylays.arcanes.spells.gold.GoldCoat}): its coats of
- * Gilding, when its Midas Curse began and how long it lasts (0 if none), and whether it wears Gilded Armor.
+ * Server to client: how much gold covers a body (see {@link com.waylays.arcanes.spells.gold.GoldCoat}): when its Midas
+ * Curse began and how long it lasts (0 if none), and whether it wears Gilded Armor.
  */
-public record GoldCoatPacket(int entityId, int coats, long midasStart, int midasDuration, boolean armor) implements CustomPacketPayload {
+public record GoldCoatPacket(int entityId, long midasStart, int midasDuration, boolean armor) implements CustomPacketPayload {
     public static final Type<GoldCoatPacket> TYPE = new Type<>(ArcanesOublies.id("gold_coat"));
     public static final StreamCodec<ByteBuf, GoldCoatPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, GoldCoatPacket::entityId,
-            ByteBufCodecs.VAR_INT, GoldCoatPacket::coats,
             ByteBufCodecs.VAR_LONG, GoldCoatPacket::midasStart,
             ByteBufCodecs.VAR_INT, GoldCoatPacket::midasDuration,
             ByteBufCodecs.BOOL, GoldCoatPacket::armor,

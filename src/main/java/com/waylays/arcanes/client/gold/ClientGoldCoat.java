@@ -1,6 +1,5 @@
 package com.waylays.arcanes.client.gold;
 
-import com.waylays.arcanes.effect.GildedEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.network.GoldCoatPacket;
 import net.minecraft.client.Minecraft;
@@ -12,8 +11,7 @@ import java.util.Map;
 
 /**
  * What the client knows of the gold on each body (see {@link com.waylays.arcanes.spells.gold.GoldCoat}), and how high
- * the gold reaches now: a tenth of the body per coat of Gilding (half of it with all five), all of it as a Midas
- * Curse runs its course, a whole shining shell for Gilded Armor.
+ * the gold reaches now: all of it as a Midas Curse runs its course, a whole shining shell for Gilded Armor.
  */
 public final class ClientGoldCoat {
     private static final Map<Integer, GoldCoatPacket> STATES = new HashMap<>();
@@ -32,7 +30,7 @@ public final class ClientGoldCoat {
         } else if (!state.armor()) {
             ARMOR_SINCE.remove(state.entityId());
         }
-        if (state.coats() <= 0 && state.midasDuration() <= 0 && !state.armor()) {
+        if (state.midasDuration() <= 0 && !state.armor()) {
             STATES.remove(state.entityId());
         } else {
             STATES.put(state.entityId(), state);
@@ -52,13 +50,12 @@ public final class ClientGoldCoat {
 
     /** How high the gold reaches on {@code entity} (0 to 1 of its height), and the Midas statue's progress. */
     public static float height(GoldCoatPacket state, LivingEntity entity, float partialTicks) {
-        float coats = state.coats() / (float) GildedEffect.MAX_COATS * .5f;
         float midas = 0;
         if (state.midasDuration() > 0) {
             float age = entity.level().getGameTime() + partialTicks - state.midasStart();
             midas = Mth.clamp(age / state.midasDuration() / MidasCurseEffect.TURNED, 0, 1.05f);
         }
-        return Math.max(coats, midas);
+        return midas;
     }
 
     /** How far up {@code entity} its Gilded Armor has flowed (0 to 1). */

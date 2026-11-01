@@ -23,8 +23,8 @@ import javax.annotation.Nullable;
 
 /**
  * One creative tab for the whole addon, laid out school by school (its spellbook first, then a scroll of each of its
- * spells at every level, in the order they were added). Stellar Fire is laid out by heat, coolest to hottest: a part
- * for each of its six heats (red to violet), each with every spell of that heat at every level. The bar of schools
+ * spells at every level, in the order they were added). Stellar Fire is laid out by colour: a part for each of its
+ * seven colours (red to violet, then green), each with every spell of that colour at every level. The bar of schools
  * beside the tab (client/CreativeTabFilter) shows one school (or one heat) at a time.
  */
 public final class ModCreativeTabs {
@@ -76,7 +76,7 @@ public final class ModCreativeTabs {
             new Section(ModSchools.BONE, () -> new ItemStack(ModItems.OSSUARY_CODEX.get()), List.of(ModItems.OSSUARY_CODEX)),
             new Section(ModSchools.WOOD, () -> new ItemStack(ModItems.SYLVAN_CODEX.get()), List.of(ModItems.SYLVAN_CODEX)),
             new Section(ModSchools.WATER, () -> new ItemStack(ModItems.TIDE_CODEX.get()), List.of(ModItems.TIDE_CODEX)),
-            STARFIRE, heat(0), heat(1), heat(2), heat(3), heat(4), heat(5),
+            STARFIRE, heat(0), heat(1), heat(2), heat(3), heat(4), heat(5), heat(6),
             new Section(ModSchools.WIND, () -> new ItemStack(ModItems.WINDS_CODEX.get()), List.of(ModItems.WINDS_CODEX)),
             new Section(ModSchools.ECHO, () -> new ItemStack(ModItems.ECHOES_CODEX.get()), List.of(ModItems.ECHOES_CODEX)),
             new Section(ModSchools.SAND, () -> new ItemStack(ModItems.DUNES_CODEX.get()), List.of(ModItems.DUNES_CODEX)));

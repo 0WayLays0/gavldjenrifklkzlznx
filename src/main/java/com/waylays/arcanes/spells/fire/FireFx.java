@@ -33,7 +33,9 @@ public final class FireFx {
             case 0, 1, 2 -> ParticleTypes.FLAME;
             case 3 -> ParticleTypes.END_ROD;
             case 4 -> ParticleTypes.SOUL_FIRE_FLAME;
-            default -> ParticleTypes.DRAGON_BREATH;
+            case 5 -> ParticleTypes.DRAGON_BREATH;
+            // No green flame among the game's own: copper's sparks of its heart's colour
+            default -> dust(tier, 1.2f);
         };
     }
 
@@ -55,9 +57,9 @@ public final class FireFx {
         SpellUtil.particles(level, ParticleTypes.LARGE_SMOKE, at.x, at.y, at.z, count, spread, spread * .5, spread, .02);
     }
 
-    /** Sets {@code e} burning, longer the hotter the flame. */
+    /** Sets {@code e} burning: as long whatever the colour. */
     public static void ignite(LivingEntity e, int tier) {
-        e.igniteForSeconds(2 + HeatColors.clamp(tier));
+        e.igniteForSeconds(4);
     }
 
     /** Burns {@code e}: {@code amount} damage of the spell's, and sets it alight. */

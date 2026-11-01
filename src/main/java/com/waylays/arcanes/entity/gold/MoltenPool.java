@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 
 /**
  * A glowing pool of molten gold left by Molten Torrent. While molten it burns and slows enemies standing in it; then it
- * cools into a plate of solid gold that holds their feet and creeps up their legs (a coat of gold every second), and at
+ * cools into a plate of solid gold that holds their feet and creeps up their legs, and at
  * last it breaks up into coins. New gobs landing on an existing pool make it molten again instead of stacking pools.
  */
 public class MoltenPool extends Entity implements AntiMagicSusceptible {
@@ -110,7 +110,6 @@ public class MoltenPool extends Entity implements AntiMagicSusceptible {
                 for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, area)) {
                     if (e.isAlive() && e.onGround() && !SpellUtil.isAlly(owner, e)) {
                         e.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 25, 3));
-                        GoldFx.gildEvery(e, 20);
                     }
                 }
             }

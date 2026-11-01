@@ -43,7 +43,7 @@ import java.util.UUID;
 /**
  * A golden knight summoned by Golden Sentinels, crowned with the sun of Eldorado. It rises out of molten gold (still
  * and untouchable for the moment it takes), then guards its summoner: attacks what the summoner attacks, what attacks
- * the summoner and nearby monsters, and every blow lays a coat of gold. Shatters into coins when its time runs out or
+ * the summoner and nearby monsters. Shatters into coins when its time runs out or
  * when it dies.
  */
 public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
@@ -188,9 +188,6 @@ public class GoldenSentinel extends PathfinderMob implements OwnedSummon {
     public boolean doHurtTarget(Entity target) {
         boolean hit = super.doHurtTarget(target);
         if (hit) {
-            if (target instanceof LivingEntity living) {
-                GoldFx.gild(living, 1);
-            }
             SpellUtil.particles(level(), GoldFx.sparks(), target.getX(), target.getY() + target.getBbHeight() * .6, target.getZ(), 5, .2, .2, .2, .25);
         }
         return hit;

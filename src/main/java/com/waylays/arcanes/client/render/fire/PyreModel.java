@@ -12,8 +12,8 @@ import static com.waylays.arcanes.client.render.water.WaterMesh.*;
 /**
  * The Pyre of Six Fires (Stellar Fire's ultimate): a towering vortex of fire round the caster, three walls of flame
  * wound round it in a spiral, tongues and sparks streaming up it in a whirl, a ring of fire on the ground at its foot,
- * its light flooding the place. It burns through the six heats one after another, red to violet, each a flash brighter
- * than the last, growing taller and hotter.
+ * its light flooding the place. It burns in its own colour and flares six times, each a flash brighter than the last,
+ * growing taller.
  */
 public final class PyreModel {
     private PyreModel() {}

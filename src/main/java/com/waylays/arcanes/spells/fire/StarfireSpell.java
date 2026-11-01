@@ -20,8 +20,8 @@ import javax.annotation.Nullable;
 
 /**
  * Base of the Stellar Fire spells: the school, the config, the caster's gesture, and the heat. Every spell comes in
- * the six heats, each its own spell ({@code <name>_<heat>}: red, orange, yellow, white, blue, violet): it burns in
- * that colour and strikes the harder the hotter it is ({@link HeatColors#POWER}), for a little more mana.
+ * the seven colours, each its own spell ({@code <name>_<colour>}: red, orange, yellow, white, blue, violet, green): it
+ * burns in that colour, and every colour strikes as hard and costs the same ({@link HeatColors#POWER}).
  */
 public abstract class StarfireSpell extends AbstractSpell {
     private final ResourceLocation spellId;
@@ -86,22 +86,23 @@ public abstract class StarfireSpell extends AbstractSpell {
         return tier;
     }
 
-    /** The spell's power at its heat. */
+    /** The spell's power: the same in every colour. */
     public float hot(int spellLevel, @Nullable LivingEntity caster) {
-        return getPower(spellLevel, caster) * HeatColors.POWER[tier];
+        return getPower(spellLevel, caster) * HeatColors.POWER;
     }
 
-    /** The hotter, the dearer: subclasses call it once their mana costs are set. */
+    /** Every colour costs the same: subclasses call it once their mana costs are set. */
     protected void costsByHeat() {
-        float k = 1 + .12f * tier;
-        this.baseManaCost = Math.round(this.baseManaCost * k);
-        this.manaCostPerLevel = Math.round(this.manaCostPerLevel * k);
+        this.baseManaCost = Math.round(this.baseManaCost * HeatColors.MANA);
+        this.manaCostPerLevel = Math.round(this.manaCostPerLevel * HeatColors.MANA);
     }
 
-    /** The tooltip line giving its heat (its star class and temperature) and how much harder it makes the spell strike. */
+    /** The tooltip line giving its colour (and the star class and temperature of that colour; copper's for green). */
     public MutableComponent heatLine(@Nullable LivingEntity caster) {
-        return Component.translatable("ui.arcanes_oublies.heat_of", Component.translatable("heat.arcanes_oublies." + tier), HeatColors.CLASS[tier],
-                HeatColors.KELVIN[tier], Utils.stringTruncation(HeatColors.POWER[tier], 2)).withStyle(s -> s.withColor(HeatColors.BODY[tier]));
+        Component colour = Component.translatable("heat.arcanes_oublies." + tier);
+        MutableComponent line = tier == HeatColors.GREEN ? Component.translatable("ui.arcanes_oublies.heat_of_copper", colour)
+                : Component.translatable("ui.arcanes_oublies.heat_of", colour, HeatColors.CLASS[tier], HeatColors.KELVIN[tier]);
+        return line.withStyle(s -> s.withColor(HeatColors.BODY[tier]));
     }
 
     /** The enemy the caster looks at within {@code range}, if any. */

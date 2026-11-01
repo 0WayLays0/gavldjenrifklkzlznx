@@ -1,6 +1,5 @@
 package com.waylays.arcanes.entity.gold;
 
-import com.waylays.arcanes.effect.GildedEffect;
 import com.waylays.arcanes.effect.MidasCurseEffect;
 import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModEntities;
@@ -26,15 +25,17 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
 /**
  * Sun of Eldorado: the jewelled sun stone of Eldorado rising above the caster, the same sun burning on the ground
- * under it. It grows, fires golden beams at the nearest enemies every half second (each beam lays a coat of gold, and
- * an enemy gilded through by them is turned to a statue on the spot), then collapses and explodes in a supernova of
- * gold that gilds everything it throws back. Beam targets are synced so the client can draw the beams.
+ * under it. It grows, fires golden beams at the nearest enemies every half second (an enemy struck by
+ * {@link #STATUE_BEAMS} of them is turned to a statue on the spot), then collapses and explodes in a supernova of
+ * gold that throws everything back. Beam targets are synced so the client can draw the beams.
  */
 public class EldoradoSun extends Entity {
     public static final int GROW_TICKS = 20;
@@ -45,8 +46,13 @@ public class EldoradoSun extends Entity {
     public static final int MAX_BEAMS = 3;
     /** Ticks a beam stays visible after a volley. */
     public static final int BEAM_TICKS = 5;
-    /** How long the curse of a body the beams gild through runs (it starts as a statue already). */
+    /** Beams that turn an enemy to a statue. */
+    public static final int STATUE_BEAMS = 5;
+    /** How long the curse of a body the beams turn runs (it starts as a statue already). */
     public static final int STATUE_TICKS = 80;
+
+    /** Beams each enemy has taken (by entity id): the server's count, gone with the sun. */
+    private final Map<Integer, Integer> beamsTaken = new HashMap<>();
 
     private static final List<EntityDataAccessor<Integer>> DATA_BEAMS = List.of(
             SynchedEntityData.defineId(EldoradoSun.class, EntityDataSerializers.INT),
@@ -137,8 +143,9 @@ public class EldoradoSun extends Entity {
                 Vec3 hit = target.getBoundingBox().getCenter();
                 SpellUtil.particles(level(), GoldFx.sparks(), hit.x, hit.y, hit.z, 8, .2, .2, .2, .3);
                 target.igniteForSeconds(2);
-                // Gilded through under the sun, it turns to gold where it stands
-                if (GoldFx.gild(target, 1) >= GildedEffect.MAX_COATS && owner instanceof LivingEntity caster && !target.hasEffect(ModEffects.MIDAS_CURSE)) {
+                // Struck often enough under the sun, it turns to gold where it stands
+                int struck = beamsTaken.merge(target.getId(), 1, Integer::sum);
+                if (struck >= STATUE_BEAMS && owner instanceof LivingEntity caster && !target.hasEffect(ModEffects.MIDAS_CURSE)) {
                     MidasCurseEffect.curse(target, caster, 1, STATUE_TICKS, beamDamage * 2);
                     level().playSound(null, hit.x, hit.y, hit.z, SoundEvents.BELL_BLOCK, SoundSource.NEUTRAL, 1.5f, 1.4f);
                 }
@@ -160,7 +167,6 @@ public class EldoradoSun extends Entity {
         Vec3 c = center();
         for (LivingEntity e : SpellUtil.enemiesAround(level(), c, SunOfEldoradoSpell.EXPLOSION_RADIUS, owner, x -> true)) {
             if (DamageSources.applyDamage(e, explosionDamage, SpellUtil.damageSource(ModSpells.SUN_OF_ELDORADO.get(), this, owner))) {
-                GoldFx.gild(e, 2);
                 Vec3 push = e.position().subtract(c);
                 push = push.lengthSqr() < 1.0E-4 ? new Vec3(0, 1, 0) : push.normalize();
                 e.push(push.x * 1.2, .5, push.z * 1.2);

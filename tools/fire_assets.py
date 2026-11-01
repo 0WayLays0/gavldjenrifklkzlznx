@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Stellar Fire art: the filaments flames are drawn with (tinted in game in each of the six heats: red, orange, yellow,
-white, blue, violet, the colours of the star classes M, K, G, F, B and O), an ember, a halo, a spark, smoke, a ring of
-light, each spell's icon in each heat, the Starfire Codex (icon and 3D book texture) and its affinity ring.
+"""Stellar Fire art: the filaments flames are drawn with (tinted in game in each of the seven colours: red, orange,
+yellow, white, blue, violet, the colours of the star classes M, K, G, F, B and O, and green, copper's), an ember, a
+halo, a spark, smoke, a ring of light, each spell's icon in each colour, the Starfire Codex (icon and 3D book texture) and its affinity ring.
 
 Called by gen_assets.py (run that one). Pixel style, shaded in bands. Original art.
 """
@@ -13,10 +13,10 @@ from PIL import Image, ImageDraw
 import gen_assets as g
 from water_assets import _tnoise, _quant, _rgba, _ramp
 
-#: Per heat (see HeatColors.java): heart, body, tips.
-CORE = [(255, 200, 144), (255, 226, 166), (255, 248, 220), (255, 255, 255), (234, 242, 255), (242, 232, 255)]
-BODY = [(240, 64, 28), (255, 134, 30), (255, 203, 56), (255, 242, 220), (79, 147, 255), (155, 92, 255)]
-TIP = [(126, 18, 6), (184, 64, 10), (216, 118, 14), (201, 214, 255), (28, 63, 216), (74, 26, 184)]
+#: Per colour (see HeatColors.java): heart, body, tips.
+CORE = [(255, 200, 144), (255, 226, 166), (255, 248, 220), (255, 255, 255), (234, 242, 255), (242, 232, 255), (234, 255, 216)]
+BODY = [(240, 64, 28), (255, 134, 30), (255, 203, 56), (255, 242, 220), (79, 147, 255), (155, 92, 255), (59, 224, 90)]
+TIP = [(126, 18, 6), (184, 64, 10), (216, 118, 14), (201, 214, 255), (28, 63, 216), (74, 26, 184), (10, 110, 44)]
 SOOT = (40, 30, 28)
 NIGHT = (14, 10, 12)
 
@@ -294,8 +294,8 @@ ICONS = [
     ("supernova", supernova_icon),
     ("stellar_pyre", stellar_pyre_icon),
 ]
-#: The six heats, coolest to hottest, as the spells are named (see HeatColors.ID).
-HEAT_IDS = ["red", "orange", "yellow", "white", "blue", "violet"]
+#: The seven colours, as the spells are named (see HeatColors.ID).
+HEAT_IDS = ["red", "orange", "yellow", "white", "blue", "violet", "green"]
 
 
 # --------------------------------------------------------------------------------------------------- the spellbook

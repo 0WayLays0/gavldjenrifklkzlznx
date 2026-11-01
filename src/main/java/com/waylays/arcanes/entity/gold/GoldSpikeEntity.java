@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 
 /**
  * One cluster of gold crystals of Golden Spikes. Waits {@code warmup} ticks while the ground glows, bursts out of the
- * ground white-hot (hurting, gilding and tossing whatever stands on it), stays a moment cooling, then sinks back. The
+ * ground white-hot (hurting and tossing whatever stands on it), stays a moment cooling, then sinks back. The
  * last of a wave is a crown of spikes: wider, higher, and it throws out a spray of coins.
  */
 public class GoldSpikeEntity extends Entity implements AntiMagicSusceptible {
@@ -111,7 +111,6 @@ public class GoldSpikeEntity extends Entity implements AntiMagicSusceptible {
         for (LivingEntity victim : level().getEntitiesOfClass(LivingEntity.class, area)) {
             if (victim.isAlive() && !SpellUtil.isAlly(owner, victim)
                     && DamageSources.applyDamage(victim, damage * (crown ? 1.5f : 1), SpellUtil.damageSource(ModSpells.GOLDEN_SPIKES.get(), this, owner))) {
-                GoldFx.gild(victim, crown ? 2 : 1);
                 Vec3 v = victim.getDeltaMovement();
                 victim.setDeltaMovement(v.x, Math.max(v.y, crown ? .8 : .55), v.z);
                 victim.hurtMarked = true;

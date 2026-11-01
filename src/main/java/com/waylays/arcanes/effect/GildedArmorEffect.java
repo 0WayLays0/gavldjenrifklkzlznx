@@ -78,9 +78,6 @@ public class GildedArmorEffect extends MobEffect {
             return;
         }
         DamageSources.applyDamage(attacker, reflected, SpellUtil.damageSource(ModSpells.GILDED_ARMOR.get(), victim, victim));
-        if (event.getSource().getDirectEntity() == attacker) {
-            GoldFx.gildEvery(attacker, 20);
-        }
         double y = victim.getY() + victim.getBbHeight() * .6;
         SpellUtil.particles(victim.level(), GoldFx.sparks(), victim.getX(), y, victim.getZ(), 10, .3, .3, .3, .35);
         SpellUtil.particles(victim.level(), GoldFx.nuggetShards(), victim.getX(), y, victim.getZ(), 4, .2, .2, .2, .15);

@@ -34,7 +34,7 @@ import java.util.Optional;
 
 /**
  * Goldfall: the sun stone opens face down in the sky over the targeted spot, giant ingots of gold gather under it and
- * drop one after the other, point first. Each one crushes, throws back and gilds what is around where it lands, stays
+ * drop one after the other, point first. Each one crushes and throws back what is around where it lands, stays
  * planted there for a moment and melts away into coins (see {@link GoldfallIngot}).
  */
 @AutoSpellConfig
@@ -67,8 +67,7 @@ public class GoldfallSpell extends AbstractSpell {
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.damage", Utils.stringTruncation(getDamage(spellLevel, caster), 2)),
-                Component.translatable("ui.arcanes_oublies.ingot_count", getIngotCount(spellLevel)),
-                Component.translatable("ui.arcanes_oublies.gilds", 1)
+                Component.translatable("ui.arcanes_oublies.ingot_count", getIngotCount(spellLevel))
         );
     }
 

@@ -25,8 +25,8 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Goldfall: a giant ingot of gold, two blocks long. It hangs white-hot under the sun vault in the sky for a moment,
- * drops point first, spinning, and drives itself into the ground: everything around is crushed, thrown back and
- * gilded. It stays planted there, cooling, then melts away into a spray of coins.
+ * drops point first, spinning, and drives itself into the ground: everything around is crushed and thrown
+ * back. It stays planted there, cooling, then melts away into a spray of coins.
  */
 public class GoldfallIngot extends SpellProjectile {
     private static final EntityDataAccessor<Integer> DATA_WAIT = SynchedEntityData.defineId(GoldfallIngot.class, EntityDataSerializers.INT);
@@ -123,9 +123,7 @@ public class GoldfallIngot extends SpellProjectile {
         Level level = level();
         Vec3 centre = foot.add(0, .5, 0);
         for (LivingEntity victim : SpellUtil.enemiesAround(level, centre, GoldfallSpell.IMPACT_RADIUS, getOwner(), e -> true)) {
-            if (DamageSources.applyDamage(victim, getDamage(), SpellUtil.damageSource(ModSpells.GOLDFALL.get(), this, getOwner()))) {
-                GoldFx.gild(victim, 1);
-            }
+            DamageSources.applyDamage(victim, getDamage(), SpellUtil.damageSource(ModSpells.GOLDFALL.get(), this, getOwner()));
             Vec3 away = victim.position().subtract(foot).multiply(1, 0, 1);
             away = away.lengthSqr() < 1.0E-4 ? new Vec3(1, 0, 0) : away.normalize();
             victim.push(away.x * .6, .35, away.z * .6);

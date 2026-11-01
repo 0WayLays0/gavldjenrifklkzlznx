@@ -56,8 +56,7 @@ public class GildedArmorSpell extends AbstractSpell {
         return List.of(
                 Component.translatable("ui.irons_spellbooks.effect_length", Utils.timeFromTicks(getDuration(spellLevel), 1)),
                 Component.translatable("ui.arcanes_oublies.armor", 3 * (amplifier + 1)),
-                Component.translatable("ui.arcanes_oublies.reflect", (int) (GildedArmorEffect.reflectRatio(amplifier) * 100)),
-                Component.translatable("ui.arcanes_oublies.armor_gilds")
+                Component.translatable("ui.arcanes_oublies.reflect", (int) (GildedArmorEffect.reflectRatio(amplifier) * 100))
         );
     }
 
