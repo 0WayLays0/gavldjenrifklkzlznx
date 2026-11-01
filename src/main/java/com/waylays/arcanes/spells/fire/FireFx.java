@@ -22,7 +22,8 @@ public final class FireFx {
     private FireFx() {}
 
     public static DustParticleOptions dust(int tier, float size) {
-        int c = HeatColors.BODY[HeatColors.clamp(tier)];
+        // The heart's colour: the body's darker reds read as black specks against the light
+        int c = HeatColors.CORE[HeatColors.clamp(tier)];
         return new DustParticleOptions(new Vector3f(((c >> 16) & 0xFF) / 255f, ((c >> 8) & 0xFF) / 255f, (c & 0xFF) / 255f), size);
     }
 
@@ -38,13 +39,13 @@ public final class FireFx {
 
     /** Flames licking up at {@code at}. */
     public static void flames(Level level, Vec3 at, int count, double spread, int tier) {
-        SpellUtil.particles(level, flame(tier), at.x, at.y, at.z, count, spread, spread * .6, spread, .02);
-        SpellUtil.particles(level, dust(tier, 1.6f), at.x, at.y, at.z, count, spread, spread * .6, spread, .02);
+        // The flames themselves are drawn by the renderers: a few of the game's own for the light they give off
+        SpellUtil.particles(level, flame(tier), at.x, at.y, at.z, Math.max(1, count / 3), spread, spread * .6, spread, .02);
     }
 
     /** Embers flying from {@code at}. */
     public static void embers(Level level, Vec3 at, int count, double spread, int tier) {
-        SpellUtil.particles(level, dust(tier, .8f), at.x, at.y, at.z, count, spread, spread, spread, .1);
+        SpellUtil.particles(level, dust(tier, .5f), at.x, at.y, at.z, Math.max(1, count / 3), spread, spread, spread, .1);
         if (tier <= 2) {
             SpellUtil.particles(level, ParticleTypes.LAVA, at.x, at.y, at.z, Math.max(1, count / 6), spread * .5, spread * .5, spread * .5, 0);
         }

@@ -32,8 +32,11 @@ public final class PyreModel {
         float spin = age * (.06f + .012f * stage);
         // Its light
         VertexConsumer glow = FireMesh.light(buffer, FireMesh.GLOW);
+        // Seen from inside (its caster in its eye) its light is a glow, not a wash over everything
+        float outside = Mth.clamp((Mth.sqrt(eye.x * eye.x + eye.z * eye.z) - radius * .6f) / radius, 0, 1);
         for (int k = 0; k < 5; k++) {
-            FireMesh.halo(glow, poseStack, view, 0, h * (.1f + .22f * k), 0, radius * 4, FireMesh.glowOf(tier), (.35f + .4f * flare) * alive, light);
+            FireMesh.halo(glow, poseStack, view, 0, h * (.1f + .22f * k), 0, radius * (1.6f + 1.4f * outside), FireMesh.glowOf(tier),
+                    (.12f + .25f * outside + .3f * flare * outside) * alive, light);
         }
         FireMesh.groundRing(glow, poseStack.last(), .05f, radius * 3, FireMesh.glowOf(tier), .7f * alive, light);
         VertexConsumer ring = FireMesh.light(buffer, FireMesh.RING);

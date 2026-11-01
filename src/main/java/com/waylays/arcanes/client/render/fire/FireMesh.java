@@ -182,6 +182,12 @@ public final class FireMesh {
             Vector3f base = new Vector3f(l[0], l[1], l[2]);
             Vector3f axis = new Vector3f(l[3], l[4], l[5]);
             float w = l[6], h = l[7], alpha = l[8], lean = l[10];
+            // A flame right against the eye (the caster inside a pyre, a corona) fades away instead of filling the view
+            Vector3f middle = new Vector3f(axis).mul(h * .4f).add(base);
+            alpha *= Mth.clamp((middle.distance(view.eye()) - 1.2f - w * .5f) / 3, 0, 1);
+            if (alpha <= .01f) {
+                return;
+            }
             int seed = (int) l[9];
             Vector3f side = new Vector3f(axis).cross(new Vector3f(view.eye()).sub(base));
             if (side.lengthSquared() < 1.0E-8f) {
