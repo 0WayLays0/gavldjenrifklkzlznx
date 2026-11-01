@@ -101,7 +101,7 @@ public class AbyssalMawSpell extends BossSpell {
             }
         }
         SpellUtil.particles(level, ParticleTypes.REVERSE_PORTAL, c.x, c.y + 1, c.z, 80, RADIUS * .4, .8, RADIUS * .4, .1);
-        SpellUtil.particles(level, ParticleTypes.SQUID_INK, c.x, c.y + .5, c.z, 30, RADIUS * .3, .3, RADIUS * .3, .05);
+        SpellUtil.particles(level, BossFx.dust(0x7A2ACC, 2f), c.x, c.y + .6, c.z, 40, RADIUS * .3, .4, RADIUS * .3, .05);
         BossFx.shockwave(level, c, RADIUS * 2.4f, t.getStyle().rune);
         level.playSound(null, c.x, c.y, c.z, SoundEvents.EVOKER_FANGS_ATTACK, SoundSource.HOSTILE, 3f, .5f);
         level.playSound(null, c.x, c.y, c.z, SoundEvents.RAVAGER_ROAR, SoundSource.HOSTILE, 2f, .6f);

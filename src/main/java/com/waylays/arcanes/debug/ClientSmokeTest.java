@@ -280,7 +280,8 @@ public final class ClientSmokeTest {
             } else if (since == shotDelays[1] - 2) {
                 aim(mc, shotYaw - 32, 12);
             } else if (since == shotDelays[2] - 2) {
-                aim(mc, shotYaw, -25);
+                // A Boss attack is mostly overhead (its eclipse, its moon, its storm): look higher
+                aim(mc, shotYaw, shotDelays == BOSS_SHOT_DELAYS ? -55 : -25);
             }
             for (int k = 0; k < shotDelays.length; k++) {
                 if (ticks - shotCastTick == shotDelays[k]) {

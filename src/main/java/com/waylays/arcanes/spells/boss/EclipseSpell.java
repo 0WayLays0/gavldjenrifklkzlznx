@@ -117,7 +117,7 @@ public class EclipseSpell extends BossSpell {
             float a = i * Mth.TWO_PI / n;
             Vec3 p = SpellUtil.groundAt(level, c.add(Mth.cos(a) * r, 0, Mth.sin(a) * r), 5, 1);
             SpellUtil.particles(level, ParticleTypes.SOUL_FIRE_FLAME, p.x, p.y + .3, p.z, 2, .3, .4, .3, .03);
-            SpellUtil.particles(level, ParticleTypes.SQUID_INK, p.x, p.y + .5, p.z, 1, .3, .3, .3, .02);
+            SpellUtil.particles(level, BossFx.dust(0x5A1A9A, 1.6f), p.x, p.y + .6, p.z, 2, .3, .4, .3, .02);
         }
         BossFx.shockwave(level, c, t.getSize() * 2.2f, t.getStyle().rune);
         level.playSound(null, c.x, c.y, c.z, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 2.5f, .6f + .15f * t.getSize2() / RADIUS);
