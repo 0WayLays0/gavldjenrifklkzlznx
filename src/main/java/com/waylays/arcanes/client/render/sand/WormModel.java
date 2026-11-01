@@ -28,7 +28,7 @@ public final class WormModel {
         // The trembling ground before it
         if (age < BURST + 6) {
             float k = BossMesh.ramp(age, 0, BURST) * (1 - BossMesh.ramp(age, BURST, BURST + 6));
-            VertexConsumer swirl = BossMesh.see(buffer, SandMesh.SWIRL);
+            VertexConsumer swirl = BossMesh.ground(buffer, SandMesh.SWIRL);
             BossMesh.pool(swirl, poseStack.last(), 0, .04f, 0, size * 4.5f * (.5f + .5f * k), age * .1f, BossMesh.argb(0xFFFFFF, .9f * k), light);
             VertexConsumer dust = BossMesh.see(buffer, BossMesh.DUST);
             for (int j = 0; j < 10; j++) {

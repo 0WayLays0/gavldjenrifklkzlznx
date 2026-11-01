@@ -23,7 +23,7 @@ public final class SarcophagusModel {
         float wrap = BossMesh.ramp(age, 0, 14);
         float tear = BossMesh.ramp(age, life - 10, life);
         float r = .55f;
-        VertexConsumer swirl = BossMesh.see(buffer, SandMesh.SWIRL);
+        VertexConsumer swirl = BossMesh.ground(buffer, SandMesh.SWIRL);
         BossMesh.pool(swirl, poseStack.last(), 0, .04f, 0, 2.6f, age * .12f, BossMesh.argb(0xFFFFFF, .8f * (1 - tear)), light);
         VertexConsumer linen = BossMesh.see(buffer, SandMesh.LINEN);
         PoseStack.Pose p = poseStack.last();

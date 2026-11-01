@@ -6,6 +6,7 @@ import com.waylays.arcanes.registry.ModEffects;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.sand.PyramidSpell;
 import com.waylays.arcanes.spells.sand.SandSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -212,6 +213,19 @@ public final class SandGameTests {
             helper.assertTrue(husk.isOnFire() || !husk.isAlive(), "the obelisk's beam did not set the husk burning");
             done(helper);
         });
+    }
+
+    /** Aimed at an enemy close by, the pyramid rises far enough on that its ground leaves its caster out. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "sand_pyramid_clear")
+    public static void pyramidRisesClearOfItsCaster(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, .5);
+        Vec3 near = caster.position().add(0, 0, 3);
+        double reach = PyramidSpell.clearOfCaster(helper.getLevel(), caster, near).z - caster.getZ();
+        helper.assertTrue(reach > PyramidSpell.HALF, "the pyramid would rise round its caster (" + reach + " blocks ahead)");
+        Vec3 far = caster.position().add(0, 0, 8);
+        helper.assertTrue(PyramidSpell.clearOfCaster(helper.getLevel(), caster, far).equals(far), "a pyramid already clear of its caster was moved");
+        done(helper);
     }
 
     /** The pyramid blinds what it walls in, then falls in on it. */

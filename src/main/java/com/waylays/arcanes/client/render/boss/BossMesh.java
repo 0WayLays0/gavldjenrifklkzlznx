@@ -55,6 +55,14 @@ public final class BossMesh {
         return buffer.getBuffer(RenderType.entityTranslucent(texture));
     }
 
+    /**
+     * See-through like {@link #see}, but only from the side its faces turn to: for what lies on the ground, which a
+     * third-person camera dipping to the floor would otherwise see from beneath, covering the whole view.
+     */
+    public static VertexConsumer ground(MultiBufferSource buffer, ResourceLocation texture) {
+        return buffer.getBuffer(RenderType.entityTranslucentCull(texture));
+    }
+
     public static VertexConsumer solid(MultiBufferSource buffer, ResourceLocation texture) {
         return buffer.getBuffer(RenderType.entityCutout(texture));
     }

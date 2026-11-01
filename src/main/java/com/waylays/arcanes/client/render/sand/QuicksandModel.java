@@ -21,10 +21,10 @@ public final class QuicksandModel {
         float close = BossMesh.ramp(age, life - 14, life);
         float k = open * (1 - close);
         float r = radius * (.3f + .7f * open) * (1 - .6f * close);
-        VertexConsumer swirl = BossMesh.see(buffer, SandMesh.SWIRL);
+        VertexConsumer swirl = BossMesh.ground(buffer, SandMesh.SWIRL);
         BossMesh.pool(swirl, poseStack.last(), 0, .04f, 0, r * 2.2f, age * .08f, BossMesh.argb(0xFFFFFF, .95f * k), light);
         BossMesh.pool(swirl, poseStack.last(), 0, .05f, 0, r * 1.3f, age * .15f + 1, BossMesh.argb(0xFFFFFF, .7f * k), light);
-        VertexConsumer dark = BossMesh.see(buffer, BossMesh.DISC);
+        VertexConsumer dark = BossMesh.ground(buffer, BossMesh.DISC);
         BossMesh.pool(dark, poseStack.last(), 0, .06f, 0, r * .45f, 0, BossMesh.argb(0x281808, .85f * k), light);
         VertexConsumer dust = BossMesh.see(buffer, BossMesh.DUST);
         // The lip of sand heaped round it

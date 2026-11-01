@@ -72,10 +72,26 @@ public class PyramidSpell extends SandSpell {
         }
     }
 
+    /**
+     * Where the pyramid rises: on the spot aimed at, or, if its ground would reach the caster, on along the caster's aim
+     * until it stands clear of it. It rises over the enemies, never round the one who called it.
+     */
+    public static Vec3 clearOfCaster(Level level, LivingEntity caster, Vec3 at) {
+        double margin = HALF + .8;
+        if (Math.abs(at.x - caster.getX()) > margin || Math.abs(at.z - caster.getZ()) > margin) {
+            return at;
+        }
+        Vec3 look = caster.getLookAngle().multiply(1, 0, 1);
+        look = look.lengthSqr() < 1.0E-4 ? new Vec3(0, 0, 1) : look.normalize();
+        // The pyramid's ground is square to the world: along the aim, its edge is this far from its middle
+        double reach = margin / Math.max(Math.abs(look.x), Math.abs(look.z));
+        return SpellUtil.groundAt(level, new Vec3(caster.getX() + look.x * reach, at.y, caster.getZ() + look.z * reach), 4, 1);
+    }
+
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         if (level instanceof ServerLevel server) {
-            Vec3 at = aimedSpot(level, entity, RANGE);
+            Vec3 at = clearOfCaster(level, entity, aimedSpot(level, entity, RANGE));
             SandScene.spawn(server, entity, this, SandScene.Kind.PYRAMID, at, new Vector3f(0, 1, 0), HALF, SandScene.PYRAMID_RISE + SandScene.PYRAMID_HOLD + 32,
                     getPower(spellLevel, entity));
             level.playSound(null, at.x, at.y, at.z, SoundEvents.WARDEN_EMERGE, SoundSource.PLAYERS, 2.5f, .6f);

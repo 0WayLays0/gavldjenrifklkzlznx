@@ -65,7 +65,7 @@ public final class EchoMesh {
         if (size <= .05f) {
             return;
         }
-        VertexConsumer sculk = BossMesh.see(buffer, SCULK);
+        VertexConsumer sculk = BossMesh.ground(buffer, SCULK);
         BossMesh.pool(sculk, poseStack.last(), x, y, z, size, spin, BossMesh.argb(0xFFFFFF, alpha), light);
         VertexConsumer veins = BossMesh.light(buffer, VEINS);
         BossMesh.pool(veins, poseStack.last(), x, y + .01f, z, size, spin, BossMesh.glow(ECHO, glow * alpha), light);
