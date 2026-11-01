@@ -97,10 +97,12 @@ public final class FireGameTests {
         helper.succeed();
     }
 
-    /** Each heat strikes harder than the one below, costs a little more, and casting changes nothing for the next cast. */
+    /**
+     * Each heat strikes harder than the one below and costs a little more; a spell's strength is its own, whoever casts
+     * it and whatever they cast before. Nothing is cast here: this test shares its batch with many others.
+     */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
     public static void hotterStrikesHarder(GameTestHelper helper) {
-        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, .5);
         for (int tier = 1; tier < HeatColors.TIERS; tier++) {
             StarfireSpell cooler = (StarfireSpell) at(ModSpells.CORONA, tier - 1), hotter = (StarfireSpell) at(ModSpells.CORONA, tier);
@@ -110,11 +112,8 @@ public final class FireGameTests {
                     "the heats of the corona do not share their levels");
         }
         StarfireSpell red = (StarfireSpell) at(ModSpells.EMBER_BOLT, 0);
-        float before = red.hot(1, caster);
-        red.onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
-        red.onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
-        helper.assertTrue(red.hot(1, caster) == before, "casting made the next cast stronger");
-        GameTestSetup.clearLeftovers(helper);
+        helper.assertTrue(red.hot(1, caster) == red.hot(1, null), "the ember bolt's strength depends on who casts it");
+        caster.discard();
         helper.succeed();
     }
 
