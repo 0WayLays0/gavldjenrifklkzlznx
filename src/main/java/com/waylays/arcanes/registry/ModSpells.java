@@ -205,6 +205,16 @@ import com.waylays.arcanes.spells.fire.PhoenixSpell;
 import com.waylays.arcanes.spells.fire.SupernovaSpell;
 import com.waylays.arcanes.spells.fire.StellarPyreSpell;
 import com.waylays.arcanes.spells.water.TideLanceSpell;
+import com.waylays.arcanes.spells.wind.GustBladeSpell;
+import com.waylays.arcanes.spells.wind.GaleSpell;
+import com.waylays.arcanes.spells.wind.UpdraftSpell;
+import com.waylays.arcanes.spells.wind.TailwindSpell;
+import com.waylays.arcanes.spells.wind.CycloneSpell;
+import com.waylays.arcanes.spells.wind.VacuumSpell;
+import com.waylays.arcanes.spells.wind.WindWallSpell;
+import com.waylays.arcanes.spells.wind.BladeStormSpell;
+import com.waylays.arcanes.spells.wind.SkyfallSpell;
+import com.waylays.arcanes.spells.wind.HurricaneSpell;
 import com.waylays.arcanes.spells.water.PressureJetSpell;
 import com.waylays.arcanes.spells.water.GeyserSpell;
 import com.waylays.arcanes.spells.water.BubblePrisonSpell;
@@ -453,6 +463,18 @@ public final class ModSpells {
     public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> PHOENIX = heats(PhoenixSpell::new);
     public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> SUPERNOVA = heats(SupernovaSpell::new);
     public static final List<DeferredHolder<AbstractSpell, AbstractSpell>> STELLAR_PYRE = heats(StellarPyreSpell::new);
+
+    // Wind Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GUST_BLADE = register(new GustBladeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GALE = register(new GaleSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> UPDRAFT = register(new UpdraftSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TAILWIND = register(new TailwindSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CYCLONE = register(new CycloneSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> VACUUM_SPHERE = register(new VacuumSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> WIND_WALL = register(new WindWallSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BLADE_STORM = register(new BladeStormSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SKYFALL = register(new SkyfallSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> HURRICANE = register(new HurricaneSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

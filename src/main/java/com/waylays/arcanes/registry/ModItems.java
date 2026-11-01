@@ -79,6 +79,8 @@ public final class ModItems {
     /** Stellar Fire spellbook (the Starfire Codex: bound in blackened leather, six flames burning round a star on its cover): 10 slots, +10% power, +200 max mana. */
     public static final DeferredHolder<Item, Item> STARFIRE_CODEX = ITEMS.register("starfire_codex",
             () -> spellbook(10, ModAttributes.STARFIRE_SPELL_POWER));
+    public static final DeferredHolder<Item, Item> WINDS_CODEX = ITEMS.register("winds_codex",
+            () -> spellbook(10, ModAttributes.WIND_SPELL_POWER));
 
     /** The Bone Blade grown out of the caster's elbow by Elbow Blade: a weapon for a while (see BoneBladeItem). */
     public static final DeferredHolder<Item, Item> BONE_BLADE = ITEMS.register("bone_blade", com.waylays.arcanes.item.BoneBladeItem::new);

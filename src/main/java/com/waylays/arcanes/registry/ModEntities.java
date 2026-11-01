@@ -71,6 +71,16 @@ import com.waylays.arcanes.entity.verdigris.SunkenTemple;
 import com.waylays.arcanes.entity.verdigris.ToppleWall;
 import com.waylays.arcanes.entity.verdigris.VineSnare;
 import com.waylays.arcanes.entity.ritual.AmethystBridge;
+import com.waylays.arcanes.entity.wind.GustBlade;
+import com.waylays.arcanes.entity.wind.GaleBurst;
+import com.waylays.arcanes.entity.wind.UpdraftGust;
+import com.waylays.arcanes.entity.wind.WindWard;
+import com.waylays.arcanes.entity.wind.Cyclone;
+import com.waylays.arcanes.entity.wind.VacuumSphere;
+import com.waylays.arcanes.entity.wind.WindWall;
+import com.waylays.arcanes.entity.wind.BladeStorm;
+import com.waylays.arcanes.entity.wind.Skyfall;
+import com.waylays.arcanes.entity.wind.Hurricane;
 import com.waylays.arcanes.entity.ritual.Meteor;
 import com.waylays.arcanes.entity.ritual.RitualDome;
 import com.waylays.arcanes.entity.ritual.RitualPortal;
@@ -627,6 +637,28 @@ public final class ModEntities {
             EntityType.Builder.<AmethystBridge>of(AmethystBridge::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(20).updateInterval(20).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<StoneColossus>> STONE_COLOSSUS = register("stone_colossus",
             EntityType.Builder.<StoneColossus>of(StoneColossus::new, MobCategory.MISC).sized(2.6f, 6.2f).clientTrackingRange(16).fireImmune());
+
+    // Wind Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<GustBlade>> GUST_BLADE = register("gust_blade",
+            EntityType.Builder.<GustBlade>of(GustBlade::new, MobCategory.MISC).sized(1.4f, .5f).clientTrackingRange(8).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<GaleBurst>> GALE_BURST = register("gale_burst",
+            EntityType.Builder.<GaleBurst>of(GaleBurst::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<UpdraftGust>> UPDRAFT = register("updraft",
+            EntityType.Builder.<UpdraftGust>of(UpdraftGust::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<WindWard>> WIND_WARD = register("wind_ward",
+            EntityType.Builder.<WindWard>of(WindWard::new, MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(10).updateInterval(2).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Cyclone>> CYCLONE = register("cyclone",
+            EntityType.Builder.<Cyclone>of(Cyclone::new, MobCategory.MISC).sized(2f, 6f).clientTrackingRange(12).updateInterval(2).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<VacuumSphere>> VACUUM_SPHERE = register("vacuum_sphere",
+            EntityType.Builder.<VacuumSphere>of(VacuumSphere::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<WindWall>> WIND_WALL = register("wind_wall",
+            EntityType.Builder.<WindWall>of(WindWall::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(20).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<BladeStorm>> BLADE_STORM = register("blade_storm",
+            EntityType.Builder.<BladeStorm>of(BladeStorm::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(10).updateInterval(2).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Skyfall>> SKYFALL = register("skyfall",
+            EntityType.Builder.<Skyfall>of(Skyfall::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(10).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<Hurricane>> HURRICANE = register("hurricane",
+            EntityType.Builder.<Hurricane>of(Hurricane::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(2).fireImmune());
 
     private ModEntities() {}
 

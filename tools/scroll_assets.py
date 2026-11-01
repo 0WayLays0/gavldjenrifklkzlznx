@@ -53,6 +53,7 @@ PALETTES = {
     "water": ["bfe4ef", "d2eef6", "e8f8fc", "8cc0d2", "a6d2e2", "2e9fe0", "1f6fb8", "0e3a66", "f4f1ea", "cfcac0", "8e887c"],
     # Smoke-blackened paper, the writing in fire orange, brass rod ends
     "starfire": ["4a3a34", "5c4840", "76605a", "2e2420", "3c2e2a", "ff9a3a", "f0401c", "7e1206", "e6bc72", "c4964a", "7a5a26"],
+    "wind": ["d6ece6", "e6f6f2", "f4fcfa", "a8cdc4", "bfdcd6", "9ee8cf", "46b09c", "1e5c58", "f4f1ea", "cfcac0", "8e887c"],
 }
 
 

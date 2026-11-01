@@ -309,6 +309,16 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.STORM_CLOUD.get(), StormCloudRenderer::new);
         event.registerEntityRenderer(ModEntities.RITUAL_PORTAL.get(), RitualPortalRenderer::new);
         event.registerEntityRenderer(ModEntities.STONE_COLOSSUS.get(), com.waylays.arcanes.client.render.StoneColossusRenderer::new);
+        event.registerEntityRenderer(ModEntities.GUST_BLADE.get(), com.waylays.arcanes.client.render.GustBladeRenderer::new);
+        event.registerEntityRenderer(ModEntities.GALE_BURST.get(), com.waylays.arcanes.client.render.GaleBurstRenderer::new);
+        event.registerEntityRenderer(ModEntities.UPDRAFT.get(), com.waylays.arcanes.client.render.UpdraftGustRenderer::new);
+        event.registerEntityRenderer(ModEntities.WIND_WARD.get(), com.waylays.arcanes.client.render.WindWardRenderer::new);
+        event.registerEntityRenderer(ModEntities.CYCLONE.get(), com.waylays.arcanes.client.render.CycloneRenderer::new);
+        event.registerEntityRenderer(ModEntities.VACUUM_SPHERE.get(), com.waylays.arcanes.client.render.VacuumSphereRenderer::new);
+        event.registerEntityRenderer(ModEntities.WIND_WALL.get(), com.waylays.arcanes.client.render.WindWallRenderer::new);
+        event.registerEntityRenderer(ModEntities.BLADE_STORM.get(), com.waylays.arcanes.client.render.BladeStormRenderer::new);
+        event.registerEntityRenderer(ModEntities.SKYFALL.get(), com.waylays.arcanes.client.render.SkyfallRenderer::new);
+        event.registerEntityRenderer(ModEntities.HURRICANE.get(), com.waylays.arcanes.client.render.HurricaneRenderer::new);
         event.registerEntityRenderer(ModEntities.AMETHYST_BRIDGE.get(), com.waylays.arcanes.client.render.AmethystBridgeRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
@@ -398,6 +408,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.SYLVAN_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.TIDE_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.STARFIRE_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.WINDS_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }

@@ -324,8 +324,8 @@ public final class ModSchools {
     ));
 
     /**
-     * Stellar Fire: flames that burn in the colours of the stars, hotter and stronger with each spell cast: red, orange,
-     * yellow, white, blue and violet (see {@link com.waylays.arcanes.spells.fire.Heat}).
+     * Stellar Fire: flames that burn in the colours of the stars, each spell in each of six heats, stronger the hotter:
+     * red, orange, yellow, white, blue and violet (see {@link com.waylays.arcanes.spells.fire.HeatColors}).
      */
     public static final ResourceLocation STARFIRE_RESOURCE = ArcanesOublies.id("starfire");
     public static final TagKey<Item> STARFIRE_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("starfire_focus"));
@@ -340,6 +340,22 @@ public final class ModSchools {
             ModAttributes.STARFIRE_MAGIC_RESIST,
             sound(SoundEvents.FIRECHARGE_USE),
             STARFIRE_MAGIC
+    ));
+
+    /** Wind Magic: blades and blasts of wind, whirlwinds, walls of wind, the lift of the air, and the hurricane. */
+    public static final ResourceLocation WIND_RESOURCE = ArcanesOublies.id("wind");
+    public static final TagKey<Item> WIND_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("wind_focus"));
+    public static final ResourceKey<DamageType> WIND_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("wind_magic"));
+    public static final int WIND_COLOR = 0x8FE3C8;
+
+    public static final DeferredHolder<SchoolType, SchoolType> WIND = SCHOOLS.register(WIND_RESOURCE.getPath(), () -> new SchoolType(
+            WIND_RESOURCE,
+            WIND_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".wind").withStyle(Style.EMPTY.withColor(WIND_COLOR)),
+            ModAttributes.WIND_SPELL_POWER,
+            ModAttributes.WIND_MAGIC_RESIST,
+            sound(SoundEvents.BREEZE_SHOOT),
+            WIND_MAGIC
     ));
 
     private ModSchools() {}

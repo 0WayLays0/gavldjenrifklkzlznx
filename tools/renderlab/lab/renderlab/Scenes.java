@@ -13,6 +13,16 @@ import com.waylays.arcanes.client.render.fire.WispModel;
 import com.waylays.arcanes.client.render.fire.FireBurstModel;
 import com.waylays.arcanes.client.render.fire.FirePillarModel;
 import com.waylays.arcanes.client.render.ritual.ColossusModel;
+import com.waylays.arcanes.client.render.wind.BladeStormModel;
+import com.waylays.arcanes.client.render.wind.CycloneModel;
+import com.waylays.arcanes.client.render.wind.GaleModel;
+import com.waylays.arcanes.client.render.wind.GustBladeModel;
+import com.waylays.arcanes.client.render.wind.HurricaneModel;
+import com.waylays.arcanes.client.render.wind.SkyfallModel;
+import com.waylays.arcanes.client.render.wind.UpdraftModel;
+import com.waylays.arcanes.client.render.wind.VacuumModel;
+import com.waylays.arcanes.client.render.wind.WindWallModel;
+import com.waylays.arcanes.client.render.wind.WindWardModel;
 import com.waylays.arcanes.client.render.ritual.PortalModel;
 import com.waylays.arcanes.client.render.ritual.RitualFigureModel;
 import com.waylays.arcanes.client.render.ritual.RitualMesh;
@@ -185,6 +195,62 @@ public final class Scenes {
                 caster(ctx, 0, 0);
                 Vector3f o = new Vector3f();
                 PyreModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, tier, Math.min(5, (int) (age / 40)), .5f, 1, 0, 6, 14, 3, LIGHT);
+            }
+            case "wblade" -> {
+                caster(ctx, 0, 0);
+                Vector3f o = new Vector3f(0, 1.4f, 1 + age * .9f);
+                GustBladeModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 2.4f, 1, 3, LIGHT);
+            }
+            case "wgale" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, .5f, 0, 5);
+                Vector3f o = new Vector3f(0, 1.3f, .6f);
+                GaleModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age / 14, 8, 3, LIGHT);
+            }
+            case "wupdraft" -> {
+                ctx.rec().box(-.3, Math.min(6, age * .4), 3.7, .3, Math.min(6, age * .4) + 1.8, 4.3, 0x6A4A8A);
+                Vector3f o = new Vector3f(0, 0, 4);
+                UpdraftModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, Math.min(1, age / 30), 6, 1.2f, 1, 3, LIGHT);
+            }
+            case "wward" -> {
+                ctx.rec().box(-.3, 0, 2.7, .3, 1.8, 3.3, 0x6A4A8A);
+                Vector3f o = new Vector3f(0, 0, 3);
+                WindWardModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 1.8f, 1, 3, LIGHT);
+            }
+            case "wcyclone" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, .8f, 1.5f, 7);
+                Vector3f o = new Vector3f(0, 0, 7);
+                CycloneModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, Math.min(1, age / 15), 0, 6.5f, 2.6f, 3, LIGHT);
+            }
+            case "wvacuum" -> {
+                husk(ctx, 1.5f, 0, 8);
+                Vector3f o = new Vector3f(0, 1.4f, 7);
+                float pull = Math.min(1, age / 30);
+                VacuumModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, pull, age < 30 ? -1 : Math.min(1, (age - 30) / 12), 7, 3, LIGHT);
+            }
+            case "wwall" -> {
+                caster(ctx, 0, 0);
+                Vector3f o = new Vector3f(0, 0, 3);
+                WindWallModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 7, 4, Math.min(1, age / 10), 3, LIGHT);
+            }
+            case "wblades" -> {
+                caster(ctx, 0, 4);
+                Vector3f o = new Vector3f(0, 0, 4);
+                BladeStormModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 7, 3, 1, 3, LIGHT);
+            }
+            case "wskyfall" -> {
+                float lift = Math.min(1, age / 30), slam = age < 30 ? -1 : Math.min(1, (age - 30) / 14);
+                float y = slam < 0 ? 9 * lift : 9 * Math.max(0, 1 - slam * 4);
+                husk(ctx, 0, y, 6);
+                Vector3f o = new Vector3f(0, 0, 6);
+                SkyfallModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, lift, slam, 9, 3, LIGHT);
+            }
+            case "whurricane" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 8, 2, 3);
+                Vector3f o = new Vector3f();
+                HurricaneModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, Math.min(1, age / 30), 0, 4, 12, 14, 3, LIGHT);
             }
             case "colossus" -> {
                 // tier: 0 standing/walking, 1 striking (age since the blow), 2 falling apart (age since)

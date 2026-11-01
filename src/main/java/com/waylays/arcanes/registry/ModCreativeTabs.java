@@ -76,7 +76,8 @@ public final class ModCreativeTabs {
             new Section(ModSchools.BONE, () -> new ItemStack(ModItems.OSSUARY_CODEX.get()), List.of(ModItems.OSSUARY_CODEX)),
             new Section(ModSchools.WOOD, () -> new ItemStack(ModItems.SYLVAN_CODEX.get()), List.of(ModItems.SYLVAN_CODEX)),
             new Section(ModSchools.WATER, () -> new ItemStack(ModItems.TIDE_CODEX.get()), List.of(ModItems.TIDE_CODEX)),
-            STARFIRE, heat(0), heat(1), heat(2), heat(3), heat(4), heat(5));
+            STARFIRE, heat(0), heat(1), heat(2), heat(3), heat(4), heat(5),
+            new Section(ModSchools.WIND, () -> new ItemStack(ModItems.WINDS_CODEX.get()), List.of(ModItems.WINDS_CODEX)));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup." + ArcanesOublies.MODID))
