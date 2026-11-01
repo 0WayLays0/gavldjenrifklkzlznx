@@ -106,8 +106,8 @@ public final class EchoGameTests {
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "echo_wave", timeoutTicks = 40)
     public static void soundWaveLeavesResonance(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
+        // Aimed straight ahead: a wave aimed down at the husk's feet would meet the floor first
         Witch caster = caster(helper, 4.5, .5);
-        caster.setXRot(12);
         Husk husk = husk(helper, 4.5, 5.5);
         cast(helper, ModSpells.SOUND_WAVE, caster);
         helper.succeedWhen(() -> {

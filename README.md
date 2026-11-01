@@ -409,6 +409,23 @@ Le son et le sculk des Abysses. Les coups de l'école laissent de la **Résonanc
 | **Chœur des Abysses** (Deep Choir, épique) | Trois hurleurs de sculk sortent du sol et hurlent à tour de rôle, chacun lançant un rayon sonique sur l'ennemi le plus proche (2 Résonance). |
 | **Requiem** (ultime) | Un cœur de sculk bat au-dessus du lanceur ; cinq murs de son balaient 14 blocs, puis au dernier battement toute la Résonance éclate et le terrain tombe dans le silence et le noir. |
 
+### Magie du Sable
+
+Le désert : sable, verre et grès. Livre : **Codex des Dunes** ; focus : sable, sable rouge, grès et verre.
+
+| Sort | Effet |
+|---|---|
+| **Rafale de Sable** (Sand Blast, commun) | Une gerbe de sable sur un cône de 6 blocs : dégâts, aveuglement 1,5 s, recul. |
+| **Éclat de Verre** (Glass Shard, commun) | Trois éclats de verre en éventail ; chacun se brise à l'impact et ses éclats blessent à moitié ce qui est proche. |
+| **Sables Mouvants** (Quicksand, peu commun) | Le sol visé devient sables mouvants 6 s (3,5 blocs) : très ralenti, attiré au centre, impossible de sauter, dégâts chaque seconde. |
+| **Pilier de Grès** (Sandstone Pillar, peu commun) | Un pilier de grès jaillit sous la cible et la projette en l'air. |
+| **Tempête de Sable** (Sandstorm, rare) | Une tempête tourne autour du lanceur 10 s, où qu'il aille : toutes les demi-secondes elle écorche et aveugle les ennemis à 6 blocs, et dévie les tirs. |
+| **Vague de Dune** (Dune Wave, rare) | Un mur de sable de 6 blocs de large roule sur 15 blocs, frappe et emporte tout ce qu'il rencontre. |
+| **Ver des Sables** (Sandworm, épique) | Le sol tremble, puis un ver gigantesque jaillit, projette ce qui s'y trouve, décrit un arc et replonge plus loin en frappant encore. |
+| **Sarcophage** (Sarcophagus, épique) | Des bandelettes enserrent la cible 4 s : immobilisée, elle dépérit chaque seconde, puis les bandelettes se déchirent dans un dernier coup double. |
+| **Obélisque** (Obelisk, épique) | Une aiguille de grès s'élève 11 s ; sa pointe dorée lance un rayon de soleil sur l'ennemi le plus proche toutes les 1,5 s et l'enflamme. |
+| **Pyramide** (Pyramid, ultime) | Une pyramide à degrés sort du sable sur la zone visée et emmure les ennemis (aveuglés, ralentis, renvoyés vers le centre), puis s'effondre sur eux 3 s plus tard. |
+
 ### Rituels (sorts de groupe)
 
 Ce n'est pas une école : des rituels à plusieurs, lents et spectaculaires. Ils se font avec la **Craie rituelle**

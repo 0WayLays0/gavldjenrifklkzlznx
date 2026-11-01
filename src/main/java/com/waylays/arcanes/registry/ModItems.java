@@ -83,6 +83,8 @@ public final class ModItems {
             () -> spellbook(10, ModAttributes.WIND_SPELL_POWER));
     public static final DeferredHolder<Item, Item> ECHOES_CODEX = ITEMS.register("echoes_codex",
             () -> spellbook(10, ModAttributes.ECHO_SPELL_POWER));
+    public static final DeferredHolder<Item, Item> DUNES_CODEX = ITEMS.register("dunes_codex",
+            () -> spellbook(10, ModAttributes.SAND_SPELL_POWER));
 
     /** The Bone Blade grown out of the caster's elbow by Elbow Blade: a weapon for a while (see BoneBladeItem). */
     public static final DeferredHolder<Item, Item> BONE_BLADE = ITEMS.register("bone_blade", com.waylays.arcanes.item.BoneBladeItem::new);

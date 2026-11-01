@@ -56,6 +56,8 @@ PALETTES = {
     "wind": ["d6ece6", "e6f6f2", "f4fcfa", "a8cdc4", "bfdcd6", "9ee8cf", "46b09c", "1e5c58", "f4f1ea", "cfcac0", "8e887c"],
     # Sculk-dark paper, the writing in the deep dark's cyan, bone rod ends
     "echo": ["16363c", "1e4850", "2a5e68", "0c2428", "123038", "8ff6ff", "2ce6f0", "0d6a78", "e8e2cf", "c4bea8", "7e7864"],
+    # Papyrus, the writing in faience turquoise, gold rod ends
+    "sand": ["e6d2a0", "f0e0b4", "faf0d0", "c4ac78", "d6c08c", "5ad6d0", "1e9a96", "0c5452", "ffd25a", "d6a030", "8a5a14"],
 }
 
 

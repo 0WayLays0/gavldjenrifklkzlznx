@@ -377,6 +377,22 @@ public final class ModSchools {
             ECHO_MAGIC
     ));
 
+    /** Sand Magic: the desert's sand, glass and sandstone; quicksand, sandstorms, the sandworm, the pyramid. */
+    public static final ResourceLocation SAND_RESOURCE = ArcanesOublies.id("sand");
+    public static final TagKey<Item> SAND_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("sand_focus"));
+    public static final ResourceKey<DamageType> SAND_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("sand_magic"));
+    public static final int SAND_COLOR = 0xE0B866;
+
+    public static final DeferredHolder<SchoolType, SchoolType> SAND = SCHOOLS.register(SAND_RESOURCE.getPath(), () -> new SchoolType(
+            SAND_RESOURCE,
+            SAND_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".sand").withStyle(Style.EMPTY.withColor(SAND_COLOR)),
+            ModAttributes.SAND_SPELL_POWER,
+            ModAttributes.SAND_MAGIC_RESIST,
+            sound(SoundEvents.SAND_BREAK),
+            SAND_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

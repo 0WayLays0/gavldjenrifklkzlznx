@@ -56,6 +56,8 @@ public final class ModAttributes {
     public static final DeferredHolder<Attribute, Attribute> WIND_MAGIC_RESIST = resistanceAttribute("wind");
     public static final DeferredHolder<Attribute, Attribute> ECHO_SPELL_POWER = powerAttribute("echo");
     public static final DeferredHolder<Attribute, Attribute> ECHO_MAGIC_RESIST = resistanceAttribute("echo");
+    public static final DeferredHolder<Attribute, Attribute> SAND_SPELL_POWER = powerAttribute("sand");
+    public static final DeferredHolder<Attribute, Attribute> SAND_MAGIC_RESIST = resistanceAttribute("sand");
 
     private ModAttributes() {}
 
