@@ -81,6 +81,8 @@ import com.waylays.arcanes.entity.wind.WindWall;
 import com.waylays.arcanes.entity.wind.BladeStorm;
 import com.waylays.arcanes.entity.wind.Skyfall;
 import com.waylays.arcanes.entity.wind.Hurricane;
+import com.waylays.arcanes.entity.echo.EchoScene;
+import com.waylays.arcanes.entity.echo.SoundWave;
 import com.waylays.arcanes.entity.ritual.Meteor;
 import com.waylays.arcanes.entity.ritual.RitualDome;
 import com.waylays.arcanes.entity.ritual.RitualPortal;
@@ -659,6 +661,12 @@ public final class ModEntities {
             EntityType.Builder.<Skyfall>of(Skyfall::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(10).fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<Hurricane>> HURRICANE = register("hurricane",
             EntityType.Builder.<Hurricane>of(Hurricane::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(16).updateInterval(2).fireImmune());
+
+    // Echo Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<SoundWave>> SOUND_WAVE = register("sound_wave",
+            EntityType.Builder.<SoundWave>of(SoundWave::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(8).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<EchoScene>> ECHO_SCENE = register("echo_scene",
+            EntityType.Builder.<EchoScene>of(EchoScene::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(2).fireImmune());
 
     private ModEntities() {}
 

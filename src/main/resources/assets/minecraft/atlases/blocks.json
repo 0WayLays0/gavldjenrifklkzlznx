@@ -24,7 +24,8 @@
         "arcanes_wood": "arcanes_oublies:item/scroll_palettes/wood",
         "arcanes_water": "arcanes_oublies:item/scroll_palettes/water",
         "arcanes_starfire": "arcanes_oublies:item/scroll_palettes/starfire",
-        "arcanes_wind": "arcanes_oublies:item/scroll_palettes/wind"
+        "arcanes_wind": "arcanes_oublies:item/scroll_palettes/wind",
+        "arcanes_echo": "arcanes_oublies:item/scroll_palettes/echo"
       }
     }
   ]

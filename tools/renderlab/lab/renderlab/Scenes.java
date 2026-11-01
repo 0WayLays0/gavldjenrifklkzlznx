@@ -36,6 +36,7 @@ import com.waylays.arcanes.client.render.water.TidalWaveModel;
 import com.waylays.arcanes.client.render.water.TyphoonModel;
 import com.waylays.arcanes.client.render.water.WaterJetModel;
 import com.waylays.arcanes.client.render.boss.*;
+import com.waylays.arcanes.client.render.echo.*;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.util.Mth;
@@ -407,6 +408,65 @@ public final class Scenes {
                 husk(ctx, -4, 0, 12);
                 Vector3f o = new Vector3f(0, 0, 0);
                 WingsModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 6, age, 70 - age, 16, 35 * Mth.DEG_TO_RAD, 5, LIGHT);
+            }
+            case "ewave" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 0, 0, 9);
+                for (int k = 0; k < 3; k++) {
+                    Vector3f o = new Vector3f(0, 1.4f, 2.5f + k * 2.5f);
+                    WaveModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age + k * 3, 1.1f, 1, 3 + k, LIGHT);
+                }
+            }
+            case "eshriek" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 1, 0, 5);
+                Vector3f o = new Vector3f(0, 1.5f, .3f);
+                ShriekModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), 7, .7f, age, 3, LIGHT);
+            }
+            case "estep" -> {
+                caster(ctx, 0, 8);
+                husk(ctx, 2, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                StepModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 30 - age, 3, 3, LIGHT);
+            }
+            case "etendrils" -> {
+                caster(ctx, -6, -4);
+                husk(ctx, 0, 0, 0);
+                Vector3f o = new Vector3f(0, 0, 0);
+                TendrilsModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 3.5f, age, 80, 3, LIGHT);
+            }
+            case "esensor" -> {
+                husk(ctx, 3, 0, 4);
+                Vector3f o = new Vector3f(0, 0, 0);
+                SensorModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 400, age % 30, new Vector3f(3, 1.2f, 4), 3, LIGHT);
+            }
+            case "eburst" -> {
+                husk(ctx, 0, 0, 0);
+                Vector3f o = new Vector3f(0, 1, 0);
+                BurstModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 4, 3, LIGHT);
+            }
+            case "eboom" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 0, 0, 14);
+                Vector3f o = new Vector3f(0, 1.4f, .5f);
+                BoomModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), 20, 1.2f, age, LIGHT);
+            }
+            case "edome" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 2);
+                Vector3f o = new Vector3f(0, 0, 0);
+                DomeModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 6, age, 160, 3, LIGHT);
+            }
+            case "eshrieker" -> {
+                husk(ctx, 4, 0, 6);
+                Vector3f o = new Vector3f(0, 0, 0);
+                ShriekerModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 200, age - 40, new Vector3f(4, 1, 6), 3, LIGHT);
+            }
+            case "erequiem" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 6, 0, 4);
+                Vector3f o = new Vector3f(0, 0, 0);
+                RequiemModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 14, age, 140, 30, 12, 5, 3, LIGHT);
             }
             default -> throw new IllegalArgumentException("no scene " + scene);
         }

@@ -358,6 +358,25 @@ public final class ModSchools {
             WIND_MAGIC
     ));
 
+    /**
+     * Echo Magic: sound and the sculk of the deep dark. Its blows leave Resonance in their victims (see
+     * {@link com.waylays.arcanes.effect.ResonanceEffect}), which its other spells make burst.
+     */
+    public static final ResourceLocation ECHO_RESOURCE = ArcanesOublies.id("echo");
+    public static final TagKey<Item> ECHO_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("echo_focus"));
+    public static final ResourceKey<DamageType> ECHO_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("echo_magic"));
+    public static final int ECHO_COLOR = 0x2CE6F0;
+
+    public static final DeferredHolder<SchoolType, SchoolType> ECHO = SCHOOLS.register(ECHO_RESOURCE.getPath(), () -> new SchoolType(
+            ECHO_RESOURCE,
+            ECHO_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".echo").withStyle(Style.EMPTY.withColor(ECHO_COLOR)),
+            ModAttributes.ECHO_SPELL_POWER,
+            ModAttributes.ECHO_MAGIC_RESIST,
+            sound(SoundEvents.SCULK_SHRIEKER_SHRIEK),
+            ECHO_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

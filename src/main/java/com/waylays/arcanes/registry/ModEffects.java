@@ -1,5 +1,7 @@
 package com.waylays.arcanes.registry;
 
+import com.waylays.arcanes.effect.ResonanceEffect;
+
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.effect.BlastLeapEffect;
 import com.waylays.arcanes.effect.BleedingEffect;
@@ -56,6 +58,9 @@ public final class ModEffects {
     public static final DeferredHolder<MobEffect, MobEffect> WEIGHTLESS = EFFECTS.register("weightless", WeightlessEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> LOW_GRAVITY = EFFECTS.register("low_gravity", LowGravityEffect::new);
     // Stellar Fire: how hot its caster burns
+
+    // Echo Magic: the sound still ringing in a creature, waiting to burst
+    public static final DeferredHolder<MobEffect, MobEffect> RESONANCE = EFFECTS.register("resonance", ResonanceEffect::new);
 
     private ModEffects() {}
 }

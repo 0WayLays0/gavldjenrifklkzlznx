@@ -54,6 +54,8 @@ PALETTES = {
     # Smoke-blackened paper, the writing in fire orange, brass rod ends
     "starfire": ["4a3a34", "5c4840", "76605a", "2e2420", "3c2e2a", "ff9a3a", "f0401c", "7e1206", "e6bc72", "c4964a", "7a5a26"],
     "wind": ["d6ece6", "e6f6f2", "f4fcfa", "a8cdc4", "bfdcd6", "9ee8cf", "46b09c", "1e5c58", "f4f1ea", "cfcac0", "8e887c"],
+    # Sculk-dark paper, the writing in the deep dark's cyan, bone rod ends
+    "echo": ["16363c", "1e4850", "2a5e68", "0c2428", "123038", "8ff6ff", "2ce6f0", "0d6a78", "e8e2cf", "c4bea8", "7e7864"],
 }
 
 

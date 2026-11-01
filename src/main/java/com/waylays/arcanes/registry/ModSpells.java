@@ -223,6 +223,16 @@ import com.waylays.arcanes.spells.wind.CycloneSpell;
 import com.waylays.arcanes.spells.wind.VacuumSpell;
 import com.waylays.arcanes.spells.wind.WindWallSpell;
 import com.waylays.arcanes.spells.wind.BladeStormSpell;
+import com.waylays.arcanes.spells.echo.SoundWaveSpell;
+import com.waylays.arcanes.spells.echo.ShriekSpell;
+import com.waylays.arcanes.spells.echo.EchoStepSpell;
+import com.waylays.arcanes.spells.echo.SculkTendrilsSpell;
+import com.waylays.arcanes.spells.echo.SculkSensorSpell;
+import com.waylays.arcanes.spells.echo.ResonantBurstSpell;
+import com.waylays.arcanes.spells.echo.SonicBoomSpell;
+import com.waylays.arcanes.spells.echo.SilenceDomeSpell;
+import com.waylays.arcanes.spells.echo.DeepChoirSpell;
+import com.waylays.arcanes.spells.echo.RequiemSpell;
 import com.waylays.arcanes.spells.wind.SkyfallSpell;
 import com.waylays.arcanes.spells.wind.HurricaneSpell;
 import com.waylays.arcanes.spells.water.PressureJetSpell;
@@ -495,6 +505,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> BLADE_STORM = register(new BladeStormSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SKYFALL = register(new SkyfallSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> HURRICANE = register(new HurricaneSpell());
+
+    // Echo Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SOUND_WAVE = register(new SoundWaveSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SHRIEK = register(new ShriekSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ECHO_STEP = register(new EchoStepSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SCULK_TENDRILS = register(new SculkTendrilsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SCULK_SENSOR = register(new SculkSensorSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RESONANT_BURST = register(new ResonantBurstSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SONIC_BOOM = register(new SonicBoomSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SILENCE_DOME = register(new SilenceDomeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> DEEP_CHOIR = register(new DeepChoirSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> REQUIEM = register(new RequiemSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

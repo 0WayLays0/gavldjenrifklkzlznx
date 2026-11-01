@@ -390,6 +390,25 @@ Le rubis et le diamant se combinent : un Rayon de Rubis visé à travers un Pris
 Livre : **Codex du Joaillier** (cuir violet, cinq gemmes serties). Focus : diamant, émeraude, éclat d'améthyste,
 lapis-lazuli.
 
+### Magie de l'Écho
+
+Le son et le sculk des Abysses. Les coups de l'école laissent de la **Résonance** dans leurs victimes (jusqu'à 5 niveaux,
+10 s) : chaque niveau rend les coups d'Écho 10 % plus forts, et certains sorts la font éclater. Livre : **Codex des
+Échos** ; focus : éclat d'écho et blocs de sculk.
+
+| Sort | Effet |
+|---|---|
+| **Onde Sonore** (Sound Wave, commun) | Un anneau de son traverse deux ennemis et laisse 1 Résonance dans chacun. |
+| **Hurlement** (Shriek, commun) | Un hurlement sur un cône de 7 blocs : dégâts, ténèbres 2 s, recul, 1 Résonance. |
+| **Pas d'Écho** (Echo Step, peu commun) | Un pas jusqu'à 10 blocs ; l'écho laissé derrière vibre puis éclate 1,5 s plus tard (dégâts sur 3 blocs). |
+| **Vrilles de Sculk** (Sculk Tendrils, peu commun) | Le sculk s'étend là où l'on vise et des vrilles fouettent ce qui s'y trouve toutes les demi-secondes : dégâts, immobilisation, Résonance. |
+| **Capteur de Sculk** (Sculk Sensor, rare) | Un capteur posé au sol 20 s : il frappe d'un trait de son tout ennemi qui bouge près de lui (7 blocs), toutes les 1,5 s. Deux au plus. |
+| **Choc Résonant** (Resonant Burst, rare) | Fait éclater la Résonance de tous les ennemis à 12 blocs : dégâts par niveau ; ceux qui n'en ont pas se mettent à résonner. |
+| **Rayon Sonique** (Sonic Boom, rare) | Une seconde de charge comme le Warden, puis un rayon de 24 blocs qui traverse tout, projette et laisse 2 Résonance. |
+| **Dôme du Silence** (Silence Dome, épique) | Un dôme de 6 blocs, 8 à 12 s : les ennemis dedans ne peuvent plus lancer de sorts, sont ralentis et résonnent, leurs tirs retombent ; le camp du lanceur est renforcé. |
+| **Chœur des Abysses** (Deep Choir, épique) | Trois hurleurs de sculk sortent du sol et hurlent à tour de rôle, chacun lançant un rayon sonique sur l'ennemi le plus proche (2 Résonance). |
+| **Requiem** (ultime) | Un cœur de sculk bat au-dessus du lanceur ; cinq murs de son balaient 14 blocs, puis au dernier battement toute la Résonance éclate et le terrain tombe dans le silence et le noir. |
+
 ### Rituels (sorts de groupe)
 
 Ce n'est pas une école : des rituels à plusieurs, lents et spectaculaires. Ils se font avec la **Craie rituelle**
