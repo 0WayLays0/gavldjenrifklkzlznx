@@ -75,7 +75,10 @@ public class EchoStepSpell extends EchoSpell {
         if (level instanceof ServerLevel server) {
             Vec3 from = entity.position();
             Vec3 to = landing(level, entity);
-            EchoScene.spawn(server, entity, this, EchoScene.Kind.STEP, from, new Vector3f(0, 1, 0), BURST_RADIUS, EchoScene.STEP_DELAY + 14,
+            // The echo faces the way its caster looked
+            Vec3 look = entity.getLookAngle().multiply(1, 0, 1);
+            Vector3f facing = look.lengthSqr() < 1.0E-4 ? new Vector3f(0, 0, 1) : new Vector3f((float) look.x, 0, (float) look.z).normalize();
+            EchoScene.spawn(server, entity, this, EchoScene.Kind.STEP, from, facing, BURST_RADIUS, EchoScene.STEP_DELAY + 14,
                     getPower(spellLevel, entity));
             EchoFx.pulse(level, from.add(0, 1, 0), 16, .4);
             entity.teleportTo(to.x, to.y, to.z);

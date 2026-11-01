@@ -40,7 +40,8 @@ public class EchoSceneRenderer extends EntityRenderer<EchoScene> {
         Vector3f target = e.sinceStruck(partialTicks) < 40 ? e.getTarget() : null;
         switch (e.getKind()) {
             case SHRIEK -> ShriekModel.draw(poseStack, buffer, view, e.getDir(), size, SHRIEK_HALF, age, seed, light);
-            case STEP -> StepModel.draw(poseStack, buffer, view, age, EchoScene.STEP_DELAY - age, size, seed, light);
+            case STEP -> StepModel.draw(poseStack, buffer, view, age, EchoScene.STEP_DELAY - age, size, (float) Math.atan2(-e.getDir().x, e.getDir().z), seed,
+                    light);
             case TENDRILS -> TendrilsModel.draw(poseStack, buffer, view, size, age, e.getLife(), seed, light);
             case SENSOR -> SensorModel.draw(poseStack, buffer, view, age, e.getLife(), e.sinceStruck(partialTicks), target, seed, light);
             case BURST -> BurstModel.draw(poseStack, buffer, view, age, size, seed, light);

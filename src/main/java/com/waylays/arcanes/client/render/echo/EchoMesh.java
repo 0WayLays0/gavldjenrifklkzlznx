@@ -20,6 +20,10 @@ public final class EchoMesh {
     public static final ResourceLocation ARC = ArcanesOublies.id("textures/entity/echo/arc.png");
     public static final ResourceLocation SCULK = ArcanesOublies.id("textures/entity/echo/sculk.png");
     public static final ResourceLocation VEINS = ArcanesOublies.id("textures/entity/echo/veins.png");
+    public static final ResourceLocation RIPPLE = ArcanesOublies.id("textures/entity/echo/ripple.png");
+    public static final ResourceLocation SCAN = ArcanesOublies.id("textures/entity/echo/scan.png");
+    public static final ResourceLocation BONE_SKIN = ArcanesOublies.id("textures/entity/echo/bone.png");
+    public static final ResourceLocation HEART = ArcanesOublies.id("textures/entity/echo/heart.png");
 
     public static final int NIGHT = 0x041216;
     public static final int SCULK_DARK = 0x062A30;
@@ -88,6 +92,56 @@ public final class EchoMesh {
             Vector3f at = new Vector3f(Mth.cos(a) * r, height * t, Mth.sin(a) * r);
             RitualMesh.billboard(motes, poseStack, view, at, .28f, 0, -1, BossMesh.glow(k % 3 == 0 ? PALE : ECHO, Mth.sin(t * Mth.PI) * alpha), light);
         }
+    }
+
+    /** Ripples of sound: a bright rim {@code r} across round {@code centre} and fainter rings inside it, seen from both sides. */
+    public static void ripple(VertexConsumer c, PoseStack.Pose p, Vector3f centre, Vector3f u, Vector3f v, float r, int argb, int light) {
+        // The texture's rim lies at 0.9 of its half-width
+        BossMesh.plate(c, p, centre, u, v, r * 2 / .9f, argb, light);
+    }
+
+    /** Ripples of sound lying on the ground at height {@code y}, seen from above. */
+    public static void groundRipple(VertexConsumer c, PoseStack.Pose p, float x, float y, float z, float r, float spin, int argb, int light) {
+        BossMesh.pool(c, p, x, y, z, r * 2 / .9f, spin, argb, light);
+    }
+
+    /**
+     * The front of a wave of sound: {@code rings} rings of light round {@code centre} in the plane of {@code u} and
+     * {@code v}, the widest {@code r} across, the narrower ones pushed forward along {@code fwd} up to {@code depth}, so
+     * that together they bulge like a shell; the outer ones brightest.
+     */
+    public static void front(VertexConsumer c, PoseStack.Pose p, Vector3f centre, Vector3f fwd, Vector3f u, Vector3f v, float r, float depth, int rings,
+                             float alpha, int light) {
+        for (int i = 0; i < rings; i++) {
+            float t = (i + 1f) / rings;
+            Vector3f at = new Vector3f(fwd).mul(depth * (1 - t * t)).add(centre);
+            ring(c, p, at, u, v, r * t, BossMesh.glow(i % 2 == 0 ? ECHO : PALE, alpha * (.35f + .65f * t)), light);
+        }
+    }
+
+    /** A rib, fang or horn of bone from {@code base} (see {@link BossMesh#horn}): stained with sculk at its root. */
+    public static void bone(VertexConsumer c, PoseStack.Pose p, Vector3f base, Vector3f dir, Vector3f bend, float len, float thick, float alpha, int light) {
+        BossMesh.horn(c, p, base, dir, bend, len, thick, 6, 7, BossMesh.argb(0xFFFFFF, alpha), BossMesh.argb(0xFFFFFF, alpha), light);
+    }
+
+    /**
+     * A figure of light the height of a player standing at the pose's origin, facing {@code yaw} (radians), drawn with the
+     * lines of {@link #SCAN}: its head, body, arms and legs, {@code spread} pushing its limbs apart.
+     */
+    public static void figure(VertexConsumer c, PoseStack.Pose p, float yaw, float spread, int argb, int light) {
+        Vector3f x = new Vector3f(Mth.cos(yaw), 0, Mth.sin(yaw)), z = new Vector3f(-Mth.sin(yaw), 0, Mth.cos(yaw)), y = new Vector3f(0, 1, 0);
+        part(c, p, x, y, z, 0, 1.76f, 0, .23f, .23f, .23f, argb, light);
+        part(c, p, x, y, z, 0, 1.13f, 0, .24f, .36f, .13f, argb, light);
+        for (int side = -1; side <= 1; side += 2) {
+            part(c, p, x, y, z, side * (.43f + .06f * spread), 1.14f - .03f * spread, 0, .11f, .36f, .11f, argb, light);
+            part(c, p, x, y, z, side * (.14f + .03f * spread), .375f, 0, .11f, .37f, .11f, argb, light);
+        }
+    }
+
+    private static void part(VertexConsumer c, PoseStack.Pose p, Vector3f x, Vector3f y, Vector3f z, float px, float py, float pz, float hx, float hy, float hz,
+                             int argb, int light) {
+        Vector3f at = new Vector3f(x).mul(px).add(new Vector3f(y).mul(py)).add(new Vector3f(z).mul(pz));
+        BossMesh.box(c, p, at, new Vector3f(x).mul(hx), new Vector3f(y).mul(hy), new Vector3f(z).mul(hz), argb, light);
     }
 
     /** Two unit vectors square to {@code d} and to each other. */

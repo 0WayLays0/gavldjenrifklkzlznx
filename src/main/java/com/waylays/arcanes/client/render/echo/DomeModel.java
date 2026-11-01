@@ -3,6 +3,7 @@ package com.waylays.arcanes.client.render.echo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.waylays.arcanes.client.render.boss.BossMesh;
+import com.waylays.arcanes.client.render.ritual.RitualMesh;
 import com.waylays.arcanes.client.render.water.WaterMesh;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
@@ -10,8 +11,9 @@ import org.joml.Vector3f;
 
 /**
  * The Dome of Silence: a hush made visible, a dome of faint rings of sound stacked from the ground to its crown, slow
- * waves of light sliding down it, sculk spread over the ground inside, its veins glowing; every sound that reaches it
- * dies on it.
+ * waves of light sliding down it, still ripples at its crown, sculk spread over the ground inside, its veins glowing,
+ * tendrils of it holding the rim down; motes of sound fall in and the floor swallows them, ripples running in from the
+ * rim to die in the middle.
  */
 public final class DomeModel {
     private static final int LATITUDES = 7, MERIDIANS = 10;
@@ -44,6 +46,36 @@ public final class DomeModel {
             float a = m * Mth.PI / MERIDIANS + age * .004f;
             Vector3f u = new Vector3f(Mth.cos(a), 0, Mth.sin(a));
             EchoMesh.arc(arc, p, new Vector3f(), u, new Vector3f(0, 1, 0), radius * rise, 0, Mth.PI, .2f, BossMesh.glow(EchoMesh.ECHO, .35f * k), light);
+        }
+        // Its crown: ripples turning, still
+        VertexConsumer ripple = BossMesh.light(buffer, EchoMesh.RIPPLE);
+        p = poseStack.last();
+        EchoMesh.ripple(ripple, p, new Vector3f(0, radius * rise * .98f, 0), x, z, radius * .3f, BossMesh.glow(EchoMesh.PALE, .7f * k), light);
+        EchoMesh.ripple(ripple, p, new Vector3f(0, radius * rise * .9f, 0), x, z, radius * .5f, BossMesh.glow(EchoMesh.ECHO, .4f * k), light);
+        // At its rim, ripples running in toward the middle: sound swallowed
+        float in = 1 - (age * .04f) % 1;
+        EchoMesh.groundRipple(ripple, p, 0, .06f, 0, radius * rise * (.2f + .8f * in), age * .01f, BossMesh.glow(EchoMesh.ECHO, .45f * (1 - in) * k), light);
+        // Tendrils of sculk holding its rim down
+        VertexConsumer skin = BossMesh.see(buffer, BossMesh.SPIKE);
+        p = poseStack.last();
+        for (int m = 0; m < 12; m++) {
+            float a = m * Mth.TWO_PI / 12 + BossMesh.hash(seed + m) * .3f;
+            Vector3f foot = new Vector3f(Mth.cos(a) * radius * rise * .98f, 0, Mth.sin(a) * radius * rise * .98f);
+            Vector3f up = new Vector3f(-Mth.cos(a) * .5f, 1, -Mth.sin(a) * .5f).normalize();
+            float len = (1.1f + .6f * BossMesh.hash(seed + m * 3)) * rise * fade;
+            float sw = age * .1f + m;
+            if (len > .05f) {
+                EchoMesh.tendril(skin, p, foot, up, new Vector3f(Mth.cos(sw) * .2f, -.25f, Mth.sin(sw) * .2f), len, .12f, 1, light);
+            }
+        }
+        // Motes of sound falling in and swallowed by the floor
+        VertexConsumer motes = BossMesh.light(buffer, BossMesh.MOTE);
+        for (int m = 0; m < 16; m++) {
+            float t = (age * .015f + BossMesh.hash(seed + m * 5)) % 1;
+            float a = BossMesh.hash(seed + m * 7) * Mth.TWO_PI + t;
+            float r = radius * rise * (.9f - .7f * t);
+            Vector3f at = new Vector3f(Mth.cos(a) * r, radius * rise * .8f * (1 - t), Mth.sin(a) * r);
+            RitualMesh.billboard(motes, poseStack, view, at, .25f, 0, -1, BossMesh.glow(m % 3 == 0 ? EchoMesh.PALE : EchoMesh.ECHO, Mth.sin(t * Mth.PI) * k), light);
         }
         EchoMesh.souls(poseStack, buffer, view, radius * .8f, radius * .9f, age, 18, k, seed, light);
     }

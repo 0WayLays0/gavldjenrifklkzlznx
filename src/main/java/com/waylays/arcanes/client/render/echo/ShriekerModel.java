@@ -37,9 +37,19 @@ public final class ShriekerModel {
         VertexConsumer band = BossMesh.light(buffer, EchoMesh.VEINS);
         BossMesh.box(band, poseStack.last(), new Vector3f(0, y0 + .45f, 0), new Vector3f(.51f, 0, 0), new Vector3f(0, .25f, 0), new Vector3f(0, 0, .51f),
                 BossMesh.glow(EchoMesh.ECHO, .5f + .5f * cry), light);
-        // Its jaws of bone, gaping as it shrieks
-        VertexConsumer bone = BossMesh.see(buffer, BossMesh.SPIKE);
+        // Tendrils at its foot
+        VertexConsumer skin = BossMesh.see(buffer, BossMesh.SPIKE);
         PoseStack.Pose p = poseStack.last();
+        for (int k = 0; k < 6; k++) {
+            float a = k * Mth.TWO_PI / 6 + BossMesh.hash(seed + k) * .5f, r = .7f + .6f * BossMesh.hash(seed + k * 3);
+            float sw = age * .18f + k * 2;
+            float len = (.4f + .35f * BossMesh.hash(seed + k * 5)) * rise * (1 - sink) * (1 + .5f * cry);
+            EchoMesh.tendril(skin, p, new Vector3f(Mth.cos(a) * r, 0, Mth.sin(a) * r), new Vector3f(Mth.cos(a) * .3f, 1, Mth.sin(a) * .3f).normalize(),
+                    new Vector3f(Mth.cos(sw) * .35f, 0, Mth.sin(sw) * .35f), len, .07f, 1, light);
+        }
+        // Its jaws of bone, gaping as it shrieks
+        VertexConsumer bone = BossMesh.see(buffer, EchoMesh.BONE_SKIN);
+        p = poseStack.last();
         for (int k = 0; k < 8; k++) {
             float a = k * Mth.TWO_PI / 8 + Mth.PI / 8;
             float r = .44f;
@@ -49,7 +59,7 @@ public final class ShriekerModel {
             Vector3f dir = new Vector3f(out).mul(open).add(0, 1, 0).normalize();
             Vector3f bend = new Vector3f(out).mul(-.35f * (1 - cry));
             float len = (k % 2 == 0 ? .75f : .55f) * rise;
-            BossMesh.horn(bone, p, base, dir, bend, len, .1f, 5, 4, BossMesh.argb(0x8A8470, 1), BossMesh.argb(EchoMesh.BONE, 1), light);
+            EchoMesh.bone(bone, p, base, dir, bend, len, .11f, 1, light);
         }
         Vector3f soul = new Vector3f(0, y0 + 1.05f, 0);
         VertexConsumer glow = BossMesh.light(buffer, BossMesh.GLOW);
@@ -58,13 +68,20 @@ public final class ShriekerModel {
         if (cry <= 0) {
             return;
         }
-        // Rings pouring up out of it
+        // Rings and ripples pouring up out of it
         VertexConsumer wave = BossMesh.light(buffer, EchoMesh.WAVE);
         p = poseStack.last();
         for (int k = 0; k < 4; k++) {
             float t = Mth.clamp((1 - cry) * 1.6f - k * .15f, 0, 1);
             EchoMesh.ring(wave, p, new Vector3f(0, y0 + 1.1f + t * 3, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, 1), .4f + 1.2f * t,
                     BossMesh.glow(EchoMesh.PALE, 1 - t), light);
+        }
+        VertexConsumer ripple = BossMesh.light(buffer, EchoMesh.RIPPLE);
+        p = poseStack.last();
+        for (int k = 0; k < 3; k++) {
+            float t = Mth.clamp((1 - cry) * 1.4f - k * .2f, 0, 1);
+            EchoMesh.ripple(ripple, p, new Vector3f(0, y0 + 1.3f + t * 4, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, 1), .6f + 2 * t,
+                    BossMesh.glow(EchoMesh.ECHO, .8f * (1 - t)), light);
         }
         if (target != null) {
             Vector3f d = new Vector3f(target).sub(soul);

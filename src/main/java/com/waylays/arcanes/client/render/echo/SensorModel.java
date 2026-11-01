@@ -39,6 +39,14 @@ public final class SensorModel {
                 BossMesh.glow(EchoMesh.ECHO, (.4f + .6f * flare) * fade), light);
         VertexConsumer skin = BossMesh.see(buffer, BossMesh.SPIKE);
         p = poseStack.last();
+        // Small tendrils round its foot, listening
+        for (int k = 0; k < 7; k++) {
+            float a = k * Mth.TWO_PI / 7 + BossMesh.hash(seed + k) * .6f, r = .75f + .9f * BossMesh.hash(seed + k * 3);
+            float sw = age * .2f + k * 1.9f;
+            float len = (.35f + .3f * BossMesh.hash(seed + k * 5)) * grow * (1 + .3f * flare);
+            EchoMesh.tendril(skin, p, new Vector3f(Mth.cos(a) * r, 0, Mth.sin(a) * r), new Vector3f(0, 1, 0),
+                    new Vector3f(Mth.cos(sw) * .4f + Mth.cos(a) * .3f, 0, Mth.sin(sw) * .4f + Mth.sin(a) * .3f), len, .05f, fade, light);
+        }
         Vector3f[] tips = new Vector3f[4];
         for (int k = 0; k < 4; k++) {
             float a = k * Mth.HALF_PI + Mth.PI / 4;
@@ -53,13 +61,20 @@ public final class SensorModel {
         for (Vector3f tip : tips) {
             RitualMesh.billboard(glow, poseStack, view, tip, .35f + .5f * flare, 0, -1, BossMesh.glow(EchoMesh.ECHO, (.6f + .4f * flare) * fade), light);
         }
+        // Listening: a ring rising off its tips every second
+        VertexConsumer wave = BossMesh.light(buffer, EchoMesh.WAVE);
+        float listen = (age % 20) / 20;
+        EchoMesh.ring(wave, poseStack.last(), new Vector3f(0, h + .5f + listen * 1.4f, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, 1), .3f + .5f * listen,
+                BossMesh.glow(EchoMesh.ECHO, .6f * (1 - listen) * fade * grow), light);
         if (flare <= 0) {
             return;
         }
-        // The pulse: a ring jumping off it, and the line of light to what it heard
-        VertexConsumer wave = BossMesh.light(buffer, EchoMesh.WAVE);
+        // The pulse: ripples jumping off it, and the line of light to what it heard
         float t = 1 - flare;
-        EchoMesh.groundRing(wave, poseStack.last(), 0, .08f, 0, .6f + 4 * t, BossMesh.glow(EchoMesh.PALE, flare), light);
+        EchoMesh.ring(wave, poseStack.last(), new Vector3f(0, h + .6f, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, 1), .4f + 1.6f * t,
+                BossMesh.glow(EchoMesh.PALE, flare), light);
+        VertexConsumer ripple = BossMesh.light(buffer, EchoMesh.RIPPLE);
+        EchoMesh.groundRipple(ripple, poseStack.last(), 0, .08f, 0, .6f + 4.5f * t, age * .05f, BossMesh.glow(EchoMesh.PALE, flare), light);
         if (target != null) {
             Vector3f from = new Vector3f(0, h + .6f, 0);
             int n = 16;

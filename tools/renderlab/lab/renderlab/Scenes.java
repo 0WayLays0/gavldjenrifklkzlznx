@@ -428,7 +428,7 @@ public final class Scenes {
                 caster(ctx, 0, 8);
                 husk(ctx, 2, 0, 1);
                 Vector3f o = new Vector3f(0, 0, 0);
-                StepModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 30 - age, 3, 3, LIGHT);
+                StepModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 30 - age, 3, (float) Math.atan2(0, -1), 3, LIGHT);
             }
             case "etendrils" -> {
                 caster(ctx, -6, -4);

@@ -10,9 +10,10 @@ import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
 /**
- * Requiem: the deep dark rises round its caster. Sculk floods the ground far around, its veins pulsing; a great heart of
- * sculk hangs over the caster, beating, its light quickening; with each beat a wall of sound races out over the whole
- * field, rings stacked high; the last beat bursts in light.
+ * Requiem: the deep dark rises round its caster. Sculk floods the ground far around, its veins pulsing; a cage of ribs
+ * of bone rises out of it, curving in toward a great heart of sculk hanging over the caster, beating, its light
+ * quickening, tendrils hanging from it to the ground; with each beat a wall of sound races out over the whole field,
+ * rings stacked high, ripples at its foot; the last beat bursts in light.
  */
 public final class RequiemModel {
     /** How long a wall of sound takes to cross the field (ticks). */
@@ -39,15 +40,29 @@ public final class RequiemModel {
         // The heart, hanging over the caster, beating
         Vector3f heart = new Vector3f(0, 5.5f + .3f * Mth.sin(age * .05f), 0);
         float size = (1.1f + .35f * beat) * BossMesh.ramp(age, 0, 20) * (1 - end * .8f);
-        VertexConsumer sculk = BossMesh.solid(buffer, BossMesh.SPIKE);
-        BossMesh.sphere(sculk, poseStack.last(), heart, size, 10, 16, age * .003f, 0, 1, 0xFF1A5A66, light);
+        VertexConsumer sculk = BossMesh.solid(buffer, EchoMesh.HEART);
+        BossMesh.sphere(sculk, poseStack.last(), heart, size, 12, 18, age * .003f, 0, 1, 0xFFFFFFFF, light);
         VertexConsumer veins = BossMesh.light(buffer, EchoMesh.VEINS);
         BossMesh.sphere(veins, poseStack.last(), heart, size * 1.02f, 10, 16, age * .003f, 0, 1, BossMesh.glow(EchoMesh.ECHO, (.5f + .5f * beat) * (1 - end)), light);
         VertexConsumer glow = BossMesh.light(buffer, BossMesh.GLOW);
         RitualMesh.billboard(glow, poseStack, view, heart, size * (3 + 2 * beat), 0, -1, BossMesh.glow(EchoMesh.ECHO, (.4f + .5f * beat) * (1 - end)), light);
+        // A cage of ribs of bone rising round it from the sculk, curving in toward the heart
+        VertexConsumer bone = BossMesh.see(buffer, EchoMesh.BONE_SKIN);
+        PoseStack.Pose p = poseStack.last();
+        float ribs = BossMesh.ramp(age, 4, first) * (1 - end);
+        if (ribs > .02f) {
+            for (int k = 0; k < 10; k++) {
+                float a = k * Mth.TWO_PI / 10 + Mth.PI / 10;
+                Vector3f out = new Vector3f(Mth.cos(a), 0, Mth.sin(a));
+                Vector3f foot = new Vector3f(out).mul(4.2f).add(0, -6 * (1 - ribs), 0);
+                Vector3f dir = new Vector3f(out).mul(.25f).add(0, 1, 0).normalize();
+                Vector3f bend = new Vector3f(out).mul(-.55f);
+                EchoMesh.bone(bone, p, foot, dir, bend, 6.2f, .26f, 1, light);
+            }
+        }
         // Tendrils hanging from it down to the ground
         VertexConsumer skin = BossMesh.see(buffer, BossMesh.SPIKE);
-        PoseStack.Pose p = poseStack.last();
+        p = poseStack.last();
         for (int k = 0; k < 6; k++) {
             float a = k * Mth.TWO_PI / 6 + age * .01f;
             Vector3f foot = new Vector3f(Mth.cos(a) * 2.2f, -.4f, Mth.sin(a) * 2.2f);
@@ -73,6 +88,17 @@ public final class RequiemModel {
                 EchoMesh.ring(wave, p, new Vector3f(0, y, 0), x, z, r * (1 - j * .03f), BossMesh.glow(j % 2 == 0 ? EchoMesh.PALE : EchoMesh.ECHO, (1 - t) * (1 - j * .15f)),
                         light);
             }
+        }
+        // Ripples at the foot of each wall
+        VertexConsumer ripple = BossMesh.light(buffer, EchoMesh.RIPPLE);
+        p = poseStack.last();
+        for (int k = 0; k < count; k++) {
+            float s = age - (first + k * step);
+            if (s < 0 || s > CROSS) {
+                continue;
+            }
+            float t = s / CROSS;
+            EchoMesh.groundRipple(ripple, p, 0, .07f, 0, 1 + radius * t, k, BossMesh.glow(EchoMesh.ECHO, .8f * (1 - t)), light);
         }
         // The last beat bursts in light
         float last = age - (first + (count - 1) * step);
