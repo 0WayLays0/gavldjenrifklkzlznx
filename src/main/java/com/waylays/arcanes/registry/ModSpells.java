@@ -18,6 +18,16 @@ import com.waylays.arcanes.spells.book.SealOfSilenceSpell;
 import com.waylays.arcanes.spells.book.TomeOfJudgmentSpell;
 import com.waylays.arcanes.spells.book.WordOfPowerSpell;
 import com.waylays.arcanes.spells.boss.AnnihilationBeamSpell;
+import com.waylays.arcanes.spells.boss.ThousandBladesSpell;
+import com.waylays.arcanes.spells.boss.ExecutionersWheelSpell;
+import com.waylays.arcanes.spells.boss.AbyssalMawSpell;
+import com.waylays.arcanes.spells.boss.DivinePrismSpell;
+import com.waylays.arcanes.spells.boss.ChainsOfTheDamnedSpell;
+import com.waylays.arcanes.spells.boss.PentacleOfThornsSpell;
+import com.waylays.arcanes.spells.boss.SeraphWingsSpell;
+import com.waylays.arcanes.spells.boss.WrathOfTheHeavensSpell;
+import com.waylays.arcanes.spells.boss.EclipseSpell;
+import com.waylays.arcanes.spells.boss.FallenMoonSpell;
 import com.waylays.arcanes.spells.boss.CrossOfLightSpell;
 import com.waylays.arcanes.spells.boss.CrushingMeteorSpell;
 import com.waylays.arcanes.spells.boss.JudgmentBladeSpell;
@@ -345,6 +355,16 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> CROSS_OF_LIGHT = register(new CrossOfLightSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUNE_PRISON = register(new RunePrisonSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> LAST_JUDGMENT = register(new LastJudgmentSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> THOUSAND_BLADES = register(new ThousandBladesSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> EXECUTIONERS_WHEEL = register(new ExecutionersWheelSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ABYSSAL_MAW = register(new AbyssalMawSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> DIVINE_PRISM = register(new DivinePrismSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CHAINS_OF_THE_DAMNED = register(new ChainsOfTheDamnedSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PENTACLE_OF_THORNS = register(new PentacleOfThornsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SERAPH_WINGS = register(new SeraphWingsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> WRATH_OF_THE_HEAVENS = register(new WrathOfTheHeavensSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ECLIPSE = register(new EclipseSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> FALLEN_MOON = register(new FallenMoonSpell());
 
     // Rune Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> WARD_RUNE = register(new WardRuneSpell());

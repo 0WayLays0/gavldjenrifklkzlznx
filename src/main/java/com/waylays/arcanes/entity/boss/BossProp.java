@@ -1,6 +1,7 @@
 package com.waylays.arcanes.entity.boss;
 
 import com.waylays.arcanes.registry.ModEntities;
+import com.waylays.arcanes.spells.boss.DivinePrismSpell;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -21,7 +22,11 @@ import org.joml.Vector3f;
  * hurts no one (the warning zone deals the damage when it runs out); it only shows what is coming.
  */
 public class BossProp extends Entity {
-    public enum Kind { METEOR, STAR, BLADE, PILLAR }
+    /**
+     * What it shows. The first four are drawn by their renderer itself; the rest are the great attacks' scenery, each a
+     * model of its own (client/render/boss).
+     */
+    public enum Kind { METEOR, STAR, BLADE, PILLAR, SWORD, WHEEL, ECLIPSE, MOON, MAW, PRISM, CHAINS, STORM, BOLT, THORNS, WINGS }
 
     private static final EntityDataAccessor<Integer> DATA_KIND = SynchedEntityData.defineId(BossProp.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_STYLE = SynchedEntityData.defineId(BossProp.class, EntityDataSerializers.INT);
@@ -31,6 +36,8 @@ public class BossProp extends Entity {
     private static final EntityDataAccessor<Integer> DATA_END = SynchedEntityData.defineId(BossProp.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Vector3f> DATA_FROM = SynchedEntityData.defineId(BossProp.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Vector3f> DATA_TO = SynchedEntityData.defineId(BossProp.class, EntityDataSerializers.VECTOR3);
+    /** One more number some scenery needs (how long a wheel rolls, how far apart an eclipse's bands strike, ...). */
+    private static final EntityDataAccessor<Float> DATA_ARG = SynchedEntityData.defineId(BossProp.class, EntityDataSerializers.FLOAT);
 
     public BossProp(EntityType<? extends BossProp> entityType, Level level) {
         super(entityType, level);
@@ -59,6 +66,27 @@ public class BossProp extends Entity {
         return prop;
     }
 
+    /**
+     * Scenery standing at {@code at} (it does not move: its model works out where everything is from the clock),
+     * showing from game tick {@code start}, its moment at {@code end}; {@code from} and {@code to} two points its model
+     * needs, {@code arg} one more number, {@code yaw} which way it faces.
+     */
+    public static BossProp scene(Level level, Kind kind, BossTelegraph.Style style, float size, int start, int end, Vec3 at, Vec3 from, Vec3 to, float arg,
+                                 float yaw) {
+        BossProp prop = new BossProp(ModEntities.BOSS_PROP.get(), level);
+        prop.entityData.set(DATA_KIND, kind.ordinal());
+        prop.entityData.set(DATA_STYLE, style.ordinal());
+        prop.entityData.set(DATA_SIZE, size);
+        prop.entityData.set(DATA_START, start);
+        prop.entityData.set(DATA_END, end);
+        prop.entityData.set(DATA_FROM, from.toVector3f());
+        prop.entityData.set(DATA_TO, to.toVector3f());
+        prop.entityData.set(DATA_ARG, arg);
+        prop.moveTo(at.x, at.y, at.z, yaw, 0);
+        level.addFreshEntity(prop);
+        return prop;
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DATA_KIND, 0);
@@ -68,6 +96,7 @@ public class BossProp extends Entity {
         builder.define(DATA_END, 0);
         builder.define(DATA_FROM, new Vector3f());
         builder.define(DATA_TO, new Vector3f());
+        builder.define(DATA_ARG, 0f);
     }
 
     public Kind getKind() {
@@ -89,6 +118,18 @@ public class BossProp extends Entity {
 
     public Vec3 getTo() {
         return new Vec3(this.entityData.get(DATA_TO));
+    }
+
+    public float getArg() {
+        return this.entityData.get(DATA_ARG);
+    }
+
+    public int getStartTick() {
+        return this.entityData.get(DATA_START);
+    }
+
+    public int getEndTick() {
+        return this.entityData.get(DATA_END);
     }
 
     /** Ticks past its start (negative before it shows). */
@@ -113,6 +154,18 @@ public class BossProp extends Entity {
             case METEOR, STAR -> 2;
             case BLADE -> 14;
             case PILLAR -> 14;
+            // As long as each model's aftermath lasts (see its model)
+            case SWORD -> 18;
+            case WHEEL -> 14;
+            case ECLIPSE -> (int) (2 * getArg()) + 50;
+            case MOON -> 40;
+            case MAW -> 26;
+            case PRISM -> 11 * DivinePrismSpell.INTERVAL + 44;
+            case CHAINS -> 28;
+            case STORM -> 32;
+            case BOLT -> 9;
+            case THORNS -> 40;
+            case WINGS -> 26;
         };
     }
 

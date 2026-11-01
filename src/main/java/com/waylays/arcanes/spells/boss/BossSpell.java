@@ -1,5 +1,9 @@
 package com.waylays.arcanes.spells.boss;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.boss.BossTelegraph;
 import com.waylays.arcanes.registry.ModSchools;
@@ -109,6 +113,21 @@ public abstract class BossSpell extends AbstractSpell implements BossAttack {
         double resist = Math.max(0, 1 - target.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE));
         target.setDeltaMovement(target.getDeltaMovement().add(d.scale(resist)).add(0, up * resist, 0));
         target.hurtMarked = true;
+    }
+
+    /**
+     * Up to {@code max} enemies of the caster within {@code range} of {@code around}, nearest first (no armour
+     * stands).
+     */
+    protected static List<LivingEntity> foes(Level level, LivingEntity caster, Vec3 around, double range, int max) {
+        List<LivingEntity> found = SpellUtil.enemiesAround(level, around, range, caster, e -> !(e instanceof ArmorStand));
+        found.sort(Comparator.comparingDouble(e -> e.distanceToSqr(around)));
+        return found.size() > max ? new ArrayList<>(found.subList(0, max)) : found;
+    }
+
+    /** Minecraft's yaw (degrees) for the horizontal direction {@code (dx, dz)}. */
+    protected static float yawOf(double dx, double dz) {
+        return (float) (Mth.atan2(-dx, dz) * Mth.RAD_TO_DEG);
     }
 
     public float getDamage(int spellLevel, @Nullable LivingEntity caster) {

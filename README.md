@@ -200,6 +200,21 @@ l'autre), chaque temps ayant sa propre zone et son propre compte à rebours.
 | **Prison Runique** (Rune Prison) | Un anneau se marque autour de la cible, puis un mur de runes s'y dresse 10 à 16 s : quiconque n'est pas du camp du lanceur et tente de le franchir est blessé et repoussé. |
 | **Jugement Dernier** (Last Judgment, ultime) | Un cercle de runes géant s'ouvre dans le ciel ; toute l'arène autour du lanceur (15 blocs) est condamnée, sauf trois petits refuges verts. Cinq météores tombent pendant le compte à rebours, puis le jugement frappe tout ce qui est hors des refuges. |
 
+Les **grandes attaques**, dix de plus, plus fortes (épiques et légendaires), chacune avec son propre décor en 3D :
+
+| Sort | Effet |
+|---|---|
+| **Mille Lames** (Thousand Blades) | Une couronne d'épées de lumière se forme au-dessus du lanceur ; de petits cercles se marquent en cascade sur les ennemis autour de la cible puis partout autour (14 à 22 épées) ; chaque épée s'élève, se retourne et plonge dans son cercle, reste plantée un instant puis se brise en lumière. |
+| **Roue du Bourreau** (Executioner's Wheel) | Une grande roue de fer noir hérissée de lames ardentes se forme devant le lanceur et tourne de plus en plus vite, puis dévale une bande de 26 blocs en traçant un sillon de feu ; la bande est marquée en quatre parties qui frappent quand la roue passe dessus (brûlure, projection sur le côté). |
+| **Gueule des Abysses** (Abyssal Maw) | Le sol s'ouvre sous la cible en une gueule de nuit violette, deux rangées de crocs se dressent autour et elle attire doucement ce qui est proche ; à la fin de l'alerte elle mord : dégâts, ralentissement et flétrissement. |
+| **Prisme Divin** (Divine Prism) | Un grand cristal flotte au-dessus du lanceur ; douze lignes se marquent autour de lui comme les heures d'une horloge et un rayon de chaque couleur de l'arc-en-ciel balaie chacune à son tour, tout autour. Il faut se tenir entre les lignes. |
+| **Chaînes des Damnés** (Chains of the Damned) | Des chaînes noires jaillissent de portes de runes autour des 3 à 5 ennemis les plus proches et enchaînent leur place (très ralenti tant qu'on y reste) ; à la fin, les chaînes se brisent et une colonne de feu infernal s'élève. |
+| **Pentacle d'Épines** (Pentacle of Thorns) | Une étoile à cinq branches se marque trait après trait autour de la cible ; d'énormes épines rouge sang jaillissent le long de chaque trait, puis le cœur de l'étoile éclate. Les espaces entre les traits sont sûrs. |
+| **Ailes du Séraphin** (Seraph's Wings, légendaire) | Deux grandes ailes de lumière dorée se déploient là où se tient le lanceur pendant qu'un large éventail de sol est marqué devant lui (16 blocs) ; elles battent une fois et une tempête de plumes de lumière balaie l'éventail, projetant et soulevant tout ce qu'elle touche. |
+| **Colère des Cieux** (Wrath of the Heavens, légendaire) | Une tempête se forme au-dessus du lanceur (roue de nuages sombres autour d'un œil lumineux) et lance 10 à 14 éclairs, chacun marqué là où se tient sa cible quand il est appelé : il faut rester en mouvement. |
+| **Éclipse** (Eclipse, légendaire) | Un soleil s'allume dans le ciel et un disque noir glisse devant lui ; à la totalité, sa couronne s'embrase et l'arène autour du lanceur (15,5 blocs) est frappée en trois anneaux de feu noir, du centre vers l'extérieur, chacun un peu après le précédent (ténèbres et faiblesse). Il faut passer dans un anneau qui a déjà brûlé. |
+| **Lune Déchue** (Fallen Moon, ultime) | Une lune apparaît haut au-dessus de la cible et tombe lentement puis de plus en plus vite en s'embrasant (6 s d'alerte) ; elle écrase tout sur 14 blocs, puis le souffle frappe jusqu'à 22 blocs autour du cratère. |
+
 Livre : **Codex du Tyran** (cuir rouge sang, cercle de runes ardent sur la couverture, ferrures noires et dorées).
 Focus de l'école : étoile du Nether. Le lanceur a ses propres animations (bras levés vers le ciel, lame abattue,
 poings au sol, mains en avant pour le rayon, bras écartés pour la prison).

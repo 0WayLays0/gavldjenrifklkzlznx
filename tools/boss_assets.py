@@ -9,6 +9,7 @@ alpha-blended, tinted by the zone's colour).
 import math
 import random
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 import gen_assets as g
@@ -577,6 +578,398 @@ def tyrants_codex_model_texture():
     return img
 
 
+
+# ---------------------------------------------------------------- the ten new attacks' art
+
+def _np_rgba(rgb, alpha):
+    return Image.fromarray(np.dstack([np.clip(rgb, 0, 255), np.clip(alpha, 0, 255)]).astype(np.uint8), "RGBA")
+
+
+def _wnoise(w, h, cells, seed):
+    """Smooth value noise in [0, 1], tiling across and down."""
+    rnd = np.random.default_rng(seed)
+    grid = rnd.random((cells[1], cells[0]))
+    ys, xs = np.mgrid[0:h, 0:w]
+    gx, gy = xs / w * cells[0], ys / h * cells[1]
+    x0, y0 = gx.astype(int), gy.astype(int)
+    fx, fy = gx - x0, gy - y0
+    fx, fy = fx * fx * (3 - 2 * fx), fy * fy * (3 - 2 * fy)
+    x1, y1 = (x0 + 1) % cells[0], (y0 + 1) % cells[1]
+    a = grid[y0, x0] * (1 - fx) + grid[y0, x1] * fx
+    b = grid[y1, x0] * (1 - fx) + grid[y1, x1] * fx
+    return a * (1 - fy) + b * fy
+
+
+def _wfbm(w, h, base, octaves, seed):
+    total, amp, norm = np.zeros((h, w)), 1.0, 0.0
+    for o in range(octaves):
+        c = base * 2 ** o
+        total += _wnoise(w, h, (c, max(1, c * h // w)), seed + o * 17) * amp
+        norm += amp
+        amp *= .5
+    return total / norm
+
+
+def moon_texture():
+    """128 x 64, wrapping round (an equirectangular map): grey dust, darker seas, craters with bright rims and their rays."""
+    W, H = 128, 64
+    ys, xs = np.mgrid[0:H, 0:W]
+    lon = (xs + .5) / W * math.tau
+    lat = ((ys + .5) / H - .5) * math.pi
+    # Points on the sphere, for craters that are round on it
+    px, py, pz = np.cos(lat) * np.cos(lon), np.sin(lat), np.cos(lat) * np.sin(lon)
+    dust = _wfbm(W, H, 4, 5, 2101)
+    seas = np.clip((_wfbm(W, H, 2, 3, 2102) - .52) * 4, 0, 1)
+    tone = .62 + .22 * (dust - .5) * 2 - .22 * seas
+    rnd = random.Random(2103)
+    for k in range(46):
+        # A crater: a dark floor, a bright rim, a faint halo of rays for the young ones
+        cl, cn = rnd.uniform(-1.3, 1.3), rnd.uniform(0, math.tau)
+        cx, cy, cz = math.cos(cl) * math.cos(cn), math.sin(cl), math.cos(cl) * math.sin(cn)
+        r = rnd.choice((.06, .08, .1, .13, .18, .25)) * rnd.uniform(.7, 1.1)
+        d = np.arccos(np.clip(px * cx + py * cy + pz * cz, -1, 1)) / r
+        floor = np.clip(1 - d, 0, 1)
+        rim = np.exp(-((d - 1) / .18) ** 2)
+        tone = tone - .16 * (floor > 0) * (.6 + .4 * floor) + .2 * rim
+        if r < .12 and rnd.random() < .35:
+            tone = tone + .1 * np.clip(1 - (d - 1) / 3, 0, 1) * (d > 1)
+    tone = np.clip(tone, 0, 1)
+    tone = np.round(tone * 10) / 10
+    rgb = np.dstack([tone * 236 + 10, tone * 230 + 12, tone * 222 + 18])
+    return _np_rgba(rgb, np.full((H, W), 255.0))
+
+
+def moon_cracks_texture():
+    """128 x 64, wrapping round like the moon's map: the glowing cracks of a moon about to burst (white on black,
+    drawn as light): the edges of big cells, brightest where they meet."""
+    W, H = 128, 64
+    rnd = np.random.default_rng(2104)
+    ys, xs = np.mgrid[0:H, 0:W]
+    pts = rnd.random((60, 2)) * (W, H)
+    best = np.full((H, W), 1e9)
+    second = np.full((H, W), 1e9)
+    for (x, y) in pts:
+        for ox in (-W, 0, W):
+            d = np.hypot(xs - x - ox, (ys - y) * 1.6)
+            second = np.where(d < best, best, np.minimum(second, d))
+            best = np.minimum(best, d)
+    edge = np.clip(1 - (second - best) / 2.4, 0, 1) ** 1.6
+    wobble = _wfbm(W, H, 8, 3, 2105)
+    v = np.clip(edge * (.6 + .8 * wobble), 0, 1)
+    v = np.round(v * 6) / 6
+    return _np_rgba(np.dstack([v * 255] * 3), np.full((H, W), 255.0))
+
+
+def disc_texture():
+    """64 x 64: a white disc, its edge soft over a pixel or two (tinted in game: the dark of an eclipse)."""
+    S2 = 64
+    ys, xs = np.mgrid[0:S2, 0:S2]
+    r = np.hypot(xs + .5 - S2 / 2, ys + .5 - S2 / 2) / (S2 / 2)
+    a = np.clip((1 - r) * 18, 0, 1)
+    return _np_rgba(np.full((S2, S2, 3), 255.0), a * 255)
+
+
+def spike_texture():
+    """32 x 64: the skin of a fang or a thorn, pale (tinted in game), from its root (V 1) to its point (V 0): a glossy
+    streak down one side, fine streaks along it, rings of growth near the root (the game shades it round)."""
+    W, H = 32, 64
+    ys, xs = np.mgrid[0:H, 0:W]
+    u, v = (xs + .5) / W, (ys + .5) / H
+    round_ = .86 + .14 * np.cos((u - .3) * math.tau)
+    gloss = np.exp(-((u - .3) / .06) ** 2) * .25
+    streak = (_wnoise(W, H, (8, 2), 2106) - .5) * .25
+    rings = .08 * np.clip(np.sin(v * 40) * 2 - 1, 0, 1) * np.clip((v - .55) * 3, 0, 1)
+    t = np.clip(round_ * .95 + gloss + streak * .6 - rings + .05 * (1 - v), 0, 1)
+    t = np.round(t * 8) / 8
+    return _np_rgba(np.dstack([t * 255] * 3), np.full((H, W), 255.0))
+
+
+def feather_texture():
+    """32 x 64: a long feather of light, white (tinted in game), its quill at V 1 and its tip at V 0: a bright shaft
+    down its middle, the vane either side combed into barbs sweeping toward the tip, a few splits in it."""
+    W, H = 64, 128
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    px = img.load()
+    rnd = random.Random(2107)
+    splits = [rnd.uniform(.25, .8) for _ in range(3)]
+    for y in range(H):
+        v = (y + .5) / H
+        # Width of the vane along it: round tip, widest a third down, narrowing to the bare quill
+        half = .46 * math.sin(math.pi * min(1, (v + .02) / .92) ** .8) * (1 if v < .86 else max(0, (1 - v) / .14))
+        for x in range(W):
+            u = (x + .5) / W * 2 - 1
+            if abs(u) > half:
+                continue
+            k = abs(u) / max(half, 1e-3)
+            barb = .5 + .5 * math.cos((v * 70 + abs(u) * 26) * 1)
+            split = any(abs(v + abs(u) * .35 - s) < .008 for s in splits)
+            a = (1 - k ** 3) * (.55 + .25 * barb) * (0 if split else 1)
+            shade = .7 + .3 * (1 - k) + .15 * barb
+            px[x, y] = (int(255 * min(1, shade)), int(255 * min(1, shade)), int(255 * min(1, shade)), int(255 * min(1, a)))
+        # The shaft
+        if v < .97:
+            for x in (W // 2 - 1, W // 2):
+                px[x, y] = (255, 255, 255, 255)
+    return img.resize((32, 64), Image.LANCZOS)
+
+
+def chain_texture():
+    """32 x 64: one link of a chain seen flat, dark iron with a bright edge where it catches the light (an oval ring,
+    see-through outside and in its hole)."""
+    W, H = 32, 64
+    ys, xs = np.mgrid[0:H, 0:W]
+    x = (xs + .5 - W / 2) / (W / 2)
+    y = (ys + .5 - H / 2) / (H / 2)
+    # An oval with straight sides: a stadium
+    yy = np.clip(np.abs(y) - .45, 0, None) / .55
+    d = np.hypot(x, yy * 1.0)
+    ring = (d < .98) & (d > .52)
+    band = np.clip((d - .52) / .46, 0, 1)
+    light = .35 + .65 * np.clip(np.sin(band * math.pi), 0, 1) ** 1.5
+    light = light * (.8 + .2 * np.clip(-x - y * .5, -1, 1))
+    t = np.round(np.clip(light, 0, 1) * 7) / 7
+    rgb = np.dstack([t * 150 + 30, t * 140 + 28, t * 150 + 36])
+    return _np_rgba(rgb, ring * 255.0)
+
+
+def iron_texture():
+    """32 x 32, tiling: plates of black iron, riveted, worn bright at their edges."""
+    W = 32
+    ys, xs = np.mgrid[0:W, 0:W]
+    n = _wnoise(W, W, (8, 8), 2108)
+    plate = ((xs % 16 == 0) | (ys % 16 == 0)) * 1.0
+    rivet = (((xs % 16 - 3) ** 2 + (ys % 16 - 3) ** 2) <= 1) * 1.0 + (((xs % 16 - 12) ** 2 + (ys % 16 - 12) ** 2) <= 1) * 1.0
+    t = .3 + .25 * n - .18 * plate + .45 * rivet + .2 * ((xs % 16 == 1) | (ys % 16 == 1))
+    t = np.round(np.clip(t, 0, 1) * 7) / 7
+    rgb = np.dstack([t * 150 + 22, t * 130 + 18, t * 140 + 24])
+    return _np_rgba(rgb, np.full((W, W), 255.0))
+
+
+def sword_texture():
+    """32 x 64: the blade of a sword of light, white (tinted in game) from its hilt (V 1) to its point (V 0): bright
+    edges, a groove down its middle with runes in it, the steel between half see-through."""
+    W, H = 32, 64
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    px = img.load()
+    for y in range(H):
+        for x in range(W):
+            u = abs((x + .5) / W * 2 - 1)
+            edge = math.exp(-((u - .92) / .07) ** 2)
+            groove = math.exp(-(u / .1) ** 2)
+            a = .45 + .5 * edge + .3 * groove
+            t = .65 + .35 * edge + .25 * groove
+            px[x, y] = (int(255 * min(1, t)), int(255 * min(1, t)), int(255 * min(1, t)), int(255 * min(1, a)))
+    d = ImageDraw.Draw(img)
+    rnd = random.Random(2109)
+    y = 10
+    while y < H - 8:
+        h = rnd.choice((3, 4))
+        shape = rnd.randrange(4)
+        if shape == 0:
+            d.line([(16, y), (16, y + h)], fill=(255, 255, 255, 255))
+        elif shape == 1:
+            d.line([(15, y), (17, y + h)], fill=(255, 255, 255, 255))
+        elif shape == 2:
+            d.line([(15, y), (17, y), (16, y + h)], fill=(255, 255, 255, 255))
+        else:
+            d.point([(15, y), (17, y + 1), (16, y + h)], fill=(255, 255, 255, 255))
+        y += h + 2
+    return img
+
+
+def prism_texture():
+    """32 x 32: the inside of a crystal, white (tinted in game): faint planes of light crossing it, half see-through."""
+    W = 32
+    ys, xs = np.mgrid[0:W, 0:W]
+    u, v = (xs + .5) / W, (ys + .5) / W
+    lines = np.zeros((W, W))
+    rnd = np.random.default_rng(2110)
+    for _ in range(7):
+        a = rnd.random() * math.pi
+        o = rnd.random()
+        dd = np.abs((u - .5) * math.cos(a) + (v - .5) * math.sin(a) - (o - .5) * .8)
+        lines += np.exp(-(dd / .02) ** 2) * rnd.uniform(.3, .8)
+    t = np.clip(.55 + .45 * lines + .15 * (1 - v), 0, 1)
+    a = np.clip(.35 + .5 * lines + .25 * np.abs(u - .5) * 2, 0, 1)
+    t = np.round(t * 8) / 8
+    return _np_rgba(np.dstack([t * 255] * 3), a * 255)
+
+
+def new_attack_textures():
+    g.save(moon_texture(), "textures/entity/boss/moon.png")
+    g.save(moon_cracks_texture(), "textures/entity/boss/moon_cracks.png")
+    g.save(disc_texture(), "textures/entity/boss/disc.png")
+    g.save(spike_texture(), "textures/entity/boss/spike.png")
+    g.save(feather_texture(), "textures/entity/boss/feather.png")
+    g.save(chain_texture(), "textures/entity/boss/chain.png")
+    g.save(iron_texture(), "textures/entity/boss/iron.png")
+    g.save(sword_texture(), "textures/entity/boss/sword.png")
+    g.save(prism_texture(), "textures/entity/boss/prism.png")
+
+
+
+# ---------------------------------------------------------------- the ten new attacks' icons (painted, 64 then 16)
+
+def _a(c, a=255):
+    return tuple(int(x) for x in c) + (a,)
+
+
+def _paint(draw, cx, cy, inner, outer=NIGHT):
+    return g.painted(64, draw, (cx, cy, inner, outer), 16)
+
+
+def thousand_blades_icon():
+    def draw(d, img, S):
+        for k in range(5):
+            x = .16 + k * .17
+            top = .1 + .08 * abs(k - 2)
+            d.polygon([(x * S, top * S), ((x + .05) * S, (top + .1) * S), ((x + .04) * S, .66 * S), ((x - .04) * S, .66 * S), ((x - .05) * S, (top + .1) * S)],
+                      fill=_a(PALE))
+            d.line([(x * S, (top + .06) * S), (x * S, .62 * S)], fill=_a((255, 255, 255)), width=max(1, S // 40))
+            d.rectangle(((x - .08) * S, .66 * S, (x + .08) * S, .7 * S), fill=_a(GOLD))
+            d.rectangle(((x - .02) * S, .7 * S, (x + .02) * S, .82 * S), fill=_a(GOLD_DARK))
+        g.glow_spot(img, .5 * S, .4 * S, .45 * S, (255, 210, 90), .6)
+    return _paint(draw, .5, .35, (110, 90, 40))
+
+
+def executioners_wheel_icon():
+    def draw(d, img, S):
+        c, r = .5 * S, .3 * S
+        for k in range(8):
+            a = k * math.tau / 8
+            pts = []
+            for i in range(7):
+                t = i / 6
+                aa = a + .55 * t
+                rr = r * (1 + .5 * t)
+                pts.append((c + math.cos(aa) * rr, c + math.sin(aa) * rr))
+            d.line(pts, fill=_a((210, 200, 205)), width=max(2, S // 22))
+            d.line(pts, fill=_a((255, 120, 90)), width=max(1, S // 64))
+        d.ellipse((c - r, c - r, c + r, c + r), outline=_a(IRON_LIGHT), width=max(2, S // 14))
+        for k in range(6):
+            a = k * math.tau / 6
+            d.line([(c, c), (c + math.cos(a) * r, c + math.sin(a) * r)], fill=_a(IRON_LIGHT), width=max(1, S // 30))
+        d.ellipse((c - .09 * S, c - .09 * S, c + .09 * S, c + .09 * S), fill=_a(CRIMSON))
+        g.glow_spot(img, c, c, .2 * S, (255, 80, 50), .8)
+    return _paint(draw, .5, .5, (90, 20, 16))
+
+
+def abyssal_maw_icon():
+    def draw(d, img, S):
+        d.ellipse((.12 * S, .5 * S, .88 * S, .9 * S), fill=_a((20, 6, 34)), outline=_a(VOID), width=max(1, S // 30))
+        d.ellipse((.3 * S, .6 * S, .7 * S, .8 * S), fill=_a((90, 40, 160)))
+        for k in range(7):
+            x = .17 + k * .11
+            h = .32 + .1 * math.sin(k * 1.7)
+            lean = (.5 - x) * .25
+            d.polygon([((x - .04) * S, .7 * S), ((x + .04) * S, .7 * S), ((x + lean) * S, (.7 - h) * S)], fill=_a((236, 226, 206)))
+            d.polygon([((x - .04) * S, .7 * S), ((x + .04) * S, .7 * S), ((x + lean * .5) * S, .62 * S)], fill=_a((70, 30, 90)))
+    return _paint(draw, .5, .7, (60, 20, 90))
+
+
+def divine_prism_icon():
+    def draw(d, img, S):
+        cols = [(255, 74, 74), (255, 154, 48), (255, 226, 74), (90, 255, 122), (74, 180, 255), (184, 106, 255)]
+        for k, col in enumerate(cols):
+            a = math.radians(35 + k * 22)
+            d.line([(.5 * S, .5 * S), ((.5 + math.cos(a) * .62) * S, (.5 + math.sin(a) * .62) * S)], fill=_a(col), width=max(2, S // 20))
+        d.polygon([(.5 * S, .06 * S), (.66 * S, .3 * S), (.5 * S, .54 * S), (.34 * S, .3 * S)], fill=_a((220, 240, 255)), outline=_a((255, 255, 255)))
+        d.line([(.5 * S, .06 * S), (.5 * S, .54 * S)], fill=_a((160, 200, 255)), width=max(1, S // 48))
+        g.glow_spot(img, .5 * S, .3 * S, .22 * S, (255, 255, 255), .7)
+    return _paint(draw, .5, .3, (60, 60, 100))
+
+
+def chains_of_the_damned_icon():
+    def draw(d, img, S):
+        for k in range(4):
+            x0 = (.08, .92)[k % 2]
+            y0 = (.2, .85)[k // 2]
+            for i in range(5):
+                t = i / 4
+                x = x0 + (.5 - x0) * t
+                y = y0 + (.48 - y0) * t
+                w = .07 if i % 2 == 0 else .035
+                d.ellipse(((x - w) * S, (y - .035) * S, (x + w) * S, (y + .035) * S), outline=_a((170, 160, 170)), width=max(1, S // 40))
+        d.ellipse((.36 * S, .34 * S, .64 * S, .62 * S), outline=_a(CRIMSON), width=max(2, S // 22))
+        d.ellipse((.45 * S, .43 * S, .55 * S, .53 * S), fill=_a((255, 200, 160)))
+        g.glow_spot(img, .5 * S, .48 * S, .2 * S, (255, 60, 50), .8)
+    return _paint(draw, .5, .48, (90, 14, 20))
+
+
+def pentacle_of_thorns_icon():
+    def draw(d, img, S):
+        pts = [(.5 + math.cos(-math.pi / 2 + j * math.tau / 5) * .4, .53 + math.sin(-math.pi / 2 + j * math.tau / 5) * .4) for j in range(5)]
+        for j in range(5):
+            a, b = pts[(j * 2) % 5], pts[(j * 2 + 2) % 5]
+            d.line([(a[0] * S, a[1] * S), (b[0] * S, b[1] * S)], fill=_a((255, 70, 80)), width=max(2, S // 26))
+            for i in range(1, 4):
+                t = i / 4
+                x, y = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
+                d.polygon([((x - .03) * S, y * S), ((x + .03) * S, y * S), (x * S, (y - .1) * S)], fill=_a((200, 30, 50)))
+        g.glow_spot(img, .5 * S, .53 * S, .14 * S, (255, 80, 90), .8)
+    return _paint(draw, .5, .53, (80, 10, 20))
+
+
+def seraph_wings_icon():
+    def draw(d, img, S):
+        for sd in (-1, 1):
+            for k in range(6):
+                a = math.radians(-20 - k * 22)
+                x0, y0 = .5 + sd * .06, .38
+                ln = .42 - k * .035
+                x1 = x0 + sd * math.cos(a) * ln
+                y1 = y0 + math.sin(-a) * ln * .9
+                d.line([(x0 * S, y0 * S), (x1 * S, y1 * S)], fill=_a((255, 238, 190) if k % 2 else GOLD), width=max(2, S // 16))
+        d.ellipse((.4 * S, .12 * S, .6 * S, .2 * S), outline=_a(GOLD), width=max(1, S // 32))
+        g.glow_spot(img, .5 * S, .4 * S, .25 * S, (255, 220, 120), .8)
+    return _paint(draw, .5, .4, (110, 90, 40))
+
+
+def wrath_of_the_heavens_icon():
+    def draw(d, img, S):
+        for k in range(7):
+            x = .12 + k * .13
+            d.ellipse(((x - .14) * S, (.1 + .05 * (k % 2)) * S, (x + .14) * S, (.34 + .05 * (k % 2)) * S), fill=_a((60, 66, 84)))
+        bolt = [(.55, .3), (.42, .55), (.54, .55), (.4, .9)]
+        d.line([(x * S, y * S) for x, y in bolt], fill=_a((140, 180, 255)), width=max(3, S // 14))
+        d.line([(x * S, y * S) for x, y in bolt], fill=_a((255, 255, 255)), width=max(1, S // 32))
+        g.glow_spot(img, .47 * S, .6 * S, .22 * S, (120, 160, 255), .7)
+    return _paint(draw, .5, .6, (30, 40, 80))
+
+
+def eclipse_icon():
+    def draw(d, img, S):
+        g.glow_spot(img, .5 * S, .5 * S, .48 * S, (255, 210, 120), 1)
+        for k in range(12):
+            a = k * math.tau / 12
+            d.line([((.5 + math.cos(a) * .26) * S, (.5 + math.sin(a) * .26) * S), ((.5 + math.cos(a) * (.42 + .05 * (k % 2))) * S,
+                    (.5 + math.sin(a) * (.42 + .05 * (k % 2))) * S)], fill=_a((255, 230, 170) if k % 3 else (190, 120, 255)), width=max(1, S // 40))
+        d.ellipse((.25 * S, .25 * S, .75 * S, .75 * S), fill=_a((255, 246, 222)))
+        d.ellipse((.27 * S, .27 * S, .73 * S, .73 * S), fill=_a((8, 2, 14)))
+    return _paint(draw, .5, .5, (60, 30, 90))
+
+
+def fallen_moon_icon():
+    def draw(d, img, S):
+        for i in range(8):
+            t = i / 7
+            x, y = .78 - t * .2, .08 + t * .3
+            r = .05 + t * .08
+            d.ellipse(((x - r) * S, (y - r) * S, (x + r) * S, (y + r) * S), fill=_a(g.lerp((255, 220, 140), (255, 90, 40), t)))
+        d.ellipse((.18 * S, .3 * S, .72 * S, .84 * S), fill=_a((176, 172, 168)))
+        for x, y, r in ((.34, .45, .06), (.55, .62, .08), (.38, .7, .04), (.58, .42, .04)):
+            d.ellipse(((x - r) * S, (y - r) * S, (x + r) * S, (y + r) * S), fill=_a((120, 116, 114)))
+        d.arc((.18 * S, .3 * S, .72 * S, .84 * S), 20, 160, fill=_a((255, 120, 50)), width=max(2, S // 20))
+        d.rectangle((0, .9 * S, S, S), fill=_a((90, 60, 40)))
+    return _paint(draw, .45, .55, (70, 40, 60))
+
+
+NEW_ICONS = (("thousand_blades", thousand_blades_icon), ("executioners_wheel", executioners_wheel_icon), ("abyssal_maw", abyssal_maw_icon),
+             ("divine_prism", divine_prism_icon), ("chains_of_the_damned", chains_of_the_damned_icon), ("pentacle_of_thorns", pentacle_of_thorns_icon),
+             ("seraph_wings", seraph_wings_icon), ("wrath_of_the_heavens", wrath_of_the_heavens_icon), ("eclipse", eclipse_icon),
+             ("fallen_moon", fallen_moon_icon))
+
+
 def main():
     for i, art in enumerate((rune_circle_tyrant(), rune_circle_judgment(), rune_circle_void())):
         g.save(art, f"textures/entity/boss/rune_circle_{i}.png")
@@ -588,11 +981,14 @@ def main():
     g.save(beam(), "textures/entity/boss/beam.png")
     g.save(judgment_blade(), "textures/entity/boss/judgment_blade.png")
     g.save(rune_wall(), "textures/entity/boss/rune_wall.png")
+    new_attack_textures()
     for name, icon in (("crushing_meteor", crushing_meteor_icon), ("judgment_blade", judgment_blade_icon),
                        ("annihilation_beam", annihilation_beam_icon), ("triple_nova", triple_nova_icon),
                        ("starfall", starfall_icon), ("seismic_rift", seismic_rift_icon), ("void_orb", void_orb_icon),
                        ("cross_of_light", cross_of_light_icon), ("rune_prison", rune_prison_icon),
                        ("last_judgment", last_judgment_icon)):
+        g.save(icon(), f"textures/gui/spell_icons/{name}.png")
+    for name, icon in NEW_ICONS:
         g.save(icon(), f"textures/gui/spell_icons/{name}.png")
     g.save(affinity_ring_boss(), "textures/item/affinity_ring_boss.png")
     g.save(tyrants_codex_icon(), "textures/item/tyrants_codex.png")

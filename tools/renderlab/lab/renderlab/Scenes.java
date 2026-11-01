@@ -35,8 +35,10 @@ import com.waylays.arcanes.client.render.water.MaelstromModel;
 import com.waylays.arcanes.client.render.water.TidalWaveModel;
 import com.waylays.arcanes.client.render.water.TyphoonModel;
 import com.waylays.arcanes.client.render.water.WaterJetModel;
+import com.waylays.arcanes.client.render.boss.*;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import net.minecraft.util.Mth;
 
 /** The scenes the render lab can draw: a spell's model, a caster and a target or two for scale. */
 public final class Scenes {
@@ -314,6 +316,97 @@ public final class Scenes {
                 }
                 RitualFigureModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), tier, plane, stations, occupied, state, since, drawn, progress, age,
                         colours[tier], 7, LIGHT);
+            }
+            case "bsword" -> {
+                // A volley: each sword strikes at its own tick; age is the volley's clock
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 9);
+                for (int k = 0; k < 6; k++) {
+                    float a = -1.2f + k * .48f;
+                    Vector3f halo = new Vector3f(Mth.sin(a) * 4.5f, 7.5f + .8f * Mth.cos(a * 2), -1.5f + Mth.cos(a) * .8f);
+                    Vector3f o = new Vector3f(-5 + k * 2.4f, 0, 8 + (k % 2) * 2);
+                    int strike = 70 + k * 3;
+                    SwordModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(halo).sub(o), age, strike - age, 3.4f, 0xFFD25A, 11 + k * 7, LIGHT);
+                }
+            }
+            case "bwheel" -> {
+                // Forms at the head of a 24-block strip; rolls from 56 to 76; bursts after
+                caster(ctx, -2, -1);
+                husk(ctx, 1, 0, 14);
+                Vector3f o = new Vector3f(0, 0, 0);
+                float rolled = Math.max(0, Math.min(1, (age - 56) / 20));
+                WheelModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 24), 2.6f, age, rolled, age - 76, 9, LIGHT);
+            }
+            case "beclipse" -> {
+                // Cast at 0; the first band strikes at 70, then every 14
+                caster(ctx, 0, 0);
+                husk(ctx, 4, 0, 6);
+                husk(ctx, -9, 0, 7);
+                Vector3f o = new Vector3f(0, 0, 0);
+                EclipseModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 22, 15.5f, 3.6f, age, age - 70, 14, 5, LIGHT);
+            }
+            case "bmoon" -> {
+                // Shows at 0, falls over 120 ticks onto a 16-block arena, then the aftermath
+                caster(ctx, -18, -4);
+                husk(ctx, 5, 0, 4);
+                Vector3f o = new Vector3f(0, 0, 0);
+                float fall = Math.min(1, age / 120);
+                MoonModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(6, 46, -8), 6, 16, age, fall, age - 120, 3, LIGHT);
+            }
+            case "bmaw" -> {
+                // Opens at 0, bites at 70
+                caster(ctx, -9, -6);
+                husk(ctx, 1, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                MawModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 6, age, 70 - age, 4, LIGHT);
+            }
+            case "bprism" -> {
+                // Forms at 0; 12 beams 30 degrees apart, 4 ticks apart, the first at 70
+                caster(ctx, 0, 0);
+                husk(ctx, 6, 0, 9);
+                Vector3f o = new Vector3f(0, 0, 0);
+                PrismModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 8, age, age - 70, 12, 1.2f, Mth.PI / 6, 4, 18, 7, LIGHT);
+            }
+            case "bchains" -> {
+                // Bursts out at 0, the sentence falls at 70
+                caster(ctx, -8, -6);
+                husk(ctx, 0, 0, 0);
+                Vector3f o = new Vector3f(0, 0, 0);
+                ChainsModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 2.6f, age, 70 - age, 3, LIGHT);
+            }
+            case "bstorm" -> {
+                // Gathers from 0; bolts strike at 70, 72 and 76; its wrath is spent at 110
+                caster(ctx, 0, -2);
+                husk(ctx, 4, 0, 6);
+                Vector3f o = new Vector3f(0, 0, 0);
+                StormModel.storm(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 20, 14, age, age - 110, 3, LIGHT);
+                float[][] bolts = {{4, 6, 70}, {-5, 8, 72}, {7, -3, 76}};
+                for (float[] b : bolts) {
+                    Vector3f at = new Vector3f(b[0], 0, b[1]);
+                    StormModel.bolt(Lab.at(at), ctx.rec(), Lab.view(ctx, at), new Vector3f(-b[0] * .3f, 18, -b[1] * .3f), age - b[2], (int) b[2], LIGHT);
+                }
+            }
+            case "bthorns" -> {
+                // A star of radius 10: its strokes burst out 6 ticks apart from 70
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 5);
+                Vector3f[] pts = new Vector3f[5];
+                for (int j = 0; j < 5; j++) {
+                    float a = -Mth.HALF_PI + j * Mth.TWO_PI / 5;
+                    pts[j] = new Vector3f(Mth.cos(a) * 10, 0, Mth.sin(a) * 10);
+                }
+                for (int j = 0; j < 5; j++) {
+                    Vector3f a = pts[(j * 2) % 5], b = pts[(j * 2 + 2) % 5];
+                    ThornsModel.draw(Lab.at(a), ctx.rec(), Lab.view(ctx, a), new Vector3f(b).sub(a), 2.6f, age - 70 - j * 6, 5 + j * 37, LIGHT);
+                }
+            }
+            case "bwings" -> {
+                // Called at 0, beat at 70; a fan 16 long, 35 degrees either side
+                caster(ctx, 0, 0);
+                husk(ctx, 2, 0, 9);
+                husk(ctx, -4, 0, 12);
+                Vector3f o = new Vector3f(0, 0, 0);
+                WingsModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 6, age, 70 - age, 16, 35 * Mth.DEG_TO_RAD, 5, LIGHT);
             }
             default -> throw new IllegalArgumentException("no scene " + scene);
         }

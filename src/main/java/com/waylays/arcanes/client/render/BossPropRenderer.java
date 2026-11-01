@@ -4,7 +4,23 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.client.render.boss.ChainsModel;
+import com.waylays.arcanes.client.render.boss.EclipseModel;
+import com.waylays.arcanes.client.render.boss.MawModel;
+import com.waylays.arcanes.client.render.boss.MoonModel;
+import com.waylays.arcanes.client.render.boss.PrismModel;
+import com.waylays.arcanes.client.render.boss.StormModel;
+import com.waylays.arcanes.client.render.boss.SwordModel;
+import com.waylays.arcanes.client.render.boss.ThornsModel;
+import com.waylays.arcanes.client.render.boss.WheelModel;
+import com.waylays.arcanes.client.render.boss.WingsModel;
+import com.waylays.arcanes.client.render.water.WaterMesh;
 import com.waylays.arcanes.entity.boss.BossProp;
+import com.waylays.arcanes.entity.boss.BossTelegraph;
+import com.waylays.arcanes.spells.boss.DivinePrismSpell;
+import com.waylays.arcanes.spells.boss.SeraphWingsSpell;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,7 +37,7 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Boss Magic scenery: a meteor (a burning mass of magma and blackstone in a halo of fire), a falling star, the giant
- * blade raised then brought down, a pillar of light.
+ * blade raised then brought down, a pillar of light; and the great attacks' scenery, each drawn by its own model.
  */
 public class BossPropRenderer extends EntityRenderer<BossProp> {
     static final ResourceLocation BLADE = ArcanesOublies.id("textures/entity/boss/judgment_blade.png");
@@ -46,6 +62,7 @@ public class BossPropRenderer extends EntityRenderer<BossProp> {
             case STAR -> star(prop, partialTicks, age, poseStack, buffer);
             case BLADE -> blade(prop, partialTicks, age, since, poseStack, buffer);
             case PILLAR -> pillar(prop, age, poseStack, buffer);
+            default -> scene(prop, partialTicks, age, since, poseStack, buffer);
         }
         super.render(prop, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
@@ -159,6 +176,42 @@ public class BossPropRenderer extends EntityRenderer<BossProp> {
         poseStack.translate(0, .1, 0);
         RenderHelper.groundQuad(buffer.getBuffer(RenderType.eyes(BlastEffectRenderer.RING)), poseStack.last(), width * (1.2f + life * 2), color, LIGHT);
         poseStack.popPose();
+    }
+
+    /** The great attacks' scenery: each drawn by its own model, from where the prop stands. */
+    private void scene(BossProp prop, float partialTicks, float age, float since, PoseStack poseStack, MultiBufferSource buffer) {
+        Vec3 at = prop.getPosition(partialTicks);
+        Vector3f from = prop.getFrom().subtract(at).toVector3f();
+        Vector3f to = prop.getTo().subtract(at).toVector3f();
+        int seed = prop.getId() * 31;
+        float size = prop.getSize();
+        float arg = prop.getArg();
+        BossTelegraph.Style style = prop.getStyle();
+        if (prop.getKind() == BossProp.Kind.WINGS) {
+            Quaternionf turn = Axis.YP.rotationDegrees(-prop.getYRot());
+            poseStack.pushPose();
+            poseStack.mulPose(turn);
+            WingsModel.draw(poseStack, buffer, WaterViews.of(this.entityRenderDispatcher, prop, partialTicks, Vec3.ZERO, turn), size, age, -since, arg,
+                    SeraphWingsSpell.HALF_ANGLE * Mth.DEG_TO_RAD, seed, LIGHT);
+            poseStack.popPose();
+            return;
+        }
+        WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, prop, partialTicks);
+        switch (prop.getKind()) {
+            case SWORD -> SwordModel.draw(poseStack, buffer, view, from, age, -since, size, style.zone, seed, LIGHT);
+            case WHEEL -> WheelModel.draw(poseStack, buffer, view, to, size, age, Mth.clamp((since + arg) / Math.max(1, arg), 0, 1), since, seed, LIGHT);
+            case ECLIPSE -> EclipseModel.draw(poseStack, buffer, view, from.y, size, size * .24f, age, since, arg, seed, LIGHT);
+            case MOON -> MoonModel.draw(poseStack, buffer, view, from, size, arg, age, prop.travel(partialTicks), since, seed, LIGHT);
+            case MAW -> MawModel.draw(poseStack, buffer, view, size, age, -since, seed, LIGHT);
+            case PRISM -> PrismModel.draw(poseStack, buffer, view, from.y, age, since, DivinePrismSpell.BEAMS, arg, DivinePrismSpell.STEP * Mth.DEG_TO_RAD,
+                    DivinePrismSpell.INTERVAL, size, seed, LIGHT);
+            case CHAINS -> ChainsModel.draw(poseStack, buffer, view, size, age, -since, seed, LIGHT);
+            case STORM -> StormModel.storm(poseStack, buffer, view, from.y, size, age, since, seed, LIGHT);
+            case BOLT -> StormModel.bolt(poseStack, buffer, view, from, since, seed, LIGHT);
+            case THORNS -> ThornsModel.draw(poseStack, buffer, view, to, size, since, seed, LIGHT);
+            default -> {
+            }
+        }
     }
 
     @Override

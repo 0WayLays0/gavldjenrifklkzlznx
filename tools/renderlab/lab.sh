@@ -14,7 +14,7 @@ fi
 SRC=$ROOT/src/main/java/com/waylays/arcanes/client/render
 BUILD=$CACHE/build
 rm -rf "$BUILD" && mkdir -p "$BUILD"
-FILES=$(find "$HERE/stubs" "$HERE/lab" -name '*.java'; echo "$SRC/RenderHelper.java"; echo "$ROOT/src/main/java/com/waylays/arcanes/spells/fire/HeatColors.java"; find "$SRC/water" "$SRC/fire" "$SRC/ritual" "$SRC/wind" -name "*.java" 2>/dev/null || true)
+FILES=$(find "$HERE/stubs" "$HERE/lab" -name '*.java'; echo "$SRC/RenderHelper.java"; echo "$ROOT/src/main/java/com/waylays/arcanes/spells/fire/HeatColors.java"; find "$SRC/water" "$SRC/fire" "$SRC/ritual" "$SRC/wind" "$SRC/boss" -name "*.java" 2>/dev/null || true)
 javac -nowarn -d "$BUILD" -cp "$JOML" $FILES
 SCENE=$1 AGE=$2 EYE=$3 AT=$4 OUT=$5
 shift 5

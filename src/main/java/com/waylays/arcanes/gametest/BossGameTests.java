@@ -11,6 +11,9 @@ import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.boss.BossSpell;
 import com.waylays.arcanes.spells.boss.LastJudgmentSpell;
+import com.waylays.arcanes.spells.boss.ThousandBladesSpell;
+import com.waylays.arcanes.spells.boss.WrathOfTheHeavensSpell;
+import net.minecraft.world.effect.MobEffects;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
@@ -90,7 +93,7 @@ public final class BossGameTests {
                 helper.assertTrue(spell instanceof BossSpell, entry.getId() + " is in the Boss school but is no Boss spell");
             }
         }
-        helper.assertTrue(count == 10, "expected 10 Boss spells, got " + count);
+        helper.assertTrue(count == 20, "expected 20 Boss spells, got " + count);
         helper.assertTrue(helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).containsKey(ModSchools.BOSS_MAGIC),
                 "boss_magic damage type missing");
         helper.assertTrue(boss.isFocus(new ItemStack(Items.NETHER_STAR)), "the nether star is not the Boss focus");
@@ -255,6 +258,232 @@ public final class BossGameTests {
             helper.assertTrue(!hurt(caster), "the wall hurt its caster");
             bossEntities(helper).forEach(Entity::discard);
             helper.succeed();
+        });
+    }
+
+    // ---------------------------------------------------------------- the ten great attacks
+
+    private static long props(GameTestHelper helper, BossProp.Kind kind) {
+        return bossEntities(helper).stream().filter(e -> e instanceof BossProp p && p.getKind() == kind).count();
+    }
+
+    private static void cast(GameTestHelper helper, AbstractSpell spell, Witch caster) {
+        spell.onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
+    }
+
+    private static void done(GameTestHelper helper) {
+        bossEntities(helper).forEach(Entity::discard);
+        helper.succeed();
+    }
+
+    /**
+     * The ten great attacks, cast together: each shows its scenery (the swords, the wheel, the eclipse, the moon, ...).
+     * Nothing lands: everything is taken away before the first warning runs out, once the storm has called its last bolt.
+     */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_scenery", timeoutTicks = 120)
+    public static void greatAttacksShowTheirScenery(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, 4.5);
+        caster.setXRot(60);
+        List<AbstractSpell> spells = List.of(ModSpells.THOUSAND_BLADES.get(), ModSpells.EXECUTIONERS_WHEEL.get(), ModSpells.ABYSSAL_MAW.get(),
+                ModSpells.DIVINE_PRISM.get(), ModSpells.CHAINS_OF_THE_DAMNED.get(), ModSpells.PENTACLE_OF_THORNS.get(), ModSpells.SERAPH_WINGS.get(),
+                ModSpells.WRATH_OF_THE_HEAVENS.get(), ModSpells.ECLIPSE.get(), ModSpells.FALLEN_MOON.get());
+        for (AbstractSpell spell : spells) {
+            cast(helper, spell, caster);
+        }
+        Set<BossProp.Kind> seen = new HashSet<>();
+        helper.onEachTick(() -> bossEntities(helper).forEach(e -> {
+            if (e instanceof BossProp p) {
+                seen.add(p.getKind());
+            }
+        }));
+        int lands = BossTelegraph.warningTicks();
+        int last = WrathOfTheHeavensSpell.bolts(1) * WrathOfTheHeavensSpell.CALL;
+        helper.assertTrue(last + 6 < lands, "the storm still calls bolts when the first warnings run out");
+        helper.runAfterDelay(last + 4, () -> {
+            for (BossProp.Kind kind : List.of(BossProp.Kind.SWORD, BossProp.Kind.WHEEL, BossProp.Kind.MAW, BossProp.Kind.PRISM, BossProp.Kind.CHAINS,
+                    BossProp.Kind.THORNS, BossProp.Kind.WINGS, BossProp.Kind.STORM, BossProp.Kind.BOLT, BossProp.Kind.ECLIPSE, BossProp.Kind.MOON)) {
+                helper.assertTrue(seen.contains(kind), "no " + kind + " was shown");
+            }
+            long swords = props(helper, BossProp.Kind.SWORD);
+            helper.assertTrue(swords >= ThousandBladesSpell.swords(1) / 2, "only " + swords + " swords for " + ThousandBladesSpell.swords(1));
+            done(helper);
+        });
+    }
+
+    /** The wheel cuts what stands in its strip as it rolls over it, not before, and not beside it. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_wheel", timeoutTicks = 160)
+    public static void executionersWheelCutsItsStrip(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, .5);
+        Pig ahead = pig(helper, 4.5, 6.5);
+        Pig beside = pig(helper, 8.3, 6.5);
+        cast(helper, ModSpells.EXECUTIONERS_WHEEL.get(), caster);
+        helper.assertTrue(props(helper, BossProp.Kind.WHEEL) == 1, "no wheel formed");
+        int lands = BossTelegraph.warningTicks();
+        helper.runAfterDelay(lands - 5, () -> helper.assertTrue(!hurt(ahead), "the wheel cut before its warning ran out"));
+        helper.runAfterDelay(lands + 4, () -> {
+            helper.assertTrue(hurt(ahead), "the wheel missed the pig in its strip");
+            helper.assertTrue(!hurt(beside), "the wheel cut a pig beside its strip");
+            helper.assertTrue(!hurt(caster), "the wheel cut its caster");
+            done(helper);
+        });
+    }
+
+    /** The first band of the eclipse strikes round its caster and leaves its victim in the dark. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_eclipse", timeoutTicks = 140)
+    public static void eclipseDarkensWhomItStrikes(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, 4.5);
+        Pig pig = pig(helper, 4.5, 6.5);
+        cast(helper, ModSpells.ECLIPSE.get(), caster);
+        helper.assertTrue(props(helper, BossProp.Kind.ECLIPSE) == 1, "no eclipse in the sky");
+        int lands = BossTelegraph.warningTicks();
+        helper.runAfterDelay(lands - 5, () -> helper.assertTrue(!hurt(pig), "the eclipse struck before its warning ran out"));
+        helper.runAfterDelay(lands + 3, () -> {
+            helper.assertTrue(hurt(pig) && pig.hasEffect(MobEffects.DARKNESS), "the pig in the first band is not hurt and in the dark");
+            helper.assertTrue(!hurt(caster), "the eclipse struck its caster");
+            done(helper);
+        });
+    }
+
+    /** The chains slow whoever they bind while they hold, then the hellfire burns them. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_chains", timeoutTicks = 140)
+    public static void chainsBindThenBurn(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 1.5, 1.5);
+        Pig pig = pig(helper, 5.5, 5.5);
+        cast(helper, ModSpells.CHAINS_OF_THE_DAMNED.get(), caster);
+        helper.assertTrue(props(helper, BossProp.Kind.CHAINS) == 1, "no chains burst out round the pig");
+        int lands = BossTelegraph.warningTicks();
+        helper.runAfterDelay(30, () -> helper.assertTrue(pig.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "the bound pig is not slowed"));
+        helper.runAfterDelay(lands + 3, () -> {
+            helper.assertTrue(hurt(pig), "the hellfire missed the bound pig");
+            helper.assertTrue(!hurt(caster), "the chains hurt their caster");
+            done(helper);
+        });
+    }
+
+    /** The prism's first beam strikes along the line ahead of its caster and leaves its victim glowing. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_prism", timeoutTicks = 140)
+    public static void prismBeamStrikesAlongItsLine(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, .5);
+        Pig pig = pig(helper, 4.5, 4.5);
+        cast(helper, ModSpells.DIVINE_PRISM.get(), caster);
+        helper.assertTrue(props(helper, BossProp.Kind.PRISM) == 1, "no prism over the caster");
+        int lands = BossTelegraph.warningTicks();
+        helper.runAfterDelay(lands - 5, () -> helper.assertTrue(!hurt(pig), "the prism struck before its warning ran out"));
+        helper.runAfterDelay(lands + 2, () -> {
+            helper.assertTrue(hurt(pig) && pig.hasEffect(MobEffects.GLOWING), "the pig on the first line is not hurt and glowing");
+            helper.assertTrue(!hurt(caster), "the prism hurt its caster");
+            done(helper);
+        });
+    }
+
+    /** The maw bites what is still in it: hurt, slowed, withering. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_maw", timeoutTicks = 140)
+    public static void abyssalMawBitesWhatStaysIn(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 1.5, 1.5);
+        Pig pig = pig(helper, 5.5, 4.5);
+        BossTelegraph t = BossTelegraph.circle(helper.getLevel(), caster, ModSpells.ABYSSAL_MAW.get(), 1, helper.absoluteVec(new Vec3(4.5, 2, 4.5)), 3)
+                .damage(4).part("maw").spawn();
+        int lands = t.getFireTick() - t.getStartTick();
+        helper.runAfterDelay(lands + 3, () -> {
+            helper.assertTrue(hurt(pig), "the maw missed the pig in it");
+            helper.assertTrue(pig.hasEffect(MobEffects.MOVEMENT_SLOWDOWN) && pig.hasEffect(MobEffects.WITHER), "the bitten pig is not slowed and withering");
+            done(helper);
+        });
+    }
+
+    /** The moon crushes what is under it and sets it burning; the blast hits what is round the crater. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_moon", timeoutTicks = 140)
+    public static void fallenMoonCrushesThenBlasts(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 7.5, .5);
+        Pig under = pig(helper, 2.5, 2.5);
+        Pig round = pig(helper, 6.5, 7.8);
+        AbstractSpell moon = ModSpells.FALLEN_MOON.get();
+        BossTelegraph crash = BossTelegraph.circle(helper.getLevel(), caster, moon, 1, helper.absoluteVec(new Vec3(2.5, 2, 2.5)), 1.8f)
+                .damage(4).part("moon").spawn();
+        BossTelegraph.ring(helper.getLevel(), caster, moon, 1, helper.absoluteVec(new Vec3(6.5, 2, 6.5)), .8f, 2).damage(4).part("blast").spawn();
+        int lands = crash.getFireTick() - crash.getStartTick();
+        helper.runAfterDelay(lands + 3, () -> {
+            helper.assertTrue(hurt(under) && under.isOnFire(), "the pig under the moon is not crushed and burning");
+            helper.assertTrue(hurt(round), "the blast missed the pig round the crater");
+            helper.assertTrue(!hurt(caster), "the moon hurt its caster");
+            done(helper);
+        });
+    }
+
+    /** The wings blast what is in the fan ahead and lift it; what is off to the side is spared. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_wings", timeoutTicks = 140)
+    public static void seraphWingsBlastTheFanAhead(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, .5);
+        Pig ahead = pig(helper, 4.5, 5.5);
+        Pig aside = pig(helper, 8.5, 1.5);
+        cast(helper, ModSpells.SERAPH_WINGS.get(), caster);
+        helper.assertTrue(props(helper, BossProp.Kind.WINGS) == 1, "no wings unfolded");
+        int lands = BossTelegraph.warningTicks();
+        helper.runAfterDelay(lands + 3, () -> {
+            helper.assertTrue(hurt(ahead) && ahead.hasEffect(MobEffects.LEVITATION), "the pig ahead is not hurt and lifted");
+            helper.assertTrue(!hurt(aside), "the wings hit a pig off to the side");
+            helper.assertTrue(!hurt(caster), "the wings hurt their caster");
+            done(helper);
+        });
+    }
+
+    /** The storm marks its first bolt on the foe under it and strikes it when the warning runs out. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_storm", timeoutTicks = 160)
+    public static void stormHuntsTheFoeUnderIt(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 1.5, 1.5);
+        Pig pig = pig(helper, 6.5, 6.5);
+        cast(helper, ModSpells.WRATH_OF_THE_HEAVENS.get(), caster);
+        helper.assertTrue(props(helper, BossProp.Kind.STORM) == 1, "no storm gathered");
+        int lands = BossTelegraph.warningTicks();
+        helper.runAfterDelay(lands - 5, () -> helper.assertTrue(!hurt(pig), "a bolt struck before its warning ran out"));
+        // By then the storm has called its last bolt: taking everything away leaves nothing behind
+        helper.runAfterDelay(lands + 4, () -> {
+            helper.assertTrue(hurt(pig), "the storm's first bolt missed the pig it was called on");
+            helper.assertTrue(!hurt(caster), "the storm struck its caster");
+            done(helper);
+        });
+    }
+
+    /** The first sword falls on the foe near the spot the caster aims at. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_blades", timeoutTicks = 140)
+    public static void thousandBladesFallOnTheFoe(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, .5);
+        caster.setXRot(30);
+        Pig pig = pig(helper, 4.5, 5.5);
+        cast(helper, ModSpells.THOUSAND_BLADES.get(), caster);
+        int lands = BossTelegraph.warningTicks();
+        helper.runAfterDelay(lands - 5, () -> helper.assertTrue(!hurt(pig), "a sword fell before its warning ran out"));
+        helper.runAfterDelay(lands + 3, () -> {
+            helper.assertTrue(hurt(pig), "no sword fell on the pig");
+            helper.assertTrue(!hurt(caster), "a sword fell on its caster");
+            done(helper);
+        });
+    }
+
+    /** Thorns burst out along a stroke of the star: what stands on it is hurt and withering, what stands beside it is not. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_thorns", timeoutTicks = 140)
+    public static void thornsBurstAlongTheirStroke(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 1.5, .5);
+        Pig on = pig(helper, 4.5, 4.5);
+        Pig beside = pig(helper, 7.5, 4.5);
+        BossTelegraph t = BossTelegraph.line(helper.getLevel(), caster, ModSpells.PENTACLE_OF_THORNS.get(), 1, helper.absoluteVec(new Vec3(4.5, 2, 1)), 0, 6, 2)
+                .damage(4).part("stroke").spawn();
+        int lands = t.getFireTick() - t.getStartTick();
+        helper.runAfterDelay(lands + 3, () -> {
+            helper.assertTrue(hurt(on) && on.hasEffect(MobEffects.WITHER), "the pig on the stroke is not hurt and withering");
+            helper.assertTrue(!hurt(beside), "the thorns hurt a pig beside the stroke");
+            done(helper);
         });
     }
 }

@@ -101,6 +101,10 @@ public final class ClientSmokeTest {
             .map(String::trim).filter(s -> !s.isEmpty()).toList();
     /** Ticks after the cast each picture is taken. */
     private static final int[] SHOT_DELAYS = {10, 25, 45};
+    /** A Boss attack lands when its warning runs out (3.5 s): its warning, then the moments it lands. */
+    private static final int[] BOSS_SHOT_DELAYS = {30, 72, 78};
+    /** The delays of the spell being photographed. */
+    private static int[] shotDelays = SHOT_DELAYS;
     /**
      * With {@code world_tree_end} in {@code arcanes.shots}: after the last spell a World Tree that lives only a moment
      * is raised, and its end photographed this many ticks into it.
@@ -240,6 +244,7 @@ public final class ClientSmokeTest {
             shotName = SHOTS.stream().anyMatch(s -> s.endsWith("*") ? name.startsWith(s.substring(0, s.length() - 1)) : s.equals(name) || s.equals(school))
                     ? name : null;
             shotCastTick = ticks;
+            shotDelays = spell instanceof BossSpell ? BOSS_SHOT_DELAYS : SHOT_DELAYS;
             java.util.UUID id = mc.player.getUUID();
             // The piranha needs its pool dug in solid ground: it is always cast on the photo floor
             boolean alone = shotName != null || spell == ModSpells.MANA_PIRANHA.get();
@@ -257,7 +262,7 @@ public final class ClientSmokeTest {
             }
         }
         AbstractSpell holding = held;
-        if (holding != null && ticks - shotCastTick <= SHOT_DELAYS[SHOT_DELAYS.length - 1]) {
+        if (holding != null && ticks - shotCastTick <= shotDelays[shotDelays.length - 1]) {
             java.util.UUID id = mc.player.getUUID();
             server.execute(() -> {
                 ServerPlayer player = server.getPlayerList().getPlayer(id);
@@ -269,16 +274,16 @@ public final class ClientSmokeTest {
         if (shotName != null && mc.player != null) {
             // Seen from a little to the right and looking down, then from the left, then looking up over the caster
             int since = ticks - shotCastTick;
-            if (since == SHOT_DELAYS[0] - 2) {
+            if (since == shotDelays[0] - 2) {
                 shotYaw = mc.player.getYRot();
                 aim(mc, shotYaw + 32, 24);
-            } else if (since == SHOT_DELAYS[1] - 2) {
+            } else if (since == shotDelays[1] - 2) {
                 aim(mc, shotYaw - 32, 12);
-            } else if (since == SHOT_DELAYS[2] - 2) {
+            } else if (since == shotDelays[2] - 2) {
                 aim(mc, shotYaw, -25);
             }
-            for (int k = 0; k < SHOT_DELAYS.length; k++) {
-                if (ticks - shotCastTick == SHOT_DELAYS[k]) {
+            for (int k = 0; k < shotDelays.length; k++) {
+                if (ticks - shotCastTick == shotDelays[k]) {
                     screenshot(mc, shotName + "_" + (k + 1));
                 }
             }
