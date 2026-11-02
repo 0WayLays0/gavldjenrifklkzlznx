@@ -970,6 +970,137 @@ NEW_ICONS = (("thousand_blades", thousand_blades_icon), ("executioners_wheel", e
              ("fallen_moon", fallen_moon_icon))
 
 
+# ---------------------------------------------------------------- the third ten attacks' icons (painted, 64 then 16)
+
+def bell_of_doom_icon():
+    def draw(d, img, S):
+        d.polygon([(.3 * S, .62 * S), (.34 * S, .3 * S), (.42 * S, .2 * S), (.58 * S, .2 * S), (.66 * S, .3 * S), (.7 * S, .62 * S), (.82 * S, .74 * S),
+                   (.18 * S, .74 * S)], fill=_a((176, 120, 60)), outline=_a(GOLD))
+        d.ellipse((.44 * S, .1 * S, .56 * S, .22 * S), outline=_a(GOLD), width=max(1, S // 30))
+        d.ellipse((.45 * S, .72 * S, .55 * S, .82 * S), fill=_a((90, 60, 30)))
+        for k in range(2):
+            r = .38 + k * .08
+            d.arc(((.5 - r) * S, (.78 - r * .3) * S, (.5 + r) * S, (.78 + r * .3) * S), 0, 180, fill=_a(GOLD if k == 0 else PALE), width=max(1, S // 30))
+        g.glow_spot(img, .5 * S, .45 * S, .3 * S, (255, 210, 90), .5)
+    return _paint(draw, .5, .45, (90, 60, 20))
+
+
+def infernal_checkerboard_icon():
+    def draw(d, img, S):
+        for gx in range(4):
+            for gy in range(4):
+                x0, y0 = .1 + gx * .2, .1 + gy * .2
+                if (gx + gy) % 2 == 0:
+                    d.rectangle((x0 * S, y0 * S, (x0 + .2) * S, (y0 + .2) * S), fill=_a(CRIMSON))
+                    d.polygon([((x0 + .04) * S, (y0 + .18) * S), ((x0 + .1) * S, (y0 + .02) * S), ((x0 + .16) * S, (y0 + .18) * S)], fill=_a(EMBER))
+                else:
+                    d.rectangle((x0 * S, y0 * S, (x0 + .2) * S, (y0 + .2) * S), fill=_a(VOID_DARK))
+        g.glow_spot(img, .5 * S, .5 * S, .4 * S, (255, 90, 40), .4)
+    return _paint(draw, .5, .5, (60, 10, 20))
+
+
+def titans_fist_icon():
+    def draw(d, img, S):
+        d.rectangle((.36 * S, .02 * S, .64 * S, .44 * S), fill=_a(IRON_LIGHT), outline=_a(IRON))
+        d.rectangle((.36 * S, .4 * S, .64 * S, .44 * S), fill=_a(GOLD))
+        for k in range(4):
+            d.rectangle(((.28 + k * .11) * S, .44 * S, (.38 + k * .11) * S, .66 * S), fill=_a((150, 140, 150)), outline=_a(IRON))
+        d.line([(.1 * S, .82 * S), (.9 * S, .82 * S)], fill=_a(EARTH), width=max(2, S // 20))
+        for k in range(5):
+            a = math.pi + k * math.pi / 4
+            d.line([(.5 * S, .8 * S), ((.5 + math.cos(a) * .4) * S, (.8 + math.sin(a) * .12) * S)], fill=_a(EMBER), width=max(1, S // 40))
+        g.glow_spot(img, .5 * S, .78 * S, .2 * S, (255, 140, 60), .8)
+    return _paint(draw, .5, .7, (80, 40, 20))
+
+
+def lances_of_judgment_icon():
+    def draw(d, img, S):
+        for k in range(3):
+            x = .25 + k * .25
+            d.line([(x * S, .12 * S), (x * S, .82 * S)], fill=_a(PALE), width=max(2, S // 22))
+            d.polygon([((x - .06) * S, .8 * S), ((x + .06) * S, .8 * S), (x * S, .96 * S)], fill=_a((255, 255, 255)))
+            d.ellipse(((x - .07) * S, .7 * S, (x + .07) * S, .76 * S), outline=_a(GOLD), width=max(1, S // 40))
+        g.glow_spot(img, .5 * S, .5 * S, .4 * S, (255, 220, 120), .6)
+    return _paint(draw, .5, .4, (100, 80, 30))
+
+
+def reapers_scythe_icon():
+    def draw(d, img, S):
+        d.line([(.22 * S, .92 * S), (.62 * S, .14 * S)], fill=_a((60, 40, 70)), width=max(2, S // 16))
+        pts = [((.62 + .32 * math.cos(a)) * S, (.14 + .32 * math.sin(a) * .7 + .12) * S) for a in [math.pi * (1.05 + .9 * t / 10) for t in range(11)]]
+        pts2 = [((.62 + .22 * math.cos(a)) * S, (.14 + .2 * math.sin(a) * .7 + .12) * S) for a in [math.pi * (1.05 + .9 * t / 10) for t in range(11)]]
+        d.polygon(pts + pts2[::-1], fill=_a((210, 190, 255)), outline=_a(VOID))
+        g.glow_spot(img, .5 * S, .25 * S, .3 * S, (160, 80, 255), .7)
+    return _paint(draw, .5, .3, (50, 14, 80))
+
+
+def orbital_strike_icon():
+    def draw(d, img, S):
+        d.ellipse((.2 * S, .04 * S, .8 * S, .18 * S), outline=_a(STAR), width=max(1, S // 28))
+        d.polygon([(.36 * S, .12 * S), (.64 * S, .12 * S), (.72 * S, .84 * S), (.28 * S, .84 * S)], fill=_a((200, 235, 255)))
+        d.polygon([(.45 * S, .12 * S), (.55 * S, .12 * S), (.58 * S, .84 * S), (.42 * S, .84 * S)], fill=_a((255, 255, 255)))
+        d.ellipse((.12 * S, .78 * S, .88 * S, .94 * S), outline=_a(STAR), width=max(1, S // 28))
+        g.glow_spot(img, .5 * S, .82 * S, .3 * S, (140, 210, 255), 1)
+    return _paint(draw, .5, .5, (20, 40, 80))
+
+
+def spectral_kings_icon():
+    def draw(d, img, S):
+        for k, (x, y) in enumerate(((.25, .3), (.75, .3), (.25, .75), (.75, .75))):
+            d.rectangle(((x - .07) * S, (y - .05) * S, (x + .07) * S, (y + .14) * S), fill=_a((60, 40, 90)))
+            d.rectangle(((x - .05) * S, (y - .15) * S, (x + .05) * S, (y - .05) * S), fill=_a((90, 70, 120)))
+            d.polygon([((x - .06) * S, (y - .15) * S), ((x - .03) * S, (y - .22) * S), (x * S, (y - .16) * S), ((x + .03) * S, (y - .22) * S),
+                       ((x + .06) * S, (y - .15) * S)], fill=_a(GOLD))
+        d.line([(.25 * S, .5 * S), (.75 * S, .5 * S)], fill=_a(VOID), width=max(1, S // 30))
+        d.line([(.5 * S, .2 * S), (.5 * S, .9 * S)], fill=_a(VOID), width=max(1, S // 30))
+        g.glow_spot(img, .5 * S, .52 * S, .15 * S, (170, 90, 255), .9)
+    return _paint(draw, .5, .5, (40, 14, 70))
+
+
+def sweeping_light_icon():
+    def draw(d, img, S):
+        d.ellipse((.36 * S, .18 * S, .64 * S, .4 * S), fill=_a((248, 244, 232)))
+        d.ellipse((.44 * S, .22 * S, .56 * S, .36 * S), fill=_a(GOLD))
+        d.ellipse((.48 * S, .26 * S, .52 * S, .32 * S), fill=_a(NIGHT))
+        d.polygon([(.5 * S, .34 * S), (.92 * S, .82 * S), (.78 * S, .92 * S)], fill=_a((255, 230, 140), 220))
+        d.arc((.1 * S, .55 * S, .9 * S, .98 * S), 200, 340, fill=_a(EMBER), width=max(1, S // 30))
+        g.glow_spot(img, .5 * S, .29 * S, .2 * S, (255, 220, 120), .8)
+    return _paint(draw, .5, .4, (80, 60, 20))
+
+
+def crimson_lotus_icon():
+    def draw(d, img, S):
+        c = .5 * S
+        for k in range(6):
+            a = k * math.tau / 6 - math.pi / 2
+            tip = (c + math.cos(a) * .42 * S, c + math.sin(a) * .42 * S)
+            l = (c + math.cos(a - .5) * .15 * S, c + math.sin(a - .5) * .15 * S)
+            r = (c + math.cos(a + .5) * .15 * S, c + math.sin(a + .5) * .15 * S)
+            d.polygon([l, tip, r, (c, c)], fill=_a(CRIMSON if k % 2 else BLOOD), outline=_a((255, 120, 140)))
+        d.ellipse((c - .07 * S, c - .07 * S, c + .07 * S, c + .07 * S), fill=_a((255, 220, 200)))
+        g.glow_spot(img, c, c, .18 * S, (255, 80, 100), .9)
+    return _paint(draw, .5, .5, (70, 10, 24))
+
+
+def collapse_icon():
+    def draw(d, img, S):
+        d.ellipse((.08 * S, .38 * S, .92 * S, .62 * S), outline=_a(VOID), width=max(2, S // 18))
+        d.ellipse((.18 * S, .42 * S, .82 * S, .58 * S), outline=_a((220, 180, 255)), width=max(1, S // 40))
+        d.ellipse((.32 * S, .32 * S, .68 * S, .68 * S), fill=_a((4, 2, 8)), outline=_a((120, 60, 200)))
+        for k in range(8):
+            a = k * math.tau / 8
+            d.line([((.5 + math.cos(a) * .46) * S, (.5 + math.sin(a) * .46) * S), ((.5 + math.cos(a) * .3) * S, (.5 + math.sin(a) * .3) * S)],
+                   fill=_a(VOID), width=max(1, S // 48))
+        g.glow_spot(img, .5 * S, .5 * S, .45 * S, (150, 60, 255), .4)
+    return _paint(draw, .5, .5, (30, 10, 50))
+
+
+THIRD_ICONS = (("bell_of_doom", bell_of_doom_icon), ("infernal_checkerboard", infernal_checkerboard_icon), ("titans_fist", titans_fist_icon),
+               ("lances_of_judgment", lances_of_judgment_icon), ("reapers_scythe", reapers_scythe_icon), ("orbital_strike", orbital_strike_icon),
+               ("spectral_kings", spectral_kings_icon), ("sweeping_light", sweeping_light_icon), ("crimson_lotus", crimson_lotus_icon),
+               ("collapse", collapse_icon))
+
+
 def main():
     for i, art in enumerate((rune_circle_tyrant(), rune_circle_judgment(), rune_circle_void())):
         g.save(art, f"textures/entity/boss/rune_circle_{i}.png")
@@ -988,7 +1119,7 @@ def main():
                        ("cross_of_light", cross_of_light_icon), ("rune_prison", rune_prison_icon),
                        ("last_judgment", last_judgment_icon)):
         g.save(icon(), f"textures/gui/spell_icons/{name}.png")
-    for name, icon in NEW_ICONS:
+    for name, icon in NEW_ICONS + THIRD_ICONS:
         g.save(icon(), f"textures/gui/spell_icons/{name}.png")
     g.save(affinity_ring_boss(), "textures/item/affinity_ring_boss.png")
     g.save(tyrants_codex_icon(), "textures/item/tyrants_codex.png")

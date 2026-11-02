@@ -4,7 +4,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.client.render.boss.BellModel;
 import com.waylays.arcanes.client.render.boss.ChainsModel;
+import com.waylays.arcanes.client.render.boss.CollapseModel;
+import com.waylays.arcanes.client.render.boss.FistModel;
+import com.waylays.arcanes.client.render.boss.JudgmentLanceModel;
+import com.waylays.arcanes.client.render.boss.KingModel;
+import com.waylays.arcanes.client.render.boss.LaserModel;
+import com.waylays.arcanes.client.render.boss.LotusModel;
+import com.waylays.arcanes.client.render.boss.OrbitalModel;
+import com.waylays.arcanes.client.render.boss.ScytheModel;
 import com.waylays.arcanes.client.render.boss.EclipseModel;
 import com.waylays.arcanes.client.render.boss.MawModel;
 import com.waylays.arcanes.client.render.boss.MoonModel;
@@ -17,7 +26,10 @@ import com.waylays.arcanes.client.render.boss.WingsModel;
 import com.waylays.arcanes.client.render.water.WaterMesh;
 import com.waylays.arcanes.entity.boss.BossProp;
 import com.waylays.arcanes.entity.boss.BossTelegraph;
+import com.waylays.arcanes.spells.boss.BellOfDoomSpell;
 import com.waylays.arcanes.spells.boss.DivinePrismSpell;
+import com.waylays.arcanes.spells.boss.ReapersScytheSpell;
+import com.waylays.arcanes.spells.boss.SweepingLightSpell;
 import com.waylays.arcanes.spells.boss.SeraphWingsSpell;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -209,6 +221,17 @@ public class BossPropRenderer extends EntityRenderer<BossProp> {
             case STORM -> StormModel.storm(poseStack, buffer, view, from.y, size, age, since, seed, LIGHT);
             case BOLT -> StormModel.bolt(poseStack, buffer, view, from, since, seed, LIGHT);
             case THORNS -> ThornsModel.draw(poseStack, buffer, view, to, size, since, seed, LIGHT);
+            // The newer attacks: their impact {@code arg} ticks after they show up
+            case BELL -> BellModel.draw(poseStack, buffer, view, from, age, age - arg, BellOfDoomSpell.TOLL, size, style.zone, seed, LIGHT);
+            case FIST -> FistModel.draw(poseStack, buffer, view, from, age, age - arg, arg, prop.getYRot(), size, style.zone, seed, LIGHT);
+            case LANCE -> JudgmentLanceModel.draw(poseStack, buffer, view, from, to, age, age - arg, size, style.zone, seed, LIGHT);
+            case SCYTHE -> ScytheModel.draw(poseStack, buffer, view, age, age - arg, prop.getYRot(), size, ReapersScytheSpell.SWEEP, style.zone, seed, LIGHT);
+            case ORBITAL -> OrbitalModel.draw(poseStack, buffer, view, from, age, age - arg, size, style.zone, seed, LIGHT);
+            case KING -> KingModel.draw(poseStack, buffer, view, to, age, age - arg, prop.getYRot(), style.zone, seed, LIGHT);
+            case LASER -> LaserModel.draw(poseStack, buffer, view, from, age, age - arg, prop.getYRot(), SweepingLightSpell.SLICES, SweepingLightSpell.STEP, size,
+                    style.zone, seed, LIGHT);
+            case LOTUS -> LotusModel.draw(poseStack, buffer, view, age, age - arg, size, prop.getYRot(), style.zone, seed, LIGHT);
+            case COLLAPSE -> CollapseModel.draw(poseStack, buffer, view, from, age, age - arg, size, style.zone, seed, LIGHT);
             default -> {
             }
         }

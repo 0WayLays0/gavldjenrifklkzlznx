@@ -9,6 +9,8 @@ import com.waylays.arcanes.entity.boss.VoidOrb;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.boss.InfernalCheckerboardSpell;
+import com.waylays.arcanes.spells.boss.LancesOfJudgmentSpell;
 import com.waylays.arcanes.spells.boss.BossSpell;
 import com.waylays.arcanes.spells.boss.LastJudgmentSpell;
 import com.waylays.arcanes.spells.boss.ThousandBladesSpell;
@@ -93,7 +95,7 @@ public final class BossGameTests {
                 helper.assertTrue(spell instanceof BossSpell, entry.getId() + " is in the Boss school but is no Boss spell");
             }
         }
-        helper.assertTrue(count == 20, "expected 20 Boss spells, got " + count);
+        helper.assertTrue(count == 30, "expected 30 Boss spells, got " + count);
         helper.assertTrue(helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).containsKey(ModSchools.BOSS_MAGIC),
                 "boss_magic damage type missing");
         helper.assertTrue(boss.isFocus(new ItemStack(Items.NETHER_STAR)), "the nether star is not the Boss focus");
@@ -307,6 +309,51 @@ public final class BossGameTests {
             }
             long swords = props(helper, BossProp.Kind.SWORD);
             helper.assertTrue(swords >= ThousandBladesSpell.swords(1) / 2, "only " + swords + " swords for " + ThousandBladesSpell.swords(1));
+            done(helper);
+        });
+    }
+
+    /**
+     * The third ten attacks, cast together: each shows its scenery (the bell, the fist, the lances, ...), and the board is
+     * marked in all its twenty-five squares. Nothing lands: everything is taken away first.
+     */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_scenery_3", timeoutTicks = 60)
+    public static void thirdTenShowTheirScenery(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, 4.5);
+        caster.setXRot(60);
+        List<AbstractSpell> spells = List.of(ModSpells.BELL_OF_DOOM.get(), ModSpells.INFERNAL_CHECKERBOARD.get(), ModSpells.TITANS_FIST.get(),
+                ModSpells.LANCES_OF_JUDGMENT.get(), ModSpells.REAPERS_SCYTHE.get(), ModSpells.ORBITAL_STRIKE.get(), ModSpells.SPECTRAL_KINGS.get(),
+                ModSpells.SWEEPING_LIGHT.get(), ModSpells.CRIMSON_LOTUS.get(), ModSpells.COLLAPSE.get());
+        for (AbstractSpell spell : spells) {
+            cast(helper, spell, caster);
+        }
+        for (BossProp.Kind kind : List.of(BossProp.Kind.BELL, BossProp.Kind.FIST, BossProp.Kind.LANCE, BossProp.Kind.SCYTHE, BossProp.Kind.ORBITAL,
+                BossProp.Kind.KING, BossProp.Kind.LASER, BossProp.Kind.LOTUS, BossProp.Kind.COLLAPSE)) {
+            helper.assertTrue(props(helper, kind) >= 1, "no " + kind + " was shown");
+        }
+        long kings = props(helper, BossProp.Kind.KING), lances = props(helper, BossProp.Kind.LANCE);
+        helper.assertTrue(kings == 4, "expected 4 kings, got " + kings);
+        helper.assertTrue(lances == LancesOfJudgmentSpell.LINES, "expected " + LancesOfJudgmentSpell.LINES + " lances, got " + lances);
+        long squares = bossEntities(helper).stream()
+                .filter(e -> e instanceof BossTelegraph t && t.getSpell() == ModSpells.INFERNAL_CHECKERBOARD.get()).count();
+        int cells = InfernalCheckerboardSpell.GRID * InfernalCheckerboardSpell.GRID;
+        helper.assertTrue(squares == cells, "the board has " + squares + " squares, not " + cells);
+        done(helper);
+    }
+
+    /** The bell's first toll strikes what stands in its first ring, when its warning runs out. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_bell", timeoutTicks = 140)
+    public static void bellTollsOnItsRing(GameTestHelper helper) {
+        GameTestSetup.clearLeftovers(helper);
+        Witch caster = caster(helper, 4.5, 4.5);
+        Pig pig = pig(helper, 4.5, 7.5);
+        cast(helper, ModSpells.BELL_OF_DOOM.get(), caster);
+        int lands = BossTelegraph.warningTicks();
+        helper.runAfterDelay(lands - 5, () -> helper.assertTrue(!hurt(pig), "the bell tolled before its warning ran out"));
+        helper.runAfterDelay(lands + 4, () -> {
+            helper.assertTrue(hurt(pig), "the first toll missed the pig in its ring");
+            helper.assertTrue(!hurt(caster), "the bell struck its caster");
             done(helper);
         });
     }

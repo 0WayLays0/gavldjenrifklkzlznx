@@ -26,7 +26,10 @@ public class BossProp extends Entity {
      * What it shows. The first four are drawn by their renderer itself; the rest are the great attacks' scenery, each a
      * model of its own (client/render/boss).
      */
-    public enum Kind { METEOR, STAR, BLADE, PILLAR, SWORD, WHEEL, ECLIPSE, MOON, MAW, PRISM, CHAINS, STORM, BOLT, THORNS, WINGS }
+    public enum Kind {
+        METEOR, STAR, BLADE, PILLAR, SWORD, WHEEL, ECLIPSE, MOON, MAW, PRISM, CHAINS, STORM, BOLT, THORNS, WINGS,
+        BELL, FIST, LANCE, SCYTHE, ORBITAL, KING, LASER, LOTUS, COLLAPSE
+    }
 
     private static final EntityDataAccessor<Integer> DATA_KIND = SynchedEntityData.defineId(BossProp.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_STYLE = SynchedEntityData.defineId(BossProp.class, EntityDataSerializers.INT);
@@ -166,6 +169,8 @@ public class BossProp extends Entity {
             case BOLT -> 9;
             case THORNS -> 40;
             case WINGS -> 26;
+            // Their aftermath is in their own time: they end when it does
+            case BELL, FIST, LANCE, SCYTHE, ORBITAL, KING, LASER, LOTUS, COLLAPSE -> 1;
         };
     }
 

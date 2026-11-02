@@ -410,6 +410,54 @@ public final class Scenes {
                 Vector3f o = new Vector3f(0, 0, 0);
                 WingsModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 6, age, 70 - age, 16, 35 * Mth.DEG_TO_RAD, 5, LIGHT);
             }
+            case "bbell" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 4, 0, 3);
+                Vector3f o = new Vector3f(0, 0, 0);
+                BellModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 7.5f, 0), age, age - 40, 16, 13.5f, 0xFFD25A, 3, LIGHT);
+            }
+            case "bfist" -> {
+                husk(ctx, 1, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                FistModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 26, 0), age, age - 40, 40, 0, 4, 0xFF6A1A, 3, LIGHT);
+            }
+            case "blance" -> {
+                caster(ctx, 0, -2);
+                Vector3f o = new Vector3f(0, 0, 0);
+                JudgmentLanceModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 16, 0), new Vector3f(0, 0, 18), age, age - 40, 1.8f, 0xFFD25A, 3, LIGHT);
+            }
+            case "bscythe" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 5);
+                Vector3f o = new Vector3f(0, 0, 0);
+                ScytheModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, age - 40, 0, 9, 12, 0x9A3CFF, 3, LIGHT);
+            }
+            case "borbital" -> {
+                husk(ctx, .5f, 0, .5f);
+                Vector3f o = new Vector3f(0, 0, 0);
+                OrbitalModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 40, 0), age, age - 40, 3.5f, 0x5AB8FF, 3, LIGHT);
+            }
+            case "bking" -> {
+                husk(ctx, 0, 0, 7.5f);
+                Vector3f o = new Vector3f(0, 0, 0);
+                KingModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 15), age, age - 40, 0, 0x9A3CFF, 3, LIGHT);
+            }
+            case "blaser" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 4, 0, 6);
+                Vector3f o = new Vector3f(0, 0, 0);
+                LaserModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 3.6f, 0), age, age - 40, 0, 8, 3, 11, 0xFFD25A, 3, LIGHT);
+            }
+            case "blotus" -> {
+                husk(ctx, 1, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                LotusModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, age - 40, 7.5f, 0, 0xFF2438, 3, LIGHT);
+            }
+            case "bcollapse" -> {
+                husk(ctx, 5, 0, 4);
+                Vector3f o = new Vector3f(0, 0, 0);
+                CollapseModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 4.5f, 0), age, age - 40, 12, 0x9A3CFF, 3, LIGHT);
+            }
             case "ewave" -> {
                 caster(ctx, 0, 0);
                 husk(ctx, 0, 0, 9);
