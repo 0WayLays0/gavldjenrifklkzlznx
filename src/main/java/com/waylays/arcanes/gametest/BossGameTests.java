@@ -201,6 +201,8 @@ public final class BossGameTests {
     /** The last judgment strikes the whole arena but its shelters. */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_judgment", timeoutTicks = 240)
     public static void lastJudgmentSparesTheSheltered(GameTestHelper helper) {
+        // The shelters reach up to eleven blocks out, over the neighbouring tests' ground: clear what those left there
+        GameTestSetup.clearLeftovers(helper);
         Witch caster = caster(helper, 4.5, 4.5);
         LastJudgmentSpell spell = (LastJudgmentSpell) ModSpells.LAST_JUDGMENT.get();
         spell.onCast(helper.getLevel(), 1, caster, CastSource.COMMAND, new MagicData(true));
@@ -222,8 +224,10 @@ public final class BossGameTests {
         helper.assertTrue(judgment != null, "no judgment marked");
         int lands = judgment.getFireTick() - (int) helper.getLevel().getGameTime();
         helper.runAfterDelay(lands + 5, () -> {
-            helper.assertTrue(hurt(exposed), "the judgment spared a pig in the open");
-            helper.assertTrue(!hurt(safe), "the judgment struck a pig in its shelter");
+            helper.assertTrue(hurt(exposed) && exposed.getLastHurtByMob() == caster, "the judgment spared a pig in the open");
+            // Struck by the spell, that is by its caster: the shelter stands on ground another test may have left
+            // burning, and that is not the judgment
+            helper.assertTrue(safe.getLastHurtByMob() != caster, "the judgment struck a pig in its shelter");
             helper.assertTrue(!hurt(caster), "the judgment struck its caster");
             bossEntities(helper).forEach(Entity::discard);
             helper.succeed();

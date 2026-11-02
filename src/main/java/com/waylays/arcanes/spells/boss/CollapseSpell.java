@@ -71,9 +71,13 @@ public class CollapseSpell extends BossSpell {
             int fire = core.getFireTick();
             int dragFrom = fire - DRAG - now(level);
             BossProp.scene(level, BossProp.Kind.COLLAPSE, BossTelegraph.Style.VOID, PULL, now(level), fire + 30, center, center.add(0, 4.5, 0), center, fire - now(level), 0);
-            // It drags everything round it in, for as long as it hangs there
+            // It drags everything round it in, for as long as it hangs there (not once it is gone)
             for (int k = Math.max(0, dragFrom); k < fire - now(level); k += 2) {
-                BossScheduler.after(server, k, l -> drag(l, entity, center));
+                BossScheduler.after(server, k, l -> {
+                    if (!core.isRemoved()) {
+                        drag(l, entity, center);
+                    }
+                });
             }
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
