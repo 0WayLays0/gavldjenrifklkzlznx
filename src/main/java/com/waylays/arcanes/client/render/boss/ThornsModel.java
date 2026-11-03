@@ -21,6 +21,7 @@ public final class ThornsModel {
     /** How long they take to sink (ticks). */
     public static final int SINK = 10;
     private static final int RED = 0xFF3A48;
+    private static final net.minecraft.resources.ResourceLocation CRYSTAL = com.waylays.arcanes.ArcanesOublies.id("textures/entity/boss/m_crimson_glass.png");
 
     private ThornsModel() {}
 
@@ -56,7 +57,8 @@ public final class ThornsModel {
         }
         // The thorns
         int n = Math.max(3, (int) (length / .5f));
-        VertexConsumer thorn = BossMesh.see(buffer, BossMesh.SPIKE);
+        // Thorns of blood-red crystal, black at their roots, barbed along their length
+        VertexConsumer thorn = BossMesh.solid(buffer, CRYSTAL);
         p = poseStack.last();
         Vector3f[] tips = new Vector3f[n];
         float[] shine = new float[n];
@@ -75,7 +77,15 @@ public final class ThornsModel {
             float lean = lat / Math.max(.1f, width) * 1.4f;
             Vector3f dir = new Vector3f(side).mul(lean).add(new Vector3f(fwd).mul((BossMesh.hash(seed + i * 13) - .5f) * .5f)).add(0, 1, 0).normalize();
             Vector3f bend = new Vector3f(side).mul(Math.signum(lat) * .22f);
-            BossMesh.horn(thorn, p, base, dir, bend, len, len * .17f, 6, 5, BossMesh.argb(0x2A0408, 1), BossMesh.argb(0xE8303E, 1), light);
+            BossMesh.horn(thorn, p, base, dir, bend, len, len * .17f, 7, 6, 0xFF2A0810, 0xFFFFFFFF, light);
+            // Barbs along it, pointing up and out
+            for (int b = 0; b < 3; b++) {
+                float t = .3f + b * .2f;
+                Vector3f at = new Vector3f(dir).mul(len * t).add(new Vector3f(bend).mul(len * t * t)).add(base);
+                float ba = BossMesh.hash(seed + i * 17 + b) * Mth.TWO_PI;
+                Vector3f barb = new Vector3f(BossMesh.across(dir)).rotateAxis(ba, dir.x, dir.y, dir.z).add(new Vector3f(dir).mul(.8f)).normalize();
+                BossMesh.horn(thorn, p, at, barb, new Vector3f(), len * .22f * (1 - t * .5f), len * .05f, 5, 2, 0xFF8A1020, 0xFFFFFFFF, light);
+            }
             tips[i] = new Vector3f(dir).mul(len).add(new Vector3f(bend).mul(len)).add(base);
             shine[i] = f * (1 - sink);
         }
