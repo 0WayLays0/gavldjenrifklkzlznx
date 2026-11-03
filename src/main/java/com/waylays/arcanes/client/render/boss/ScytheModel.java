@@ -13,7 +13,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
- * Reaper's Scythe: the Reaper itself rises over the caster, eight blocks of tattered black robe and hood, a skull in the
+ * Reaper's Scythe: the Reaper itself rises high over the caster, eight blocks of tattered black robe and hood, a skull in the
  * hood's shadow, its eyes burning. Its bony hands grip a great scythe: an ebony haft bound in gold, a skull at its collar,
  * a long curved blade of folded steel with runes down its flat and light along its edge. It reaps round the caster
  * twice, half a turn in front, then half a turn behind, its jaw falling open, a sheet of light trailing the blade; then
@@ -26,8 +26,10 @@ public final class ScytheModel {
     /** Ticks each half-turn takes. */
     private static final float REAP = 6;
     // The scythe in the Reaper's own space (it faces +Z): the haft's top and its collar, the blade's tip
-    private static final Vector3f TOP = new Vector3f(-1.3f, 7.6f, -.9f), COLLAR = new Vector3f(.7f, 2.0f, 4.5f), TIP = new Vector3f(-6.2f, 1.5f, 5.4f);
-    private static final Vector3f HEAD = new Vector3f(0, 8.55f, .1f);
+    private static final Vector3f TOP = new Vector3f(-1.3f, 10.6f, -.9f), COLLAR = new Vector3f(.7f, 2.0f, 4.5f), TIP = new Vector3f(-6.2f, 1.5f, 5.4f);
+    private static final Vector3f HEAD = new Vector3f(0, 11.55f, .1f);
+    /** How high over the caster the Reaper floats (its hem clear of the camera), its scythe reaching down to the ground. */
+    private static final float LIFT = 3;
     private static final int BLADE = 16;
 
     private ScytheModel() {}
@@ -72,16 +74,16 @@ public final class ScytheModel {
         VertexConsumer cloth = BossMesh.solid(buffer, CLOTH);
         place(poseStack, turn, k, bob);
         PoseStack.Pose p = poseStack.last();
-        Figures.robe(cloth, p, 7.7f, 3.0f, .85f, 2.1f, 9, 1.6f, wind, seed, 0xFFFFFFFF, 0xFF0A0610, light);
-        Figures.robe(cloth, p, 8.0f, 6.5f, .55f, 1.55f, 7, .4f, wind * .4f, seed + 5, 0xFFE8E0F0, 0xFF0A0610, light);
+        Figures.robe(cloth, p, 7.7f + LIFT, 3.0f + LIFT, .85f, 2.1f, 9, 1.6f, wind, seed, 0xFFFFFFFF, 0xFF0A0610, light);
+        Figures.robe(cloth, p, 8.0f + LIFT, 6.5f + LIFT, .55f, 1.55f, 7, .4f, wind * .4f, seed + 5, 0xFFE8E0F0, 0xFF0A0610, light);
         poseStack.pushPose();
         poseStack.translate(HEAD.x, HEAD.y, HEAD.z);
         poseStack.mulPose(new Quaternionf().rotationX(.12f));
         Figures.hood(cloth, poseStack, .62f, 1.9f, 0xFFF0E8F8, light);
         poseStack.popPose();
         Vector3f gripR = grip(.3f), gripL = grip(.52f);
-        sleeve(cloth, p, new Vector3f(-1.0f, 7.3f, .1f), new Vector3f(-1.5f, 6.3f, .4f), gripR, light);
-        sleeve(cloth, p, new Vector3f(1.0f, 7.3f, .1f), new Vector3f(1.45f, 5.6f, 1.0f), gripL, light);
+        sleeve(cloth, p, new Vector3f(-1.0f, 7.3f + LIFT, .1f), new Vector3f(-1.5f, 6.3f + LIFT, .4f), gripR, light);
+        sleeve(cloth, p, new Vector3f(1.0f, 7.3f + LIFT, .1f), new Vector3f(1.45f, 5.6f + LIFT, 1.0f), gripL, light);
         poseStack.popPose();
 
         // ---- bone: the skull, the hands, the skull at the collar
@@ -194,7 +196,7 @@ public final class ScytheModel {
         RitualMesh.billboard(glow, poseStack, view, new Vector3f(head).sub(right), .5f * k, 0, -1, eyes, light);
         RitualMesh.billboard(glow, poseStack, view, new Vector3f(head).add(right), 1.4f * k, 0, -1, BossMesh.glow(zone, .35f), light);
         RitualMesh.billboard(glow, poseStack, view, new Vector3f(head).sub(right), 1.4f * k, 0, -1, BossMesh.glow(zone, .35f), light);
-        RitualMesh.billboard(glow, poseStack, view, world(new Vector3f(0, 5.5f, 0), turn, k, bob), 12 * k, 0, -1, BossMesh.glow(zone, .12f), light);
+        RitualMesh.billboard(glow, poseStack, view, world(new Vector3f(0, 5.5f + LIFT, 0), turn, k, bob), 12 * k, 0, -1, BossMesh.glow(zone, .12f), light);
         // The sheet of light the blade leaves as it reaps: the ground it has just swept
         if (reaping > .01f) {
             float now = face + a;
@@ -213,7 +215,7 @@ public final class ScytheModel {
         for (int i = 0; i < 10; i++) {
             float an = i * Mth.TWO_PI / 10 + age * .02f;
             float r = 1.6f + BossMesh.hash(seed + i) * 1.2f;
-            float y = 2.4f + (age * .04f + BossMesh.hash(seed + i * 5) * 3) % 3;
+            float y = 2.4f + LIFT + (age * .04f + BossMesh.hash(seed + i * 5) * 3) % 3;
             RitualMesh.billboard(smoke, poseStack, view, new Vector3f(Mth.cos(an) * r, y, Mth.sin(an) * r), 2.2f + puff * 4, an, -1,
                     BossMesh.argb(0x1A1024, (.35f + puff * .5f) * Math.max(size, puff)), light);
         }
