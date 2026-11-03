@@ -210,9 +210,9 @@ Les **grandes attaques**, dix de plus, plus fortes (épiques et légendaires), c
 | **Glas funèbre** (Bell of Doom, épique) | Une grande cloche de bronze sonne trois fois au-dessus du lanceur ; chaque coup envoie un anneau marqué sur le sol, plus large à chaque fois (jusqu'à 13,5 blocs) : frappe, recul et ralentissement. |
 | **Damier infernal** (Infernal Checkerboard, épique) | Un damier de 5 × 5 cases autour du point visé : les cases d'une couleur s'embrasent en colonnes de feu, puis les autres. |
 | **Poing du titan** (Titan's Fist, épique) | Un gantelet colossal de fer et d'or plonge du ciel sur le point visé (4 blocs), puis le sol tremble en deux anneaux plus larges et plus faibles. |
-| **Lances du jugement** (Lances of Judgment, rare) | Cinq bandes de 18 blocs devant le lanceur ; des lances de lumière tombent dessus l'une après l'autre, du milieu vers l'extérieur. |
+| **Colonnes renversées** (Toppling Columns, rare) | Cinq colonnes de temple en marbre, hautes de 18 blocs, sortent de terre devant le lanceur ; l'une après l'autre, du milieu vers l'extérieur, elles se fissurent et s'écrasent le long de leur bande. |
 | **Faux de la Faucheuse** (Reaper's Scythe, épique) | Une faux spectrale fauche la moitié devant le lanceur, puis la moitié derrière (9 blocs) ; ceux qu'elle touche se flétrissent. |
-| **Frappe orbitale** (Orbital Strike, épique) | Un anneau de lumière se verrouille sur l'ennemi le plus proche ; une colonne de feu blanc tombe du ciel, puis une onde de choc. |
+| **Vierges de fer** (Iron Maidens, épique) | Un cercueil de fer noir hérissé de pointes sort de terre autour de chacun des trois ennemis les plus proches ; ses portes claquent à la fin de l'alerte : retenu et saigné. |
 | **Spectres royaux** (Spectral Kings, épique) | Quatre rois fantômes aux quatre vents autour de la cible chargent l'un après l'autre à travers elle, le long de quatre bandes marquées. |
 | **Horloge du destin** (Clock of Fate, rare) | Le sol autour du lanceur devient le cadran d'une horloge géante (11 blocs) ; sa grande aiguille d'or balaie le cadran et chaque heure brûle quand elle passe dessus. |
 | **Lotus écarlate** (Crimson Lotus, rare) | Un lotus de verre écarlate éclot sur le point visé : son cœur éclate, puis ses six pétales s'ouvrent et tranchent six parts de sol. |

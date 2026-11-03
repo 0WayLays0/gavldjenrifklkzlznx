@@ -1013,15 +1013,22 @@ def titans_fist_icon():
     return _paint(draw, .5, .7, (80, 40, 20))
 
 
-def lances_of_judgment_icon():
+def toppling_columns_icon():
     def draw(d, img, S):
-        for k in range(3):
-            x = .25 + k * .25
-            d.line([(x * S, .12 * S), (x * S, .82 * S)], fill=_a(PALE), width=max(2, S // 22))
-            d.polygon([((x - .06) * S, .8 * S), ((x + .06) * S, .8 * S), (x * S, .96 * S)], fill=_a((255, 255, 255)))
-            d.ellipse(((x - .07) * S, .7 * S, (x + .07) * S, .76 * S), outline=_a(GOLD), width=max(1, S // 40))
-        g.glow_spot(img, .5 * S, .5 * S, .4 * S, (255, 220, 120), .6)
-    return _paint(draw, .5, .4, (100, 80, 30))
+        # A column toppling, a second still standing behind it, dust where it lands
+        d.polygon([(.12 * S, .78 * S), (.2 * S, .7 * S), (.82 * S, .22 * S), (.9 * S, .3 * S)], fill=_a((236, 230, 218)))
+        for k in range(5):
+            t = .2 + k * .15
+            x, y = .16 + (.86 - .16) * t, .74 + (.26 - .74) * t
+            d.line([((x - .03) * S, (y - .03) * S), ((x + .03) * S, (y + .03) * S)], fill=_a((150, 146, 140)), width=max(1, S // 40))
+        d.rectangle((.06 * S, .76 * S, .26 * S, .84 * S), fill=_a((210, 204, 194)))
+        d.rectangle((.78 * S, .14 * S, .96 * S, .22 * S), fill=_a((210, 204, 194)))
+        d.rectangle((.6 * S, .3 * S, .7 * S, .86 * S), fill=_a((200, 194, 184)))
+        d.rectangle((.56 * S, .26 * S, .74 * S, .31 * S), fill=_a((220, 214, 204)))
+        d.line([(.2 * S, .66 * S), (.36 * S, .58 * S), (.3 * S, .5 * S)], fill=_a((255, 220, 120)), width=max(1, S // 40))
+        g.glow_spot(img, .3 * S, .6 * S, .16 * S, (255, 220, 120), .6)
+        d.ellipse((.02 * S, .82 * S, .4 * S, .96 * S), fill=_a((200, 190, 170), 150))
+    return _paint(draw, .5, .5, (70, 60, 40))
 
 
 def reapers_scythe_icon():
@@ -1034,14 +1041,25 @@ def reapers_scythe_icon():
     return _paint(draw, .5, .3, (50, 14, 80))
 
 
-def orbital_strike_icon():
+def iron_maidens_icon():
     def draw(d, img, S):
-        d.ellipse((.2 * S, .04 * S, .8 * S, .18 * S), outline=_a(STAR), width=max(1, S // 28))
-        d.polygon([(.36 * S, .12 * S), (.64 * S, .12 * S), (.72 * S, .84 * S), (.28 * S, .84 * S)], fill=_a((200, 235, 255)))
-        d.polygon([(.45 * S, .12 * S), (.55 * S, .12 * S), (.58 * S, .84 * S), (.42 * S, .84 * S)], fill=_a((255, 255, 255)))
-        d.ellipse((.12 * S, .78 * S, .88 * S, .94 * S), outline=_a(STAR), width=max(1, S // 28))
-        g.glow_spot(img, .5 * S, .82 * S, .3 * S, (140, 210, 255), 1)
-    return _paint(draw, .5, .5, (20, 40, 80))
+        # An iron casket, its doors open, spikes inside, red light in its hollow
+        body = [(.5 * S, .08 * S), (.62 * S, .14 * S), (.64 * S, .28 * S), (.7 * S, .36 * S), (.66 * S, .6 * S), (.62 * S, .92 * S), (.38 * S, .92 * S),
+                (.34 * S, .6 * S), (.3 * S, .36 * S), (.36 * S, .28 * S), (.38 * S, .14 * S)]
+        d.polygon(body, fill=_a((40, 34, 44)))
+        d.polygon([(.4 * S, .36 * S), (.6 * S, .36 * S), (.58 * S, .88 * S), (.42 * S, .88 * S)], fill=_a((150, 20, 30)))
+        for k in range(4):
+            y = (.44 + k * .11) * S
+            d.line([(.42 * S, y), (.48 * S, y)], fill=_a(GOLD), width=max(1, S // 40))
+            d.line([(.58 * S, y), (.52 * S, y)], fill=_a(GOLD), width=max(1, S // 40))
+        d.polygon([(.3 * S, .36 * S), (.14 * S, .42 * S), (.18 * S, .86 * S), (.34 * S, .88 * S)], fill=_a((58, 50, 62)))
+        d.polygon([(.7 * S, .36 * S), (.86 * S, .42 * S), (.82 * S, .86 * S), (.66 * S, .88 * S)], fill=_a((58, 50, 62)))
+        d.line([(.44 * S, .2 * S), (.48 * S, .2 * S)], fill=_a((255, 60, 60)), width=max(1, S // 40))
+        d.line([(.52 * S, .2 * S), (.56 * S, .2 * S)], fill=_a((255, 60, 60)), width=max(1, S // 40))
+        for x in (.4, .5, .6):
+            d.line([(x * S, .1 * S), (x * S, .02 * S)], fill=_a(GOLD), width=max(1, S // 40))
+        g.glow_spot(img, .5 * S, .6 * S, .2 * S, (255, 40, 50), .7)
+    return _paint(draw, .5, .5, (60, 10, 20))
 
 
 def spectral_kings_icon():
@@ -1105,7 +1123,7 @@ def collapse_icon():
 
 
 THIRD_ICONS = (("bell_of_doom", bell_of_doom_icon), ("infernal_checkerboard", infernal_checkerboard_icon), ("titans_fist", titans_fist_icon),
-               ("lances_of_judgment", lances_of_judgment_icon), ("reapers_scythe", reapers_scythe_icon), ("orbital_strike", orbital_strike_icon),
+               ("toppling_columns", toppling_columns_icon), ("reapers_scythe", reapers_scythe_icon), ("iron_maidens", iron_maidens_icon),
                ("spectral_kings", spectral_kings_icon), ("clock_of_fate", clock_of_fate_icon), ("crimson_lotus", crimson_lotus_icon),
                ("collapse", collapse_icon))
 

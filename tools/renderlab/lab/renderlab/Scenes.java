@@ -421,10 +421,13 @@ public final class Scenes {
                 Vector3f o = new Vector3f(0, 0, 0);
                 FistModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 26, 0), age, age - 40, 40, 0, 4, 0xFF6A1A, 3, LIGHT);
             }
-            case "blance" -> {
+            case "bcolumn" -> {
                 caster(ctx, 0, -2);
-                Vector3f o = new Vector3f(0, 0, 0);
-                JudgmentLanceModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 16, 0), new Vector3f(0, 0, 18), age, age - 40, 1.8f, 0xFFD25A, 3, LIGHT);
+                husk(ctx, 0, 0, 10);
+                for (int k = -2; k <= 2; k++) {
+                    Vector3f o = new Vector3f(k * 3.4f, 0, 0);
+                    ColumnModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 18), age, age - 40 - Math.abs(k) * 5, 2.4f, 0xFFD25A, 3 + k, LIGHT);
+                }
             }
             case "bscythe" -> {
                 caster(ctx, 0, 0);
@@ -432,10 +435,11 @@ public final class Scenes {
                 Vector3f o = new Vector3f(0, 0, 0);
                 ScytheModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, age - 40, 0, 9, 12, 0x9A3CFF, 3, LIGHT);
             }
-            case "borbital" -> {
-                husk(ctx, .5f, 0, .5f);
+            case "bmaiden" -> {
+                caster(ctx, 0, -8);
+                husk(ctx, 0, 0, 0);
                 Vector3f o = new Vector3f(0, 0, 0);
-                OrbitalModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 40, 0), age, age - 40, 3.5f, 0x5AB8FF, 3, LIGHT);
+                MaidenModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, age - 40, 180, 2, 0xFF2438, 3, LIGHT);
             }
             case "bking" -> {
                 husk(ctx, 0, 0, 7.5f);

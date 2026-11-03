@@ -8,12 +8,12 @@ import com.waylays.arcanes.client.render.boss.BellModel;
 import com.waylays.arcanes.client.render.boss.BoardModel;
 import com.waylays.arcanes.client.render.boss.ChainsModel;
 import com.waylays.arcanes.client.render.boss.ClockModel;
+import com.waylays.arcanes.client.render.boss.ColumnModel;
 import com.waylays.arcanes.client.render.boss.CollapseModel;
 import com.waylays.arcanes.client.render.boss.FistModel;
-import com.waylays.arcanes.client.render.boss.JudgmentLanceModel;
 import com.waylays.arcanes.client.render.boss.KingModel;
 import com.waylays.arcanes.client.render.boss.LotusModel;
-import com.waylays.arcanes.client.render.boss.OrbitalModel;
+import com.waylays.arcanes.client.render.boss.MaidenModel;
 import com.waylays.arcanes.client.render.boss.ScytheModel;
 import com.waylays.arcanes.client.render.boss.EclipseModel;
 import com.waylays.arcanes.client.render.boss.MawModel;
@@ -226,9 +226,9 @@ public class BossPropRenderer extends EntityRenderer<BossProp> {
             // The newer attacks: their impact {@code arg} ticks after they show up
             case BELL -> BellModel.draw(poseStack, buffer, view, from, age, age - arg, BellOfDoomSpell.TOLL, size, style.zone, seed, LIGHT);
             case FIST -> FistModel.draw(poseStack, buffer, view, from, age, age - arg, arg, prop.getYRot(), size, style.zone, seed, LIGHT);
-            case LANCE -> JudgmentLanceModel.draw(poseStack, buffer, view, from, to, age, age - arg, size, style.zone, seed, LIGHT);
+            case COLUMN -> ColumnModel.draw(poseStack, buffer, view, to, age, age - arg, size, style.zone, seed, LIGHT);
             case SCYTHE -> ScytheModel.draw(poseStack, buffer, view, age, age - arg, prop.getYRot(), size, ReapersScytheSpell.SWEEP, style.zone, seed, LIGHT);
-            case ORBITAL -> OrbitalModel.draw(poseStack, buffer, view, from, age, age - arg, size, style.zone, seed, LIGHT);
+            case MAIDEN -> MaidenModel.draw(poseStack, buffer, view, age, age - arg, prop.getYRot(), size, style.zone, seed, LIGHT);
             case KING -> KingModel.draw(poseStack, buffer, view, to, age, age - arg, prop.getYRot(), style.zone, seed, LIGHT);
             case CLOCK -> ClockModel.draw(poseStack, buffer, view, age, age - arg, prop.getYRot(), ClockOfFateSpell.SLICES, ClockOfFateSpell.STEP, size, style.zone,
                     seed, LIGHT);

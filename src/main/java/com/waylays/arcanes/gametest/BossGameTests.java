@@ -10,7 +10,7 @@ import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
 import com.waylays.arcanes.spells.boss.InfernalCheckerboardSpell;
-import com.waylays.arcanes.spells.boss.LancesOfJudgmentSpell;
+import com.waylays.arcanes.spells.boss.TopplingColumnsSpell;
 import com.waylays.arcanes.spells.boss.BossSpell;
 import com.waylays.arcanes.spells.boss.LastJudgmentSpell;
 import com.waylays.arcanes.spells.boss.ThousandBladesSpell;
@@ -318,7 +318,7 @@ public final class BossGameTests {
     }
 
     /**
-     * The third ten attacks, cast together: each shows its scenery (the bell, the fist, the lances, ...), and the board is
+     * The third ten attacks, cast together: each shows its scenery (the bell, the fist, the columns, ...), and the board is
      * marked in all its twenty-five squares. Nothing lands: everything is taken away first.
      */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "boss_scenery_3", timeoutTicks = 60)
@@ -327,18 +327,18 @@ public final class BossGameTests {
         Witch caster = caster(helper, 4.5, 4.5);
         caster.setXRot(60);
         List<AbstractSpell> spells = List.of(ModSpells.BELL_OF_DOOM.get(), ModSpells.INFERNAL_CHECKERBOARD.get(), ModSpells.TITANS_FIST.get(),
-                ModSpells.LANCES_OF_JUDGMENT.get(), ModSpells.REAPERS_SCYTHE.get(), ModSpells.ORBITAL_STRIKE.get(), ModSpells.SPECTRAL_KINGS.get(),
+                ModSpells.TOPPLING_COLUMNS.get(), ModSpells.REAPERS_SCYTHE.get(), ModSpells.IRON_MAIDENS.get(), ModSpells.SPECTRAL_KINGS.get(),
                 ModSpells.CLOCK_OF_FATE.get(), ModSpells.CRIMSON_LOTUS.get(), ModSpells.COLLAPSE.get());
         for (AbstractSpell spell : spells) {
             cast(helper, spell, caster);
         }
-        for (BossProp.Kind kind : List.of(BossProp.Kind.BELL, BossProp.Kind.FIST, BossProp.Kind.LANCE, BossProp.Kind.SCYTHE, BossProp.Kind.ORBITAL,
-                BossProp.Kind.KING, BossProp.Kind.CLOCK, BossProp.Kind.LOTUS, BossProp.Kind.COLLAPSE)) {
+        for (BossProp.Kind kind : List.of(BossProp.Kind.BELL, BossProp.Kind.FIST, BossProp.Kind.COLUMN, BossProp.Kind.SCYTHE, BossProp.Kind.MAIDEN,
+                BossProp.Kind.KING, BossProp.Kind.CLOCK, BossProp.Kind.LOTUS, BossProp.Kind.COLLAPSE, BossProp.Kind.BOARD)) {
             helper.assertTrue(props(helper, kind) >= 1, "no " + kind + " was shown");
         }
-        long kings = props(helper, BossProp.Kind.KING), lances = props(helper, BossProp.Kind.LANCE);
+        long kings = props(helper, BossProp.Kind.KING), columns = props(helper, BossProp.Kind.COLUMN);
         helper.assertTrue(kings == 4, "expected 4 kings, got " + kings);
-        helper.assertTrue(lances == LancesOfJudgmentSpell.LINES, "expected " + LancesOfJudgmentSpell.LINES + " lances, got " + lances);
+        helper.assertTrue(columns == TopplingColumnsSpell.LINES, "expected " + TopplingColumnsSpell.LINES + " columns, got " + columns);
         long squares = bossEntities(helper).stream()
                 .filter(e -> e instanceof BossTelegraph t && t.getSpell() == ModSpells.INFERNAL_CHECKERBOARD.get()).count();
         int cells = InfernalCheckerboardSpell.GRID * InfernalCheckerboardSpell.GRID;

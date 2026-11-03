@@ -26,18 +26,19 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Lances of Judgment: five long strips are marked side by side ahead of the caster, and giant lances of light fall out
- * of the sky onto them one after another, the middle one first, then outward.
+ * Toppling Columns: five long strips are marked side by side ahead of the caster, and at the head of each a column of an
+ * old temple, as tall as the strip is long, rises out of the ground; one after another, the middle one first, then
+ * outward, they crack, topple and crash down their strips.
  */
 @AutoSpellConfig
-public class LancesOfJudgmentSpell extends BossSpell {
+public class TopplingColumnsSpell extends BossSpell {
     public static final int LINES = 5;
-    public static final float LENGTH = 18, WIDTH = 1.8f, SPACING = 3;
-    /** Ticks between one pair of lances and the next. */
+    public static final float LENGTH = 18, WIDTH = 2.4f, SPACING = 3.4f;
+    /** Ticks between one pair of columns and the next. */
     public static final int STEP = 5;
 
-    public LancesOfJudgmentSpell() {
-        super("lances_of_judgment", SpellRarity.RARE, 5, 20, BossAnimations.BLADE_CALL);
+    public TopplingColumnsSpell() {
+        super("toppling_columns", SpellRarity.RARE, 5, 20, BossAnimations.BLADE_CALL);
         this.manaCostPerLevel = 15;
         this.baseSpellPower = 9;
         this.spellPowerPerLevel = 3;
@@ -56,7 +57,7 @@ public class LancesOfJudgmentSpell extends BossSpell {
 
     @Override
     public Optional<SoundEvent> getCastStartSound() {
-        return Optional.of(SoundEvents.BEACON_POWER_SELECT);
+        return Optional.of(SoundEvents.ANCIENT_DEBRIS_BREAK);
     }
 
     @Override
@@ -70,9 +71,9 @@ public class LancesOfJudgmentSpell extends BossSpell {
                 int off = k - LINES / 2;
                 Vec3 start = SpellUtil.groundAt(level, base.add(side.scale(off * SPACING)), 4, 1);
                 BossTelegraph t = BossTelegraph.line(level, entity, this, spellLevel, start, yaw, LENGTH, WIDTH).style(BossTelegraph.Style.HOLY)
-                        .delayed(Math.abs(off) * STEP).damage(damage).part("lance").spawn();
+                        .delayed(Math.abs(off) * STEP).damage(damage).part("column").spawn();
                 int fire = t.getFireTick();
-                BossProp.scene(level, BossProp.Kind.LANCE, BossTelegraph.Style.HOLY, WIDTH, now(level), fire + 18, start, start.add(0, 16, 0), start.add(fwd.scale(LENGTH)),
+                BossProp.scene(level, BossProp.Kind.COLUMN, BossTelegraph.Style.HOLY, WIDTH, now(level), fire + 32, start, start, start.add(fwd.scale(LENGTH)),
                         fire - now(level), yaw);
             }
         }
@@ -90,9 +91,10 @@ public class LancesOfJudgmentSpell extends BossSpell {
             }
         }
         Vec3 c = t.center();
-        SpellUtil.particles(level, ParticleTypes.END_ROD, c.x, c.y + .4, c.z, 30, f.x * LENGTH * .3 + .3, .3, f.z * LENGTH * .3 + .3, .05);
+        SpellUtil.particles(level, ParticleTypes.CLOUD, c.x, c.y + .6, c.z, 30, f.x * LENGTH * .3 + .3, .4, f.z * LENGTH * .3 + .3, .04);
         SpellUtil.particles(level, BossFx.dust(t.getStyle().zone, 1.4f), c.x, c.y + .3, c.z, 20, f.x * LENGTH * .3 + .3, .2, f.z * LENGTH * .3 + .3, .02);
-        level.playSound(null, c.x, c.y, c.z, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.HOSTILE, 1.6f, 1.4f);
+        level.playSound(null, c.x, c.y, c.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 1.4f, .6f);
+        level.playSound(null, c.x, c.y, c.z, SoundEvents.STONE_BREAK, SoundSource.HOSTILE, 2f, .5f);
         SpellUtil.cameraShake(level, c, 6, 10);
     }
 }
