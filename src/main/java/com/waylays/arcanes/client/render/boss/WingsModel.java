@@ -21,6 +21,8 @@ public final class WingsModel {
     private static final int GOLD = 0xFFD25A;
     private static final int PALE = 0xFFF4DA;
     private static final int FLYING = 44;
+    /** The three pairs: how big, how far raised (radians), how high on the back. */
+    private static final float[] PAIR_SIZE = {1, .6f, .5f}, PAIR_RAISE = {0, .42f, -.95f}, PAIR_HEIGHT = {1.65f, 1.95f, 1.2f};
 
     private WingsModel() {}
 
@@ -38,8 +40,13 @@ public final class WingsModel {
         float gather = until > 0 ? 1 - Mth.clamp(until / 40, 0, 1) : 1;
         float lift = .1f * Mth.sin(age * .12f) * (1 - sweep);
         if (fade > .01f) {
-            for (int sd = -1; sd <= 1; sd += 2) {
-                wing(poseStack, buffer, view, sd, span, unfold, lift, sweep, fade, gather, seed + (sd + 1) * 97, light);
+            // Six wings, as a seraph has: the great pair, a smaller pair raised over them, another folded down under them
+            for (int pair = 0; pair < 3; pair++) {
+                float k = PAIR_SIZE[pair];
+                for (int sd = -1; sd <= 1; sd += 2) {
+                    wing(poseStack, buffer, view, sd, span * k, unfold, lift + PAIR_RAISE[pair], sweep * (pair == 0 ? 1 : .7f), fade, gather, PAIR_HEIGHT[pair],
+                            seed + (sd + 1) * 97 + pair * 13, light);
+                }
             }
             // The halo, and the light where the seraph would stand
             VertexConsumer ring = BossMesh.light(buffer, BossMesh.RING);
@@ -64,9 +71,9 @@ public final class WingsModel {
 
     /** One wing: three bones (arm, forearm, hand) and the rows of feathers along them. */
     private static void wing(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, int sd, float span, float unfold, float lift, float sweep, float fade, float gather,
-                             int seed, int light) {
+                             float height, int seed, int light) {
         float u = span / 7;
-        Vector3f shoulder = new Vector3f(sd * .3f, 1.65f, -.35f);
+        Vector3f shoulder = new Vector3f(sd * .3f, height, -.35f);
         float t1 = Mth.lerp(unfold, -1.15f, .78f) + lift;
         float t2 = Mth.lerp(unfold, -1.6f, .4f) + lift * 1.5f;
         float t3 = Mth.lerp(unfold, -1.9f, .05f) + lift * 2;
@@ -99,10 +106,28 @@ public final class WingsModel {
         for (float[] f : feathers) {
             feather(shine, p, f, facing, BossMesh.glow(GOLD, (.25f + .25f * gather + .3f * sweep) * fade), light);
         }
-        // The bones, light
+        // Each feather's quill, a white line down its middle
+        VertexConsumer quill = BossMesh.light(buffer, BossMesh.BEAM);
+        p = poseStack.last();
+        for (float[] f : feathers) {
+            Vector3f root = new Vector3f(f[0], f[1], f[2]), dir = new Vector3f(f[3], f[4], f[5]);
+            Vector3f mid = curl(root, dir, facing, f[6], .5f), end = curl(root, dir, facing, f[6], 1);
+            RitualMesh.thread(quill, p, view.eye(), new Vector3f[] {root, mid, end}, .05f * u, new int[] {BossMesh.glow(PALE, .7f * fade), BossMesh.glow(PALE, .5f * fade),
+                    BossMesh.glow(GOLD, .1f * fade)}, light);
+        }
+        // The bones: gold, light running along them
+        if (fade > .3f) {
+            VertexConsumer gold = BossMesh.solid(buffer, BellModel.GOLD);
+            Vector3f[] arm = Sculpt.curve(shoulder, new Vector3f(elbow).add(0, .1f * u, 0), wrist, 7);
+            Vector3f[] all = new Vector3f[8];
+            System.arraycopy(arm, 0, all, 0, 7);
+            all[7] = tip;
+            Sculpt.sweep(gold, poseStack.last(), all, Sculpt.taper(.16f * u, .05f * u, 8, 1), Sculpt.taper(.16f * u, .05f * u, 8, 1), Sculpt.circle(7), false, null, 1,
+                    Sculpt.fill(0xFFFFFFFF, 8), true, light);
+        }
         VertexConsumer beam = BossMesh.light(buffer, BossMesh.BEAM);
-        int[] col = {BossMesh.glow(PALE, .8f * fade), BossMesh.glow(PALE, .7f * fade), BossMesh.glow(GOLD, .6f * fade), BossMesh.glow(GOLD, .3f * fade)};
-        RitualMesh.thread(beam, poseStack.last(), view.eye(), bones, .3f * u, col, light);
+        int[] col = {BossMesh.glow(PALE, .7f * fade), BossMesh.glow(PALE, .6f * fade), BossMesh.glow(GOLD, .5f * fade), BossMesh.glow(GOLD, .3f * fade)};
+        RitualMesh.thread(beam, poseStack.last(), view.eye(), bones, .45f * u, col, light);
     }
 
     /** The next joint, {@code len} from {@code from} at {@code angle} above the outward line, swept forward by {@code sweep}. */
@@ -127,14 +152,24 @@ public final class WingsModel {
         }
     }
 
+    /** A feather: narrow at its root, broadest two thirds along, drawn to a point, curling back a little. */
     private static void feather(VertexConsumer c, PoseStack.Pose p, float[] f, Vector3f facing, int argb, int light) {
         Vector3f root = new Vector3f(f[0], f[1], f[2]);
         Vector3f dir = new Vector3f(f[3], f[4], f[5]);
         float len = f[6];
         Vector3f w = new Vector3f(dir).cross(facing).normalize().mul(len * .2f);
-        Vector3f tip = new Vector3f(dir).mul(len).add(root);
-        BossMesh.quad2(c, p, new Vector3f(root).sub(w), new Vector3f(root).add(w), new Vector3f(tip).add(w), new Vector3f(tip).sub(w), 0, 1, 1, 1, 1, 0, 0, 0, argb,
+        Vector3f a = curl(root, dir, facing, len, .35f), b = curl(root, dir, facing, len, .7f), tip = curl(root, dir, facing, len, 1);
+        Vector3f w0 = new Vector3f(w).mul(.35f), w1 = new Vector3f(w).mul(.9f), w2 = new Vector3f(w);
+        BossMesh.quad2(c, p, new Vector3f(root).sub(w0), new Vector3f(root).add(w0), new Vector3f(a).add(w1), new Vector3f(a).sub(w1), 0, 1, 1, 1, 1, .65f, 0, .65f,
+                argb, argb, light);
+        BossMesh.quad2(c, p, new Vector3f(a).sub(w1), new Vector3f(a).add(w1), new Vector3f(b).add(w2), new Vector3f(b).sub(w2), 0, .65f, 1, .65f, 1, .3f, 0, .3f, argb,
                 argb, light);
+        BossMesh.quad2(c, p, new Vector3f(b).sub(w2), new Vector3f(b).add(w2), tip, tip, 0, .3f, 1, .3f, .5f, 0, .5f, 0, argb, argb, light);
+    }
+
+    /** Where a feather from {@code root} along {@code dir} is {@code t} of the way to its tip, curling back toward {@code facing}. */
+    private static Vector3f curl(Vector3f root, Vector3f dir, Vector3f facing, float len, float t) {
+        return new Vector3f(dir).mul(len * t).add(new Vector3f(facing).mul(len * .12f * t * t)).add(root);
     }
 
     /** The storm of feathers blasting out over the fan, and the sheet of gold racing across it. */
