@@ -260,6 +260,22 @@ def crimson_glass():
     return image(rgb, alpha)
 
 
+def flesh():
+    """Raw flesh of the abyss: dark crimson going to violet, veins standing out, a wet sheen in places."""
+    f1, f2 = worley(N, N, 30, 151)
+    vein = 1 - smooth(0, .07, f2 - f1)
+    ys, xs = np.mgrid[0:N, 0:N]
+    dx = ((fbm(N, N, 4, 3, 152) - .5) * 30).astype(int)
+    dy = ((fbm(N, N, 4, 3, 153) - .5) * 30).astype(int)
+    vein = vein[(ys + dy) % N, (xs + dx) % N]
+    base = fbm(N, N, 4, 5, 154)
+    rgb = ramp(base, [(0, (40, 6, 22)), (.5, (96, 16, 44)), (1, (150, 40, 80))])
+    rgb = mix(rgb, (70, 20, 90), smooth(.55, .8, fbm(N, N, 3, 4, 155)) * .5)
+    rgb = mix(rgb, (190, 50, 70), vein * .7)
+    rgb = mix(rgb, (255, 200, 220), smooth(.86, .97, noise(N, N, (48, 48), 156)) * .4)
+    return image(rgb)
+
+
 # ---------------------------------------------------------------- glow masks
 
 def rune_band(count=16, w=512, h=64, seed=101):
@@ -429,7 +445,7 @@ def tile_glow():
 
 
 MATERIALS = (("bronze", bronze), ("iron_plate", iron), ("steel", steel), ("gold_chased", gold), ("marble", marble), ("obsidian", obsidian),
-             ("bone", bone), ("cloth", cloth), ("crimson_glass", crimson_glass), ("rune_band", rune_band), ("cracks", cracks),
+             ("bone", bone), ("flesh", flesh), ("cloth", cloth), ("crimson_glass", crimson_glass), ("rune_band", rune_band), ("cracks", cracks),
              ("engraving", engraving), ("clock_face", clock_face), ("clock_glow", clock_glow), ("tile_dark", lambda: tile(True)),
              ("tile_light", lambda: tile(False)), ("tile_glow", tile_glow))
 

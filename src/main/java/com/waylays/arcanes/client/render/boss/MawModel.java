@@ -2,6 +2,8 @@ package com.waylays.arcanes.client.render.boss;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.waylays.arcanes.ArcanesOublies;
+import net.minecraft.resources.ResourceLocation;
 import com.waylays.arcanes.client.render.ritual.RitualMesh;
 import com.waylays.arcanes.client.render.water.WaterMesh;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,7 +20,12 @@ public final class MawModel {
     public static final int SNAP = 4;
     /** How long after the bite it is gone (ticks). */
     public static final int CLOSE = 26;
-    private static final int OUTER = 16, INNER = 10;
+    private static final int OUTER = 16, FEELERS = 7;
+    /** Its rows of fangs: how many, how far out, how long (of the radius). */
+    private static final int[] ROWS = {16, 12, 9};
+    private static final float[] RING = {.95f, .74f, .52f}, LENGTH = {.6f, .45f, .32f};
+    private static final ResourceLocation FLESH = ArcanesOublies.id("textures/entity/boss/m_flesh.png");
+    private static final ResourceLocation BONE = ArcanesOublies.id("textures/entity/boss/m_bone.png");
     private static final int VIOLET = 0x9A3CFF;
 
     private MawModel() {}
@@ -44,28 +51,56 @@ public final class MawModel {
         VertexConsumer rim = BossMesh.light(buffer, BossMesh.RING);
         BossMesh.pool(rim, poseStack.last(), 0, .07f, 0, radius * 2.05f * gape, 0, BossMesh.glow(VIOLET, (.7f + .3f * Mth.sin(age * .25f)) * gape), light);
 
-        // The fangs
-        VertexConsumer bone = BossMesh.see(buffer, BossMesh.SPIKE);
-        PoseStack.Pose p = poseStack.last();
-        Vector3f[] tips = new Vector3f[OUTER + INNER];
-        for (int k = 0; k < OUTER + INNER; k++) {
-            boolean outer = k < OUTER;
-            int i = outer ? k : k - OUTER;
-            float a = (i + (outer ? 0 : .5f)) * Mth.TWO_PI / (outer ? OUTER : INNER) + BossMesh.hash(seed + k) * .12f;
-            float rr = radius * (outer ? .93f : .66f);
-            float len = radius * (outer ? .62f + .3f * BossMesh.hash(seed + k * 3) : .42f + .2f * BossMesh.hash(seed + k * 3));
-            float thick = len * .2f;
-            // Rising out of the ground (what is below it is hidden), each a little behind the last
-            float up = BossMesh.ramp(rise * 1.3f - BossMesh.hash(seed + k * 5) * .3f, 0, 1);
-            float y = -len * (1 - up) - len * 1.15f * sink;
+        // The gums: rings of raw flesh, one under each row of fangs, swelling out of the ground
+        float swell = rise * (1 - sink);
+        VertexConsumer flesh = BossMesh.solid(buffer, FLESH);
+        for (int row = 0; row < 3; row++) {
+            float rr = radius * RING[row];
+            poseStack.pushPose();
+            poseStack.translate(0, -.35f + .45f * swell, 0);
+            Sculpt.torus(flesh, poseStack.last(), rr, radius * (.11f - row * .02f) * (.3f + .7f * swell), 48, 8, 0, Mth.TWO_PI, 6, 0xFFFFFFFF, light);
+            poseStack.popPose();
+        }
+        // Feelers round the rim, groping, drawn in as it bites
+        for (int f = 0; f < FEELERS; f++) {
+            float a = (f + .5f) * Mth.TWO_PI / FEELERS + BossMesh.hash(seed + f * 13) * .3f;
             Vector3f out = new Vector3f(Mth.cos(a), 0, Mth.sin(a));
-            Vector3f in = new Vector3f(out).negate();
-            float tilt = (outer ? .3f : .15f) + bite * (outer ? 1.05f : 1.2f);
-            Vector3f dir = new Vector3f(0, Mth.cos(tilt), 0).add(new Vector3f(in).mul(Mth.sin(tilt))).normalize();
-            Vector3f base = new Vector3f(out).mul(rr).add(0, y, 0);
-            Vector3f bend = new Vector3f(in).mul(.28f);
-            BossMesh.horn(bone, p, base, dir, bend, len, thick, 7, 6, BossMesh.argb(0x3A1450, 1), BossMesh.argb(0xF4ECDC, 1), light);
-            tips[k] = new Vector3f(dir).mul(len).add(new Vector3f(bend).mul(len)).add(base);
+            int n = 9;
+            Vector3f[] pts = new Vector3f[n];
+            float len = radius * (.9f + .4f * BossMesh.hash(seed + f * 17)) * swell;
+            for (int i = 0; i < n; i++) {
+                float t = (float) i / (n - 1);
+                float wave = Mth.sin(age * .2f + f * 1.7f + t * 4) * .5f * t;
+                float reach = Mth.lerp(bite, 1, -.3f);
+                Vector3f side = new Vector3f(-out.z, 0, out.x);
+                pts[i] = new Vector3f(out).mul(radius * 1.05f + len * t * .55f * reach).add(0, len * Mth.sin(t * 1.4f) * .7f, 0).add(new Vector3f(side).mul(wave));
+            }
+            Sculpt.sweep(flesh, poseStack.last(), pts, Sculpt.taper(radius * .07f, .02f, n, 1), Sculpt.taper(radius * .07f, .02f, n, 1), Sculpt.circle(7), false, null,
+                    1, Sculpt.fade(0xFFFFFFFF, 0xFFE0A0C0, n), true, light);
+        }
+        // The fangs: three rows, bone at their points and dark at their roots, curved in toward the gullet
+        VertexConsumer bone = BossMesh.solid(buffer, BONE);
+        PoseStack.Pose p = poseStack.last();
+        Vector3f[] tips = new Vector3f[ROWS[0] + ROWS[1] + ROWS[2]];
+        int next = 0;
+        for (int row = 0; row < 3; row++) {
+            for (int i = 0; i < ROWS[row]; i++) {
+                int k = next++;
+                float a = (i + row * .5f) * Mth.TWO_PI / ROWS[row] + BossMesh.hash(seed + k) * .1f;
+                float rr = radius * RING[row];
+                float len = radius * (LENGTH[row] + .22f * BossMesh.hash(seed + k * 3));
+                float thick = len * (row == 0 ? .2f : .17f);
+                float up = BossMesh.ramp(rise * 1.3f - BossMesh.hash(seed + k * 5) * .3f - row * .08f, 0, 1);
+                float y = -len * (1 - up) - len * 1.15f * sink;
+                Vector3f outward = new Vector3f(Mth.cos(a), 0, Mth.sin(a));
+                Vector3f in = new Vector3f(outward).negate();
+                float tilt = (.32f - row * .08f) + bite * (1.05f + row * .1f);
+                Vector3f dir = new Vector3f(0, Mth.cos(tilt), 0).add(new Vector3f(in).mul(Mth.sin(tilt))).normalize();
+                Vector3f base = new Vector3f(outward).mul(rr).add(0, y, 0);
+                Vector3f bend = new Vector3f(in).mul(.3f);
+                BossMesh.horn(bone, p, base, dir, bend, len, thick, 8, 7, 0xFF3A2030, 0xFFFFFFFF, light);
+                tips[k] = new Vector3f(dir).mul(len).add(new Vector3f(bend).mul(len)).add(base);
+            }
         }
         // Their roots glowing, and a shine on their points
         VertexConsumer glow = BossMesh.light(buffer, BossMesh.GLOW);

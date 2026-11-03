@@ -102,36 +102,76 @@ public final class PrismModel {
             Vector3f at = new Vector3f(Mth.cos(a) * r, (BossMesh.hash(seed + k * 11) - .4f) * 5 * (1 - t), Mth.sin(a) * r).add(heart);
             RitualMesh.billboard(motes, poseStack, view, at, .4f, 0, -1, BossMesh.glow(COLOURS[k % COLOURS.length], Mth.sin(t * Mth.PI) * charge * form), light);
         }
-        // The crystal: two pyramids base to base, see-through, its facets lit from within
-        Vector3f top = new Vector3f(heart).add(0, HALF * s, 0), bottom = new Vector3f(heart).add(0, -HALF * s, 0);
-        Vector3f[] ring = new Vector3f[4];
-        for (int k = 0; k < 4; k++) {
-            float a = spin + k * Mth.HALF_PI;
-            ring[k] = new Vector3f(Mth.cos(a) * 1.8f * s, 0, Mth.sin(a) * 1.8f * s).add(heart);
+        // The crystal: a long eight-sided prism drawn to a point at both ends, see-through, its facets lit from within
+        int sides = 8;
+        Vector3f top = new Vector3f(heart).add(0, HALF * 1.25f * s, 0), bottom = new Vector3f(heart).add(0, -HALF * 1.25f * s, 0);
+        Vector3f[] upper = new Vector3f[sides], lower = new Vector3f[sides];
+        for (int k = 0; k < sides; k++) {
+            float a = spin + k * Mth.TWO_PI / sides;
+            upper[k] = new Vector3f(Mth.cos(a) * 1.35f * s, HALF * .45f * s, Mth.sin(a) * 1.35f * s).add(heart);
+            lower[k] = new Vector3f(Mth.cos(a) * 1.35f * s, -HALF * .45f * s, Mth.sin(a) * 1.35f * s).add(heart);
         }
         for (int pass = 0; pass < 2; pass++) {
             VertexConsumer c = pass == 0 ? BossMesh.see(buffer, BossMesh.PRISM) : BossMesh.light(buffer, BossMesh.PRISM);
             PoseStack.Pose p = poseStack.last();
+            for (int k = 0; k < sides; k++) {
+                int j = (k + 1) % sides;
+                int tint = pass == 0 ? BossMesh.argb(BossMesh.mix(0xE6F4FF, COLOURS[(k + (int) (age / 6)) % COLOURS.length], .3f), .5f)
+                        : BossMesh.glow(BossMesh.mix(0xBFE6FF, COLOURS[(k + (int) (age / 5)) % COLOURS.length], .4f), .4f + .2f * Mth.sin(age * .2f + k));
+                Vector3f mid = new Vector3f(upper[k]).add(upper[j]).mul(.5f).sub(heart);
+                BossMesh.faced(c, p, upper[k], upper[j], top, top, new float[] {0, 1, 1, 1, .5f, 0, .5f, 0}, tint, tint, tint, tint, light,
+                        new Vector3f(mid).add(new Vector3f(top).sub(heart).mul(.3f)));
+                BossMesh.faced(c, p, lower[k], upper[k], upper[j], lower[j], new float[] {0, 1, 0, 0, 1, 0, 1, 1}, tint, tint, tint, tint, light, new Vector3f(mid.x, 0,
+                        mid.z));
+                BossMesh.faced(c, p, lower[j], lower[k], bottom, bottom, new float[] {1, 0, 0, 0, .5f, 1, .5f, 1}, tint, tint, tint, tint, light,
+                        new Vector3f(mid.x, 0, mid.z).add(new Vector3f(bottom).sub(heart).mul(.3f)));
+            }
+        }
+        // Its golden cage: three rings turning about it, tilted every way, and a crown and a foot of gold
+        VertexConsumer gold = BossMesh.solid(buffer, BellModel.GOLD);
+        for (int r = 0; r < 3; r++) {
+            poseStack.pushPose();
+            poseStack.translate(heart.x, heart.y, heart.z);
+            poseStack.mulPose(new org.joml.Quaternionf().rotationY(age * (.02f + r * .012f) + r * 2.1f).rotateX(.5f + r * .55f).rotateZ(age * .01f * (r - 1)));
+            Sculpt.torus(gold, poseStack.last(), (3.0f + r * .45f) * s, .1f * s, 56, 6, 0, Mth.TWO_PI, 12, 0xFFFFFFFF, light);
             for (int k = 0; k < 4; k++) {
-                Vector3f a = ring[k], b = ring[(k + 1) % 4];
-                int tint = pass == 0 ? BossMesh.argb(BossMesh.mix(0xE6F4FF, COLOURS[(k + (int) (age / 6)) % COLOURS.length], .25f), .55f)
-                        : BossMesh.glow(BossMesh.mix(0xBFE6FF, COLOURS[(k * 2 + (int) (age / 5)) % COLOURS.length], .35f), .45f + .2f * Mth.sin(age * .2f + k));
-                Vector3f mid = new Vector3f(a).add(b).mul(.5f);
-                BossMesh.faced(c, p, a, b, top, top, new float[] {0, 1, 1, 1, .5f, 0, .5f, 0}, tint, tint, tint, tint, light,
-                        new Vector3f(mid).sub(heart).add(new Vector3f(top).sub(heart).mul(.3f)));
-                BossMesh.faced(c, p, b, a, bottom, bottom, new float[] {1, 0, 0, 0, .5f, 1, .5f, 1}, tint, tint, tint, tint, light,
-                        new Vector3f(mid).sub(heart).add(new Vector3f(bottom).sub(heart).mul(.3f)));
+                float a = k * Mth.HALF_PI;
+                poseStack.pushPose();
+                poseStack.translate(Mth.cos(a) * (3.0f + r * .45f) * s, 0, Mth.sin(a) * (3.0f + r * .45f) * s);
+                Sculpt.gem(gold, poseStack.last(), .2f * s, .12f * s, .2f * s, 6, 0xFFFFFFFF, light);
+                poseStack.popPose();
+            }
+            poseStack.popPose();
+        }
+        for (int end = -1; end <= 1; end += 2) {
+            poseStack.pushPose();
+            poseStack.translate(heart.x, heart.y + end * HALF * .45f * s, heart.z);
+            poseStack.mulPose(new org.joml.Quaternionf().rotationY(spin));
+            Sculpt.torus(gold, poseStack.last(), 1.42f * s, .1f * s, 8, 5, 0, Mth.TWO_PI, 4, 0xFFFFFFFF, light);
+            poseStack.popPose();
+        }
+        // Small crystals orbiting it, one of each colour
+        for (int pass = 0; pass < 2; pass++) {
+            VertexConsumer c = pass == 0 ? BossMesh.see(buffer, BossMesh.PRISM) : BossMesh.light(buffer, BossMesh.PRISM);
+            for (int k = 0; k < COLOURS.length; k++) {
+                float a = -age * .03f + k * Mth.TWO_PI / COLOURS.length;
+                poseStack.pushPose();
+                poseStack.translate(heart.x + Mth.cos(a) * 4.6f * s, heart.y + Mth.sin(a * 2 + k) * .8f * s, heart.z + Mth.sin(a) * 4.6f * s);
+                poseStack.mulPose(new org.joml.Quaternionf().rotationY(age * .1f + k).rotateX(.4f));
+                int tint = pass == 0 ? BossMesh.argb(BossMesh.mix(COLOURS[k], 0xFFFFFF, .3f), .7f) : BossMesh.glow(COLOURS[k], .7f);
+                Sculpt.gem(c, poseStack.last(), .45f * s, .5f * s, .7f * s, 6, tint, light);
+                poseStack.popPose();
             }
         }
         // Its edges, catching every colour
         VertexConsumer edge = BossMesh.light(buffer, BossMesh.BEAM);
         PoseStack.Pose p = poseStack.last();
-        for (int k = 0; k < 4; k++) {
-            int c = BossMesh.glow(COLOURS[(k + (int) (age / 4)) % COLOURS.length], .8f);
+        for (int k = 0; k < sides; k++) {
+            int c = BossMesh.glow(COLOURS[(k + (int) (age / 4)) % COLOURS.length], .75f);
             int w = BossMesh.glow(0xFFFFFF, .5f);
-            RitualMesh.thread(edge, p, view.eye(), new Vector3f[] {top, ring[k]}, .16f, new int[] {w, c}, light);
-            RitualMesh.thread(edge, p, view.eye(), new Vector3f[] {ring[k], bottom}, .16f, new int[] {c, w}, light);
-            RitualMesh.thread(edge, p, view.eye(), new Vector3f[] {ring[k], ring[(k + 1) % 4]}, .16f, new int[] {c, c}, light);
+            RitualMesh.thread(edge, p, view.eye(), new Vector3f[] {top, upper[k]}, .12f, new int[] {w, c}, light);
+            RitualMesh.thread(edge, p, view.eye(), new Vector3f[] {lower[k], bottom}, .12f, new int[] {c, w}, light);
+            RitualMesh.thread(edge, p, view.eye(), new Vector3f[] {upper[k], lower[k]}, .1f, new int[] {c, c}, light);
         }
         // Its heart, a halo round it
         VertexConsumer glow = BossMesh.light(buffer, BossMesh.GLOW);
