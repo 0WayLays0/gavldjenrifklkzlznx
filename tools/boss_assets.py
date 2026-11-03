@@ -1113,6 +1113,8 @@ def main():
     g.save(judgment_blade(), "textures/entity/boss/judgment_blade.png")
     g.save(rune_wall(), "textures/entity/boss/rune_wall.png")
     new_attack_textures()
+    import boss_materials
+    boss_materials.main()
     for name, icon in (("crushing_meteor", crushing_meteor_icon), ("judgment_blade", judgment_blade_icon),
                        ("annihilation_beam", annihilation_beam_icon), ("triple_nova", triple_nova_icon),
                        ("starfall", starfall_icon), ("seismic_rift", seismic_rift_icon), ("void_orb", void_orb_icon),
