@@ -34,13 +34,13 @@ public final class CannonModel {
             return;
         }
         Vector3f f = new Vector3f(forward).normalize();
-        // Over the caster's head and behind it, so that it stands clear of them and of the ground
-        Vector3f centre = new Vector3f(0, height + 1.5f, 0).sub(new Vector3f(f).mul(1.2f));
+        // High over the strip just ahead of the caster: clear of them, of the ground, and of a camera behind them
+        Vector3f centre = new Vector3f(0, height + 3.2f, 0).add(new Vector3f(f).mul(2.5f));
         // The engine's own space: its axis (local Y) down the strip
         Quaternionf facing = new Quaternionf().rotationTo(new Vector3f(0, 1, 0), f);
         float spin = fired ? age * .5f : age * (.05f + .3f * charge * charge);
         float shake = fired && firing < duration ? .05f * Mth.sin(age * 3.1f) : 0;
-        float s = form * (.6f + .4f * Math.min(1, charge + (fired ? 1 : 0)));
+        float s = form * (.6f + .4f * Math.min(1, charge + (fired ? 1 : 0))) * .8f;
 
         // ---- the rings: black iron, gold edges, studs
         VertexConsumer iron = BossMesh.solid(buffer, BellModel.IRON);
@@ -135,7 +135,7 @@ public final class CannonModel {
             float throb = .8f + .2f * Mth.sin(age * 1.9f);
             RitualMesh.billboard(impact, poseStack, view, to, w * 5 * throb, 0, -1, BossMesh.glow(CRIMSON, end), light);
             RitualMesh.billboard(impact, poseStack, view, to, w * 2.2f * throb, 0, -1, BossMesh.glow(0xFFFFFF, end), light);
-            RitualMesh.billboard(impact, poseStack, view, muzzle, w * 3.2f * burst, 0, -1, BossMesh.glow(0xFFE0E0, .8f * end), light);
+            RitualMesh.billboard(impact, poseStack, view, muzzle, w * 1.5f * burst, 0, -1, BossMesh.glow(0xFFE0E0, .7f * end), light);
             VertexConsumer shock = BossMesh.light(buffer, BossMesh.RING);
             float wave = (age * .12f) % 1;
             BossMesh.pool(shock, poseStack.last(), to.x, .1f, to.z, w * (2 + 6 * wave), 0, BossMesh.glow(CRIMSON, (1 - wave) * end), light);

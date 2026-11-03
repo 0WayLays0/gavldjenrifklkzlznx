@@ -186,17 +186,20 @@ public final class SwordModel {
         for (int side = -1; side <= 1; side += 2) {
             Vector3f e0 = new Vector3f(tip), e1 = new Vector3f(dir).mul(-blade * .2f).add(tip).add(new Vector3f(flat).mul(side * w * .98f)),
                     e2 = new Vector3f(dir).mul(-blade).add(tip).add(new Vector3f(flat).mul(side * w * .85f));
-            RitualMesh.thread(edge, poseStack.last(), view.eye(), new Vector3f[] {e0, e1, e2}, w * .35f, new int[] {BossMesh.glow(0xFFFFFF, alpha),
+            RitualMesh.thread(edge, poseStack.last(), view.eye(), new Vector3f[] {e0, e1, e2}, Math.min(w * .35f, .25f), new int[] {BossMesh.glow(0xFFFFFF, alpha),
                     BossMesh.glow(0xFFFFFF, .8f * alpha), BossMesh.glow(color, .5f * alpha)}, light);
         }
         Vector3f guard = new Vector3f(dir).mul(-blade).add(tip);
         VertexConsumer halo = BossMesh.light(buffer, BossMesh.RING);
-        RitualMesh.billboard(halo, poseStack, view, guard, length * .6f, 0, -1, BossMesh.glow(color, .6f * alpha), light);
+        // Glows that grow with the sword, but not so far that a giant one washes out the whole view
+        float big = Math.min(length, 4.5f);
+        RitualMesh.billboard(halo, poseStack, view, guard, big * .6f, 0, -1, BossMesh.glow(color, .6f * alpha), light);
         VertexConsumer glow = BossMesh.light(buffer, BossMesh.GLOW);
-        RitualMesh.billboard(glow, poseStack, view, guard, length * .5f, 0, -1, BossMesh.glow(color, .55f * alpha), light);
-        RitualMesh.billboard(glow, poseStack, view, guard, length * .14f, 0, -1, BossMesh.glow(0xFFFFFF, .9f * alpha), light);
-        RitualMesh.billboard(glow, poseStack, view, new Vector3f(dir).mul(-blade * .45f).add(tip), length * .9f, 0, -1, BossMesh.glow(color, .2f * alpha), light);
-        RitualMesh.billboard(glow, poseStack, view, new Vector3f(dir).mul(-length * .99f).add(tip), length * .16f, 0, -1, BossMesh.glow(0xFFFFFF, .7f * alpha), light);
+        RitualMesh.billboard(glow, poseStack, view, guard, big * .5f, 0, -1, BossMesh.glow(color, .55f * alpha), light);
+        RitualMesh.billboard(glow, poseStack, view, guard, big * .14f, 0, -1, BossMesh.glow(0xFFFFFF, .9f * alpha), light);
+        RitualMesh.billboard(glow, poseStack, view, new Vector3f(dir).mul(-blade * .45f).add(tip), big * .9f, 0, -1, BossMesh.glow(color, .2f * alpha * Math.min(1, 4.5f / length)),
+                light);
+        RitualMesh.billboard(glow, poseStack, view, new Vector3f(dir).mul(-length * .99f).add(tip), big * .16f, 0, -1, BossMesh.glow(0xFFFFFF, .7f * alpha), light);
         VertexConsumer motes = BossMesh.light(buffer, BossMesh.MOTE);
         int seed = (int) (tip.x * 31 + tip.z * 17);
         for (int k = 0; k < 8; k++) {
