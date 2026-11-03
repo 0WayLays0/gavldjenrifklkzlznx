@@ -463,6 +463,13 @@ public final class Scenes {
                 Vector3f o = new Vector3f(0, 0, 0);
                 BoardModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, age - 40, 0, 3, 5, 22, new int[] {0xFF2438, 0x9A3CFF}, 3, LIGHT);
             }
+            case "bcannon" -> {
+                // Charges from 0 to 40, fires at 40 for 40 ticks
+                caster(ctx, 0, -1);
+                husk(ctx, 0, 0, 10);
+                Vector3f o = new Vector3f(0, 0, 0);
+                CannonModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), 1.3f, Math.min(1, age / 40), age - 40, 40, age, 20, 2.6f, LIGHT);
+            }
             case "bcollapse" -> {
                 husk(ctx, 5, 0, 4);
                 Vector3f o = new Vector3f(0, 0, 0);

@@ -5,6 +5,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.client.render.boss.BellModel;
+import com.waylays.arcanes.client.render.boss.BossMesh;
+import com.waylays.arcanes.client.render.boss.Sculpt;
 import com.waylays.arcanes.client.render.boss.BoardModel;
 import com.waylays.arcanes.client.render.boss.ChainsModel;
 import com.waylays.arcanes.client.render.boss.ClockModel;
@@ -35,18 +37,14 @@ import com.waylays.arcanes.spells.boss.ClockOfFateSpell;
 import com.waylays.arcanes.spells.boss.SeraphWingsSpell;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -101,23 +99,23 @@ public class BossPropRenderer extends EntityRenderer<BossProp> {
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.FIRE, poseStack, size * 2f, -age * 13, BlastEffectRenderer.rgb(1f, .75f, .35f));
         BlastEffectRenderer.layer(buffer, BlastEffectRenderer.CORE, poseStack, size * 1.4f, 0, BlastEffectRenderer.rgb(1f, .85f, .6f));
         poseStack.popPose();
-        // The rock: a big block of magma with blackstone chunks stuck to it, tumbling
+        // The rock: a ball of dark stone split by glowing cracks, jagged chunks stuck to it, tumbling
         poseStack.mulPose(Axis.YP.rotationDegrees(age * 7));
         poseStack.mulPose(Axis.XP.rotationDegrees(age * 11));
-        block(Blocks.MAGMA_BLOCK.defaultBlockState(), size, 0, 0, 0, poseStack, buffer);
-        float s = size * .55f;
-        block(Blocks.BLACKSTONE.defaultBlockState(), s, size * .45f, size * .1f, 0, poseStack, buffer);
-        block(Blocks.BLACKSTONE.defaultBlockState(), s, -size * .4f, -size * .2f, size * .15f, poseStack, buffer);
-        block(Blocks.BLACKSTONE.defaultBlockState(), s * .8f, 0, size * .4f, -size * .35f, poseStack, buffer);
-        poseStack.popPose();
-    }
-
-    private static void block(BlockState state, float size, float x, float y, float z, PoseStack poseStack, MultiBufferSource buffer) {
-        poseStack.pushPose();
-        poseStack.translate(x, y, z);
-        poseStack.scale(size, size, size);
-        poseStack.translate(-.5, -.5, -.5);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(state, poseStack, buffer, LIGHT, OverlayTexture.NO_OVERLAY);
+        VertexConsumer rock = buffer.getBuffer(RenderType.entityCutout(BossMesh.MOON));
+        BossMesh.sphere(rock, poseStack.last(), new Vector3f(), size * .62f, 12, 20, 0, 0, 1, 0xFF6A4A44, LIGHT);
+        for (int k = 0; k < 6; k++) {
+            poseStack.pushPose();
+            float a = k * 1.9f, b = k * 2.7f;
+            poseStack.translate(Mth.cos(a) * Mth.cos(b) * size * .5f, Mth.sin(b) * size * .5f, Mth.sin(a) * Mth.cos(b) * size * .5f);
+            poseStack.mulPose(Axis.ZP.rotationDegrees(k * 53));
+            float s = size * (.28f + .06f * (k % 3));
+            poseStack.scale(s, s * 1.3f, s);
+            Sculpt.gem(rock, poseStack.last(), 1, .8f, 1, 5, 0xFF5A3C38, LIGHT);
+            poseStack.popPose();
+        }
+        VertexConsumer cracks = buffer.getBuffer(RenderType.eyes(BossMesh.MOON_CRACKS));
+        BossMesh.sphere(cracks, poseStack.last(), new Vector3f(), size * .63f, 12, 20, 0, 0, 1, BossMesh.glow(0xFF7A30, 1), LIGHT);
         poseStack.popPose();
     }
 
@@ -138,42 +136,25 @@ public class BossPropRenderer extends EntityRenderer<BossProp> {
     }
 
     /**
-     * The blade: fades in standing on its hilt at the start of the strip, point to the sky, then swings down along the
-     * strip in the last ticks before its warning runs out, and fades out lying in it.
+     * The blade: a giant sword of light (the Thousand Blades' shape, as tall as its strip is long) fades in standing on its
+     * hilt at the start of the strip, point to the sky, then swings down along the strip in the last ticks before its
+     * warning runs out, and fades out lying in it.
      */
     private void blade(BossProp prop, float partialTicks, float age, float since, PoseStack poseStack, MultiBufferSource buffer) {
         float length = prop.getSize();
-        float width = Math.max(1.5f, length * .14f);
         float appear = Mth.clamp(age / 15f, 0, 1);
         float fade = since > 0 ? 1 - since / prop.lingerTicks() : appear;
         // 0 standing, 90 lying along the strip
         float swing = Mth.clamp((since + SWING_TICKS) / SWING_TICKS, 0, 1);
-        float tilt = 90 * swing * swing;
+        float tilt = Mth.HALF_PI * swing * swing;
         // Hovering and swaying a little while it waits
         float hover = (1 - swing) * (1.5f + Mth.sin(age * .15f) * .25f);
-        poseStack.pushPose();
-        poseStack.translate(0, hover, 0);
-        poseStack.mulPose(Axis.YP.rotationDegrees(-prop.getYRot()));
-        poseStack.mulPose(Axis.XP.rotationDegrees(tilt));
-        int color = BossTelegraphRenderer.additive(0xFFF0C0, Mth.clamp(fade, 0, 1));
-        VertexConsumer c = buffer.getBuffer(RenderType.eyes(BLADE));
-        // Two crossed planes along the blade (+Y, point up)
-        for (int k = 0; k < 2; k++) {
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(k * 90));
-            PoseStack.Pose pose = poseStack.last();
-            float h = width * .5f;
-            RenderHelper.vertex(c, pose, -h, 0, 0, 0, 1, color, LIGHT, 0, 0, 1);
-            RenderHelper.vertex(c, pose, h, 0, 0, 1, 1, color, LIGHT, 0, 0, 1);
-            RenderHelper.vertex(c, pose, h, length, 0, 1, 0, color, LIGHT, 0, 0, 1);
-            RenderHelper.vertex(c, pose, -h, length, 0, 0, 0, color, LIGHT, 0, 0, 1);
-            RenderHelper.vertex(c, pose, -h, length, 0, 0, 0, color, LIGHT, 0, 0, -1);
-            RenderHelper.vertex(c, pose, h, length, 0, 1, 0, color, LIGHT, 0, 0, -1);
-            RenderHelper.vertex(c, pose, h, 0, 0, 1, 1, color, LIGHT, 0, 0, -1);
-            RenderHelper.vertex(c, pose, -h, 0, 0, 0, 1, color, LIGHT, 0, 0, -1);
-            poseStack.popPose();
-        }
-        poseStack.popPose();
+        Quaternionf turn = new Quaternionf().rotationY(-prop.getYRot() * Mth.DEG_TO_RAD).rotateX(tilt);
+        Vector3f dir = turn.transform(new Vector3f(0, 1, 0));
+        Vector3f flat = turn.transform(new Vector3f(1, 0, 0)), thick = turn.transform(new Vector3f(0, 0, 1));
+        Vector3f tip = new Vector3f(dir).mul(length).add(0, hover, 0);
+        WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, prop, partialTicks);
+        SwordModel.sword(poseStack, buffer, view, tip, dir, flat, thick, length * 1.3f, 0xFFD25A, Mth.clamp(fade, 0, 1), LIGHT);
     }
 
     /** A pillar of light shooting up, then thinning out. */
