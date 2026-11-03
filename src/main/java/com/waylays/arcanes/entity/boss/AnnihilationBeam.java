@@ -117,7 +117,8 @@ public class AnnihilationBeam extends SpellEffectEntity {
             Vec3 c = position();
             level.playSound(null, c.x, c.y, c.z, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 3f, .7f);
             level.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_ACTIVATE, SoundSource.HOSTILE, 2f, .5f);
-            SpellUtil.cameraShake(level, c.add(forward().scale(getLength() * .5)), DURATION, getLength() * .6f);
+            // The whole arena shakes while it fires, the caster too
+            SpellUtil.cameraShake(level, c.add(forward().scale(getLength() * .5)), DURATION, getLength() * .9f + 8);
         }
         if (firing >= 0 && firing < DURATION) {
             if (firing % PULSE == 0) {

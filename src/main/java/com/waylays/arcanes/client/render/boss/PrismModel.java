@@ -71,11 +71,13 @@ public final class PrismModel {
                 Vector3f from = new Vector3f(heart).add(0, -HALF * s, 0);
                 Vector3f hit = new Vector3f(dir).mul(reach).add(0, .1f, 0);
                 VertexConsumer beam = BossMesh.light(buffer, BossMesh.BEAM);
-                RitualMesh.shaft(beam, poseStack.last(), view.eye(), from, hit, 1.3f, BossMesh.glow(colour, .9f * on), light);
-                RitualMesh.shaft(beam, poseStack.last(), view.eye(), from, hit, .45f, BossMesh.glow(0xFFFFFF, .85f * on), light);
+                // A wide haze, the coloured body, a white-hot core
+                RitualMesh.shaft(beam, poseStack.last(), view.eye(), from, hit, 4.2f, BossMesh.glow(colour, .35f * on), light);
+                RitualMesh.shaft(beam, poseStack.last(), view.eye(), from, hit, 2.4f, BossMesh.glow(colour, .95f * on), light);
+                RitualMesh.shaft(beam, poseStack.last(), view.eye(), from, hit, .95f, BossMesh.glow(0xFFFFFF, .9f * on), light);
                 VertexConsumer glow = BossMesh.light(buffer, BossMesh.GLOW);
-                RitualMesh.billboard(glow, poseStack, view, new Vector3f(hit).add(0, .3f, 0), 3.2f, 0, -1, BossMesh.glow(colour, on), light);
-                RitualMesh.billboard(glow, poseStack, view, new Vector3f(hit).add(0, .3f, 0), 1.3f, 0, -1, BossMesh.glow(0xFFFFFF, on), light);
+                RitualMesh.billboard(glow, poseStack, view, new Vector3f(hit).add(0, .3f, 0), 6.5f, 0, -1, BossMesh.glow(colour, on), light);
+                RitualMesh.billboard(glow, poseStack, view, new Vector3f(hit).add(0, .3f, 0), 2.6f, 0, -1, BossMesh.glow(0xFFFFFF, on), light);
                 RitualMesh.billboard(glow, poseStack, view, from, 2.6f, 0, -1, BossMesh.glow(colour, .8f * on), light);
                 VertexConsumer sparks = BossMesh.light(buffer, BossMesh.MOTE);
                 for (int j = 0; j < 8; j++) {

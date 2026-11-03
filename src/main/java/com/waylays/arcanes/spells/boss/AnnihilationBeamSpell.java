@@ -26,7 +26,7 @@ import java.util.Optional;
  */
 @AutoSpellConfig
 public class AnnihilationBeamSpell extends BossSpell {
-    public static final float WIDTH = 2.6f;
+    public static final float WIDTH = 4f;
 
     public AnnihilationBeamSpell() {
         super("annihilation_beam", SpellRarity.EPIC, 3, 30, BossAnimations.BEAM);
@@ -38,7 +38,7 @@ public class AnnihilationBeamSpell extends BossSpell {
     }
 
     public static float length(int spellLevel) {
-        return 26 + 2 * spellLevel;
+        return 36 + 3 * spellLevel;
     }
 
     @Override

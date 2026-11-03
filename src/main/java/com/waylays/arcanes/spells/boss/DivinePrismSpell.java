@@ -107,5 +107,7 @@ public class DivinePrismSpell extends BossSpell {
         Vec3 c = t.center();
         level.playSound(null, c.x, c.y, c.z, SoundEvents.GUARDIAN_ATTACK, SoundSource.HOSTILE, 1.4f, 1.6f);
         level.playSound(null, c.x, c.y, c.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.HOSTILE, 2f, .8f);
+        // Each beam that lands shakes the ground a little
+        SpellUtil.cameraShake(level, c, 6, t.getSize() + 10);
     }
 }

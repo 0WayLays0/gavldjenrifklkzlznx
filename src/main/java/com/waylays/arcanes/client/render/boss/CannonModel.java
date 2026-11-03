@@ -100,22 +100,52 @@ public final class CannonModel {
                 RitualMesh.billboard(motes, poseStack, view, at, .35f, 0, -1, BossMesh.glow(k % 3 == 0 ? 0xFFFFFF : CRIMSON, Mth.sin(t * Mth.PI) * charge), light);
             }
         } else if (end > 0) {
-            // Sloping down to the strip's far end, at the height of a body
             Vector3f to = new Vector3f(muzzle).add(new Vector3f(f).mul(length));
+            // Sloping down to the strip's far end, at the height of a body
             to.y = height;
-            float flicker = .9f + .1f * Mth.sin(age * 2.3f);
-            float w = width * .8f * end * flicker;
+            float flicker = .88f + .12f * Mth.sin(age * 2.3f) + .06f * Mth.sin(age * 5.7f);
+            float burst = firing < 6 ? 1 + (1 - firing / 6) * .8f : 1;
+            float w = width * end * flicker * burst;
             VertexConsumer beam = BossMesh.light(buffer, BossMesh.BEAM);
-            RitualMesh.shaft(beam, poseStack.last(), view.eye(), muzzle, to, w * 1.6f, BossMesh.glow(CRIMSON, .5f * end), light);
-            RitualMesh.shaft(beam, poseStack.last(), view.eye(), muzzle, to, w, BossMesh.glow(CRIMSON, end), light);
-            RitualMesh.shaft(beam, poseStack.last(), view.eye(), muzzle, to, w * .38f, BossMesh.glow(0xFFF4F0, end), light);
+            // A wide haze, the crimson body, the white-hot core
+            RitualMesh.shaft(beam, poseStack.last(), view.eye(), muzzle, to, w * 2.6f, BossMesh.glow(CRIMSON, .35f * end), light);
+            RitualMesh.shaft(beam, poseStack.last(), view.eye(), muzzle, to, w * 1.5f, BossMesh.glow(CRIMSON, end), light);
+            RitualMesh.shaft(beam, poseStack.last(), view.eye(), muzzle, to, w * .9f, BossMesh.glow(0xFF8090, .8f * end), light);
+            RitualMesh.shaft(beam, poseStack.last(), view.eye(), muzzle, to, w * .42f, BossMesh.glow(0xFFF4F0, end), light);
             // Rings of light racing down it
             VertexConsumer ring = BossMesh.light(buffer, BossMesh.RING);
-            for (int k = 0; k < 7; k++) {
-                float t = (age * .08f + k / 7f) % 1;
-                Vector3f at = new Vector3f(muzzle).add(new Vector3f(f).mul(length * t));
-                BossMesh.plate(ring, poseStack.last(), at, u, v, w * (1.6f + .8f * Mth.sin(t * Mth.PI)), BossMesh.glow(k % 2 == 0 ? 0xFFFFFF : CRIMSON, (1 - t) * end),
+            for (int k = 0; k < 12; k++) {
+                float t = (age * .1f + k / 12f) % 1;
+                Vector3f at = new Vector3f(muzzle).lerp(to, t);
+                BossMesh.plate(ring, poseStack.last(), at, u, v, w * (1.9f + .9f * Mth.sin(t * Mth.PI)), BossMesh.glow(k % 2 == 0 ? 0xFFFFFF : CRIMSON, (1 - t) * end),
                         light);
+            }
+            // The ground it burns along, and where it strikes the far end: a blaze, a shock rolling out
+            VertexConsumer scorch = BossMesh.light(buffer, BossMesh.NOISE);
+            Vector3f side = new Vector3f(-f.z, 0, f.x).mul(w * .9f);
+            int segs = Math.max(2, (int) (length / 2));
+            for (int i = 0; i < segs; i++) {
+                Vector3f a0 = new Vector3f(f).mul(1.5f + length * i / segs).add(0, .06f, 0), a1 = new Vector3f(f).mul(1.5f + length * (i + 1) / segs).add(0, .06f, 0);
+                float v0 = i * .5f - age * .2f, v1 = (i + 1) * .5f - age * .2f;
+                BossMesh.faced(scorch, poseStack.last(), new Vector3f(a0).add(side), new Vector3f(a0).sub(side), new Vector3f(a1).sub(side), new Vector3f(a1).add(side),
+                        new float[] {1, v0, 0, v0, 0, v1, 1, v1}, BossMesh.glow(CRIMSON, .8f * end), BossMesh.glow(CRIMSON, .8f * end), BossMesh.glow(0xFF6040, .8f * end),
+                        BossMesh.glow(0xFF6040, .8f * end), light, BossMesh.UP);
+            }
+            VertexConsumer impact = BossMesh.light(buffer, BossMesh.GLOW);
+            float throb = .8f + .2f * Mth.sin(age * 1.9f);
+            RitualMesh.billboard(impact, poseStack, view, to, w * 5 * throb, 0, -1, BossMesh.glow(CRIMSON, end), light);
+            RitualMesh.billboard(impact, poseStack, view, to, w * 2.2f * throb, 0, -1, BossMesh.glow(0xFFFFFF, end), light);
+            RitualMesh.billboard(impact, poseStack, view, muzzle, w * 3.2f * burst, 0, -1, BossMesh.glow(0xFFE0E0, .8f * end), light);
+            VertexConsumer shock = BossMesh.light(buffer, BossMesh.RING);
+            float wave = (age * .12f) % 1;
+            BossMesh.pool(shock, poseStack.last(), to.x, .1f, to.z, w * (2 + 6 * wave), 0, BossMesh.glow(CRIMSON, (1 - wave) * end), light);
+            VertexConsumer sparks = BossMesh.light(buffer, BossMesh.MOTE);
+            for (int k = 0; k < 24; k++) {
+                float life = (age * .12f + BossMesh.hash(k * 5)) % 1;
+                float a = BossMesh.hash(k * 7) * Mth.TWO_PI;
+                Vector3f vel = new Vector3f(Mth.cos(a) * .35f, .4f + .4f * BossMesh.hash(k * 11), Mth.sin(a) * .35f);
+                Vector3f at = WaterMesh.thrown(to, vel, life * 14, .06f);
+                RitualMesh.billboard(sparks, poseStack, view, at, .45f * (1 - life), 0, -1, BossMesh.glow(life < .4f ? 0xFFFFFF : CRIMSON, (1 - life) * end), light);
             }
         }
     }
