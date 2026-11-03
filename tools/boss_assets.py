@@ -611,8 +611,8 @@ def _wfbm(w, h, base, octaves, seed):
 
 
 def moon_texture():
-    """128 x 64, wrapping round (an equirectangular map): grey dust, darker seas, craters with bright rims and their rays."""
-    W, H = 128, 64
+    """512 x 256, wrapping round (an equirectangular map): grey dust, darker seas, craters with bright rims and their rays."""
+    W, H = 512, 256
     ys, xs = np.mgrid[0:H, 0:W]
     lon = (xs + .5) / W * math.tau
     lat = ((ys + .5) / H - .5) * math.pi
@@ -622,30 +622,29 @@ def moon_texture():
     seas = np.clip((_wfbm(W, H, 2, 3, 2102) - .52) * 4, 0, 1)
     tone = .62 + .22 * (dust - .5) * 2 - .22 * seas
     rnd = random.Random(2103)
-    for k in range(46):
+    for k in range(170):
         # A crater: a dark floor, a bright rim, a faint halo of rays for the young ones
         cl, cn = rnd.uniform(-1.3, 1.3), rnd.uniform(0, math.tau)
         cx, cy, cz = math.cos(cl) * math.cos(cn), math.sin(cl), math.cos(cl) * math.sin(cn)
-        r = rnd.choice((.06, .08, .1, .13, .18, .25)) * rnd.uniform(.7, 1.1)
+        r = rnd.choice((.025, .035, .05, .06, .08, .1, .13, .18, .25)) * rnd.uniform(.7, 1.1)
         d = np.arccos(np.clip(px * cx + py * cy + pz * cz, -1, 1)) / r
         floor = np.clip(1 - d, 0, 1)
         rim = np.exp(-((d - 1) / .18) ** 2)
         tone = tone - .16 * (floor > 0) * (.6 + .4 * floor) + .2 * rim
         if r < .12 and rnd.random() < .35:
             tone = tone + .1 * np.clip(1 - (d - 1) / 3, 0, 1) * (d > 1)
-    tone = np.clip(tone, 0, 1)
-    tone = np.round(tone * 10) / 10
+    tone = np.clip(tone + (_wfbm(W, H, 32, 3, 2106) - .5) * .12, 0, 1)
     rgb = np.dstack([tone * 236 + 10, tone * 230 + 12, tone * 222 + 18])
     return _np_rgba(rgb, np.full((H, W), 255.0))
 
 
 def moon_cracks_texture():
-    """128 x 64, wrapping round like the moon's map: the glowing cracks of a moon about to burst (white on black,
+    """512 x 256, wrapping round like the moon's map: the glowing cracks of a moon about to burst (white on black,
     drawn as light): the edges of big cells, brightest where they meet."""
-    W, H = 128, 64
+    W, H = 512, 256
     rnd = np.random.default_rng(2104)
     ys, xs = np.mgrid[0:H, 0:W]
-    pts = rnd.random((60, 2)) * (W, H)
+    pts = rnd.random((70, 2)) * (W, H)
     best = np.full((H, W), 1e9)
     second = np.full((H, W), 1e9)
     for (x, y) in pts:
@@ -653,10 +652,9 @@ def moon_cracks_texture():
             d = np.hypot(xs - x - ox, (ys - y) * 1.6)
             second = np.where(d < best, best, np.minimum(second, d))
             best = np.minimum(best, d)
-    edge = np.clip(1 - (second - best) / 2.4, 0, 1) ** 1.6
+    edge = np.clip(1 - (second - best) / 6, 0, 1) ** 2
     wobble = _wfbm(W, H, 8, 3, 2105)
     v = np.clip(edge * (.6 + .8 * wobble), 0, 1)
-    v = np.round(v * 6) / 6
     return _np_rgba(np.dstack([v * 255] * 3), np.full((H, W), 255.0))
 
 

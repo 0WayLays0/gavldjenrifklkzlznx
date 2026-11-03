@@ -56,11 +56,11 @@ public final class MoonModel {
         BossMesh.pool(shade, poseStack.last(), centre.x, .04f, centre.z, zone * 2 * (.35f + .65f * e), 0, BossMesh.argb(0x080406, .55f * e * show), light);
         // The moon
         VertexConsumer rock = BossMesh.solid(buffer, BossMesh.MOON);
-        BossMesh.sphere(rock, poseStack.last(), centre, r, 16, 32, turn, 0, 1, 0xFFFFFFFF, light);
+        BossMesh.sphere(rock, poseStack.last(), centre, r, 28, 56, turn, 0, 1, 0xFFFFFFFF, light);
         // Its cracks, glowing as it heats
         VertexConsumer cracks = BossMesh.light(buffer, BossMesh.MOON_CRACKS);
         float glowK = heat * (.75f + .25f * Mth.sin(age * .35f));
-        BossMesh.sphere(cracks, poseStack.last(), centre, r * 1.006f, 16, 32, turn, 0, 1, BossMesh.glow(BossMesh.mix(0xFF5A1A, 0xFFD080, heat), glowK), light);
+        BossMesh.sphere(cracks, poseStack.last(), centre, r * 1.006f, 28, 56, turn, 0, 1, BossMesh.glow(BossMesh.mix(0xFF5A1A, 0xFFD080, heat), glowK), light);
         // Its underside burning
         VertexConsumer burn = BossMesh.light(buffer, BossMesh.NOISE);
         BossMesh.sphere(burn, poseStack.last(), centre, r * 1.04f, 6, 32, turn * 3 - age * .01f, .55f, 1, BossMesh.glow(0xFF8A3A, .8f * heat), light);

@@ -16,6 +16,7 @@ import org.joml.Vector3f;
  * the dark disc shrinks to a point and the light comes back in a flash.
  */
 public final class EclipseModel {
+    private static final net.minecraft.resources.ResourceLocation OBSIDIAN = com.waylays.arcanes.ArcanesOublies.id("textures/entity/boss/m_obsidian.png");
     public static final int BANDS = 3;
     /** How long it takes to cover the sun (ticks). */
     public static final int TOTALITY = 32;
@@ -107,6 +108,38 @@ public final class EclipseModel {
         }
         poseStack.popPose();
 
+        // A celestial mechanism round the sun: rings of gold turning every way, set with gems, and shards of black glass
+        // circling it like dark moons
+        if (kindle > .05f && pass < 1) {
+            float mech = kindle * (1 - pass);
+            VertexConsumer gold = BossMesh.solid(buffer, BellModel.GOLD);
+            for (int r = 0; r < 3; r++) {
+                float rr = rs * (2.1f + .45f * r) * mech;
+                poseStack.pushPose();
+                poseStack.translate(sun.x, sun.y, sun.z);
+                poseStack.mulPose(new org.joml.Quaternionf().rotationY(age * (.01f + .006f * r) + r * 2.1f).rotateX(1.1f + r * .35f).rotateZ(-age * .008f * (r + 1)));
+                Sculpt.torus(gold, poseStack.last(), rr, rs * .05f, 64, 6, 0, Mth.TWO_PI, 16, 0xFFFFFFFF, light);
+                for (int k = 0; k < 8; k++) {
+                    float a = k * Mth.TWO_PI / 8;
+                    poseStack.pushPose();
+                    poseStack.translate(Mth.cos(a) * rr, 0, Mth.sin(a) * rr);
+                    Sculpt.gem(gold, poseStack.last(), rs * .1f, rs * .06f, rs * .1f, 6, k % 2 == 0 ? 0xFFFFFFFF : 0xFFC080FF, light);
+                    poseStack.popPose();
+                }
+                poseStack.popPose();
+            }
+            VertexConsumer stone = BossMesh.solid(buffer, OBSIDIAN);
+            for (int k = 0; k < 7; k++) {
+                float a = age * .02f + k * Mth.TWO_PI / 7;
+                float rr = rs * 3.4f * mech;
+                poseStack.pushPose();
+                poseStack.translate(sun.x + Mth.cos(a) * rr, sun.y + Mth.sin(a * 2 + k) * rs * .6f, sun.z + Mth.sin(a) * rr);
+                poseStack.mulPose(new org.joml.Quaternionf().rotationXYZ(age * .05f + k, k * 1.3f, age * .03f));
+                poseStack.scale(rs * .32f, rs * .7f, rs * .32f);
+                Sculpt.gem(stone, poseStack.last(), 1, .9f, 1.2f, 5, 0xFFB0A0C8, light);
+                poseStack.popPose();
+            }
+        }
         // Rays of shadow-light falling on the arena
         VertexConsumer shafts = BossMesh.light(buffer, BossMesh.BEAM);
         for (int k = 0; k < 10; k++) {
