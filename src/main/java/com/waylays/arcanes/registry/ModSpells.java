@@ -44,7 +44,7 @@ import com.waylays.arcanes.spells.boss.JudgmentBladeSpell;
 import com.waylays.arcanes.spells.boss.LastJudgmentSpell;
 import com.waylays.arcanes.spells.boss.RunePrisonSpell;
 import com.waylays.arcanes.spells.boss.SeismicRiftSpell;
-import com.waylays.arcanes.spells.boss.StarfallSpell;
+import com.waylays.arcanes.spells.boss.PendulumSpell;
 import com.waylays.arcanes.spells.boss.TripleNovaSpell;
 import com.waylays.arcanes.spells.boss.VoidOrbSpell;
 import com.waylays.arcanes.spells.errethys.ManaCrowsSpell;
@@ -379,7 +379,7 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> JUDGMENT_BLADE = register(new JudgmentBladeSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> ANNIHILATION_BEAM = register(new AnnihilationBeamSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> TRIPLE_NOVA = register(new TripleNovaSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> STARFALL = register(new StarfallSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PENDULUM = register(new PendulumSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SEISMIC_RIFT = register(new SeismicRiftSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> VOID_ORB = register(new VoidOrbSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> CROSS_OF_LIGHT = register(new CrossOfLightSpell());

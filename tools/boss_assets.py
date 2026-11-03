@@ -382,17 +382,18 @@ def triple_nova_icon():
     return img
 
 
-def starfall_icon():
-    img = _icon_base((20, 40, 90), NIGHT, 8, 4)
-    for sx, sy in ((3, 9), (8, 5), (12, 11)):
-        for i in range(1, 4):
-            _px(img, sx - i, sy - i, g.lerp(STAR, NIGHT, i / 4))
-        _px(img, sx, sy, (255, 255, 255))
-        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-            _px(img, sx + dx, sy + dy, STAR)
-    d = ImageDraw.Draw(img)
-    d.arc((1, 12, 15, 17), 180, 360, fill=STAR + (255,))
-    return img
+def pendulum_icon():
+    def draw(d, img, S):
+        # A crescent blade hanging from a long rod, swinging, a trail of light behind it
+        d.line([(.5 * S, .04 * S), (.36 * S, .62 * S)], fill=_a(IRON_LIGHT), width=max(1, S // 22))
+        d.ellipse((.42 * S, .0 * S, .58 * S, .1 * S), fill=_a(GOLD))
+        d.pieslice((.08 * S, .38 * S, .64 * S, .94 * S), 20, 160, fill=_a((210, 214, 226)))
+        d.pieslice((.16 * S, .44 * S, .56 * S, .76 * S), 20, 160, fill=_a(NIGHT))
+        d.arc((.08 * S, .38 * S, .64 * S, .94 * S), 20, 160, fill=_a((255, 90, 90)), width=max(1, S // 30))
+        d.arc((.3 * S, .4 * S, .96 * S, .96 * S), 30, 120, fill=_a(CRIMSON, 160), width=max(1, S // 26))
+        d.ellipse((.31 * S, .56 * S, .41 * S, .66 * S), fill=_a(PALE))
+        g.glow_spot(img, .36 * S, .78 * S, .2 * S, (255, 60, 70), .6)
+    return _paint(draw, .5, .5, (60, 10, 20))
 
 
 def seismic_rift_icon():
@@ -1142,7 +1143,7 @@ def main():
     boss_materials.main()
     for name, icon in (("crushing_meteor", crushing_meteor_icon), ("judgment_blade", judgment_blade_icon),
                        ("annihilation_beam", annihilation_beam_icon), ("triple_nova", triple_nova_icon),
-                       ("starfall", starfall_icon), ("seismic_rift", seismic_rift_icon), ("void_orb", void_orb_icon),
+                       ("pendulum", pendulum_icon), ("seismic_rift", seismic_rift_icon), ("void_orb", void_orb_icon),
                        ("cross_of_light", cross_of_light_icon), ("rune_prison", rune_prison_icon),
                        ("last_judgment", last_judgment_icon)):
         g.save(icon(), f"textures/gui/spell_icons/{name}.png")

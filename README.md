@@ -189,7 +189,7 @@ l'autre), chaque temps ayant sa propre zone et son propre compte à rebours.
 | **Lame du Jugement** (Judgment Blade) | Une lame de lumière géante se dresse sur une longue bande marquée devant le lanceur (18 à 26 blocs) et s'abat dessus ; la bande jaillit en piliers de lumière une seconde après. |
 | **Rayon d'Anéantissement** (Annihilation Beam) | Un cercle de runes se dresse debout devant le lanceur et se charge, puis un rayon d'énergie balaie la bande marquée (28 à 32 blocs) pendant 2 s. |
 | **Nova Triple** (Triple Nova) | Trois zones de feu autour du lanceur : le disque central explose, puis un anneau, puis un anneau plus large (13 blocs), l'un après l'autre. |
-| **Pluie d'Étoiles** (Starfall) | De petits cercles se marquent en cascade autour de la cible ; une étoile tombe dans chacun à son tour (7 à 15 étoiles). |
+| **Pendule du bourreau** (Pendulum of Doom) | Un pendule géant à lame d'acier en croissant pend d'un cercle de runes au-dessus d'une bande de 20 blocs et la traverse trois fois. |
 | **Faille Sismique** (Seismic Rift) | Une faille se marque depuis les pieds du lanceur et s'ouvre tronçon par tronçon en projetant en l'air ceux qui s'y trouvent : le danger avance le long de la ligne. |
 | **Orbe du Néant** (Void Orb) | Une énorme sphère de ténèbres roule lentement sur un chemin marqué (la toucher blesse, s'en approcher attire) ; au bout, elle s'effondre en aspirant tout autour, puis explose. |
 | **Croix de Lumière** (Cross of Light) | Une grande croix de lumière se marque autour de la cible et jaillit en piliers, puis une seconde croix tournée d'un huitième de tour. |

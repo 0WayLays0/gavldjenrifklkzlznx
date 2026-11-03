@@ -16,6 +16,7 @@ import com.waylays.arcanes.client.render.boss.FistModel;
 import com.waylays.arcanes.client.render.boss.KingModel;
 import com.waylays.arcanes.client.render.boss.LotusModel;
 import com.waylays.arcanes.client.render.boss.MaidenModel;
+import com.waylays.arcanes.client.render.boss.PendulumModel;
 import com.waylays.arcanes.client.render.boss.ScytheModel;
 import com.waylays.arcanes.client.render.boss.EclipseModel;
 import com.waylays.arcanes.client.render.boss.MawModel;
@@ -32,6 +33,7 @@ import com.waylays.arcanes.entity.boss.BossTelegraph;
 import com.waylays.arcanes.spells.boss.BellOfDoomSpell;
 import com.waylays.arcanes.spells.boss.DivinePrismSpell;
 import com.waylays.arcanes.spells.boss.InfernalCheckerboardSpell;
+import com.waylays.arcanes.spells.boss.PendulumSpell;
 import com.waylays.arcanes.spells.boss.ReapersScytheSpell;
 import com.waylays.arcanes.spells.boss.ClockOfFateSpell;
 import com.waylays.arcanes.spells.boss.SeraphWingsSpell;
@@ -216,6 +218,8 @@ public class BossPropRenderer extends EntityRenderer<BossProp> {
             case LOTUS -> LotusModel.draw(poseStack, buffer, view, age, age - arg, size, prop.getYRot(), style.zone, seed, LIGHT);
             case BOARD -> BoardModel.draw(poseStack, buffer, view, age, age - arg, prop.getYRot(), InfernalCheckerboardSpell.CELL, InfernalCheckerboardSpell.GRID,
                     InfernalCheckerboardSpell.WAVE, new int[] {BossTelegraph.Style.CRIMSON.zone, BossTelegraph.Style.VOID.zone}, seed, LIGHT);
+            case PENDULUM -> PendulumModel.draw(poseStack, buffer, view, from, age, age - arg, PendulumSpell.SWING, PendulumSpell.SWINGS, prop.getYRot(), size, style.zone,
+                    seed, LIGHT);
             case COLLAPSE -> CollapseModel.draw(poseStack, buffer, view, from, age, age - arg, size, style.zone, seed, LIGHT);
             default -> {
             }

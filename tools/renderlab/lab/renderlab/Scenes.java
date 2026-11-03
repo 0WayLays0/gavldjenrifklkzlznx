@@ -476,6 +476,12 @@ public final class Scenes {
                 Vector3f o = new Vector3f(0, 0, 0);
                 PrisonModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 6, 4, Math.min(1, age / 10), age, LIGHT);
             }
+            case "bpendulum" -> {
+                caster(ctx, 0, -10);
+                husk(ctx, 2, 0, 0);
+                Vector3f o = new Vector3f(0, 0, 0);
+                PendulumModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 15, 0), age, age - 40, 16, 3, 90, 20, 0xFF2438, 3, LIGHT);
+            }
             case "bcollapse" -> {
                 husk(ctx, 5, 0, 4);
                 Vector3f o = new Vector3f(0, 0, 0);
