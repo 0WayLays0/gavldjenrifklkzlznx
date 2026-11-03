@@ -69,10 +69,52 @@ public final class ChainsModel {
             }
             paths[k] = path;
         }
-        VertexConsumer iron = BossMesh.see(buffer, BossMesh.CHAIN);
+        VertexConsumer iron = BossMesh.solid(buffer, BellModel.IRON);
         PoseStack.Pose p = poseStack.last();
         for (int k = 0; k < CHAINS; k++) {
-            links(iron, p, paths[k], bind, since, shatter, seed + k * 101, light);
+            links(iron, poseStack, paths[k], bind, since, shatter, seed + k * 101, light);
+        }
+        // The posts the chains burst from: black iron, a gilded collar, a crown of spikes; the shackle round the doomed spot
+        float post = BossMesh.ramp(age, 0, 8) * (1 - BossMesh.ramp(since, 8, 22));
+        for (int k = 0; k < CHAINS; k++) {
+            float a = a0 + k * Mth.HALF_PI;
+            poseStack.pushPose();
+            poseStack.translate(Mth.cos(a) * radius * 1.05f, (post - 1) * 1.6f, Mth.sin(a) * radius * 1.05f);
+            Sculpt.lathe(iron, poseStack.last(), new float[] {.75f, 0, .7f, .2f, .5f, .35f, .42f, 1.0f, .5f, 1.15f, .38f, 1.25f, 0, 1.3f}, 16, 2, .5f, 0xFF8A8098,
+                    0xFFFFFFFF, light);
+            poseStack.popPose();
+        }
+        float shackle = reach * (1 - shatter);
+        if (shackle > .01f) {
+            poseStack.pushPose();
+            poseStack.translate(bind.x, bind.y - .2f, bind.z);
+            poseStack.mulPose(new org.joml.Quaternionf().rotationY(age * .05f));
+            Sculpt.torus(iron, poseStack.last(), radius * .55f * shackle, .12f, 40, 8, 0, Mth.TWO_PI, 8, 0xFFFFFFFF, light);
+            poseStack.popPose();
+        }
+        VertexConsumer gold = BossMesh.solid(buffer, BellModel.GOLD);
+        for (int k = 0; k < CHAINS; k++) {
+            float a = a0 + k * Mth.HALF_PI;
+            poseStack.pushPose();
+            poseStack.translate(Mth.cos(a) * radius * 1.05f, (post - 1) * 1.6f, Mth.sin(a) * radius * 1.05f);
+            poseStack.pushPose();
+            poseStack.translate(0, 1.02f, 0);
+            Sculpt.torus(gold, poseStack.last(), .46f, .07f, 16, 5, 0, Mth.TWO_PI, 4, 0xFFFFFFFF, light);
+            poseStack.popPose();
+            for (int j = 0; j < 5; j++) {
+                float b = j * Mth.TWO_PI / 5;
+                BossMesh.horn(gold, poseStack.last(), new Vector3f(Mth.cos(b) * .36f, 1.2f, Mth.sin(b) * .36f), new Vector3f(Mth.cos(b) * .4f, 1, Mth.sin(b) * .4f)
+                        .normalize(), new Vector3f(), .5f, .07f, 5, 3, 0xFFFFFFFF, 0xFFFFF0C0, light);
+            }
+            poseStack.popPose();
+        }
+        if (shackle > .01f) {
+            for (int j = 0; j < 8; j++) {
+                float b = j * Mth.TWO_PI / 8 + age * .05f;
+                float rr = radius * .55f * shackle;
+                BossMesh.horn(gold, poseStack.last(), new Vector3f(bind).add(Mth.cos(b) * rr, -.2f, Mth.sin(b) * rr), new Vector3f(-Mth.cos(b), .25f, -Mth.sin(b))
+                        .normalize(), new Vector3f(), .45f, .07f, 5, 3, 0xFFFFFFFF, 0xFFFFF0C0, light);
+            }
         }
         if (shatter < 1) {
             // Red light running along them toward the seal
@@ -119,8 +161,8 @@ public final class ChainsModel {
         }
     }
 
-    /** The links along {@code path}, each square to the one before; flung off from the seal once it shatters. */
-    private static void links(VertexConsumer c, PoseStack.Pose p, Vector3f[] path, Vector3f bind, float since, float shatter, int seed, int light) {
+    /** The links along {@code path}, each turned a quarter from the one before; flung off from the seal, shrinking, once it shatters. */
+    private static void links(VertexConsumer c, PoseStack poseStack, Vector3f[] path, Vector3f bind, float since, float shatter, int seed, int light) {
         float[] along = new float[path.length];
         for (int i = 1; i < path.length; i++) {
             along[i] = along[i - 1] + path[i].distance(path[i - 1]);
@@ -140,22 +182,28 @@ public final class ChainsModel {
             if (j % 2 == 1) {
                 side = new Vector3f(dir).cross(side).normalize();
             }
-            float alpha = 1;
+            float size = 1;
             if (shatter > 0) {
                 Vector3f out = new Vector3f(at).sub(bind);
                 out.y = Math.abs(out.y) + .5f;
                 out.normalize().mul(.25f + .2f * BossMesh.hash(seed + j));
                 at = WaterMesh.thrown(at, out, since, .04f);
                 dir.rotateY(since * .3f * (BossMesh.hash(seed + j * 3) - .5f));
-                alpha = 1 - shatter;
+                side = BossMesh.across(dir);
+                size = 1 - shatter;
             }
-            if (alpha <= .01f) {
+            if (size <= .02f) {
                 continue;
             }
-            Vector3f h = new Vector3f(dir).mul(LINK * .5f), w = new Vector3f(side).mul(LINK * .26f);
-            int col = BossMesh.argb(0xC8B8C0, alpha);
-            BossMesh.quad(c, p, new Vector3f(at).sub(h).sub(w), new Vector3f(at).sub(h).add(w), new Vector3f(at).add(h).add(w), new Vector3f(at).add(h).sub(w), 0, 1,
-                    1, 1, 1, 0, 0, 0, col, col, light, new Vector3f(dir).cross(side).normalize());
+            // The link's ring lies in the plane of the chain and its side
+            Vector3f n = new Vector3f(dir).cross(side).normalize();
+            org.joml.Quaternionf frame = new org.joml.Matrix3f(dir, n, new Vector3f(dir).cross(n).normalize()).getNormalizedRotation(new org.joml.Quaternionf());
+            poseStack.pushPose();
+            poseStack.translate(at.x, at.y, at.z);
+            poseStack.mulPose(frame);
+            poseStack.scale(1.55f * size, size, size);
+            Sculpt.torus(c, poseStack.last(), LINK * .3f, LINK * .085f, 12, 6, 0, Mth.TWO_PI, 1, 0xFFE8E0E8, light);
+            poseStack.popPose();
         }
     }
 }
