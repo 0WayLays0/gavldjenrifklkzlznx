@@ -28,7 +28,7 @@ public class BossProp extends Entity {
      */
     public enum Kind {
         METEOR, STAR, BLADE, PILLAR, SWORD, WHEEL, ECLIPSE, MOON, MAW, PRISM, CHAINS, STORM, BOLT, THORNS, WINGS,
-        BELL, FIST, LANCE, SCYTHE, ORBITAL, KING, LASER, LOTUS, COLLAPSE
+        BELL, FIST, LANCE, SCYTHE, ORBITAL, KING, CLOCK, LOTUS, COLLAPSE, BOARD
     }
 
     private static final EntityDataAccessor<Integer> DATA_KIND = SynchedEntityData.defineId(BossProp.class, EntityDataSerializers.INT);
@@ -170,7 +170,7 @@ public class BossProp extends Entity {
             case THORNS -> 40;
             case WINGS -> 26;
             // Their aftermath is in their own time: they end when it does
-            case BELL, FIST, LANCE, SCYTHE, ORBITAL, KING, LASER, LOTUS, COLLAPSE -> 1;
+            case BELL, FIST, LANCE, SCYTHE, ORBITAL, KING, CLOCK, LOTUS, COLLAPSE, BOARD -> 1;
         };
     }
 

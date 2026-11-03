@@ -35,6 +35,8 @@ public class BellOfDoomSpell extends BossSpell {
     public static final float[] RADII = {1.5f, 5.5f, 9.5f, 13.5f};
     /** Ticks between two tolls. */
     public static final int TOLL = 16;
+    /** Where the bell hangs: so far before the caster, so high. */
+    public static final double BELL_AHEAD = 7, BELL_HEIGHT = 9.5;
 
     public BellOfDoomSpell() {
         super("bell_of_doom", SpellRarity.EPIC, 3, 35, BossAnimations.SKY_CALL);
@@ -72,7 +74,10 @@ public class BellOfDoomSpell extends BossSpell {
                     fire = t.getFireTick();
                 }
             }
-            BossProp.scene(level, BossProp.Kind.BELL, BossTelegraph.Style.HOLY, RADII[3], now(level), fire + TOLL * 2 + 24, c, c.add(0, 7.5, 0), c, fire - now(level), 0);
+            // The bell hangs high before the caster, where it can be seen; its rings race out round the caster
+            Vec3 ahead = direction(facing(entity)).scale(BELL_AHEAD);
+            BossProp.scene(level, BossProp.Kind.BELL, BossTelegraph.Style.HOLY, RADII[3], now(level), fire + TOLL * 2 + 24, c, c.add(ahead).add(0, BELL_HEIGHT, 0), c,
+                    fire - now(level), 0);
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }

@@ -374,15 +374,16 @@ def clock_face(size=512):
 
 
 def clock_glow(size=512):
-    """What of the clock's face glows: its numerals and the hour marks."""
+    """What of the clock's face glows on the ground (its numerals stand on it in gold): the hour marks, the minutes, a rose of runes."""
     w = size
     c = w / 2
     img = Image.new("L", (w, w), 0)
     d = ImageDraw.Draw(img)
-    for k, numeral in enumerate(NUMERALS):
-        a = k * math.tau / 12
-        r = c * .8
-        roman(d, c + math.sin(a) * r, c - math.cos(a) * r, w * .075, numeral, a, max(2, w // 120), 255)
+    d.ellipse((c * .06, c * .06, w - c * .06, w - c * .06), outline=200, width=3)
+    d.ellipse((c * .36, c * .36, w - c * .36, w - c * .36), outline=140, width=2)
+    for k in range(60):
+        a = k * math.tau / 60
+        d.line([(c + math.cos(a) * c * .9, c + math.sin(a) * c * .9), (c + math.cos(a) * c * .86, c + math.sin(a) * c * .86)], fill=170, width=2)
     for k in range(12):
         a = k * math.tau / 12 - math.pi / 2
         d.line([(c + math.cos(a) * c * .93, c + math.sin(a) * c * .93), (c + math.cos(a) * c * .86, c + math.sin(a) * c * .86)], fill=255, width=5)

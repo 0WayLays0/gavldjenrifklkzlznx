@@ -1057,15 +1057,24 @@ def spectral_kings_icon():
     return _paint(draw, .5, .5, (40, 14, 70))
 
 
-def sweeping_light_icon():
+def clock_of_fate_icon():
     def draw(d, img, S):
-        d.ellipse((.36 * S, .18 * S, .64 * S, .4 * S), fill=_a((248, 244, 232)))
-        d.ellipse((.44 * S, .22 * S, .56 * S, .36 * S), fill=_a(GOLD))
-        d.ellipse((.48 * S, .26 * S, .52 * S, .32 * S), fill=_a(NIGHT))
-        d.polygon([(.5 * S, .34 * S), (.92 * S, .82 * S), (.78 * S, .92 * S)], fill=_a((255, 230, 140), 220))
-        d.arc((.1 * S, .55 * S, .9 * S, .98 * S), 200, 340, fill=_a(EMBER), width=max(1, S // 30))
-        g.glow_spot(img, .5 * S, .29 * S, .2 * S, (255, 220, 120), .8)
-    return _paint(draw, .5, .4, (80, 60, 20))
+        c = .5 * S
+        d.ellipse((.1 * S, .1 * S, .9 * S, .9 * S), fill=_a((26, 18, 34)), outline=_a(GOLD), width=max(1, S // 22))
+        d.ellipse((.17 * S, .17 * S, .83 * S, .83 * S), outline=_a(GOLD_DARK), width=max(1, S // 60))
+        for k in range(12):
+            a = k * math.tau / 12 - math.pi / 2
+            r0, r1 = .36 * S, (.27 if k % 3 == 0 else .31) * S
+            d.line([(c + math.cos(a) * r0, c + math.sin(a) * r0), (c + math.cos(a) * r1, c + math.sin(a) * r1)], fill=_a(GOLD), width=max(1, S // 40))
+        # A burning hour under the minute hand
+        d.pieslice((.14 * S, .14 * S, .86 * S, .86 * S), -60, -30, fill=_a((255, 170, 60), 150))
+        a = -math.pi / 2 + math.tau * 1.5 / 12
+        d.line([(c, c), (c + math.cos(a) * .36 * S, c + math.sin(a) * .36 * S)], fill=_a((255, 236, 160)), width=max(1, S // 24))
+        b = -math.pi / 2 - math.tau / 12
+        d.line([(c, c), (c + math.cos(b) * .22 * S, c + math.sin(b) * .22 * S)], fill=_a(GOLD), width=max(1, S // 18))
+        d.ellipse((c - .05 * S, c - .05 * S, c + .05 * S, c + .05 * S), fill=_a(GOLD))
+        g.glow_spot(img, c + .14 * S, c - .2 * S, .18 * S, (255, 190, 90), .7)
+    return _paint(draw, .5, .5, (70, 50, 20))
 
 
 def crimson_lotus_icon():
@@ -1097,7 +1106,7 @@ def collapse_icon():
 
 THIRD_ICONS = (("bell_of_doom", bell_of_doom_icon), ("infernal_checkerboard", infernal_checkerboard_icon), ("titans_fist", titans_fist_icon),
                ("lances_of_judgment", lances_of_judgment_icon), ("reapers_scythe", reapers_scythe_icon), ("orbital_strike", orbital_strike_icon),
-               ("spectral_kings", spectral_kings_icon), ("sweeping_light", sweeping_light_icon), ("crimson_lotus", crimson_lotus_icon),
+               ("spectral_kings", spectral_kings_icon), ("clock_of_fate", clock_of_fate_icon), ("crimson_lotus", crimson_lotus_icon),
                ("collapse", collapse_icon))
 
 

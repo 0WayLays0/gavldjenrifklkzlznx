@@ -200,7 +200,7 @@ public final class BellModel {
         float sky = top.y + yokeY + 14;
         BossMesh.annulus(circle, poseStack.last(), new Vector3f(top.x, sky, top.z), new Vector3f(1, 0, 0), new Vector3f(0, 0, -1), 2.5f, 7, 48, 3, age * .015f, 0,
                 BossMesh.glow(zone, .8f * (1 - up)), BossMesh.glow(zone, .35f * (1 - up)), light, true);
-        // Rings of sound: each toll a ring bursting from the lip, falling to the ground and racing out over it
+        // Rings of sound: each toll a ring bursting from the lip, falling to the ground round the caster and racing out over it
         VertexConsumer ring = BossMesh.light(buffer, BossMesh.RING);
         float lipY = top.y - 3.0f * SCALE;
         for (int k = 0; k < 3; k++) {
@@ -211,9 +211,11 @@ public final class BellModel {
             float t = s / 18, f = 1 - t;
             for (int w = 0; w < 3; w++) {
                 float tw = Math.max(0, t - w * .08f);
-                float y = Mth.lerp(Math.min(1, tw * 3), lipY, .15f + w * .05f);
-                float r = Mth.lerp(Math.min(1, tw * 3), 2.2f * SCALE, 3.6f * SCALE) + radius * Math.max(0, tw * 1.25f - .25f);
-                BossMesh.pool(ring, poseStack.last(), top.x, y, top.z, r * 2.15f, k + w, BossMesh.glow(w == 0 ? 0xFFFFFF : zone, f * (1 - w * .3f)), light);
+                float drop = Math.min(1, tw * 3);
+                float y = Mth.lerp(drop, lipY, .15f + w * .05f);
+                float x = Mth.lerp(drop, top.x, 0), z = Mth.lerp(drop, top.z, 0);
+                float r = Mth.lerp(drop, 2.2f * SCALE, 1.5f) + radius * Math.max(0, tw * 1.25f - .25f);
+                BossMesh.pool(ring, poseStack.last(), x, y, z, r * 2.15f, k + w, BossMesh.glow(w == 0 ? 0xFFFFFF : zone, f * (1 - w * .3f)), light);
             }
         }
         VertexConsumer halo = BossMesh.light(buffer, BossMesh.GLOW);

@@ -69,15 +69,21 @@ public class InfernalCheckerboardSpell extends BossSpell {
             Vec3 fwd = direction(yaw), side = new Vec3(fwd.z, 0, -fwd.x);
             float damage = getDamage(spellLevel, entity);
             int half = GRID / 2;
+            int fire = 0;
             for (int gx = -half; gx <= half; gx++) {
                 for (int gz = -half; gz <= half; gz++) {
                     Vec3 cell = center.add(side.scale(gx * CELL)).add(fwd.scale(gz * CELL));
                     Vec3 start = SpellUtil.groundAt(level, cell.subtract(fwd.scale(CELL * .5)), 4, 1);
                     int wave = Math.floorMod(gx + gz, 2);
-                    BossTelegraph.line(level, entity, this, spellLevel, start, yaw, CELL, CELL).style(wave == 0 ? BossTelegraph.Style.CRIMSON : BossTelegraph.Style.VOID)
-                            .delayed(wave * WAVE).damage(damage).part("cell").spawn();
+                    BossTelegraph t = BossTelegraph.line(level, entity, this, spellLevel, start, yaw, CELL, CELL)
+                            .style(wave == 0 ? BossTelegraph.Style.CRIMSON : BossTelegraph.Style.VOID).delayed(wave * WAVE).damage(damage).part("cell").spawn();
+                    if (wave == 0) {
+                        fire = t.getFireTick();
+                    }
                 }
             }
+            // The board itself: its squares, its frame, its rooks, its hellfire
+            BossProp.scene(level, BossProp.Kind.BOARD, BossTelegraph.Style.CRIMSON, CELL * GRID, now(level), fire + WAVE + 42, center, center, center, fire - now(level), yaw);
             level.playSound(null, center.x, center.y, center.z, SoundEvents.BLAZE_SHOOT, SoundSource.HOSTILE, 2f, .5f);
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
@@ -93,7 +99,6 @@ public class InfernalCheckerboardSpell extends BossSpell {
                 target.hurtMarked = true;
             }
         }
-        BossProp.spawn(level, BossProp.Kind.PILLAR, t.getStyle(), CELL * .55f, now(level), now(level), c, c);
         SpellUtil.particles(level, ParticleTypes.FLAME, c.x, c.y + .3, c.z, 14, CELL * .35, .4, CELL * .35, .06);
         SpellUtil.particles(level, ParticleTypes.SOUL_FIRE_FLAME, c.x, c.y + .3, c.z, 6, CELL * .3, .3, CELL * .3, .04);
         level.playSound(null, c.x, c.y, c.z, SoundEvents.FIRECHARGE_USE, SoundSource.HOSTILE, 1.2f, .6f + level.random.nextFloat() * .3f);

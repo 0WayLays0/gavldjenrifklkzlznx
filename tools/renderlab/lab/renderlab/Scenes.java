@@ -414,7 +414,7 @@ public final class Scenes {
                 caster(ctx, 0, 0);
                 husk(ctx, 4, 0, 3);
                 Vector3f o = new Vector3f(0, 0, 0);
-                BellModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 7.5f, 0), age, age - 40, 16, 13.5f, 0xFFD25A, 3, LIGHT);
+                BellModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 9.5f, 7), age, age - 40, 16, 13.5f, 0xFFD25A, 3, LIGHT);
             }
             case "bfist" -> {
                 husk(ctx, 1, 0, 1);
@@ -442,16 +442,22 @@ public final class Scenes {
                 Vector3f o = new Vector3f(0, 0, 0);
                 KingModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 15), age, age - 40, 0, 0x9A3CFF, 3, LIGHT);
             }
-            case "blaser" -> {
+            case "bclock" -> {
                 caster(ctx, 0, 0);
                 husk(ctx, 4, 0, 6);
                 Vector3f o = new Vector3f(0, 0, 0);
-                LaserModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 3.6f, 0), age, age - 40, 0, 8, 3, 11, 0xFFD25A, 3, LIGHT);
+                ClockModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, age - 40, 0, 12, 3, 11, 0xFFD25A, 3, LIGHT);
             }
             case "blotus" -> {
                 husk(ctx, 1, 0, 1);
                 Vector3f o = new Vector3f(0, 0, 0);
                 LotusModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, age - 40, 7.5f, 0, 0xFF2438, 3, LIGHT);
+            }
+            case "bboard" -> {
+                caster(ctx, 0, -10);
+                husk(ctx, 1, 0, 2);
+                Vector3f o = new Vector3f(0, 0, 0);
+                BoardModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, age - 40, 0, 3, 5, 22, new int[] {0xFF2438, 0x9A3CFF}, 3, LIGHT);
             }
             case "bcollapse" -> {
                 husk(ctx, 5, 0, 4);

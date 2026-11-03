@@ -214,7 +214,7 @@ Les **grandes attaques**, dix de plus, plus fortes (épiques et légendaires), c
 | **Faux de la Faucheuse** (Reaper's Scythe, épique) | Une faux spectrale fauche la moitié devant le lanceur, puis la moitié derrière (9 blocs) ; ceux qu'elle touche se flétrissent. |
 | **Frappe orbitale** (Orbital Strike, épique) | Un anneau de lumière se verrouille sur l'ennemi le plus proche ; une colonne de feu blanc tombe du ciel, puis une onde de choc. |
 | **Spectres royaux** (Spectral Kings, épique) | Quatre rois fantômes aux quatre vents autour de la cible chargent l'un après l'autre à travers elle, le long de quatre bandes marquées. |
-| **Balayage de lumière** (Sweeping Light, rare) | Un œil de lumière au-dessus du lanceur balaie un rayon tout autour : huit parts de sol (11 blocs) brûlent l'une après l'autre. |
+| **Horloge du destin** (Clock of Fate, rare) | Le sol autour du lanceur devient le cadran d'une horloge géante (11 blocs) ; sa grande aiguille d'or balaie le cadran et chaque heure brûle quand elle passe dessus. |
 | **Lotus écarlate** (Crimson Lotus, rare) | Un lotus de verre écarlate éclot sur le point visé : son cœur éclate, puis ses six pétales s'ouvrent et tranchent six parts de sol. |
 | **Effondrement** (Collapse, légendaire) | Une sphère noire attire tout dans 12 blocs pendant 2 s, s'effondre sur son cœur (4 blocs) puis explose vers l'extérieur. |
 | **Colère des Cieux** (Wrath of the Heavens, légendaire) | Une tempête se forme au-dessus du lanceur (roue de nuages sombres autour d'un œil lumineux) et lance 10 à 14 éclairs, chacun marqué là où se tient sa cible quand il est appelé : il faut rester en mouvement. |

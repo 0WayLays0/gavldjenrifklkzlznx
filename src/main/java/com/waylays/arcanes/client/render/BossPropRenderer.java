@@ -5,12 +5,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.client.render.boss.BellModel;
+import com.waylays.arcanes.client.render.boss.BoardModel;
 import com.waylays.arcanes.client.render.boss.ChainsModel;
+import com.waylays.arcanes.client.render.boss.ClockModel;
 import com.waylays.arcanes.client.render.boss.CollapseModel;
 import com.waylays.arcanes.client.render.boss.FistModel;
 import com.waylays.arcanes.client.render.boss.JudgmentLanceModel;
 import com.waylays.arcanes.client.render.boss.KingModel;
-import com.waylays.arcanes.client.render.boss.LaserModel;
 import com.waylays.arcanes.client.render.boss.LotusModel;
 import com.waylays.arcanes.client.render.boss.OrbitalModel;
 import com.waylays.arcanes.client.render.boss.ScytheModel;
@@ -28,8 +29,9 @@ import com.waylays.arcanes.entity.boss.BossProp;
 import com.waylays.arcanes.entity.boss.BossTelegraph;
 import com.waylays.arcanes.spells.boss.BellOfDoomSpell;
 import com.waylays.arcanes.spells.boss.DivinePrismSpell;
+import com.waylays.arcanes.spells.boss.InfernalCheckerboardSpell;
 import com.waylays.arcanes.spells.boss.ReapersScytheSpell;
-import com.waylays.arcanes.spells.boss.SweepingLightSpell;
+import com.waylays.arcanes.spells.boss.ClockOfFateSpell;
 import com.waylays.arcanes.spells.boss.SeraphWingsSpell;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -228,9 +230,11 @@ public class BossPropRenderer extends EntityRenderer<BossProp> {
             case SCYTHE -> ScytheModel.draw(poseStack, buffer, view, age, age - arg, prop.getYRot(), size, ReapersScytheSpell.SWEEP, style.zone, seed, LIGHT);
             case ORBITAL -> OrbitalModel.draw(poseStack, buffer, view, from, age, age - arg, size, style.zone, seed, LIGHT);
             case KING -> KingModel.draw(poseStack, buffer, view, to, age, age - arg, prop.getYRot(), style.zone, seed, LIGHT);
-            case LASER -> LaserModel.draw(poseStack, buffer, view, from, age, age - arg, prop.getYRot(), SweepingLightSpell.SLICES, SweepingLightSpell.STEP, size,
-                    style.zone, seed, LIGHT);
+            case CLOCK -> ClockModel.draw(poseStack, buffer, view, age, age - arg, prop.getYRot(), ClockOfFateSpell.SLICES, ClockOfFateSpell.STEP, size, style.zone,
+                    seed, LIGHT);
             case LOTUS -> LotusModel.draw(poseStack, buffer, view, age, age - arg, size, prop.getYRot(), style.zone, seed, LIGHT);
+            case BOARD -> BoardModel.draw(poseStack, buffer, view, age, age - arg, prop.getYRot(), InfernalCheckerboardSpell.CELL, InfernalCheckerboardSpell.GRID,
+                    InfernalCheckerboardSpell.WAVE, new int[] {BossTelegraph.Style.CRIMSON.zone, BossTelegraph.Style.VOID.zone}, seed, LIGHT);
             case COLLAPSE -> CollapseModel.draw(poseStack, buffer, view, from, age, age - arg, size, style.zone, seed, LIGHT);
             default -> {
             }

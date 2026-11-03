@@ -32,7 +32,7 @@ import com.waylays.arcanes.spells.boss.LancesOfJudgmentSpell;
 import com.waylays.arcanes.spells.boss.ReapersScytheSpell;
 import com.waylays.arcanes.spells.boss.OrbitalStrikeSpell;
 import com.waylays.arcanes.spells.boss.SpectralKingsSpell;
-import com.waylays.arcanes.spells.boss.SweepingLightSpell;
+import com.waylays.arcanes.spells.boss.ClockOfFateSpell;
 import com.waylays.arcanes.spells.boss.CrimsonLotusSpell;
 import com.waylays.arcanes.spells.boss.CollapseSpell;
 import com.waylays.arcanes.spells.boss.WrathOfTheHeavensSpell;
@@ -399,7 +399,7 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> REAPERS_SCYTHE = register(new ReapersScytheSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> ORBITAL_STRIKE = register(new OrbitalStrikeSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SPECTRAL_KINGS = register(new SpectralKingsSpell());
-    public static final DeferredHolder<AbstractSpell, AbstractSpell> SWEEPING_LIGHT = register(new SweepingLightSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CLOCK_OF_FATE = register(new ClockOfFateSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> CRIMSON_LOTUS = register(new CrimsonLotusSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> COLLAPSE = register(new CollapseSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> WRATH_OF_THE_HEAVENS = register(new WrathOfTheHeavensSpell());

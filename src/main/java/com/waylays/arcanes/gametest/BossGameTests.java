@@ -328,12 +328,12 @@ public final class BossGameTests {
         caster.setXRot(60);
         List<AbstractSpell> spells = List.of(ModSpells.BELL_OF_DOOM.get(), ModSpells.INFERNAL_CHECKERBOARD.get(), ModSpells.TITANS_FIST.get(),
                 ModSpells.LANCES_OF_JUDGMENT.get(), ModSpells.REAPERS_SCYTHE.get(), ModSpells.ORBITAL_STRIKE.get(), ModSpells.SPECTRAL_KINGS.get(),
-                ModSpells.SWEEPING_LIGHT.get(), ModSpells.CRIMSON_LOTUS.get(), ModSpells.COLLAPSE.get());
+                ModSpells.CLOCK_OF_FATE.get(), ModSpells.CRIMSON_LOTUS.get(), ModSpells.COLLAPSE.get());
         for (AbstractSpell spell : spells) {
             cast(helper, spell, caster);
         }
         for (BossProp.Kind kind : List.of(BossProp.Kind.BELL, BossProp.Kind.FIST, BossProp.Kind.LANCE, BossProp.Kind.SCYTHE, BossProp.Kind.ORBITAL,
-                BossProp.Kind.KING, BossProp.Kind.LASER, BossProp.Kind.LOTUS, BossProp.Kind.COLLAPSE)) {
+                BossProp.Kind.KING, BossProp.Kind.CLOCK, BossProp.Kind.LOTUS, BossProp.Kind.COLLAPSE)) {
             helper.assertTrue(props(helper, kind) >= 1, "no " + kind + " was shown");
         }
         long kings = props(helper, BossProp.Kind.KING), lances = props(helper, BossProp.Kind.LANCE);
