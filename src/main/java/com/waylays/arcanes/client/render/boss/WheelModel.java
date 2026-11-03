@@ -7,7 +7,11 @@ import com.waylays.arcanes.client.render.ritual.RitualMesh;
 import com.waylays.arcanes.client.render.water.WaterMesh;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
+import org.joml.Matrix3f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import net.minecraft.resources.ResourceLocation;
+import com.waylays.arcanes.ArcanesOublies;
 
 /**
  * The Executioner's Wheel: a great wheel of black iron, its rim ringed with curved blades and wrapped in red fire, a
@@ -15,6 +19,8 @@ import org.joml.Vector3f;
  * whole of it, cutting a burning furrow and throwing sparks behind; at the end it bursts apart in fire.
  */
 public final class WheelModel {
+    private static final ResourceLocation IRON = BellModel.IRON, GOLD = BellModel.GOLD;
+    private static final ResourceLocation STEEL = ArcanesOublies.id("textures/entity/boss/m_steel.png");
     private static final int BLADES = 8;
     private static final int SPOKES = 6;
     private static final int RIM = 40;
@@ -107,84 +113,108 @@ public final class WheelModel {
 
     private static void body(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f centre, Vector3f fwd, Vector3f up, Vector3f axis,
                              float r, float spin, float fade, float age, int seed, int light) {
-        // The rim and an inner ring: tubes of black iron
-        VertexConsumer iron = BossMesh.see(buffer, BossMesh.IRON);
+        // The wheel's own space: its axle along Y, turned by its spin
+        Quaternionf frame = new Matrix3f(new Vector3f(fwd), new Vector3f(axis), new Vector3f(fwd).cross(axis).normalize()).getNormalizedRotation(new Quaternionf())
+                .rotateY(spin);
+        // ---- iron: the rim, an inner ring, the spokes, the hub
+        VertexConsumer iron = BossMesh.solid(buffer, IRON);
+        place(poseStack, centre, frame);
         PoseStack.Pose p = poseStack.last();
-        int metal = BossMesh.argb(0xC8B8B8, fade);
-        ring(iron, p, centre, fwd, up, r, r * .085f, spin, metal, light);
-        ring(iron, p, centre, fwd, up, r * .62f, r * .05f, spin, metal, light);
-        // Spokes and hub
+        Sculpt.torus(iron, p, r, r * .09f, 64, 8, 0, Mth.TWO_PI, 12, 0xFFFFFFFF, light);
+        Sculpt.torus(iron, p, r * .62f, r * .05f, 48, 6, 0, Mth.TWO_PI, 8, 0xFFD8D0E0, light);
         for (int k = 0; k < SPOKES; k++) {
-            float a = k * Mth.TWO_PI / SPOKES - spin;
-            Vector3f d = new Vector3f(fwd).mul(Mth.cos(a)).add(new Vector3f(up).mul(Mth.sin(a)));
-            Vector3f mid = new Vector3f(d).mul(r * .55f).add(centre);
-            BossMesh.box(iron, p, mid, new Vector3f(d).mul(r * .45f), new Vector3f(d).cross(axis).normalize().mul(r * .045f), new Vector3f(axis).mul(r * .045f),
-                    metal, light);
+            float a = k * Mth.TWO_PI / SPOKES;
+            poseStack.pushPose();
+            poseStack.mulPose(new Quaternionf().rotationY(-a));
+            poseStack.translate(r * .55f, 0, 0);
+            Sculpt.block(iron, poseStack.last(), r * .9f, r * .07f, r * .1f, r * .015f, .5f, 0xFFFFFFFF, light);
+            poseStack.popPose();
         }
-        BossMesh.box(iron, p, centre, new Vector3f(fwd).mul(r * .16f), new Vector3f(up).mul(r * .16f), new Vector3f(axis).mul(r * .2f), metal, light);
-        // The blades: curved, sweeping back from the rim against its turning
-        VertexConsumer steel = BossMesh.see(buffer, BossMesh.SWORD);
+        Sculpt.lathe(iron, p, new float[] {0, -r * .26f, r * .16f, -r * .25f, r * .2f, -r * .16f, r * .2f, r * .16f, r * .16f, r * .25f, 0, r * .26f}, 20, 2, 1,
+                0xFFFFFFFF, 0xFFFFFFFF, light);
+        poseStack.popPose();
+        // ---- gold: studs round the rim, caps on the spokes, the hub's spikes
+        VertexConsumer gold = BossMesh.solid(buffer, GOLD);
+        place(poseStack, centre, frame);
         p = poseStack.last();
-        int blade = BossMesh.argb(0x9A8080, .95f * fade);
+        for (int k = 0; k < 16; k++) {
+            float a = (k + .5f) * Mth.TWO_PI / 16;
+            for (int side = -1; side <= 1; side += 2) {
+                poseStack.pushPose();
+                poseStack.translate(Mth.cos(a) * r, side * r * .085f, Mth.sin(a) * r);
+                poseStack.mulPose(new Quaternionf().rotationX(side < 0 ? Mth.PI : 0));
+                Sculpt.lathe(gold, poseStack.last(), new float[] {r * .05f, 0, r * .045f, r * .025f, 0, r * .035f}, 8, 1, 1, 0xFFFFFFFF, 0xFFFFFFFF, light);
+                poseStack.popPose();
+            }
+        }
+        for (int k = 0; k < SPOKES; k++) {
+            float a = k * Mth.TWO_PI / SPOKES;
+            for (float rr : new float[] {r * .23f, r * .62f, r * .9f}) {
+                poseStack.pushPose();
+                poseStack.translate(Mth.cos(a) * rr, 0, Mth.sin(a) * rr);
+                Sculpt.torus(gold, poseStack.last(), r * .055f, r * .025f, 10, 5, 0, Mth.TWO_PI, 1, 0xFFFFFFFF, light);
+                poseStack.popPose();
+            }
+        }
+        for (int side = -1; side <= 1; side += 2) {
+            BossMesh.horn(gold, p, new Vector3f(0, side * r * .25f, 0), new Vector3f(0, side, 0), new Vector3f(), r * .32f, r * .09f, 8, 3, 0xFFFFFFFF, 0xFFFFF0C0,
+                    light);
+            Sculpt.torus(gold, p, r * .2f, r * .03f, 20, 5, 0, Mth.TWO_PI, 3, 0xFFFFFFFF, light);
+        }
+        poseStack.popPose();
+        // ---- steel: the blades, curved, sweeping back from the rim against its turning
+        VertexConsumer steel = BossMesh.solid(buffer, STEEL);
+        place(poseStack, centre, frame);
+        p = poseStack.last();
         Vector3f[][] edges = new Vector3f[BLADES][];
         for (int k = 0; k < BLADES; k++) {
-            float a0 = k * Mth.TWO_PI / BLADES - spin;
-            int n = 6;
-            Vector3f[] lead = new Vector3f[n + 1], trail = new Vector3f[n + 1];
-            for (int i = 0; i <= n; i++) {
-                float t = (float) i / n;
-                float a = a0 + .55f * t;
-                float rr = r * (1 + .5f * t);
-                float w = r * .2f * (float) Math.pow(1 - t, .7f);
-                Vector3f out = new Vector3f(fwd).mul(Mth.cos(a)).add(new Vector3f(up).mul(Mth.sin(a)));
-                Vector3f tan = new Vector3f(fwd).mul(-Mth.sin(a)).add(new Vector3f(up).mul(Mth.cos(a)));
-                Vector3f mid = new Vector3f(out).mul(rr).add(centre);
-                lead[i] = new Vector3f(tan).mul(-w * .5f).add(mid);
-                trail[i] = new Vector3f(tan).mul(w * .5f).add(mid);
-            }
+            float a0 = k * Mth.TWO_PI / BLADES;
+            int n = 7;
+            Vector3f[] path = new Vector3f[n];
+            float[] wid = new float[n], th = new float[n];
+            Vector3f[] edge = new Vector3f[n];
             for (int i = 0; i < n; i++) {
-                float v0 = (float) i / n, v1 = (float) (i + 1) / n;
-                BossMesh.quad2(steel, p, lead[i], trail[i], trail[i + 1], lead[i + 1], 0, 1 - v0, 1, 1 - v0, 1, 1 - v1, 0, 1 - v1, blade, blade, light);
+                float t = (float) i / (n - 1);
+                float a = a0 + .6f * t;
+                float rr = r * (.95f + .55f * t);
+                path[i] = new Vector3f(Mth.cos(a) * rr, 0, Mth.sin(a) * rr);
+                wid[i] = r * .13f * (float) Math.pow(1 - t, .6f) + .01f;
+                th[i] = r * .02f * (1 - t) + .005f;
+                // The edge leads: toward the way the wheel turns
+                edge[i] = new Vector3f(-Mth.sin(a), 0, Mth.cos(a)).mul(-wid[i]).add(path[i]);
             }
-            edges[k] = lead;
+            Sculpt.sweep(steel, p, path, wid, th, Sculpt.WEDGE, true, new Vector3f(0, 0, 1), .5f / r, Sculpt.fill(0xFFE0D8D8, n), true, light);
+            edges[k] = edge;
         }
-        // Their edges, white-hot
+        poseStack.popPose();
+        // ---- light: the edges white-hot, the runes at the hub, the glow
         VertexConsumer edge = BossMesh.light(buffer, BossMesh.BEAM);
-        p = poseStack.last();
         for (Vector3f[] lead : edges) {
+            Vector3f[] world = new Vector3f[lead.length];
             int[] col = new int[lead.length];
             for (int i = 0; i < lead.length; i++) {
+                world[i] = frame.transform(new Vector3f(lead[i])).add(centre);
                 col[i] = BossMesh.glow(i > lead.length - 3 ? 0xFFFFFF : 0xFF5A3A, fade * (.6f + .4f * i / (lead.length - 1)));
             }
-            RitualMesh.thread(edge, p, view.eye(), lead, r * .09f, col, light);
+            RitualMesh.thread(edge, poseStack.last(), view.eye(), world, r * .08f, col, light);
         }
-        // Runes turning at its hub, both faces
         VertexConsumer runes = BossMesh.light(buffer, BossMesh.RUNES);
         p = poseStack.last();
         float cs = Mth.cos(-spin), sn = Mth.sin(-spin);
         Vector3f ru = new Vector3f(fwd).mul(cs).add(new Vector3f(up).mul(sn)), rv = new Vector3f(fwd).mul(-sn).add(new Vector3f(up).mul(cs));
         for (int side = -1; side <= 1; side += 2) {
-            Vector3f at = new Vector3f(axis).mul(side * r * .21f).add(centre);
+            Vector3f at = new Vector3f(axis).mul(side * r * .14f).add(centre);
             BossMesh.plate(runes, p, at, ru, rv, r * 1.15f, BossMesh.glow(0xFF4030, fade * (.75f + .25f * Mth.sin(age * .3f))), light);
         }
         VertexConsumer glow = BossMesh.light(buffer, BossMesh.GLOW);
-        RitualMesh.billboard(glow, poseStack, view, centre, r * 1.1f, 0, -1, BossMesh.glow(0xFF4030, .55f * fade), light);
-        RitualMesh.billboard(glow, poseStack, view, centre, r * 3.4f, 0, -1, BossMesh.glow(0xB01810, .35f * fade), light);
+        RitualMesh.billboard(glow, poseStack, view, centre, r * 1.1f, 0, -1, BossMesh.glow(0xFF4030, .45f * fade), light);
+        RitualMesh.billboard(glow, poseStack, view, centre, r * 3.4f, 0, -1, BossMesh.glow(0xB01810, .3f * fade), light);
     }
 
-    /** A tube bent into a circle of {@code r} round {@code centre} in the plane of {@code u} and {@code v}. */
-    private static void ring(VertexConsumer c, PoseStack.Pose p, Vector3f centre, Vector3f u, Vector3f v, float r, float thick, float spin, int argb, int light) {
-        Vector3f[] axis = new Vector3f[RIM + 1];
-        float[] rad = new float[RIM + 1];
-        int[] col = new int[RIM + 1];
-        for (int i = 0; i <= RIM; i++) {
-            float a = i * Mth.TWO_PI / RIM - spin;
-            axis[i] = new Vector3f(u).mul(Mth.cos(a) * r).add(new Vector3f(v).mul(Mth.sin(a) * r)).add(centre);
-            rad[i] = thick;
-            col[i] = argb;
-        }
-        // Close the loop smoothly: the tube works its ends' tangents from their neighbours
-        axis[RIM] = new Vector3f(axis[0]);
-        WaterMesh.tube(c, p, axis, rad, col, 6, 0, 1, 0, .8f, 0, 0, light);
+    private static void place(PoseStack poseStack, Vector3f centre, Quaternionf frame) {
+        poseStack.pushPose();
+        poseStack.translate(centre.x, centre.y, centre.z);
+        poseStack.mulPose(frame);
     }
+
 }

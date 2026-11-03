@@ -6,8 +6,6 @@ import com.waylays.arcanes.client.render.ritual.RitualMesh;
 import com.waylays.arcanes.client.render.water.WaterMesh;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
-import net.minecraft.resources.ResourceLocation;
-import com.waylays.arcanes.ArcanesOublies;
 import org.joml.Matrix3f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -23,7 +21,6 @@ public final class SwordModel {
     /** How long it stands in the ground after (ticks). */
     public static final int STAND = 18;
     private static final int BLADE_STEPS = 7;
-    private static final ResourceLocation STEEL = ArcanesOublies.id("textures/entity/boss/m_steel.png");
 
     private SwordModel() {}
 
@@ -135,21 +132,54 @@ public final class SwordModel {
     }
 
     /**
-     * A sword, its point at {@code tip}, its blade running back from it against {@code dir}, flat across {@code flat};
-     * {@code length} from point to pommel. A blade of folded steel with a burning fuller, a guard of gold with its
-     * quillons swept toward the point, a grip bound in gold wire, a pommel set with a gem; light along its edges.
-     * Sinking into the ground as {@code alpha} falls (solid steel does not fade).
+     * A sword of light, its point at {@code tip}, its blade running back from it against {@code dir}, flat across
+     * {@code flat}; {@code length} from point to pommel. Its shape is a real sword's (a diamond blade with a burning
+     * fuller, a guard with its quillons swept toward the point, a grip bound with rings, a round pommel), but it is made
+     * of light: a pale see-through body, the same shape again glowing over it, fading with {@code alpha}.
      */
     public static void sword(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f tip, Vector3f dir, Vector3f flat, Vector3f thick,
                              float length, int color, float alpha, int light) {
         Vector3f back = new Vector3f(dir).negate();
         Quaternionf frame = new Matrix3f(new Vector3f(flat).normalize(), back, new Vector3f(thick).normalize()).getNormalizedRotation(new Quaternionf());
-        Vector3f at = new Vector3f(tip).add(new Vector3f(dir).mul((1 - alpha) * length * .7f));
-        float l = length;
-        float blade = l * .74f;
-        float w = l * .085f;
-        // ---- the blade (steel)
-        VertexConsumer steel = BossMesh.solid(buffer, STEEL);
+        float l = length, blade = l * .74f, w = l * .085f;
+        int pale = BossMesh.mix(color, 0xFFFFFF, .55f);
+        // The body: pale light seen through, then the same shape glowing over it
+        VertexConsumer body = BossMesh.see(buffer, BossMesh.SWORD);
+        shape(body, poseStack, tip, frame, l, BossMesh.argb(pale, .6f * alpha), BossMesh.argb(BossMesh.mix(0xFFE0A0, color, .3f), .75f * alpha), light);
+        VertexConsumer shine = BossMesh.light(buffer, BossMesh.SWORD);
+        shape(shine, poseStack, tip, frame, l, BossMesh.glow(color, .7f * alpha), BossMesh.glow(BossMesh.mix(0xFFD070, color, .3f), .6f * alpha), light);
+        // The fuller, white-hot down the middle of each face
+        VertexConsumer fuller = BossMesh.light(buffer, BossMesh.BEAM);
+        place(poseStack, tip, frame);
+        int lit = BossMesh.glow(0xFFFFFF, .9f * alpha);
+        for (int side = -1; side <= 1; side += 2) {
+            float z = side * (w * .2f + .006f) * 1.1f;
+            Vector3f a0 = new Vector3f(-w * .2f, blade * .1f, z), a1 = new Vector3f(w * .2f, blade * .1f, z);
+            Vector3f b1 = new Vector3f(w * .2f, blade * .94f, z), b0 = new Vector3f(-w * .2f, blade * .94f, z);
+            Vector3f n = new Vector3f(0, 0, side);
+            if (side > 0) {
+                Sculpt.put(fuller, poseStack.last(), a0, 0, 0, lit, light, n);
+                Sculpt.put(fuller, poseStack.last(), a1, 1, 0, lit, light, n);
+                Sculpt.put(fuller, poseStack.last(), b1, 1, 1, lit, light, n);
+                Sculpt.put(fuller, poseStack.last(), b0, 0, 1, lit, light, n);
+            } else {
+                Sculpt.put(fuller, poseStack.last(), b0, 0, 1, lit, light, n);
+                Sculpt.put(fuller, poseStack.last(), b1, 1, 1, lit, light, n);
+                Sculpt.put(fuller, poseStack.last(), a1, 1, 0, lit, light, n);
+                Sculpt.put(fuller, poseStack.last(), a0, 0, 0, lit, light, n);
+            }
+        }
+        poseStack.popPose();
+        VertexConsumer glow = BossMesh.light(buffer, BossMesh.GLOW);
+        Vector3f guard = new Vector3f(dir).mul(-blade).add(tip);
+        RitualMesh.billboard(glow, poseStack, view, guard, length * .55f, 0, -1, BossMesh.glow(color, .55f * alpha), light);
+        RitualMesh.billboard(glow, poseStack, view, new Vector3f(dir).mul(-blade * .45f).add(tip), length * .9f, 0, -1, BossMesh.glow(color, .22f * alpha), light);
+        RitualMesh.billboard(glow, poseStack, view, new Vector3f(dir).mul(-length * .98f).add(tip), length * .2f, 0, -1, BossMesh.glow(0xFFFFFF, .6f * alpha), light);
+    }
+
+    /** The sword's shape, its point at {@code at}: the blade in {@code bladeColor}, the hilt in {@code hiltColor}. */
+    private static void shape(VertexConsumer c, PoseStack poseStack, Vector3f at, Quaternionf frame, float l, int bladeColor, int hiltColor, int light) {
+        float blade = l * .74f, w = l * .085f;
         place(poseStack, at, frame);
         int n = BLADE_STEPS + 1;
         Vector3f[] path = new Vector3f[n];
@@ -160,61 +190,25 @@ public final class SwordModel {
             sx[i] = w * (float) Math.pow(Math.min(1, t / .22f), .7f) * (1 - .15f * t) + .005f;
             sy[i] = sx[i] * .2f + .006f;
         }
-        Sculpt.sweep(steel, poseStack.last(), path, sx, sy, Sculpt.DIAMOND, true, new Vector3f(1, 0, 0), .5f / l, Sculpt.fill(0xFFE8ECF4, n), true, light);
-        poseStack.popPose();
-        // ---- the hilt (gold): the guard, the wire on the grip, the pommel
-        VertexConsumer gold = BossMesh.solid(buffer, BellModel.GOLD);
-        place(poseStack, at, frame);
+        Sculpt.sweep(c, poseStack.last(), path, sx, sy, Sculpt.DIAMOND, true, new Vector3f(1, 0, 0), 1 / blade, Sculpt.fill(bladeColor, n), true, light);
         poseStack.translate(0, blade, 0);
         float g = l * .2f, gh = l * .02f;
-        Sculpt.slab(gold, poseStack.last(), new float[] {-g * .55f, -gh, -g * .85f, -gh * 2.2f, -g, -gh * 3.6f, -g * .94f, -gh * .2f, -g * .55f, gh, -w * .9f, gh * 1.6f,
+        Sculpt.slab(c, poseStack.last(), new float[] {-g * .55f, -gh, -g * .85f, -gh * 2.2f, -g, -gh * 3.6f, -g * .94f, -gh * .2f, -g * .55f, gh, -w * .9f, gh * 1.6f,
                 0, gh * 2.4f, w * .9f, gh * 1.6f, g * .55f, gh, g * .94f, -gh * .2f, g, -gh * 3.6f, g * .85f, -gh * 2.2f, g * .55f, -gh, w * .9f, -gh * 1.4f, 0, -gh * 2.6f,
-                -w * .9f, -gh * 1.4f}, w * .38f, w * .06f, 4 / l, 0xFFFFFFFF, 0xFFE0B060, light);
+                -w * .9f, -gh * 1.4f}, w * .38f, w * .06f, 4 / l, hiltColor, hiltColor, light);
         float grip = l * .17f;
+        Vector3f[] gripPath = {new Vector3f(0, gh * 2.4f, 0), new Vector3f(0, gh * 2.4f + grip, 0)};
+        Sculpt.sweep(c, poseStack.last(), gripPath, Sculpt.fill(w * .26f, 2), Sculpt.fill(w * .26f, 2), Sculpt.circle(8), false, null, 1, Sculpt.fill(hiltColor, 2), true,
+                light);
         for (int k = 0; k < 4; k++) {
             poseStack.pushPose();
             poseStack.translate(0, gh * 2.4f + (k + .5f) * grip / 4, 0);
-            Sculpt.torus(gold, poseStack.last(), w * .3f, w * .07f, 10, 4, 0, Mth.TWO_PI, 2, 0xFFFFFFFF, light);
+            Sculpt.torus(c, poseStack.last(), w * .3f, w * .07f, 10, 4, 0, Mth.TWO_PI, 2, hiltColor, light);
             poseStack.popPose();
         }
         poseStack.translate(0, gh * 2.4f + grip + w * .32f, 0);
-        Sculpt.lathe(gold, poseStack.last(), BellModel.sphere(w * .42f, 8), 10, 1, 1, 0xFFFFFFFF, 0xFFFFFFFF, light);
+        Sculpt.lathe(c, poseStack.last(), BellModel.sphere(w * .42f, 8), 10, 1, 1, hiltColor, hiltColor, light);
         poseStack.popPose();
-        // ---- the grip itself (dark leather) and the gems
-        VertexConsumer dark = BossMesh.solid(buffer, BellModel.IRON);
-        place(poseStack, at, frame);
-        Vector3f[] gripPath = {new Vector3f(0, blade, 0), new Vector3f(0, blade + gh * 2.4f + grip, 0)};
-        Sculpt.sweep(dark, poseStack.last(), gripPath, Sculpt.fill(w * .3f, 2), Sculpt.fill(w * .3f, 2), Sculpt.circle(8), false, null, 1, Sculpt.fill(0xFF6A4A3A, 2), true,
-                light);
-        poseStack.translate(0, blade + gh * .3f, w * .35f);
-        poseStack.mulPose(new Quaternionf().rotationX(Mth.HALF_PI));
-        Sculpt.gem(dark, poseStack.last(), w * .3f, w * .15f, w * .1f, 6, BossMesh.mix(color, 0xFFFFFF, .2f) | 0xFF000000, light);
-        poseStack.popPose();
-        // ---- light: the fuller, the edges, a halo at the guard
-        VertexConsumer fuller = BossMesh.light(buffer, BossMesh.BEAM);
-        place(poseStack, at, frame);
-        int lit = BossMesh.glow(color, .9f * alpha);
-        for (int side = -1; side <= 1; side += 2) {
-            float z = side * (w * .2f + .006f) * 1.1f;
-            Vector3f a0 = new Vector3f(-w * .18f, blade * .12f, z), a1 = new Vector3f(w * .18f, blade * .12f, z);
-            Vector3f b1 = new Vector3f(w * .18f, blade * .92f, z), b0 = new Vector3f(-w * .18f, blade * .92f, z);
-            if (side > 0) {
-                Sculpt.put(fuller, poseStack.last(), a0, 0, 0, lit, light, new Vector3f(0, 0, 1));
-                Sculpt.put(fuller, poseStack.last(), a1, 1, 0, lit, light, new Vector3f(0, 0, 1));
-                Sculpt.put(fuller, poseStack.last(), b1, 1, 1, lit, light, new Vector3f(0, 0, 1));
-                Sculpt.put(fuller, poseStack.last(), b0, 0, 1, lit, light, new Vector3f(0, 0, 1));
-            } else {
-                Sculpt.put(fuller, poseStack.last(), b0, 0, 1, lit, light, new Vector3f(0, 0, -1));
-                Sculpt.put(fuller, poseStack.last(), b1, 1, 1, lit, light, new Vector3f(0, 0, -1));
-                Sculpt.put(fuller, poseStack.last(), a1, 1, 0, lit, light, new Vector3f(0, 0, -1));
-                Sculpt.put(fuller, poseStack.last(), a0, 0, 0, lit, light, new Vector3f(0, 0, -1));
-            }
-        }
-        poseStack.popPose();
-        VertexConsumer glow = BossMesh.light(buffer, BossMesh.GLOW);
-        Vector3f guard = new Vector3f(dir).mul(-blade).add(at);
-        RitualMesh.billboard(glow, poseStack, view, guard, length * .45f, 0, -1, BossMesh.glow(color, .5f * alpha), light);
-        RitualMesh.billboard(glow, poseStack, view, new Vector3f(dir).mul(-blade * .45f).add(at), length * .7f, 0, -1, BossMesh.glow(color, .16f * alpha), light);
     }
 
     private static void place(PoseStack poseStack, Vector3f at, Quaternionf frame) {
