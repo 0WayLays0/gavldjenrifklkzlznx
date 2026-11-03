@@ -1,6 +1,7 @@
 package com.waylays.arcanes.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.waylays.arcanes.client.render.boss.PrisonModel;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.entity.boss.RuneWall;
@@ -34,6 +35,8 @@ public class RuneWallRenderer extends EntityRenderer<RuneWall> {
         }
         float age = wall.tickCount + partialTicks;
         float r = wall.getRadius();
+        // Its standing stones, then the wall of runes between them
+        PrisonModel.draw(poseStack, buffer, WaterViews.of(this.entityRenderDispatcher, wall, partialTicks), r, RuneWall.HEIGHT, standing, age, LIGHT);
         float h = RuneWall.HEIGHT * standing;
         int n = Mth.clamp(Mth.ceil(Mth.TWO_PI * r / 1.5f), 16, 96);
         float pulse = .75f + .25f * Mth.sin(age * .2f);

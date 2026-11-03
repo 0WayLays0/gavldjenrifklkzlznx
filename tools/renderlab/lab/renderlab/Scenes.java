@@ -470,6 +470,12 @@ public final class Scenes {
                 Vector3f o = new Vector3f(0, 0, 0);
                 CannonModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), 1.3f, Math.min(1, age / 40), age - 40, 40, age, 20, 2.6f, LIGHT);
             }
+            case "bprison" -> {
+                husk(ctx, 0, 0, 0);
+                caster(ctx, 0, -9);
+                Vector3f o = new Vector3f(0, 0, 0);
+                PrisonModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 6, 4, Math.min(1, age / 10), age, LIGHT);
+            }
             case "bcollapse" -> {
                 husk(ctx, 5, 0, 4);
                 Vector3f o = new Vector3f(0, 0, 0);
