@@ -66,6 +66,38 @@ public final class StormModel {
         float er = radius * .32f * gather;
         BossMesh.plate(swirl, poseStack.last(), eye, new Vector3f(Mth.cos(-age * .05f), 0, Mth.sin(-age * .05f)), new Vector3f(-Mth.sin(-age * .05f), 0,
                 Mth.cos(-age * .05f)), er * 2, BossMesh.glow(0x6AA8FF, .8f * body), light);
+        // Rain falling in curtains from its underside
+        VertexConsumer rain = BossMesh.light(buffer, BossMesh.BEAM);
+        for (int k = 0; k < 40; k++) {
+            float a = BossMesh.hash(seed + k * 19) * Mth.TWO_PI + turn;
+            float r = radius * (.2f + .75f * BossMesh.hash(seed + k * 23)) * gather;
+            float fall = (age * .9f + BossMesh.hash(seed + k * 29) * height) % height;
+            Vector3f top = new Vector3f(Mth.cos(a) * r, height - 1.5f - fall, Mth.sin(a) * r);
+            RitualMesh.shaft(rain, poseStack.last(), view.eye(), top, new Vector3f(top).add(.4f, -3.5f, .2f), .08f, BossMesh.glow(0x9AB8E0, .45f * body), light);
+        }
+        // The eye's frame: a ring of gold, rays of gold round it, and the black slit of its pupil
+        VertexConsumer gold = BossMesh.solid(buffer, BellModel.GOLD);
+        poseStack.pushPose();
+        poseStack.translate(eye.x, eye.y + .1f, eye.z);
+        poseStack.mulPose(new org.joml.Quaternionf().rotationY(age * .01f));
+        Sculpt.torus(gold, poseStack.last(), er * 1.02f, er * .07f, 48, 6, 0, Mth.TWO_PI, 8, 0xFFFFFFFF, light);
+        Sculpt.torus(gold, poseStack.last(), er * 1.2f, er * .035f, 48, 5, 0, Mth.TWO_PI, 8, 0xFFE0C080, light);
+        for (int k = 0; k < 16; k++) {
+            float a = k * Mth.TWO_PI / 16;
+            float len = er * (k % 2 == 0 ? .7f : .4f);
+            BossMesh.horn(gold, poseStack.last(), new Vector3f(Mth.cos(a) * er * 1.05f, 0, Mth.sin(a) * er * 1.05f), new Vector3f(Mth.cos(a), -.15f, Mth.sin(a))
+                    .normalize(), new Vector3f(0, -.1f, 0), len, er * .06f, 5, 3, 0xFFFFFFFF, 0xFFFFF0C0, light);
+        }
+        poseStack.popPose();
+        VertexConsumer dark = BossMesh.solid(buffer, BellModel.IRON);
+        poseStack.pushPose();
+        poseStack.translate(eye.x, eye.y - .05f, eye.z);
+        // The pupil follows the bolts: it narrows as it strikes
+        float narrow = .35f + .25f * Mth.sin(age * .2f);
+        poseStack.mulPose(new org.joml.Quaternionf().rotationY(-age * .03f).rotateX(Mth.HALF_PI));
+        Sculpt.slab(dark, poseStack.last(), new float[] {0, -er * .8f, er * .12f * narrow * 2, -er * .3f, er * .14f * narrow * 2, 0, er * .12f * narrow * 2, er * .3f, 0,
+                er * .8f, -er * .12f * narrow * 2, er * .3f, -er * .14f * narrow * 2, 0, -er * .12f * narrow * 2, -er * .3f}, .08f, .02f, 1, 0xFF05060A, 0xFF05060A, light);
+        poseStack.popPose();
         VertexConsumer glow = BossMesh.light(buffer, BossMesh.GLOW);
         RitualMesh.billboard(glow, poseStack, view, eye, er * 2.6f, 0, -1, BossMesh.glow(0x5A8CFF, .5f * body), light);
         // Lightning flickering inside the cloud
