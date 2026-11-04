@@ -1619,5 +1619,10 @@
   "ui.arcanes_oublies.bombs": "%s Bombs: %s Damage Each",
   "death.attack.clockwork_magic": "%1$s was caught in the gears",
   "death.attack.clockwork_magic.player": "%1$s was caught in %2$s's gears",
-  "death.attack.clockwork_magic.item": "%1$s was caught in %2$s's gears using %3$s"
+  "death.attack.clockwork_magic.item": "%1$s was caught in %2$s's gears using %3$s",
+  "entity.arcanes_oublies.mana_salamander": "Mana Salamander",
+  "spell.arcanes_oublies.mana_salamander": "Mana Salamander",
+  "spell.arcanes_oublies.mana_salamander.guide": "Summon a salamander of red mana, embers glowing in its veins. Its bite sets your enemies on fire, and when they come close it breathes a gout of flame over them; fire cannot hurt it. Cast again to send it away.",
+  "ui.arcanes_oublies.bite_burns": "Bite Sets on Fire for %s s",
+  "ui.arcanes_oublies.fire_breath": "Breathes Fire Every %s"
 }

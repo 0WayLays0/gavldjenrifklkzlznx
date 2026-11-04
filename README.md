@@ -104,6 +104,7 @@ laissent rien en mourant et se dissolvent en étincelles quand leur temps est é
 | **Dromadaire de Mana** (Mana Dromedary) | Un dromadaire sellé : clic droit pour le monter, avec la ruée du chameau ; un second joueur peut monter derrière le lanceur. 2 à 4 min. |
 | **Serpent de Mana** (Mana Serpent) | Un serpent qui ondule en S ; sa morsure empoisonne (Poison II au niveau 4) et ralentit. |
 | **Corbeau de Mana** (Mana Crow) | Un corbeau qui vole comme un oiseau : battements d'ailes, vol plané en descente, cercles au-dessus du lanceur, piqués sur les ennemis. |
+| **Salamandre de Mana** (Mana Salamander) | Une salamandre de mana **rouge**, des braises dans les veines et une crête de petites flammes sur le dos : elle ondule comme un lézard, sa morsure met le feu (4 s) et, toutes les 3 s, elle crache un jet de flammes sur les ennemis proches devant elle (seulement ceux qu'elle combat). Le feu ne lui fait rien ; elle n'enflamme jamais les blocs. |
 
 Chaque sort n'invoque qu'une seule créature (plus forte qu'un membre des anciennes nuées) ; le relancer la renvoie.
 Les créatures de sorts différents peuvent se battre ensemble.

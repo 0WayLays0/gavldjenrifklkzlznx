@@ -203,15 +203,34 @@ def mainspring_leap_icon():
 
 def gear_trap_icon():
     def draw(d, img, S):
-        d.ellipse((.1 * S, .62 * S, .9 * S, .9 * S), fill=_a((60, 44, 30)), outline=_a(BRASS_DARK))
+        cx, cy = .5, .62
+        # The brass gear it lies on, seen at a slant
+        pts = []
+        for k in range(48):
+            a = k * math.tau / 48
+            r = .44 if (k // 2) % 2 == 0 else .4
+            pts.append(((cx + math.cos(a) * r) * S, (cy + math.sin(a) * r * .55) * S))
+        d.polygon(pts, fill=_a(BRASS), outline=_a(BRASS_DARK))
+        d.ellipse(((cx - .3) * S, (cy - .17) * S, (cx + .3) * S, (cy + .17) * S), fill=_a((74, 52, 30)))
+        # The two jaws standing open, steel teeth along their inner edges
         for side in (-1, 1):
+            outer, inner = [], []
+            for k in range(13):
+                a = math.pi * k / 12
+                x = cx + side * (.06 + math.sin(a) * .26)
+                outer.append((x * S, (cy - math.cos(a) * .0 - .02 - math.sin(a) * .36 + .36 * (1 - math.cos(a)) * 0) * S))
             jaw = []
             for k in range(13):
-                a = math.pi * (k / 12)
-                r = .32 if k % 2 == 0 else .25
-                jaw.append(((.5 + side * (.04 + math.sin(a) * r * .55)) * S, (.76 - math.cos(a) * r * 1.3 + .02) * S))
-            d.polygon(jaw, fill=_a(STEEL_LIGHT if side < 0 else STEEL), outline=_a(STEEL_DARK))
-        _gear(d, S, .5, .8, .1, 10, BRASS, BRASS_DARK, .2, 3)
+                a = math.pi * k / 12
+                jaw.append(((cx + side * (.05 + math.sin(a) * .3)) * S, (cy - .38 * math.sin(a) * .2 - .34 * (1 - abs(math.cos(a))) - .02) * S))
+            teeth = []
+            for k in range(12, -1, -1):
+                a = math.pi * k / 12
+                r = .18 if k % 2 else .24
+                teeth.append(((cx + side * (.05 + math.sin(a) * r)) * S, (cy - .26 * (1 - abs(math.cos(a))) * (r / .24) - .02) * S))
+            d.polygon(jaw + teeth, fill=_a(STEEL_LIGHT if side < 0 else STEEL), outline=_a(STEEL_DARK))
+        d.ellipse(((cx - .06) * S, (cy - .05) * S, (cx + .06) * S, (cy + .05) * S), fill=_a(CORE))
+        g.glow_spot(img, cx * S, cy * S, .12 * S, CORE, .8)
     return _icon(draw)
 
 

@@ -29,6 +29,7 @@ import com.waylays.arcanes.entity.errethys.ManaCamel;
 import com.waylays.arcanes.entity.errethys.ManaWolf;
 import com.waylays.arcanes.entity.errethys.ManaKangaroo;
 import com.waylays.arcanes.entity.errethys.ManaFox;
+import com.waylays.arcanes.entity.errethys.ManaSalamander;
 import com.waylays.arcanes.entity.errethys.ManaFalcon;
 import com.waylays.arcanes.entity.errethys.ManaButterfly;
 import com.waylays.arcanes.entity.errethys.ManaCrow;
@@ -351,6 +352,8 @@ public final class ModEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<ManaFox>> MANA_FOX = register("mana_fox",
             EntityType.Builder.<ManaFox>of(ManaFox::new, MobCategory.MISC).sized(.6f, .7f).clientTrackingRange(10));
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaSalamander>> MANA_SALAMANDER = register("mana_salamander",
+            EntityType.Builder.<ManaSalamander>of(ManaSalamander::new, MobCategory.MISC).sized(.7f, .5f).clientTrackingRange(10).fireImmune());
 
     public static final DeferredHolder<EntityType<?>, EntityType<ManaWolf>> MANA_WOLF = register("mana_wolf",
             EntityType.Builder.<ManaWolf>of(ManaWolf::new, MobCategory.MISC).sized(.7f, .95f).clientTrackingRange(10));
@@ -714,6 +717,7 @@ public final class ModEntities {
         event.put(MANA_CROW.get(), ManaCrow.createAttributes().build());
         event.put(MANA_DROMEDARY.get(), ManaCamel.createAttributes().build());
         event.put(MANA_FOX.get(), ManaFox.createAttributes().build());
+        event.put(MANA_SALAMANDER.get(), ManaSalamander.createAttributes().build());
         event.put(MANA_WOLF.get(), ManaWolf.createAttributes().build());
         event.put(MANA_BUTTERFLY.get(), ManaButterfly.createAttributes().build());
         event.put(MANA_KANGAROO.get(), ManaKangaroo.createAttributes().build());

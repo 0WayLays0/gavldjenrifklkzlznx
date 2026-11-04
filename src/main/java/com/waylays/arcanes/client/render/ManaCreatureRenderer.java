@@ -16,7 +16,8 @@ import javax.annotation.Nullable;
 /**
  * An Errethys creature: the model drawn in translucent sky-blue mana, with a second additive pass that makes its
  * veins of light glow from within. The mana skin has no fixed layout, so it fits any model; skins "with eyes" add
- * a bright corner that the addon's own models map their eyes to.
+ * a bright corner that the addon's own models map their eyes to. A creature of another mana (the red salamander) brings its
+ * own skin and glow.
  */
 public class ManaCreatureRenderer<T extends Mob, M extends EntityModel<T>> extends MobRenderer<T, M> {
     public static final ResourceLocation SKIN = ArcanesOublies.id("textures/entity/mana_skin.png");
@@ -27,11 +28,20 @@ public class ManaCreatureRenderer<T extends Mob, M extends EntityModel<T>> exten
     private final ResourceLocation skin;
     private final float scale;
 
+    /** The red mana of the salamander, with eyes: its skin and its glow. */
+    public static final ResourceLocation RED_SKIN_EYES = ArcanesOublies.id("textures/entity/mana_skin_red_eyes.png");
+    public static final ResourceLocation RED_GLOW_EYES = ArcanesOublies.id("textures/entity/mana_glow_red_eyes.png");
+
     public ManaCreatureRenderer(EntityRendererProvider.Context context, M model, float shadow, float scale, boolean eyes) {
+        this(context, model, shadow, scale, eyes ? SKIN_EYES : SKIN, eyes ? GLOW_EYES : GLOW);
+    }
+
+    /** A creature of another mana: its own {@code skin} and {@code glow}. */
+    public ManaCreatureRenderer(EntityRendererProvider.Context context, M model, float shadow, float scale, ResourceLocation skin, ResourceLocation glow) {
         super(context, model, shadow * scale);
-        this.skin = eyes ? SKIN_EYES : SKIN;
+        this.skin = skin;
         this.scale = scale;
-        addLayer(glowLayer(this, eyes ? GLOW_EYES : GLOW));
+        addLayer(glowLayer(this, glow));
     }
 
     /** The additive pass that lights the creature from within. */

@@ -8,6 +8,7 @@ import com.waylays.arcanes.entity.errethys.ManaCamel;
 import com.waylays.arcanes.entity.errethys.ManaCrow;
 import com.waylays.arcanes.entity.errethys.ManaFalcon;
 import com.waylays.arcanes.entity.errethys.ManaFox;
+import com.waylays.arcanes.entity.errethys.ManaSalamander;
 import com.waylays.arcanes.entity.errethys.ManaKangaroo;
 import com.waylays.arcanes.entity.errethys.ManaRat;
 import com.waylays.arcanes.entity.errethys.ManaPiranha;
@@ -102,7 +103,7 @@ public final class ErrethysGameTests {
                 count++;
             }
         }
-        helper.assertTrue(count == 10, "expected 10 Errethys spells, got " + count);
+        helper.assertTrue(count == 11, "expected 11 Errethys spells, got " + count);
         helper.assertTrue(helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).containsKey(ModSchools.ERRETHYS_MAGIC),
                 "errethys_magic damage type missing");
         helper.assertTrue(errethys.isFocus(new ItemStack(Items.PRISMARINE_CRYSTALS)), "prismarine crystals are not the Errethys focus");
@@ -120,6 +121,7 @@ public final class ErrethysGameTests {
         ModSpells.MANA_SERPENT.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_CROWS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_FOX.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_SALAMANDER.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_WOLF.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_BUTTERFLY.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_KANGAROO.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
@@ -130,6 +132,7 @@ public final class ErrethysGameTests {
         helper.assertTrue(around(helper, ManaSerpent.class, caster).size() == 1, "expected 1 serpent, got " + around(helper, ManaSerpent.class, caster).size());
         helper.assertTrue(around(helper, ManaCrow.class, caster).size() == 1, "expected 1 crow, got " + around(helper, ManaCrow.class, caster).size());
         helper.assertTrue(around(helper, ManaFox.class, caster).size() == 1, "expected 1 fox, got " + around(helper, ManaFox.class, caster).size());
+        helper.assertTrue(around(helper, ManaSalamander.class, caster).size() == 1, "expected 1 salamander, got " + around(helper, ManaSalamander.class, caster).size());
         helper.assertTrue(around(helper, ManaWolf.class, caster).size() == 1, "expected 1 wolf, got " + around(helper, ManaWolf.class, caster).size());
         helper.assertTrue(around(helper, ManaButterfly.class, caster).size() == 1, "expected 1 butterfly, got " + around(helper, ManaButterfly.class, caster).size());
         helper.assertTrue(around(helper, ManaKangaroo.class, caster).size() == 1, "expected 1 kangaroo, got " + around(helper, ManaKangaroo.class, caster).size());
@@ -339,6 +342,18 @@ public final class ErrethysGameTests {
     public static void manaFoxBleeds(GameTestHelper helper) {
         Vindicator[] foe = new Vindicator[1];
         fight(helper, ModSpells.MANA_FOX, () -> helper.assertTrue(foe[0].hasEffect(ModEffects.BLEEDING), "the fox's bite did not bleed"), foe, false);
+    }
+
+    /** The salamander's bite or breath sets its prey on fire, and fire does not hurt it. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_salamander", timeoutTicks = 300)
+    public static void manaSalamanderSetsOnFire(GameTestHelper helper) {
+        Vindicator[] foe = new Vindicator[1];
+        fight(helper, ModSpells.MANA_SALAMANDER, () -> {
+            helper.assertTrue(foe[0].isOnFire() || !foe[0].isAlive(), "the salamander did not set the vindicator on fire");
+            for (ManaSalamander salamander : helper.getLevel().getEntitiesOfClass(ManaSalamander.class, foe[0].getBoundingBox().inflate(12))) {
+                helper.assertTrue(salamander.fireImmune(), "the salamander is not fire-proof");
+            }
+        }, foe, false);
     }
 
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_wolf", timeoutTicks = 300)

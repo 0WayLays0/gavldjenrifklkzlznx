@@ -1619,5 +1619,10 @@
   "ui.arcanes_oublies.bombs": "%s bombes : %s dégâts chacune",
   "death.attack.clockwork_magic": "%1$s a été pris dans les engrenages",
   "death.attack.clockwork_magic.player": "%1$s a été pris dans les engrenages de %2$s",
-  "death.attack.clockwork_magic.item": "%1$s a été pris dans les engrenages de %2$s avec %3$s"
+  "death.attack.clockwork_magic.item": "%1$s a été pris dans les engrenages de %2$s avec %3$s",
+  "entity.arcanes_oublies.mana_salamander": "Salamandre de mana",
+  "spell.arcanes_oublies.mana_salamander": "Salamandre de mana",
+  "spell.arcanes_oublies.mana_salamander.guide": "Invoque une salamandre de mana rouge, des braises luisant dans ses veines. Sa morsure met le feu à tes ennemis, et quand ils s'approchent elle leur crache un jet de flammes ; le feu ne lui fait rien. Relance le sort pour la renvoyer.",
+  "ui.arcanes_oublies.bite_burns": "La morsure met le feu pendant %s s",
+  "ui.arcanes_oublies.fire_breath": "Crache du feu toutes les %s"
 }

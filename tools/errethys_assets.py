@@ -29,7 +29,12 @@ def _sparkles():
     return {(rnd.randrange(64), rnd.randrange(64)) for _ in range(40)}
 
 
-def mana_skin(eyes):
+RED = (232, 72, 44)
+RED_LIGHT = (255, 186, 120)
+RED_DEEP = (150, 28, 18)
+
+
+def mana_skin(eyes, base=SKY, light=SKY_LIGHT):
     """64 x 64 translucent mana (alpha well under opaque), lighter where the veins run."""
     img = Image.new("RGBA", (64, 64))
     px = img.load()
@@ -38,7 +43,7 @@ def mana_skin(eyes):
         for x in range(64):
             v = _ridges(x, y)
             swirl = fbm(x / 9 + 5, y / 9, 3, 202)
-            c = g.lerp(SKY, SKY_LIGHT, v * .9 + swirl * .2)
+            c = g.lerp(base, light, v * .9 + swirl * .2)
             a = int(130 + 90 * v + 25 * swirl)
             if (x, y) in sparkles:
                 c, a = (255, 255, 255), 235
@@ -50,7 +55,7 @@ def mana_skin(eyes):
     return img
 
 
-def mana_glow(eyes):
+def mana_glow(eyes, dim=(16, 46, 70), bright=(120, 215, 255), spark=(230, 250, 255)):
     """Additive light of the skin: a faint blue all over, the veins and sparkles bright."""
     img = Image.new("RGB", (64, 64))
     px = img.load()
@@ -58,9 +63,9 @@ def mana_glow(eyes):
     for y in range(64):
         for x in range(64):
             v = _ridges(x, y)
-            c = g.lerp((16, 46, 70), (120, 215, 255), v)
+            c = g.lerp(dim, bright, v)
             if (x, y) in sparkles:
-                c = (230, 250, 255)
+                c = spark
             px[x, y] = c
     if eyes:
         for y in range(60, 64):
@@ -206,6 +211,30 @@ def mana_fox_icon():
     ])
 
 
+def mana_salamander_icon():
+    """A salamander of red mana seen from above, wriggling: splayed legs, a crest of flames down its back, a long tail."""
+    img = g.spell_background(8, 8, (130, 40, 24), (30, 8, 6))
+    img.alpha_composite(g.from_grid([
+        "................",
+        "......rr........",
+        ".....rLLr.......",
+        ".....eLLe.......",
+        "..r..rLfr..r....",
+        "..rr.rLfLrrr....",
+        "....rrLfLr......",
+        ".....rLfLr......",
+        "..rrrrLfLr......",
+        "..r..rLLLr..r...",
+        "......rLLrrrr...",
+        ".......rLr......",
+        "........rLr.....",
+        ".........rLr....",
+        "..........rr....",
+        "................",
+    ], {"r": RED_DEEP, "L": RED, "f": (255, 214, 90), "e": (255, 255, 255)}))
+    return img
+
+
 def mana_wolf_icon():
     """A wolf's head, howling up: upright ears, heavy mane, the muzzle raised."""
     return _icon([
@@ -321,10 +350,13 @@ def main():
     g.save(mana_skin(True), "textures/entity/mana_skin_eyes.png")
     g.save(mana_glow(False), "textures/entity/mana_glow.png")
     g.save(mana_glow(True), "textures/entity/mana_glow_eyes.png")
+    # The salamander's red mana, embers in its veins
+    g.save(mana_skin(True, RED, RED_LIGHT), "textures/entity/mana_skin_red_eyes.png")
+    g.save(mana_glow(True, (70, 16, 8), (255, 140, 60), (255, 236, 180)), "textures/entity/mana_glow_red_eyes.png")
     for name, fn in (("mana_rats", mana_rats_icon), ("mana_piranha", mana_piranha_icon), ("mana_dromedary", mana_dromedary_icon),
                      ("mana_serpent", mana_serpent_icon), ("mana_crows", mana_crows_icon), ("mana_fox", mana_fox_icon),
                      ("mana_wolf", mana_wolf_icon), ("mana_butterfly", mana_butterfly_icon), ("mana_kangaroo", mana_kangaroo_icon),
-                     ("mana_falcon", mana_falcon_icon)):
+                     ("mana_falcon", mana_falcon_icon), ("mana_salamander", mana_salamander_icon)):
         g.save(fn(), f"textures/gui/spell_icons/{name}.png")
     g.save(affinity_ring_errethys(), "textures/item/affinity_ring_errethys.png")
     g.write_json("models/item/affinity_ring_errethys.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_errethys"}})

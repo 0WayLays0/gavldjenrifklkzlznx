@@ -51,6 +51,7 @@ import com.waylays.arcanes.spells.errethys.ManaCrowsSpell;
 import com.waylays.arcanes.spells.errethys.ManaWolfSpell;
 import com.waylays.arcanes.spells.errethys.ManaKangarooSpell;
 import com.waylays.arcanes.spells.errethys.ManaFoxSpell;
+import com.waylays.arcanes.spells.errethys.ManaSalamanderSpell;
 import com.waylays.arcanes.spells.errethys.ManaFalconSpell;
 import com.waylays.arcanes.spells.errethys.ManaButterflySpell;
 import com.waylays.arcanes.spells.errethys.ManaDromedarySpell;
@@ -374,6 +375,7 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_SERPENT = register(new ManaSerpentSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_CROWS = register(new ManaCrowsSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_FOX = register(new ManaFoxSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_SALAMANDER = register(new ManaSalamanderSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_WOLF = register(new ManaWolfSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_BUTTERFLY = register(new ManaButterflySpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MANA_KANGAROO = register(new ManaKangarooSpell());

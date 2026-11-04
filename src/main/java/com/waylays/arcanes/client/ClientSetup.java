@@ -5,6 +5,7 @@ import com.waylays.arcanes.client.model.ManaCrowModel;
 import com.waylays.arcanes.client.model.ManaWolfModel;
 import com.waylays.arcanes.client.model.ManaKangarooModel;
 import com.waylays.arcanes.client.model.ManaFoxModel;
+import com.waylays.arcanes.client.model.ManaSalamanderModel;
 import com.waylays.arcanes.client.model.ManaFalconModel;
 import com.waylays.arcanes.client.model.ManaButterflyModel;
 import com.waylays.arcanes.client.model.ManaPiranhaModel;
@@ -339,6 +340,9 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.MANA_DROMEDARY.get(), ManaCamelRenderer::new);
         event.registerEntityRenderer(ModEntities.MANA_FOX.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaFoxModel(context.bakeLayer(ManaFoxModel.LAYER)), .3f, 1.05f, true));
+        event.registerEntityRenderer(ModEntities.MANA_SALAMANDER.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaSalamanderModel(context.bakeLayer(ManaSalamanderModel.LAYER)), .35f, 1.1f,
+                        ManaCreatureRenderer.RED_SKIN_EYES, ManaCreatureRenderer.RED_GLOW_EYES));
         event.registerEntityRenderer(ModEntities.MANA_WOLF.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaWolfModel(context.bakeLayer(ManaWolfModel.LAYER)), .4f, 1.15f, true));
         event.registerEntityRenderer(ModEntities.MANA_BUTTERFLY.get(),
@@ -391,6 +395,7 @@ public final class ClientSetup {
         event.registerLayerDefinition(ManaCrowModel.LAYER, ManaCrowModel::createBodyLayer);
         event.registerLayerDefinition(ManaPiranhaModel.LAYER, ManaPiranhaModel::createBodyLayer);
         event.registerLayerDefinition(ManaFoxModel.LAYER, ManaFoxModel::createBodyLayer);
+        event.registerLayerDefinition(ManaSalamanderModel.LAYER, ManaSalamanderModel::createBodyLayer);
         event.registerLayerDefinition(ManaWolfModel.LAYER, ManaWolfModel::createBodyLayer);
         event.registerLayerDefinition(ManaButterflyModel.LAYER, ManaButterflyModel::createBodyLayer);
         event.registerLayerDefinition(ManaKangarooModel.LAYER, ManaKangarooModel::createBodyLayer);
