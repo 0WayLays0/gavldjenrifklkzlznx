@@ -62,6 +62,8 @@ public final class ModAttributes {
     public static final DeferredHolder<Attribute, Attribute> LOTUS_MAGIC_RESIST = resistanceAttribute("lotus");
     public static final DeferredHolder<Attribute, Attribute> AURORA_SPELL_POWER = powerAttribute("aurora");
     public static final DeferredHolder<Attribute, Attribute> AURORA_MAGIC_RESIST = resistanceAttribute("aurora");
+    public static final DeferredHolder<Attribute, Attribute> CLOCKWORK_SPELL_POWER = powerAttribute("clockwork");
+    public static final DeferredHolder<Attribute, Attribute> CLOCKWORK_MAGIC_RESIST = resistanceAttribute("clockwork");
 
     private ModAttributes() {}
 

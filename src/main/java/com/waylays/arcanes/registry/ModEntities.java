@@ -687,6 +687,11 @@ public final class ModEntities {
             EntityType.Builder.<com.waylays.arcanes.entity.aurora.AuroraScene>of(com.waylays.arcanes.entity.aurora.AuroraScene::new, MobCategory.MISC).sized(1f, 1f)
                     .clientTrackingRange(12).updateInterval(1).fireImmune());
 
+    // Clockwork Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<com.waylays.arcanes.entity.clockwork.ClockworkScene>> CLOCKWORK_SCENE = register("clockwork_scene",
+            EntityType.Builder.<com.waylays.arcanes.entity.clockwork.ClockworkScene>of(com.waylays.arcanes.entity.clockwork.ClockworkScene::new, MobCategory.MISC)
+                    .sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
+
     // Lotus Magic
     public static final DeferredHolder<EntityType<?>, EntityType<LotusScene>> LOTUS_SCENE = register("lotus_scene",
             EntityType.Builder.<LotusScene>of(LotusScene::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());

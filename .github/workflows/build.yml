@@ -112,7 +112,7 @@ jobs:
           export LIBGL_ALWAYS_SOFTWARE=1
           set +e
           # Spells photographed into the log (see ClientSmokeTest), for a look at how they render
-          SHOTS="school:aurora"
+          SHOTS="school:clockwork"
           timeout --kill-after=30s 2040 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClient -Parcanes.autotest=true "-Parcanes.shots=$SHOTS" --console=plain > client.log 2>&1
           code=$?
           set -e

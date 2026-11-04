@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:clock",
+    "minecraft:copper_ingot",
+    "minecraft:piston",
+    "minecraft:redstone"
+  ]
+}

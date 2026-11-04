@@ -489,6 +489,27 @@ bleue, glace compactée, poche d'encre luisante, boule de neige.
 | **Halo polaire** (Polar Halo, épique) | Un grand halo d'aurore cerclé de glace s'ouvre au-dessus de la zone visée, des rideaux en pendant : des rayons de toutes les couleurs tombent sur les ennemis 6 s. |
 | **Nuit boréale** (Boreal Night, ultime) | La nuit tombe sous un dôme d'étoiles (16 blocs) où ondule l'aurore ; quatre immenses rideaux balaient le terrain, puis toutes les lumières se rassemblent en un pilier qui frappe chaque ennemi et soigne le camp du lanceur. |
 
+### Magie Horlogère
+
+Des machines de laiton brossé, de cuivre poli et d'acier bleui : engrenages qui s'engrènent, ressorts, pistons qui
+crachent de la vapeur, rivets chauffés au rouge, et des cœurs d'énergie bleue derrière des hublots, d'où jaillissent des
+arcs électriques. Livre : **Codex de l'Horloger** (cuir sang-de-bœuf repoussé d'un cadran d'horloge et d'engrenages de
+laiton, cadre de laiton riveté, un grand engrenage en relief s'engrenant avec deux petits sur chaque plat, un cœur
+bleu à leur centre, une clé de remontage sur le dos) ; focus : horloge, lingot de cuivre, piston, poudre de redstone.
+
+| Sort | Effet |
+|---|---|
+| **Engrenage-scie** (Saw-Gear, commun) | Un anneau de dents d'acier tournant autour d'engrenages de laiton : il tranche 4 ennemis puis éclate en rouages. |
+| **Salve de rivets** (Rivet Volley, commun) | Un éventail de 3 à 6 rivets chauffés au rouge, chacun frappant le premier ennemi sur son chemin. |
+| **Bond du ressort** (Mainspring Leap, peu commun) | Un grand ressort s'écrase puis projette le lanceur haut et loin en repoussant les ennemis proches ; à l'atterrissage, un choc d'engrenages frappe autour (3 blocs). Pas de dégâts de chute. |
+| **Piège à engrenages** (Gear Trap, peu commun) | Un piège posé au sol (30 s) dont les mâchoires d'acier se referment sur les premiers ennemis, les mordent et les retiennent 3 s. |
+| **Tourelle mécanique** (Clockwork Turret, rare) | Une tourelle de laiton sur trépied, aux canons tournants, tire 10 s sur l'ennemi visible le plus proche (14 blocs). |
+| **Cage gyroscopique** (Gyroscopic Cage, rare) | Trois anneaux dentés tournoient autour de l'ennemi visé : retenu au centre, frappé par des arcs, puis un dernier coup quand ils éclatent. |
+| **Automate de laiton** (Brass Automaton, épique) | Une machine de près de 3 blocs combat 20 s : elle marche vers l'ennemi le plus proche, arme son bras à piston et frappe ; elle a une clé de remontage qui tourne dans le dos. |
+| **Locomotive de laiton** (Brass Locomotive, épique) | Des rails se posent sur 24 blocs à côté du lanceur, puis une locomotive à vapeur rouge et laiton fonce dessus et écarte chaque ennemi sur la voie. |
+| **Bombardement en dirigeable** (Airship Bombardment, épique) | Un dirigeable de toile et de laiton survole la zone visée en larguant 10 bombes qui éclatent dans le feu et la fumée. |
+| **Grand Mécanisme** (Great Mechanism, ultime) | Un grand engrenage sous le lanceur, un anneau denté autour du terrain (12 blocs), huit grands engrenages et des pistons à vapeur, un astrolabe au cœur d'énergie bleue qui lance des arcs ; puis la surcharge : une vague de lumière bleue frappe et projette tous les ennemis et protège le camp du lanceur. |
+
 ### Rituels (sorts de groupe)
 
 Ce n'est pas une école : des rituels à plusieurs, lents et spectaculaires. Ils se font avec la **Craie rituelle**

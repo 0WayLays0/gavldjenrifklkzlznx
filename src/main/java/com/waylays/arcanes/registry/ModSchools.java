@@ -425,6 +425,22 @@ public final class ModSchools {
             AURORA_MAGIC
     ));
 
+    /** Clockwork Magic: gears of brass, copper and steel, steam, and cores of blue energy; machines that fight for the caster. */
+    public static final ResourceLocation CLOCKWORK_RESOURCE = ArcanesOublies.id("clockwork");
+    public static final TagKey<Item> CLOCKWORK_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("clockwork_focus"));
+    public static final ResourceKey<DamageType> CLOCKWORK_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("clockwork_magic"));
+    public static final int CLOCKWORK_COLOR = 0xE6B04C;
+
+    public static final DeferredHolder<SchoolType, SchoolType> CLOCKWORK = SCHOOLS.register(CLOCKWORK_RESOURCE.getPath(), () -> new SchoolType(
+            CLOCKWORK_RESOURCE,
+            CLOCKWORK_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".clockwork").withStyle(Style.EMPTY.withColor(CLOCKWORK_COLOR)),
+            ModAttributes.CLOCKWORK_SPELL_POWER,
+            ModAttributes.CLOCKWORK_MAGIC_RESIST,
+            sound(SoundEvents.ANVIL_USE),
+            CLOCKWORK_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

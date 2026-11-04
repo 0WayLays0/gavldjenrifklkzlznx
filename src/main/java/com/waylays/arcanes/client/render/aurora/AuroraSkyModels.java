@@ -52,7 +52,6 @@ public final class AuroraSkyModels {
             AuroraMesh.ribbon(band, p, view.eye(), pts, .55f, .85f, age * 2 + s * 20, light);
         }
         // A curtain coiling round its foot
-        VertexConsumer rays = BossMesh.light(buffer, AuroraMesh.RAYS);
         int m = 40;
         Vector3f[] coil = new Vector3f[m];
         for (int i = 0; i < m; i++) {
@@ -61,7 +60,7 @@ public final class AuroraSkyModels {
             float r = radius * (1.15f - .45f * t) * k;
             coil[i] = new Vector3f(Mth.cos(a) * r, t * 1.5f, Mth.sin(a) * r);
         }
-        AuroraMesh.curtain(rays, p, coil, 2.5f, age, .8f * k, age * .02f, light);
+        AuroraMesh.curtain(buffer, p, coil, 2.5f, age, .8f * k, age * .02f, light);
         VertexConsumer ring = BossMesh.light(buffer, BossMesh.RING);
         AuroraMesh.ring(ring, p, .08f, radius * .9f * k, radius * 1.25f * k, AuroraMesh.TEAL, .7f * k, light);
         AuroraMesh.glow(poseStack, buffer, view, new Vector3f(0, h * .4f, 0), radius * 2.2f, AuroraMesh.TEAL, .25f * k, light);
@@ -245,9 +244,8 @@ public final class AuroraSkyModels {
             AuroraMesh.ice(buffer, p, new Vector3f(Mth.cos(a) * (r + .35f), height, Mth.sin(a) * (r + .35f)), out, (i % 2 == 0 ? .3f : .2f) * k, 2.6f, age * 2 + i, light);
         }
         // Curtains hanging down from it
-        VertexConsumer rays = BossMesh.light(buffer, AuroraMesh.RAYS);
         Vector3f[] hems = AuroraMesh.arc(r * .97f, height - 4.5f, 48, spin, Mth.TWO_PI);
-        AuroraMesh.curtain(rays, p, hems, 4.3f, age, .75f * k, age * .01f, light);
+        AuroraMesh.curtain(buffer, p, hems, 4.3f, age, .75f * k, age * .01f, light);
         // Its shadow of light on the ground
         VertexConsumer ground = BossMesh.light(buffer, BossMesh.RING);
         AuroraMesh.ring(ground, p, .08f, r * .9f, r * 1.05f, AuroraMesh.VIOLET, .6f * k, light);
@@ -290,7 +288,6 @@ public final class AuroraSkyModels {
                     tw * dusk), light);
         }
         // The aurora rippling across the dome
-        VertexConsumer rays = BossMesh.light(buffer, AuroraMesh.RAYS);
         for (int c = 0; c < 3; c++) {
             int n = 40;
             Vector3f[] hems = new Vector3f[n];
@@ -302,7 +299,7 @@ public final class AuroraSkyModels {
                 float y = radius * .45f + radius * .1f * Mth.cos(t * 2 + c) - Math.abs(t) * radius * .15f;
                 hems[i] = new Vector3f(x * Mth.cos(tilt) - z * Mth.sin(tilt), y, x * Mth.sin(tilt) + z * Mth.cos(tilt));
             }
-            AuroraMesh.curtain(rays, p, hems, radius * .35f, age + c * 40, .8f * dusk, age * .006f + c, light);
+            AuroraMesh.curtain(buffer, p, hems, radius * .35f, age + c * 40, .8f * dusk, age * .006f + c, light);
         }
         // The waves: great curtains sweeping the ground
         for (int w = 0; w < 4; w++) {
@@ -322,7 +319,7 @@ public final class AuroraSkyModels {
                 float s = (float) i / (n - 1) * 2 - 1;
                 hems[i] = new Vector3f(across).mul(x + .8f * Mth.sin(s * 5 + age * .1f)).add(new Vector3f(line).mul(s * half));
             }
-            AuroraMesh.curtain(rays, p, hems, 9, age, fade, age * .02f, light);
+            AuroraMesh.curtain(buffer, p, hems, 9, age, fade, age * .02f, light);
             VertexConsumer pool = BossMesh.light(buffer, BossMesh.GLOW);
             for (int i = 0; i < 6; i++) {
                 float s = (i / 5f * 2 - 1) * half;

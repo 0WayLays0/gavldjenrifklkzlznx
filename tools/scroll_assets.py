@@ -62,6 +62,8 @@ PALETTES = {
     "lotus": ["f2d8e4", "f8e6ee", "fff4f8", "d4b0c2", "e4c4d4", "f58ac0", "c8467e", "6e1e44", "7fd6b0", "3f9a72", "1f5a40"],
     # Night-blue paper, the writing in aurora green, silver rod ends
     "aurora": ["1c2a5a", "24346a", "2e4280", "141e44", "18244e", "6cf5c2", "3fc8a0", "1e6a5a", "e6eef8", "aab8cc", "6a7890"],
+    # Brass-tinted parchment, the writing in the cores' blue, brass rod ends
+    "clockwork": ["e8d6a8", "f0e2bc", "f8eed2", "cbb27a", "dcc490", "5accff", "2a8ad0", "16407a", "ffe498", "dea050", "76491e"],
 }
 
 

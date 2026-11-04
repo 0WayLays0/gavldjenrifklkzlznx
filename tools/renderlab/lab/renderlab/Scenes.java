@@ -41,6 +41,7 @@ import com.waylays.arcanes.client.render.sand.*;
 import com.waylays.arcanes.client.render.lotus.*;
 import com.waylays.arcanes.client.render.gem.*;
 import com.waylays.arcanes.client.render.aurora.*;
+import com.waylays.arcanes.client.render.clockwork.*;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.util.Mth;
@@ -828,6 +829,85 @@ public final class Scenes {
                 husk(ctx, 6, 0, 4);
                 Vector3f o = new Vector3f(0, 0, 0);
                 AuroraSkyModels.night(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 250, 16, 30, 40, 28, 200, 3, LIGHT);
+            }
+            case "csaw" -> {
+                caster(ctx, 0, -3);
+                husk(ctx, 0, 0, 6);
+                Vector3f o = new Vector3f(0, 1.2f, -1.5f + age * 1.1f);
+                ClockModels.saw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, false, 0, 3, LIGHT);
+            }
+            case "crivet" -> {
+                caster(ctx, 0, -3);
+                for (int k = 0; k < 3; k++) {
+                    Vector3f d = new Vector3f((k - 1) * .15f, 0, 1).normalize();
+                    Vector3f o = new Vector3f(d).mul(1 + age * 1.8f).add(0, 1.4f, -2);
+                    ClockModels.rivet(Lab.at(o), ctx.rec(), Lab.view(ctx, o), d, age, false, 0, k * 7, LIGHT);
+                }
+            }
+            case "cspring" -> {
+                Vector3f o = new Vector3f(0, 0, 0);
+                if (age < 6) {
+                    caster(ctx, 0, 0);
+                }
+                husk(ctx, 4, 0, 6);
+                ClockModels.spring(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 80, age - 30, age >= 30 ? new Vector3f(0, 0, 6) : null, 6, 3, LIGHT);
+            }
+            case "ctrap" -> {
+                Vector3f o = new Vector3f(0, 0, 0);
+                boolean sprung = age >= 30;
+                if (sprung) {
+                    husk(ctx, 0, 0, 0);
+                }
+                ClockModels.trap(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 600, sprung, false, age - 30, 10, 3, 60, 3, LIGHT);
+            }
+            case "cturret" -> {
+                caster(ctx, -2, -2);
+                husk(ctx, 5, 0, 6);
+                Vector3f o = new Vector3f(0, 0, 0);
+                float since = age < 12 ? 999 : (age - 12) % 8;
+                ClockModels.turret(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 200, since, age < 12 ? null : new Vector3f(5, 1.1f, 6), 12, 3,
+                        LIGHT);
+            }
+            case "cgyro" -> {
+                husk(ctx, 0, 0, 0);
+                Vector3f o = new Vector3f(0, 0, 0);
+                ClockModels.gyro(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 80, 1.5f, age < 12 ? 999 : (age - 12) % 10, false, 12, 10, 3, LIGHT);
+            }
+            case "cauto" -> {
+                husk(ctx, 0, 0, 3.2f);
+                Vector3f o = new Vector3f(0, 0, 0);
+                float since = age >= 40 ? (age - 40) % 22 : -1;
+                ClockMachineModels.automaton(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 400, age * .45f, age < 40 && age > 20 ? 1 : 0, since,
+                        20, 8, 3, LIGHT);
+            }
+            case "cloco" -> {
+                caster(ctx, 1.8f, -2);
+                husk(ctx, .5f, 0, 14);
+                Vector3f o = new Vector3f(0, 0, 0);
+                float u = Math.max(0, Math.min(1, (age - 14) / 26f));
+                float front = 24 * (.35f * u + .65f * u * u);
+                float u1 = Math.max(0, Math.min(1, (age + 1 - 14) / 26f));
+                float laid = 24 * Math.max(0, Math.min(1, age / 14f)) + 1;
+                ClockMachineModels.locomotive(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 60, laid, front,
+                        Math.max(0, Math.min(1, (age - 8) / 6f)), age - 40, 24 * (.35f * u1 + .65f * u1 * u1) - front, 3, LIGHT);
+            }
+            case "cship" -> {
+                husk(ctx, 1, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                Vector3f d = new Vector3f(0, 0, 1);
+                java.util.function.IntFunction<Vector3f> lands = i -> {
+                    float along = -14 + .3f * (20 + i * 5) + .3f * 10;
+                    float side = (i % 2 == 0 ? 1 : -1) * (1 + .6f * ((i / 2) % 2));
+                    return new Vector3f(d).mul(along).add(-d.z * side, 0, d.x * side);
+                };
+                ClockMachineModels.airship(Lab.at(o), ctx.rec(), Lab.view(ctx, o), d, age, 110, -14 + .3f * age, 9, 10, i -> 20 + i * 5, lands, 10, .3f, 3, LIGHT);
+            }
+            case "cmech" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 6, 0, 4);
+                Vector3f o = new Vector3f(0, 0, 0);
+                ClockMachineModels.mechanism(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 240, 12, age < 30 ? 999 : (age - 30) % 10, new Vector3f(6, 1.1f, 4), 30, 200, 3,
+                        LIGHT);
             }
             default -> throw new IllegalArgumentException("no scene " + scene);
         }

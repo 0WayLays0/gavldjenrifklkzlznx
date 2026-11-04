@@ -137,7 +137,6 @@ public final class AuroraModels {
             return;
         }
         PoseStack.Pose p = poseStack.last();
-        VertexConsumer rays = BossMesh.light(buffer, AuroraMesh.RAYS);
         // Two curtains, the nearer brighter, the hem of each coming down from the sky as it unrolls
         for (int layer = 0; layer < 2; layer++) {
             int n = 26;
@@ -149,7 +148,7 @@ public final class AuroraModels {
                 float fold = .7f * Mth.sin(t * 7 + age * .03f + layer * 1.3f) + .25f * Mth.sin(t * 17 - age * .05f);
                 hems[i] = new Vector3f(d).mul(t * length * (1 + .1f * layer)).add(new Vector3f(side).mul(fold - layer * .8f)).add(0, hem, 0);
             }
-            AuroraMesh.curtain(rays, p, hems, top - hem, age, (layer == 0 ? 1 : .45f) * fade, age * .01f + layer * .3f, light);
+            AuroraMesh.curtain(buffer, p, hems, top - hem, age, (layer == 0 ? 1 : .45f) * fade, age * .01f + layer * .3f, light);
         }
         // Its hem burning green on the ground, and the ground glowing under it
         if (unroll > .9f) {
@@ -200,13 +199,12 @@ public final class AuroraModels {
             AuroraMesh.ribbon(band, p, view.eye(), pts, .5f, .9f * fade, age * 3 + s * 40, light);
         }
         // Low curtains along it
-        VertexConsumer rays = BossMesh.light(buffer, AuroraMesh.RAYS);
         Vector3f[] hems = new Vector3f[n];
         for (int i = 0; i < n; i++) {
             float t = (float) i / (n - 1);
             hems[i] = new Vector3f(to).mul(t).add(new Vector3f(side).mul(.4f * Mth.sin(t * 6 + age * .1f)));
         }
-        AuroraMesh.curtain(rays, p, hems, 2.2f, age, .8f * fade, age * .02f, light);
+        AuroraMesh.curtain(buffer, p, hems, 2.2f, age, .8f * fade, age * .02f, light);
         AuroraMesh.stars(poseStack, buffer, view, new Vector3f(to).mul(.5f), l * .5f + .5f, 2.5f, age, 16, fade, seed, light);
     }
 
@@ -219,12 +217,11 @@ public final class AuroraModels {
             return;
         }
         PoseStack.Pose p = poseStack.last();
-        VertexConsumer rays = BossMesh.light(buffer, AuroraMesh.RAYS);
         for (int layer = 0; layer < 2; layer++) {
             int n = 30;
             float r = radius * (.85f + .25f * layer);
             Vector3f[] hems = AuroraMesh.arc(r, .02f, n, age * (layer == 0 ? .03f : -.025f), Mth.TWO_PI);
-            AuroraMesh.curtain(rays, p, hems, 1.25f - .25f * layer, age, (layer == 0 ? .8f : .45f) * k, age * .02f, light);
+            AuroraMesh.curtain(buffer, p, hems, 1.25f - .25f * layer, age, (layer == 0 ? .8f : .45f) * k, age * .02f, light);
         }
         VertexConsumer band = BossMesh.light(buffer, AuroraMesh.BAND);
         for (int s = 0; s < 3; s++) {
@@ -254,13 +251,12 @@ public final class AuroraModels {
             return;
         }
         PoseStack.Pose p = poseStack.last();
-        VertexConsumer rays = BossMesh.light(buffer, AuroraMesh.RAYS);
         float r = radius * (1 - .35f * down);
         float hem = Mth.lerp(down, 14, 0) + rise * 6;
         Vector3f[] hems = AuroraMesh.arc(r, hem, 44, age * .02f, Mth.TWO_PI);
-        AuroraMesh.curtain(rays, p, hems, 6, age, fade, age * .01f, light);
+        AuroraMesh.curtain(buffer, p, hems, 6, age, fade, age * .01f, light);
         Vector3f[] inner = AuroraMesh.arc(r * .6f, hem + 2, 32, -age * .03f, Mth.TWO_PI);
-        AuroraMesh.curtain(rays, p, inner, 4, age + 20, .5f * fade, age * .01f, light);
+        AuroraMesh.curtain(buffer, p, inner, 4, age + 20, .5f * fade, age * .01f, light);
         // As they land: a flash, a ring running out, a column of light
         if (after > 0) {
             float flash = (float) Math.exp(-after / 5);

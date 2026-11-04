@@ -48,10 +48,18 @@ def rays_texture():
     t = (ys + .5) / H
     streak = .55 * _tnoise(W, H, (32, 1), 1701) + .3 * _tnoise(W, H, (64, 2), 1702) + .15 * _tnoise(W, H, (16, 1), 1703)
     bright = np.clip((_tnoise(W, H, (8, 1), 1704) - .55) * 4, 0, 1)
-    rays = np.clip(streak * (.35 + .9 * bright), 0, 1) * (.3 + .7 * t ** .9) * np.clip(t * 6, 0, 1)
+    rays = np.clip(streak * (.35 + .9 * bright), 0, 1) * (.62 + .38 * t ** .9) * np.clip(t * 10, 0, 1)
     hem = np.exp(-((1 - t) / .05) ** 2) * (.7 + .3 * _tnoise(W, H, (24, 1), 1705))
     v = np.clip(rays + hem * .9, 0, 1)
     return _rgba(np.dstack([v * 255] * 3), np.full((H, W), 255.0))
+
+
+def veil_texture():
+    """128 x 64, tiling across: the rays of rays_texture() as a veil: white, as opaque as the rays are bright (tinted in
+    game and laid over what is behind a curtain, so its colours show against a bright sky)."""
+    rays = np.asarray(rays_texture(), dtype=np.float32)[..., 0]
+    a = np.clip(rays * 1.3, 0, 255)
+    return _rgba(np.full(rays.shape + (3,), 255.0), a)
 
 
 def band_texture():
@@ -422,6 +430,7 @@ def affinity_ring_aurora():
 def main():
     g.save(rays_texture(), "textures/entity/aurora/rays.png")
     g.save(band_texture(), "textures/entity/aurora/band.png")
+    g.save(veil_texture(), "textures/entity/aurora/veil.png")
     g.save(night_texture(), "textures/entity/aurora/night.png")
     for name, icon in ICONS:
         g.save(icon(), f"textures/gui/spell_icons/{name}.png")

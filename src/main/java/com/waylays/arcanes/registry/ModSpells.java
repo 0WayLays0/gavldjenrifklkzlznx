@@ -279,6 +279,16 @@ import com.waylays.arcanes.spells.aurora.CelestialSpiralSpell;
 import com.waylays.arcanes.spells.aurora.AuroraSerpentSpell;
 import com.waylays.arcanes.spells.aurora.PolarHaloSpell;
 import com.waylays.arcanes.spells.aurora.BorealNightSpell;
+import com.waylays.arcanes.spells.clockwork.ClockworkSawbladeSpell;
+import com.waylays.arcanes.spells.clockwork.RivetVolleySpell;
+import com.waylays.arcanes.spells.clockwork.MainspringLeapSpell;
+import com.waylays.arcanes.spells.clockwork.GearTrapSpell;
+import com.waylays.arcanes.spells.clockwork.ClockworkTurretSpell;
+import com.waylays.arcanes.spells.clockwork.GyroCageSpell;
+import com.waylays.arcanes.spells.clockwork.BrassAutomatonSpell;
+import com.waylays.arcanes.spells.clockwork.BrassLocomotiveSpell;
+import com.waylays.arcanes.spells.clockwork.AirshipBombardmentSpell;
+import com.waylays.arcanes.spells.clockwork.GreatMechanismSpell;
 import com.waylays.arcanes.spells.echo.SoundWaveSpell;
 import com.waylays.arcanes.spells.echo.ShriekSpell;
 import com.waylays.arcanes.spells.echo.EchoStepSpell;
@@ -619,6 +629,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> AURORA_SERPENT = register(new AuroraSerpentSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> POLAR_HALO = register(new PolarHaloSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> BOREAL_NIGHT = register(new BorealNightSpell());
+
+    // Clockwork Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CLOCKWORK_SAWBLADE = register(new ClockworkSawbladeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RIVET_VOLLEY = register(new RivetVolleySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MAINSPRING_LEAP = register(new MainspringLeapSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GEAR_TRAP = register(new GearTrapSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CLOCKWORK_TURRET = register(new ClockworkTurretSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GYRO_CAGE = register(new GyroCageSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BRASS_AUTOMATON = register(new BrassAutomatonSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BRASS_LOCOMOTIVE = register(new BrassLocomotiveSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> AIRSHIP_BOMBARDMENT = register(new AirshipBombardmentSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GREAT_MECHANISM = register(new GreatMechanismSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());
