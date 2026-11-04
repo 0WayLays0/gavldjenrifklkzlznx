@@ -24,7 +24,7 @@ import org.joml.Vector3f;
 import java.util.List;
 
 /**
- * Diamond Bastion: a great cluster of diamond bursts out of the ground at the caster's feet for twelve seconds, a dome of
+ * Diamond Bastion: a great cluster of diamond bursts out of the ground just ahead of the caster for twelve seconds, a dome of
  * pale light over it: the caster's side within it is hardened (Resistance II) and enemy shots flying into it are
  * turned aside. When its time runs out it shatters, its crystals striking the enemies round it.
  */
@@ -55,7 +55,9 @@ public class DiamondBastionSpell extends GemSpell {
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         if (level instanceof ServerLevel server) {
-            Vec3 at = SpellUtil.groundAt(level, entity.position(), 2, 1);
+            // Just ahead of the caster, so they stand in its dome but not inside its crystals
+            float yaw = entity.getYRot() * Mth.DEG_TO_RAD;
+            Vec3 at = SpellUtil.groundAt(level, entity.position().add(-Mth.sin(yaw) * 2.5, 0, Mth.cos(yaw) * 2.5), 2, 1);
             GemScene.spawn(server, entity, this, GemScene.Kind.BASTION, at, new Vector3f(0, 1, 0), RADIUS, LIFE, getPower(spellLevel, entity));
             GemFx.sigil(level, at, Gem.DIAMOND, RADIUS, 30);
         }

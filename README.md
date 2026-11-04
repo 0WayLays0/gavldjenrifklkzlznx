@@ -396,7 +396,7 @@ Le rubis et le diamant se combinent : un Rayon de Rubis visé à travers un Pris
 | **Carapace de Diamant** (Diamond Shell) | Douze plaques de diamant autour du lanceur : chaque coup perd 60 % de sa force sur une plaque, qui file frapper l'agresseur ; à la fin le reste éclate sur les ennemis. |
 | **Lance de diamant** (Diamond Lance) | Une pointe de diamant tirée plus vite que l'œil traverse tous les ennemis sur 22 blocs, un rayon arc-en-ciel derrière elle. |
 | **Poussière de diamant** (Diamond Dust) | Un dôme de poussière de diamant scintillant (3,5 blocs, 4 s) taillade, aveugle et ralentit les ennemis dedans. |
-| **Bastion de diamant** (Diamond Bastion) | Un grand amas de diamant jaillit aux pieds du lanceur pour 12 s sous un dôme de lumière : Résistance II pour son camp, tirs ennemis détournés ; à la fin il éclate sur les ennemis autour. |
+| **Bastion de diamant** (Diamond Bastion) | Un grand amas de diamant jaillit juste devant le lanceur pour 12 s sous un dôme de lumière : Résistance II pour son camp, tirs ennemis détournés ; à la fin il éclate sur les ennemis autour. |
 | **Résonance d'Améthyste** (Amethyst Resonance) | Des grappes d'améthyste jaillissent en cercle et sonnent trois fois : chaque onde blesse et étourdit les ennemis (8 blocs) et brise leurs tirs. |
 | **Géode** (Geode) | Une géode (basalte, calcite, améthyste) se referme autour de l'ennemi visé, ouverte côté lanceur ; ses cristaux poussent vers l'intérieur et le transpercent, puis elle éclate. |
 | **Pointes d'améthyste** (Amethyst Spikes) | Des grappes d'améthyste jaillissent l'une après l'autre sur 12 blocs devant le lanceur, de plus en plus grandes : dégâts et projection. |

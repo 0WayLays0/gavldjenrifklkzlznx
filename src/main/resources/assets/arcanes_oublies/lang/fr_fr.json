@@ -1535,7 +1535,7 @@
   "spell.arcanes_oublies.diamond_dust": "Poussière de diamant",
   "spell.arcanes_oublies.diamond_dust.guide": "Un dôme de poussière de diamant scintillant de toutes les couleurs se pose là où tu vises pendant quatre secondes : les ennemis dedans sont tailladés encore et encore, aveuglés par son éclat et ralentis.",
   "spell.arcanes_oublies.diamond_bastion": "Bastion de diamant",
-  "spell.arcanes_oublies.diamond_bastion.guide": "Un grand amas de diamant jaillit du sol à tes pieds pendant douze secondes sous un dôme de lumière pâle : ton camp à l'intérieur est endurci et les tirs ennemis qui y entrent sont détournés. À la fin, il éclate et ses cristaux frappent les ennemis autour.",
+  "spell.arcanes_oublies.diamond_bastion.guide": "Un grand amas de diamant jaillit du sol juste devant toi pendant douze secondes sous un dôme de lumière pâle : ton camp à l'intérieur est endurci et les tirs ennemis qui y entrent sont détournés. À la fin, il éclate et ses cristaux frappent les ennemis autour.",
   "ui.arcanes_oublies.gem_shards": "%s éclats : %s dégâts chacun",
   "ui.arcanes_oublies.mirror_turns": "Détourne les tirs ennemis",
   "ui.arcanes_oublies.mirror_binds": "Enchaîne un ennemi %s : silence et ralentissement",

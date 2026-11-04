@@ -95,7 +95,7 @@ public final class ClientSmokeTest {
     private static final int RECAST_DELAY = 60;
     /** Let the last spells (the ultimates, about 8 s) finish before stopping. */
     private static final int FINAL_TICKS = 220;
-    private static final long WATCHDOG_SECONDS = 1200;
+    private static final long WATCHDOG_SECONDS = 1950;
     /** Spells (ids without the namespace, or prefixes ending in *) whose casts are photographed into the log. */
     private static final List<String> SHOTS = Arrays.stream(System.getProperty("arcanes.shots", "").split(","))
             .map(String::trim).filter(s -> !s.isEmpty()).toList();

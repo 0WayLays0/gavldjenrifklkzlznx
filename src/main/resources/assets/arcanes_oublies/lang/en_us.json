@@ -1535,7 +1535,7 @@
   "spell.arcanes_oublies.diamond_dust": "Diamond Dust",
   "spell.arcanes_oublies.diamond_dust.guide": "A dome of diamond dust glittering in every colour settles where you aim for four seconds: the enemies in it are cut again and again, blinded by its glitter and slowed.",
   "spell.arcanes_oublies.diamond_bastion": "Diamond Bastion",
-  "spell.arcanes_oublies.diamond_bastion.guide": "A great cluster of diamond bursts out of the ground at your feet for twelve seconds under a dome of pale light: your side within it is hardened and enemy shots flying into it are turned aside. When its time runs out it shatters, its crystals striking the enemies round it.",
+  "spell.arcanes_oublies.diamond_bastion.guide": "A great cluster of diamond bursts out of the ground just ahead of you for twelve seconds under a dome of pale light: your side within it is hardened and enemy shots flying into it are turned aside. When its time runs out it shatters, its crystals striking the enemies round it.",
   "ui.arcanes_oublies.gem_shards": "%s Shards: %s Damage Each",
   "ui.arcanes_oublies.mirror_turns": "Turns Enemy Shots Aside",
   "ui.arcanes_oublies.mirror_binds": "Binds a Foe for %s: Silenced and Slowed",
