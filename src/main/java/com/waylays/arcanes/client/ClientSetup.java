@@ -324,6 +324,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.SAND_LANCE.get(), com.waylays.arcanes.client.render.SandLanceRenderer::new);
         event.registerEntityRenderer(ModEntities.SAND_SCENE.get(), com.waylays.arcanes.client.render.SandSceneRenderer::new);
         event.registerEntityRenderer(ModEntities.LOTUS_SCENE.get(), com.waylays.arcanes.client.render.LotusSceneRenderer::new);
+        event.registerEntityRenderer(ModEntities.GEM_SCENE.get(), com.waylays.arcanes.client.render.GemSceneRenderer::new);
         event.registerEntityRenderer(ModEntities.AMETHYST_BRIDGE.get(), com.waylays.arcanes.client.render.AmethystBridgeRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),

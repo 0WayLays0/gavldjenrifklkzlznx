@@ -384,13 +384,29 @@ Le rubis et le diamant se combinent : un Rayon de Rubis visé à travers un Pris
 |---|---|
 | **Rayon de Rubis** (Ruby Ray) | Maintenu : un rubis tourne devant la main et déverse un rayon rouge (24 blocs) qui traverse et brûle tout ce qui est sur sa ligne. À travers un Prisme de Diamant, il se divise en trois rayons qui cherchent les ennemis autour du prisme. |
 | **Cœur Ardent** (Burning Heart) | Un rubis lancé se plante dans l'ennemi (ou le sol), bat trois fois en brûlant autour de lui, puis éclate en éclats en fusion (4,5 blocs). |
+| **Éclats de rubis** (Ruby Shards) | Trois longs cristaux de rubis en éventail, une traînée de feu derrière chacun : chacun transperce deux ennemis en les enflammant, puis se brise. |
+| **Nova de rubis** (Ruby Nova) | Un grand rubis s'élève au-dessus du lanceur et rassemble la lumière une seconde, puis lâche un anneau de 16 rayons sur le sol (9 blocs) : dégâts, feu, recul ; le rubis se brise. |
+| **Météore de rubis** (Ruby Meteor) | Un rubis géant tombe en flammes du ciel sur le sceau visé 1,5 s plus tard (4,5 blocs, recul, feu) et laisse un bassin en fusion qui brûle 4 s, des cristaux de rubis dressés dans la chaleur. |
 | **Sceau de Lapis** (Lapis Seal) | Quatre tablettes de lapis à runes d'or entourent l'ennemi visé et l'enchaînent de lumière dorée : ni sort ni mouvement (4 à 9 s), puis le sceau éclate. |
 | **Constellation de Lapis** (Lapis Constellation) | Sept étoiles de lapis tournent autour du lanceur, reliées comme une constellation ; chacune fond sur un ennemi qui approche (8 blocs). |
+| **Étoile filante** (Shooting Star) | Une étoile de lapis mouchetée et cerclée d'or vole vers l'ennemi regardé et éclate en étoiles d'or : dégâts sur 2 blocs, ralentissement. |
+| **Voûte céleste** (Celestial Vault) | Un disque de ciel nocturne (lapis, constellation et runes d'or) s'ouvre au-dessus de la zone visée : pendant 5 s, des étoiles d'or tombent sur les ennemis dessous. |
+| **Miroir de lapis** (Lapis Mirror) | Une tablette de lapis dans un cadre d'or tourne autour du lanceur 10 s : elle renvoie les tirs ennemis et, toutes les 2 s, enchaîne l'ennemi le plus proche (dégâts, silence, ralentissement). |
 | **Prisme de Diamant** (Diamond Prism) | Un grand diamant flotte au-dessus de l'endroit visé et frappe chaque seconde jusqu'à trois ennemis de rayons arc-en-ciel ; il divise le Rayon de Rubis (deux prismes à la fois). |
 | **Carapace de Diamant** (Diamond Shell) | Douze plaques de diamant autour du lanceur : chaque coup perd 60 % de sa force sur une plaque, qui file frapper l'agresseur ; à la fin le reste éclate sur les ennemis. |
+| **Lance de diamant** (Diamond Lance) | Une pointe de diamant tirée plus vite que l'œil traverse tous les ennemis sur 22 blocs, un rayon arc-en-ciel derrière elle. |
+| **Poussière de diamant** (Diamond Dust) | Un dôme de poussière de diamant scintillant (3,5 blocs, 4 s) taillade, aveugle et ralentit les ennemis dedans. |
+| **Bastion de diamant** (Diamond Bastion) | Un grand amas de diamant jaillit aux pieds du lanceur pour 12 s sous un dôme de lumière : Résistance II pour son camp, tirs ennemis détournés ; à la fin il éclate sur les ennemis autour. |
 | **Résonance d'Améthyste** (Amethyst Resonance) | Des grappes d'améthyste jaillissent en cercle et sonnent trois fois : chaque onde blesse et étourdit les ennemis (8 blocs) et brise leurs tirs. |
 | **Géode** (Geode) | Une géode (basalte, calcite, améthyste) se referme autour de l'ennemi visé, ouverte côté lanceur ; ses cristaux poussent vers l'intérieur et le transpercent, puis elle éclate. |
+| **Pointes d'améthyste** (Amethyst Spikes) | Des grappes d'améthyste jaillissent l'une après l'autre sur 12 blocs devant le lanceur, de plus en plus grandes : dégâts et projection. |
+| **Améthyste bourgeonnante** (Budding Amethyst) | Un bloc d'améthyste bourgeonnante grandit au point visé (bourgeons, grappes, grands cristaux) ; chaque étape résonne sur les ennemis autour (dégâts, ralentissement), puis il éclate sur eux (5 blocs). |
+| **Carillon d'améthyste** (Amethyst Chimes) | Des cristaux d'améthyste pendent d'un anneau d'or au-dessus du lanceur 12 s : chaque seconde, une onde frappe jusqu'à 3 ennemis visibles (ralentis) et brise les tirs ennemis proches. |
 | **Floraison d'Émeraude** (Emerald Bloom) | Une fleur d'émeraudes soigne chaque seconde le lanceur et ses alliés (8 blocs) et retire un mal à chacun ; à la fin, Régénération et Absorption. |
+| **Lien de vie** (Lifeline) | Un rayon vert relie une émeraude sur la poitrine du lanceur au plus blessé de son camp (12 blocs) : il lui retire un mal, puis le soigne toutes les demi-secondes pendant 3 s. |
+| **Égide d'émeraude** (Emerald Aegis) | Des plaques d'émeraude se referment en carapace autour du lanceur puis s'enfoncent en lui : Absorption (8 PV et plus) pour lui et son camp à 6 blocs pendant 15 s, et un peu de régénération. |
+| **Arbre d'émeraude** (Emerald Tree) | Une émeraude lancée devient un arbre de cristal chargé de fruits d'émeraude : toutes les 2 s pendant 12 s, un fruit tombe et soigne le camp du lanceur autour (5 blocs). |
+| **Épines d'émeraude** (Emerald Thorns) | Un fourré d'épines d'émeraude jaillit autour du lanceur (7 blocs) et empale les ennemis ; des flots de vie reviennent et le soignent de 40 % du mal fait. |
 | **Couronne des Cinq Joyaux** (Crown of the Five Gems, ultime) | Un pentagramme et cinq grandes gemmes autour du lanceur : pendant 8 s le rubis brûle, le lapis scelle, le diamant protège, l'améthyste résonne, l'émeraude soigne ; puis elles fusionnent en une gemme prismatique qui **foudroie l'endroit visé** d'un rayon de toutes les couleurs. |
 
 Livre : **Codex du Joaillier** (cuir violet, cinq gemmes serties). Focus : diamant, émeraude, éclat d'améthyste,

@@ -249,6 +249,208 @@ ICONS = (("ruby_ray", ruby_ray_icon), ("ruby_heart", ruby_heart_icon), ("lapis_s
          ("crown_of_gems", crown_of_gems_icon))
 
 
+# ------------------------------------------------------------------------------------------- the newer spells' art
+
+def lapis_texture():
+    """64 x 64, tiling: polished lapis lazuli: deep ultramarine clouded darker and lighter, flecks of golden pyrite,
+    a few pale veins of calcite."""
+    import numpy as np
+    from water_assets import _tnoise, _rgba
+    S = 64
+    n = _tnoise(S, S, (6, 6), 1601)
+    fine = _tnoise(S, S, (24, 24), 1602)
+    t = np.clip(.25 + .5 * n + .25 * fine, 0, 1)[..., None]
+    col = np.array(LAPIS_DARK, np.float32) * (1 - t) + np.array((52, 104, 224), np.float32) * t
+    vein = np.clip(1 - np.abs(_tnoise(S, S, (4, 4), 1603) - .5) / .025, 0, 1)
+    col = col + (np.array((200, 214, 240), np.float32) - col) * (.45 * vein[..., None])
+    rnd = np.random.default_rng(1604)
+    flecks = rnd.random((S, S)) < .03
+    col[flecks] = np.array(GOLD, np.float32) * (.8 + .4 * rnd.random((flecks.sum(), 1)))
+    return _rgba(np.clip(col, 0, 255), np.full((S, S), 255.0))
+
+
+def _star(d, S, x, y, r, fill, outline=None, inner=.44, turn=0.0):
+    pts = []
+    for k in range(10):
+        a = -math.pi / 2 + turn + k * math.pi / 5
+        rr = r if k % 2 == 0 else r * inner
+        pts.append(((x + math.cos(a) * rr) * S, (y + math.sin(a) * rr) * S))
+    d.polygon(pts, fill=_c(fill), outline=_c(outline) if outline else None)
+
+
+def ruby_shards_icon():
+    def draw(d, img, S):
+        for k, (x, y) in enumerate(((.3, .78), (.5, .7), (.7, .62))):
+            d.line((x * S - .2 * S, y * S + .2 * S, x * S, y * S), fill=_c((255, 140, 60), 180), width=S // 16)
+            crystal(d, S, x, y, .1, .36, .75, RUBY, RUBY_LIGHT, RUBY_DARK)
+        sparkle_at(d, S, .86, .2, .07)
+    return _icon(draw, .5, .6, (90, 20, 30))
+
+
+def ruby_nova_icon():
+    def draw(d, img, S):
+        for k in range(12):
+            a = k * math.tau / 12
+            d.line((.5 * S, .45 * S, (.5 + math.cos(a) * .48) * S, (.45 + math.sin(a) * .48) * S), fill=_c(RUBY_LIGHT, 220), width=S // 28)
+        g.glow_spot(img, .5 * S, .45 * S, .3 * S, (255, 120, 120), .9)
+        gem_side(d, S, .5, .42, .4, RUBY, RUBY_LIGHT, RUBY_DARK)
+    return _icon(draw, .5, .45, (90, 20, 30))
+
+
+def ruby_meteor_icon():
+    def draw(d, img, S):
+        d.line((.95 * S, .02 * S, .55 * S, .48 * S), fill=_c((255, 150, 60), 200), width=S // 6)
+        d.line((.95 * S, .02 * S, .55 * S, .48 * S), fill=_c((255, 230, 160)), width=S // 14)
+        d.ellipse((.1 * S, .76 * S, .9 * S, .96 * S), fill=_c((255, 110, 40), 220))
+        gem_side(d, S, .48, .55, .44, RUBY, RUBY_LIGHT, RUBY_DARK)
+        g.glow_spot(img, .5 * S, .86 * S, .3 * S, (255, 120, 40), .8)
+    return _icon(draw, .5, .6, (70, 20, 20))
+
+
+def shooting_star_icon():
+    def draw(d, img, S):
+        d.line((.08 * S, .92 * S, .6 * S, .4 * S), fill=_c(GOLD, 200), width=S // 10)
+        d.line((.08 * S, .92 * S, .6 * S, .4 * S), fill=_c((255, 250, 220)), width=S // 26)
+        _star(d, S, .64, .36, .28, LAPIS, GOLD, turn=.3)
+        _star(d, S, .64, .36, .12, (90, 140, 255), None, turn=.3)
+        sparkle_at(d, S, .2, .25, .07, GOLD)
+    return _icon(draw, .5, .5, (16, 24, 70))
+
+
+def celestial_vault_icon():
+    def draw(d, img, S):
+        d.ellipse((.06 * S, .06 * S, .94 * S, .5 * S), fill=_c(LAPIS_DARK), outline=_c(GOLD), width=S // 20)
+        for x, y in ((.25, .26), (.42, .18), (.6, .3), (.75, .22)):
+            sparkle_at(d, S, x, y, .05, GOLD)
+        for x, y in ((.3, .62), (.62, .8)):
+            d.line((x * S, (y - .2) * S, x * S, y * S), fill=_c(GOLD, 160), width=S // 30)
+            _star(d, S, x, y, .09, GOLD, OUTLINE)
+    return _icon(draw, .5, .3, (16, 24, 70))
+
+
+def lapis_mirror_icon():
+    def draw(d, img, S):
+        d.rounded_rectangle((.26 * S, .1 * S, .74 * S, .9 * S), radius=int(.2 * S), fill=_c(GOLD), outline=_c(OUTLINE))
+        d.rounded_rectangle((.32 * S, .16 * S, .68 * S, .84 * S), radius=int(.16 * S), fill=_c(LAPIS))
+        for y in (.32, .5, .68):
+            d.line((.42 * S, y * S, .58 * S, y * S), fill=_c(GOLD), width=S // 24)
+            d.line((.5 * S, (y - .05) * S, .5 * S, (y + .05) * S), fill=_c(GOLD), width=S // 24)
+        sparkle_at(d, S, .8, .2, .07)
+    return _icon(draw, .5, .5, (16, 24, 70))
+
+
+def diamond_lance_icon():
+    def draw(d, img, S):
+        for i, c in enumerate(((255, 70, 80), (255, 200, 60), (80, 240, 110), (80, 120, 255), (190, 90, 255))):
+            d.line((.08 * S, (.84 + i * .025) * S, .55 * S, .45 * S), fill=_c(c, 200), width=S // 40)
+        d.line((.08 * S, .9 * S, .62 * S, .38 * S), fill=_c(WHITE), width=S // 24)
+        crystal(d, S, .66, .34, .12, .5, .8, DIAMOND, WHITE, DIAMOND_DARK)
+        sparkle_at(d, S, .9, .1, .08)
+    return _icon(draw, .5, .5, (40, 70, 100))
+
+
+def diamond_dust_icon():
+    def draw(d, img, S):
+        import random
+        rnd = random.Random(7)
+        g.glow_spot(img, .5 * S, .55 * S, .4 * S, (220, 245, 255), .5)
+        for k in range(16):
+            x, y = .15 + rnd.random() * .7, .2 + rnd.random() * .65
+            c = [(255, 120, 120), (255, 230, 120), (140, 255, 160), (140, 200, 255), (220, 160, 255), WHITE][k % 6]
+            sparkle_at(d, S, x, y, .04 + rnd.random() * .05, c)
+        gem_side(d, S, .5, .55, .22, DIAMOND, WHITE, DIAMOND_DARK)
+    return _icon(draw, .5, .5, (40, 70, 100))
+
+
+def diamond_bastion_icon():
+    def draw(d, img, S):
+        d.pieslice((.04 * S, .2 * S, .96 * S, 1.2 * S), 180, 360, fill=_c((180, 230, 255), 70), outline=_c(WHITE, 160))
+        for x, h, a in ((.5, .6, 0), (.34, .38, -.4), (.66, .38, .4), (.22, .24, -.8), (.78, .24, .8)):
+            crystal(d, S, x, .88, .14 if h > .5 else .1, h, a, DIAMOND, WHITE, DIAMOND_DARK)
+        sparkle_at(d, S, .5, .2, .08)
+    return _icon(draw, .5, .7, (40, 70, 100))
+
+
+def amethyst_spikes_icon():
+    def draw(d, img, S):
+        d.rectangle((0, .82 * S, S, S), fill=_c(AMETHYST_DARK))
+        for k in range(5):
+            x = .12 + k * .19
+            crystal(d, S, x, .86, .08 + k * .015, .14 + k * .1, .15 * (k - 2), AMETHYST, AMETHYST_LIGHT, AMETHYST_DARK)
+    return _icon(draw, .5, .7, (60, 30, 90))
+
+
+def budding_amethyst_icon():
+    def draw(d, img, S):
+        d.rectangle((.24 * S, .62 * S, .76 * S, .92 * S), fill=_c((120, 80, 170)), outline=_c(OUTLINE))
+        for x, h, a in ((.5, .5, 0), (.34, .3, -.5), (.66, .32, .5)):
+            crystal(d, S, x, .64, .12, h, a, AMETHYST, AMETHYST_LIGHT, AMETHYST_DARK)
+        for r in (.34, .44):
+            d.arc(((.5 - r) * S, (.55 - r) * S, (.5 + r) * S, (.55 + r) * S), 200, 340, fill=_c(AMETHYST_LIGHT, 140), width=S // 30)
+    return _icon(draw, .5, .6, (60, 30, 90))
+
+
+def amethyst_chimes_icon():
+    def draw(d, img, S):
+        d.line((.12 * S, .14 * S, .88 * S, .14 * S), fill=_c(GOLD), width=S // 16)
+        for k, (x, ln) in enumerate(((.2, .5), (.36, .66), (.52, .58), (.68, .72), (.84, .46))):
+            d.line((x * S, .14 * S, x * S, (.14 + ln * .3) * S), fill=_c((200, 200, 220)), width=max(1, S // 48))
+            crystal(d, S, x, .14 + ln * .3, .08, ln * .5, math.pi, AMETHYST, AMETHYST_LIGHT, AMETHYST_DARK)
+        for r in (.4, .48):
+            d.arc(((.5 - r) * S, (.5 - r) * S, (.5 + r) * S, (.5 + r) * S), 20, 160, fill=_c(AMETHYST_LIGHT, 120), width=S // 32)
+    return _icon(draw, .5, .4, (60, 30, 90))
+
+
+def emerald_lifeline_icon():
+    def draw(d, img, S):
+        d.line((.18 * S, .72 * S, .82 * S, .3 * S), fill=_c(EMERALD, 200), width=S // 8)
+        d.line((.18 * S, .72 * S, .82 * S, .3 * S), fill=_c(EMERALD_LIGHT), width=S // 20)
+        for x, y in ((.36, .6), (.62, .43)):
+            d.line(((x - .06) * S, y * S, (x + .06) * S, y * S), fill=_c(WHITE), width=S // 24)
+            d.line((x * S, (y - .06) * S, x * S, (y + .06) * S), fill=_c(WHITE), width=S // 24)
+        gem_side(d, S, .18, .72, .26, EMERALD, EMERALD_LIGHT, EMERALD_DARK)
+        g.glow_spot(img, .82 * S, .3 * S, .14 * S, (180, 255, 210), .9)
+    return _icon(draw, .5, .5, (20, 70, 40))
+
+
+def emerald_aegis_icon():
+    def draw(d, img, S):
+        d.polygon([(.5 * S, .08 * S), (.86 * S, .22 * S), (.8 * S, .62 * S), (.5 * S, .92 * S), (.2 * S, .62 * S), (.14 * S, .22 * S)], fill=_c(EMERALD),
+                  outline=_c(OUTLINE))
+        d.polygon([(.5 * S, .18 * S), (.74 * S, .28 * S), (.7 * S, .58 * S), (.5 * S, .8 * S)], fill=_c(EMERALD_LIGHT, 200))
+        d.line((.5 * S, .18 * S, .5 * S, .8 * S), fill=_c(EMERALD_DARK), width=S // 32)
+        sparkle_at(d, S, .3, .3, .07)
+    return _icon(draw, .5, .5, (20, 70, 40))
+
+
+def emerald_tree_icon():
+    def draw(d, img, S):
+        d.line((.5 * S, .92 * S, .5 * S, .5 * S), fill=_c((120, 90, 60)), width=S // 10)
+        for x, y, a in ((.5, .48, 0), (.32, .56, -.7), (.68, .56, .7), (.4, .36, -.35), (.6, .36, .35)):
+            crystal(d, S, x, y, .1, .28, a, EMERALD, EMERALD_LIGHT, EMERALD_DARK)
+        for x, y in ((.24, .72), (.78, .76)):
+            d.ellipse(((x - .05) * S, (y - .05) * S, (x + .05) * S, (y + .05) * S), fill=_c(EMERALD_LIGHT), outline=_c(OUTLINE))
+    return _icon(draw, .5, .5, (20, 70, 40))
+
+
+def emerald_thorns_icon():
+    def draw(d, img, S):
+        d.rectangle((0, .84 * S, S, S), fill=_c((40, 50, 40)))
+        for x, h, a in ((.2, .44, -.25), (.38, .6, -.1), (.56, .7, .08), (.76, .5, .25)):
+            crystal(d, S, x, .88, .09, h, a, EMERALD, EMERALD_LIGHT, EMERALD_DARK)
+        d.line((.7 * S, .2 * S, .9 * S, .08 * S), fill=_c((255, 120, 140)), width=S // 20)
+        g.glow_spot(img, .86 * S, .12 * S, .12 * S, (180, 255, 210), .9)
+    return _icon(draw, .5, .6, (20, 60, 40))
+
+
+NEW_ICONS = (("ruby_shards", ruby_shards_icon), ("ruby_nova", ruby_nova_icon), ("ruby_meteor", ruby_meteor_icon),
+             ("shooting_star", shooting_star_icon), ("celestial_vault", celestial_vault_icon), ("lapis_mirror", lapis_mirror_icon),
+             ("diamond_lance", diamond_lance_icon), ("diamond_dust", diamond_dust_icon), ("diamond_bastion", diamond_bastion_icon),
+             ("amethyst_spikes", amethyst_spikes_icon), ("budding_amethyst", budding_amethyst_icon), ("amethyst_chimes", amethyst_chimes_icon),
+             ("emerald_lifeline", emerald_lifeline_icon), ("emerald_aegis", emerald_aegis_icon), ("emerald_tree", emerald_tree_icon),
+             ("emerald_thorns", emerald_thorns_icon))
+
+
 def jeweller_sigil():
     """256x256 white on black (tinted in game, drawn glowing on the ground): the plan of a brilliant cut seen from above
     (an octagonal table, star and kite facets, a sixteen-sided girdle) in two rings, five small gems set round it."""
@@ -391,8 +593,9 @@ def main():
     g.save(facet(), "textures/entity/gem/facet.png")
     g.save(sparkle(), "textures/entity/gem/sparkle.png")
     g.save(jeweller_sigil(), "textures/entity/gem/sigil.png")
-    for name, icon in ICONS:
+    for name, icon in ICONS + NEW_ICONS:
         g.save(icon(), f"textures/gui/spell_icons/{name}.png")
+    g.save(lapis_texture(), "textures/entity/gem/lapis.png")
     g.save(affinity_ring_gem(), "textures/item/affinity_ring_gem.png")
     g.save(jewellers_codex_icon(), "textures/item/jewellers_codex.png")
     g.save(jewellers_codex_model_texture(), "textures/item/jewellers_codex_3d.png")

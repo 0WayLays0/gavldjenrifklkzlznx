@@ -677,6 +677,11 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<SandScene>> SAND_SCENE = register("sand_scene",
             EntityType.Builder.<SandScene>of(SandScene::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
 
+    // Gem Magic's newer spells
+    public static final DeferredHolder<EntityType<?>, EntityType<com.waylays.arcanes.entity.gem.GemScene>> GEM_SCENE = register("gem_scene",
+            EntityType.Builder.<com.waylays.arcanes.entity.gem.GemScene>of(com.waylays.arcanes.entity.gem.GemScene::new, MobCategory.MISC).sized(1f, 1f)
+                    .clientTrackingRange(12).updateInterval(1).fireImmune());
+
     // Lotus Magic
     public static final DeferredHolder<EntityType<?>, EntityType<LotusScene>> LOTUS_SCENE = register("lotus_scene",
             EntityType.Builder.<LotusScene>of(LotusScene::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());

@@ -61,4 +61,9 @@ public abstract class GemSpell extends AbstractSpell {
     public float getPower(int spellLevel, @Nullable LivingEntity caster) {
         return getSpellPower(spellLevel, caster);
     }
+
+    /** Where the caster's aim meets the ground: under the enemy they look at, else the ground they point at. */
+    public static net.minecraft.world.phys.Vec3 aimed(net.minecraft.world.level.Level level, LivingEntity caster, double range) {
+        return com.waylays.arcanes.spells.SpellUtil.aimedSpot(level, caster, range);
+    }
 }

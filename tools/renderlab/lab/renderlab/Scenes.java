@@ -39,6 +39,7 @@ import com.waylays.arcanes.client.render.boss.*;
 import com.waylays.arcanes.client.render.echo.*;
 import com.waylays.arcanes.client.render.sand.*;
 import com.waylays.arcanes.client.render.lotus.*;
+import com.waylays.arcanes.client.render.gem.*;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.util.Mth;
@@ -57,6 +58,13 @@ public final class Scenes {
 
     static void husk(Ctx ctx, float x, float y, float z) {
         ctx.rec().box(x - .3, y, z - .3, x + .3, y + 1.95, z + .3, 0x8A7A52);
+    }
+
+    /** Gem scenes that need more than one call. */
+    static final class GemModelsLab {
+        static void vault(Ctx ctx, Vector3f o, float age) {
+            LapisModels.vault(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 112, 5, 8, (age - 12) % 8, new Vector3f(2, 1, 1), 3, LIGHT);
+        }
     }
 
     public static void draw(String scene, float age, Ctx ctx) {
@@ -665,6 +673,101 @@ public final class Scenes {
                 husk(ctx, -4, 0, -5);
                 Vector3f o = new Vector3f(0, 0, 0);
                 ThousandModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 170, 10, age % 5, new Vector3f(5, 1, 3), 3, LIGHT);
+            }
+            case "gshard" -> {
+                caster(ctx, 0, -3);
+                husk(ctx, 0, 0, 7);
+                for (int k = 0; k < 3; k++) {
+                    float a = (k - 1) * 6 * Mth.DEG_TO_RAD;
+                    Vector3f d = new Vector3f(Mth.sin(a), 0, Mth.cos(a));
+                    Vector3f o = new Vector3f(d).mul(Math.min(age, 18) * 1.3f).add(0, 1.4f, -2.4f);
+                    RubyModels.shard(Lab.at(o), ctx.rec(), Lab.view(ctx, o), d, age, false, 0, k * 31, LIGHT);
+                }
+            }
+            case "gnova" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 4, 0, 4);
+                Vector3f o = new Vector3f(0, 0, 0);
+                RubyModels.nova(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 40, 22, 9, 3, LIGHT);
+            }
+            case "gmeteor" -> {
+                husk(ctx, 2, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                RubyModels.meteor(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 115, 30, 30, 4.5f, 3, LIGHT);
+            }
+            case "gstar" -> {
+                caster(ctx, 0, -3);
+                husk(ctx, 0, 0, 7);
+                boolean done = age > 9;
+                Vector3f o = done ? new Vector3f(0, 1.4f, 6.6f) : new Vector3f(0, 1.4f, -2.4f + age);
+                LapisModels.star(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, done, age - 9, 3, LIGHT);
+            }
+            case "gvault" -> {
+                husk(ctx, 2, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                GemModelsLab.vault(ctx, o, age);
+            }
+            case "gmirror" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 5);
+                Vector3f o = new Vector3f(0, 0, 0);
+                LapisModels.mirror(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 200, age % 40, new Vector3f(3, 1.1f, 5), 3, LIGHT);
+            }
+            case "glance" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 0, 0, 8);
+                husk(ctx, 0, 0, 14);
+                Vector3f o = new Vector3f(0, 1.5f, .3f);
+                DiamondModels.lance(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 14, 20, 4, 3, LIGHT);
+            }
+            case "gdust" -> {
+                husk(ctx, 1, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                DiamondModels.dust(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 92, 3.5f, 3, LIGHT);
+            }
+            case "gbastion" -> {
+                caster(ctx, 2, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                DiamondModels.bastion(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 254, 5, 14, 3, LIGHT);
+            }
+            case "gspikes" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, .3f, 0, 7);
+                Vector3f o = new Vector3f(0, 0, 0);
+                AmethystModels.spikes(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 32, 12, 3, LIGHT);
+            }
+            case "gbudding" -> {
+                husk(ctx, 2, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                AmethystModels.budding(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 95, 5, 20, 3, LIGHT);
+            }
+            case "gchimes" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 5);
+                Vector3f o = new Vector3f(0, 0, 0);
+                AmethystModels.chimes(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 240, 20, 20, (age - 20) % 20, new Vector3f(3, 1.1f, 5), 3, LIGHT);
+            }
+            case "glifeline" -> {
+                caster(ctx, 0, 0);
+                caster(ctx, 3, 4);
+                Vector3f o = new Vector3f(0, 0, 0);
+                EmeraldModels.lifeline(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 68, new Vector3f(3, 1.1f, 4), age % 10, 3, LIGHT);
+            }
+            case "gaegis" -> {
+                caster(ctx, 0, 0);
+                Vector3f o = new Vector3f(0, 0, 0);
+                EmeraldModels.aegis(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 60, 3, LIGHT);
+            }
+            case "gtree" -> {
+                caster(ctx, 2, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                EmeraldModels.tree(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 260, 20, 5, (age - 20) % 40, 3, LIGHT);
+            }
+            case "gthorns" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 3);
+                Vector3f o = new Vector3f(0, 0, 0);
+                EmeraldModels.thorns(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 30, 6, 7, 3, LIGHT);
             }
             default -> throw new IllegalArgumentException("no scene " + scene);
         }

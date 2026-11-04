@@ -85,7 +85,7 @@ public final class GemGameTests {
                 count++;
             }
         }
-        helper.assertTrue(count == 10, "expected 10 Gem spells, found " + count);
+        helper.assertTrue(count == 26, "expected 26 Gem spells, found " + count);
         helper.assertTrue(new ItemStack(ModItems.JEWELLERS_CODEX.get()).getItem() instanceof SpellBook, "the Jeweller's Codex is not a spellbook");
         helper.assertTrue(new ItemStack(Items.DIAMOND).is(ModSchools.GEM_FOCUS), "diamonds are not the school's focus");
         helper.succeed();
