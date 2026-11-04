@@ -468,6 +468,27 @@ d'un cœur d'étamines dorées et d'une tête à graines), avec leurs grandes fe
 | **Tempête de pétales** (Petal Storm, épique) | Un tourbillon de pétales enveloppe le lanceur 8 s (4,5 blocs) : les ennemis pris dedans sont tailladés toutes les demi-secondes, emportés et aveuglés. |
 | **Lotus aux mille pétales** (Thousand-Petal Lotus, ultime) | Un étang de lumière s'ouvre et un immense lotus en sort, s'ouvrant anneau après anneau ; en pleine éclosion un pilier de lumière tombe à travers son cœur (10 blocs) : ennemis frappés, soulevés, ralentis et marqués, alliés soignés ; puis ses pétales tombent un à un sur les ennemis restants. |
 
+### Magie de l'Aurore
+
+Les aurores boréales : des rideaux de lumière qui pendent en plis ondulants, leurs rayons montant d'un ourlet vert
+éclatant vers le turquoise, le bleu, le violet et le rose, des rubans de la même lumière, des étoiles qui scintillent et
+des pointes de glace pâle. Livre : **Codex Boréal** (cuir bleu nuit peint d'une aurore au-dessus de pics enneigés, cadre
+de filigrane d'argent, une étoile de glace en relief sur chaque plat, des fleurons de cristal au dos) ; focus : glace
+bleue, glace compactée, poche d'encre luisante, boule de neige.
+
+| Sort | Effet |
+|---|---|
+| **Lance boréale** (Aurora Lance, commun) | Une pique de lumière à pointe de glace, trois rubans d'aurore tournoyant derrière elle : elle traverse trois ennemis et les ralentit. |
+| **Feux polaires** (Polar Wisps, commun) | 3 à 5 feux follets d'aurore s'élèvent, puis filent chacun vers son ennemi en traînant des rubans de couleur et éclatent en le marquant. |
+| **Rideau boréal** (Borealis Curtain, peu commun) | Un rideau d'aurore de 12 blocs se déroule jusqu'au sol en travers du regard, pendant 8 s : il brûle, ralentit et marque les ennemis dedans et détourne les tirs. |
+| **Envol boréal** (Aurora Glide, peu commun) | Le lanceur chevauche une vague d'aurore sur une douzaine de blocs ; les ennemis sur son chemin sont frappés, projetés et marqués. |
+| **Manteau d'aurore** (Aurora Mantle, rare) | Des rideaux d'aurore enveloppent le lanceur 10 s (sous le niveau des yeux) : Résistance I, Vitesse I, tirs détournés, les ennemis proches brûlés et ralentis. |
+| **Bénédiction boréale** (Boreal Blessing, rare) | Des rideaux d'aurore descendent du ciel autour du lanceur (8 blocs) : son camp est soigné, libéré d'un mal, régénéré et protégé. |
+| **Spirale céleste** (Celestial Spiral, rare) | Une colonne tourbillonnante de rubans d'aurore au point visé attire, soulève et brûle les ennemis 6 s. |
+| **Serpent d'aurore** (Aurora Serpent, épique) | Un serpent tissé d'aurore, à tête et nageoires de glace, tourne dans le ciel 10 s et plonge toutes les 2 s sur l'ennemi le plus proche. |
+| **Halo polaire** (Polar Halo, épique) | Un grand halo d'aurore cerclé de glace s'ouvre au-dessus de la zone visée, des rideaux en pendant : des rayons de toutes les couleurs tombent sur les ennemis 6 s. |
+| **Nuit boréale** (Boreal Night, ultime) | La nuit tombe sous un dôme d'étoiles (16 blocs) où ondule l'aurore ; quatre immenses rideaux balaient le terrain, puis toutes les lumières se rassemblent en un pilier qui frappe chaque ennemi et soigne le camp du lanceur. |
+
 ### Rituels (sorts de groupe)
 
 Ce n'est pas une école : des rituels à plusieurs, lents et spectaculaires. Ils se font avec la **Craie rituelle**

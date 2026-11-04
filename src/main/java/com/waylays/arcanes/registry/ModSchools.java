@@ -409,6 +409,22 @@ public final class ModSchools {
             LOTUS_MAGIC
     ));
 
+    /** Aurora Magic: the northern lights; curtains and ribbons of green, turquoise and violet light, stars and ice. */
+    public static final ResourceLocation AURORA_RESOURCE = ArcanesOublies.id("aurora");
+    public static final TagKey<Item> AURORA_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("aurora_focus"));
+    public static final ResourceKey<DamageType> AURORA_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("aurora_magic"));
+    public static final int AURORA_COLOR = 0x5CF5B8;
+
+    public static final DeferredHolder<SchoolType, SchoolType> AURORA = SCHOOLS.register(AURORA_RESOURCE.getPath(), () -> new SchoolType(
+            AURORA_RESOURCE,
+            AURORA_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".aurora").withStyle(Style.EMPTY.withColor(AURORA_COLOR)),
+            ModAttributes.AURORA_SPELL_POWER,
+            ModAttributes.AURORA_MAGIC_RESIST,
+            sound(SoundEvents.AMETHYST_BLOCK_RESONATE),
+            AURORA_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

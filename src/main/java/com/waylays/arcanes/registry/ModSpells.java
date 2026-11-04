@@ -269,6 +269,16 @@ import com.waylays.arcanes.spells.lotus.LotusMandalaSpell;
 import com.waylays.arcanes.spells.lotus.LotusLanternsSpell;
 import com.waylays.arcanes.spells.lotus.PetalStormSpell;
 import com.waylays.arcanes.spells.lotus.ThousandPetalLotusSpell;
+import com.waylays.arcanes.spells.aurora.AuroraLanceSpell;
+import com.waylays.arcanes.spells.aurora.PolarWispsSpell;
+import com.waylays.arcanes.spells.aurora.BorealisCurtainSpell;
+import com.waylays.arcanes.spells.aurora.AuroraGlideSpell;
+import com.waylays.arcanes.spells.aurora.AuroraMantleSpell;
+import com.waylays.arcanes.spells.aurora.BorealBlessingSpell;
+import com.waylays.arcanes.spells.aurora.CelestialSpiralSpell;
+import com.waylays.arcanes.spells.aurora.AuroraSerpentSpell;
+import com.waylays.arcanes.spells.aurora.PolarHaloSpell;
+import com.waylays.arcanes.spells.aurora.BorealNightSpell;
 import com.waylays.arcanes.spells.echo.SoundWaveSpell;
 import com.waylays.arcanes.spells.echo.ShriekSpell;
 import com.waylays.arcanes.spells.echo.EchoStepSpell;
@@ -597,6 +607,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> LOTUS_LANTERNS = register(new LotusLanternsSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> PETAL_STORM = register(new PetalStormSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> THOUSAND_PETAL_LOTUS = register(new ThousandPetalLotusSpell());
+
+    // Aurora Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> AURORA_LANCE = register(new AuroraLanceSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> POLAR_WISPS = register(new PolarWispsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BOREALIS_CURTAIN = register(new BorealisCurtainSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> AURORA_GLIDE = register(new AuroraGlideSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> AURORA_MANTLE = register(new AuroraMantleSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BOREAL_BLESSING = register(new BorealBlessingSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CELESTIAL_SPIRAL = register(new CelestialSpiralSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> AURORA_SERPENT = register(new AuroraSerpentSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> POLAR_HALO = register(new PolarHaloSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BOREAL_NIGHT = register(new BorealNightSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

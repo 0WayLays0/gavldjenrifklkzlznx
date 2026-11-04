@@ -80,7 +80,8 @@ public final class ModCreativeTabs {
             new Section(ModSchools.WIND, () -> new ItemStack(ModItems.WINDS_CODEX.get()), List.of(ModItems.WINDS_CODEX)),
             new Section(ModSchools.ECHO, () -> new ItemStack(ModItems.ECHOES_CODEX.get()), List.of(ModItems.ECHOES_CODEX)),
             new Section(ModSchools.SAND, () -> new ItemStack(ModItems.DUNES_CODEX.get()), List.of(ModItems.DUNES_CODEX)),
-            new Section(ModSchools.LOTUS, () -> new ItemStack(ModItems.LOTUS_CODEX.get()), List.of(ModItems.LOTUS_CODEX)));
+            new Section(ModSchools.LOTUS, () -> new ItemStack(ModItems.LOTUS_CODEX.get()), List.of(ModItems.LOTUS_CODEX)),
+            new Section(ModSchools.AURORA, () -> new ItemStack(ModItems.BOREAL_CODEX.get()), List.of(ModItems.BOREAL_CODEX)));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup." + ArcanesOublies.MODID))

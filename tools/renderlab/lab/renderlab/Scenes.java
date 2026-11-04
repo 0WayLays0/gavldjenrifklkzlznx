@@ -40,6 +40,7 @@ import com.waylays.arcanes.client.render.echo.*;
 import com.waylays.arcanes.client.render.sand.*;
 import com.waylays.arcanes.client.render.lotus.*;
 import com.waylays.arcanes.client.render.gem.*;
+import com.waylays.arcanes.client.render.aurora.*;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.util.Mth;
@@ -768,6 +769,65 @@ public final class Scenes {
                 husk(ctx, 3, 0, 3);
                 Vector3f o = new Vector3f(0, 0, 0);
                 EmeraldModels.thorns(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 30, 6, 7, 3, LIGHT);
+            }
+            case "alance" -> {
+                caster(ctx, 0, -3);
+                husk(ctx, 0, 0, 8);
+                Vector3f o = new Vector3f(0, 1.4f, -2.2f + age * 1.5f);
+                AuroraModels.lance(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, false, 0, 3, LIGHT);
+            }
+            case "awisp" -> {
+                caster(ctx, 0, -3);
+                for (int k = 0; k < 3; k++) {
+                    Vector3f o = new Vector3f((k - 1) * 2f, 2 + k * .3f, age * .4f + k);
+                    AuroraModels.wisp(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f((1 - k) * .1f, 0, .5f), age, false, 0, k, k * 7, LIGHT);
+                }
+            }
+            case "acurtain" -> {
+                caster(ctx, 0, -6);
+                husk(ctx, 2, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                AuroraModels.curtain(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(1, 0, 0), age, 175, 12, 5.5f, 3, LIGHT);
+            }
+            case "aglide" -> {
+                caster(ctx, 0, 10);
+                Vector3f o = new Vector3f(0, 0, 0);
+                AuroraModels.glide(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, .5f, 10), age, 36, 12, 3, LIGHT);
+            }
+            case "amantle" -> {
+                caster(ctx, 0, 0);
+                Vector3f o = new Vector3f(0, 0, 0);
+                AuroraModels.mantle(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 215, 1.6f, 3, LIGHT);
+            }
+            case "ablessing" -> {
+                caster(ctx, 0, 0);
+                caster(ctx, 3, 2);
+                Vector3f o = new Vector3f(0, 0, 0);
+                AuroraModels.blessing(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 60, 8, 16, 3, LIGHT);
+            }
+            case "aspiral" -> {
+                husk(ctx, 1.5f, 1, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                AuroraSkyModels.spiral(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 135, 4, 3, LIGHT);
+            }
+            case "aserpent" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 5, 0, 4);
+                Vector3f o = new Vector3f(0, 0, 0);
+                float since = (age - 20) % 40;
+                AuroraSkyModels.serpent(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 220, age >= 20 ? since : 99, age >= 20 ? new Vector3f(5, 0, 4) : null, 6, 6, .06f, 16, 3,
+                        LIGHT);
+            }
+            case "ahalo" -> {
+                husk(ctx, 2, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                AuroraSkyModels.halo(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 150, 7, 9, 15, (age - 15) % 8, new Vector3f(2, 0, 1), 3, LIGHT);
+            }
+            case "anight" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 6, 0, 4);
+                Vector3f o = new Vector3f(0, 0, 0);
+                AuroraSkyModels.night(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 250, 16, 30, 40, 28, 200, 3, LIGHT);
             }
             default -> throw new IllegalArgumentException("no scene " + scene);
         }

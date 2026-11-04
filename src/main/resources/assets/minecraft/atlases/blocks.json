@@ -27,7 +27,8 @@
         "arcanes_wind": "arcanes_oublies:item/scroll_palettes/wind",
         "arcanes_echo": "arcanes_oublies:item/scroll_palettes/echo",
         "arcanes_sand": "arcanes_oublies:item/scroll_palettes/sand",
-        "arcanes_lotus": "arcanes_oublies:item/scroll_palettes/lotus"
+        "arcanes_lotus": "arcanes_oublies:item/scroll_palettes/lotus",
+        "arcanes_aurora": "arcanes_oublies:item/scroll_palettes/aurora"
       }
     }
   ]
