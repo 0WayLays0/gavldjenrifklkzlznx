@@ -37,7 +37,7 @@ public final class PetalStormModel {
         for (int i = 0; i < PETALS; i++) {
             float h = BossMesh.hash(seed + i * 7), h2 = BossMesh.hash(seed + i * 13), h3 = BossMesh.hash(seed + i * 29);
             int band = i % 3;
-            float r = (1.1f + band * 1.05f + h * .7f + .25f * Mth.sin(age * .05f + i)) * scale * (.55f + .45f * grow);
+            float r = (1.5f + band * 1.0f + h * .6f + .25f * Mth.sin(age * .05f + i)) * scale * (.55f + .45f * grow);
             float w = (.2f - band * .035f) * (1 + .3f * h2);
             float a = h * Mth.TWO_PI + age * w;
             float climb = (h2 + age * (.008f + .006f * h3)) % 1;

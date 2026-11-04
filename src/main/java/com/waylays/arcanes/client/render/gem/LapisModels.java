@@ -191,9 +191,15 @@ public final class LapisModels {
         if (k <= .01f) {
             return;
         }
-        float a = age * .06f;
+        // It swings from one shoulder to the other behind its master, never in front of their eyes
+        Vector3f f = new Vector3f(dir.x, 0, dir.z);
+        if (f.lengthSquared() < 1.0E-6f) {
+            f.set(0, 0, 1);
+        }
+        f.normalize();
+        float a = (float) Math.atan2(f.z, f.x) + Mth.PI + 1.1f * Mth.sin(age * .035f);
         Vector3f out = new Vector3f(Mth.cos(a), 0, Mth.sin(a));
-        Vector3f at = new Vector3f(out).mul(1.5f).add(0, 1.3f + .1f * Mth.sin(age * .1f), 0);
+        Vector3f at = new Vector3f(out).mul(1.3f).add(0, 1.55f + .1f * Mth.sin(age * .1f), 0);
         poseStack.pushPose();
         poseStack.translate(at.x, at.y, at.z);
         poseStack.mulPose(LotusMesh.frame(new Vector3f(0, 1, 0), out));
