@@ -29,7 +29,7 @@ def _sparkles():
     return {(rnd.randrange(64), rnd.randrange(64)) for _ in range(40)}
 
 
-RED = (232, 72, 44)
+RED = (210, 50, 32)
 RED_LIGHT = (255, 186, 120)
 RED_DEEP = (150, 28, 18)
 
@@ -352,7 +352,7 @@ def main():
     g.save(mana_glow(True), "textures/entity/mana_glow_eyes.png")
     # The salamander's red mana, embers in its veins
     g.save(mana_skin(True, RED, RED_LIGHT), "textures/entity/mana_skin_red_eyes.png")
-    g.save(mana_glow(True, (70, 16, 8), (255, 140, 60), (255, 236, 180)), "textures/entity/mana_glow_red_eyes.png")
+    g.save(mana_glow(True, (34, 6, 3), (215, 92, 36), (255, 220, 160)), "textures/entity/mana_glow_red_eyes.png")
     for name, fn in (("mana_rats", mana_rats_icon), ("mana_piranha", mana_piranha_icon), ("mana_dromedary", mana_dromedary_icon),
                      ("mana_serpent", mana_serpent_icon), ("mana_crows", mana_crows_icon), ("mana_fox", mana_fox_icon),
                      ("mana_wolf", mana_wolf_icon), ("mana_butterfly", mana_butterfly_icon), ("mana_kangaroo", mana_kangaroo_icon),
