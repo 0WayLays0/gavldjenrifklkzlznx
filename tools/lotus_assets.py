@@ -301,15 +301,18 @@ def lotus_throne_icon():
 
 def mire_roots_icon():
     def draw(d, img, S):
-        d.rectangle((0, .7 * S, S, S), fill=_a(MUD))
-        d.ellipse((.1 * S, .64 * S, .9 * S, .8 * S), fill=_a((70, 52, 36)))
-        for x0, curl in ((.22, 1), (.5, -1), (.76, 1)):
-            pts = [((x0 + curl * .12 * math.sin(t * 3)) * S, (.74 - t * .58) * S) for t in [i / 12 for i in range(13)]]
+        d.ellipse((-.1 * S, .66 * S, 1.1 * S, 1.2 * S), fill=_a(MUD))
+        d.ellipse((.1 * S, .7 * S, .9 * S, .86 * S), fill=_a((84, 64, 44)))
+        for x0, side in ((.2, -1), (.8, 1)):
+            pts = [((x0 + side * .1 * math.sin(t * 2.4)) * S, (.8 - t * .5) * S) for t in [i / 10 for i in range(11)]]
             for i in range(len(pts) - 1):
-                w = int(S * (.09 if i % 4 < 3 else .05))
-                d.line([pts[i], pts[i + 1]], fill=_a((236, 214, 178)), width=w)
-        for x, y in ((.3, .73), (.62, .76), (.44, .7)):
-            d.ellipse(((x - .03) * S, (y - .02) * S, (x + .03) * S, (y + .02) * S), fill=_a((140, 120, 96)))
+                w = int(S * (.12 - .05 * i / 10)) if i % 3 != 2 else int(S * .05)
+                d.line([pts[i], pts[i + 1]], fill=_a((240, 222, 188)), width=w)
+            hx, hy = pts[-1]
+            d.ellipse((hx - .03 * S, hy - .03 * S, hx + .03 * S, hy + .03 * S), fill=_a((200, 170, 130)))
+        d.line((.5 * S, .78 * S, .5 * S, .5 * S), fill=_a((110, 158, 74)), width=max(2, S // 22))
+        _lotus(d, img, S, .5, .52, .22, .7)
+        g.glow_spot(img, .5 * S, .4 * S, .14 * S, GOLD, .5)
     return _icon(draw, .5, .5, (50, 40, 50))
 
 
@@ -352,14 +355,18 @@ def lotus_lanterns_icon():
 
 def petal_storm_icon():
     def draw(d, img, S):
-        for k in range(14):
-            t = k / 14
-            a = t * math.tau * 1.4
-            r = .1 + .32 * t
-            x, y = .5 + math.cos(a) * r, .55 + math.sin(a) * r * .55 - t * .15
-            _petal(d, S, x, y, .16 + .06 * t, .09, a + 1.6, (WHITE, PINK, ROSE)[k % 3], ROSE)
-        g.glow_spot(img, .5 * S, .55 * S, .2 * S, (255, 180, 220), .6)
-    return _icon(draw)
+        for k, (y, r) in enumerate(((.82, .14), (.66, .24), (.5, .34), (.32, .42))):
+            d.arc(((.5 - r) * S, (y - r * .3) * S, (.5 + r) * S, (y + r * .3) * S), 0, 360, fill=_a((255, 200, 225), 110), width=max(1, S // 40))
+        for k in range(16):
+            t = k / 15
+            a = t * math.tau * 2.2
+            r = .14 + .3 * t
+            y = .84 - .54 * t
+            x = .5 + math.cos(a) * r
+            yy = y + math.sin(a) * r * .3
+            _petal(d, S, x, yy, .13 + .04 * t, .08, a + 1.7, (WHITE, PINK, ROSE)[k % 3], ROSE)
+        g.glow_spot(img, .5 * S, .6 * S, .16 * S, (255, 190, 225), .5)
+    return _icon(draw, .5, .55)
 
 
 def thousand_petal_lotus_icon():
