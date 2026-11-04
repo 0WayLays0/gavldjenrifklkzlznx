@@ -393,6 +393,22 @@ public final class ModSchools {
             SAND_MAGIC
     ));
 
+    /** Lotus Magic: the lotus rising pure out of the mud; keen petals, the sacred pond, roots and seeds, the light of its heart. */
+    public static final ResourceLocation LOTUS_RESOURCE = ArcanesOublies.id("lotus");
+    public static final TagKey<Item> LOTUS_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("lotus_focus"));
+    public static final ResourceKey<DamageType> LOTUS_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("lotus_magic"));
+    public static final int LOTUS_COLOR = 0xF58AC0;
+
+    public static final DeferredHolder<SchoolType, SchoolType> LOTUS = SCHOOLS.register(LOTUS_RESOURCE.getPath(), () -> new SchoolType(
+            LOTUS_RESOURCE,
+            LOTUS_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".lotus").withStyle(Style.EMPTY.withColor(LOTUS_COLOR)),
+            ModAttributes.LOTUS_SPELL_POWER,
+            ModAttributes.LOTUS_MAGIC_RESIST,
+            sound(SoundEvents.AZALEA_LEAVES_BREAK),
+            LOTUS_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

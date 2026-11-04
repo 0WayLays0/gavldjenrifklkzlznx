@@ -58,6 +58,8 @@ PALETTES = {
     "echo": ["16363c", "1e4850", "2a5e68", "0c2428", "123038", "8ff6ff", "2ce6f0", "0d6a78", "e8e2cf", "c4bea8", "7e7864"],
     # Papyrus, the writing in faience turquoise, gold rod ends
     "sand": ["e6d2a0", "f0e0b4", "faf0d0", "c4ac78", "d6c08c", "5ad6d0", "1e9a96", "0c5452", "ffd25a", "d6a030", "8a5a14"],
+    # Blush paper, the writing in deep rose, jade rod ends
+    "lotus": ["f2d8e4", "f8e6ee", "fff4f8", "d4b0c2", "e4c4d4", "f58ac0", "c8467e", "6e1e44", "7fd6b0", "3f9a72", "1f5a40"],
 }
 
 

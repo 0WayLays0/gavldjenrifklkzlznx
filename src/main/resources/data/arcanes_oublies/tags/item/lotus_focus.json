@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:lily_pad",
+    "minecraft:pink_petals",
+    "minecraft:pink_tulip",
+    "minecraft:cherry_sapling"
+  ]
+}

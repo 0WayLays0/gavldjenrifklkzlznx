@@ -38,6 +38,7 @@ import com.waylays.arcanes.client.render.water.WaterJetModel;
 import com.waylays.arcanes.client.render.boss.*;
 import com.waylays.arcanes.client.render.echo.*;
 import com.waylays.arcanes.client.render.sand.*;
+import com.waylays.arcanes.client.render.lotus.*;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.util.Mth;
@@ -598,6 +599,72 @@ public final class Scenes {
                 husk(ctx, 3, 2, 2);
                 Vector3f o = new Vector3f(0, 0, 0);
                 SimoomModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), 5, age, 240, age % 25, new Vector3f(2.5f, 0, -1.5f), 3, LIGHT);
+            }
+            case "lpetal" -> {
+                caster(ctx, 0, -3);
+                husk(ctx, 0, 0, 6);
+                for (int k = 0; k < 5; k++) {
+                    float a = (k - 2) * 11 * Mth.DEG_TO_RAD;
+                    Vector3f d = new Vector3f(Mth.sin(a), 0, Mth.cos(a));
+                    Vector3f o = new Vector3f(d).mul(Math.min(age, 18) * 1.1f).add(0, 1.4f, -2.4f);
+                    boolean done = age > 7 && k == 2;
+                    PetalModel.draw(Lab.at(done ? new Vector3f(0, 1.4f, 5.3f) : o), ctx.rec(), Lab.view(ctx, done ? new Vector3f(0, 1.4f, 5.3f) : o), d, age, done,
+                            age - 7, k * 31, LIGHT);
+                }
+            }
+            case "lbud" -> {
+                caster(ctx, 0, -5);
+                husk(ctx, 0, 0, 0);
+                Vector3f o = new Vector3f(0, 0, 0);
+                BudModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 42, 1.3f, 3, LIGHT);
+            }
+            case "lpond" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 2);
+                Vector3f o = new Vector3f(0, 0, 0);
+                PondModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 200, 5, 3, LIGHT);
+            }
+            case "lthrone" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 6);
+                Vector3f o = new Vector3f(0, 0, 0);
+                ThroneModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 215, age % 30, new Vector3f(3, 1, 6), 3, LIGHT);
+            }
+            case "lroots" -> {
+                husk(ctx, 1.5f, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                RootsModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 110, 4, 3, LIGHT);
+            }
+            case "lpod" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, -2, 0, 7);
+                Vector3f o = new Vector3f(1, 0, -.6f);
+                PodModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 252, age % 20, new Vector3f(-3, 1, 7.6f), 3, LIGHT);
+            }
+            case "lmandala" -> {
+                husk(ctx, 3, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                MandalaModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 72, 7, 3, LIGHT);
+            }
+            case "llantern" -> {
+                caster(ctx, 0, -3);
+                for (int k = 0; k < 5; k++) {
+                    float a = k * Mth.TWO_PI / 5;
+                    Vector3f o = new Vector3f(Mth.sin(a) * 1.8f, 1.6f + .3f * k, Mth.cos(a) * 1.8f - 3);
+                    LanternModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 200, k == 4 && age > 20, age - 20, k, k * 17, LIGHT);
+                }
+            }
+            case "lstorm" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                PetalStormModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 175, 4.5f, 3, LIGHT);
+            }
+            case "lthousand" -> {
+                husk(ctx, 5, 0, 3);
+                husk(ctx, -4, 0, -5);
+                Vector3f o = new Vector3f(0, 0, 0);
+                ThousandModel.draw(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 170, 10, age % 5, new Vector3f(5, 1, 3), 3, LIGHT);
             }
             default -> throw new IllegalArgumentException("no scene " + scene);
         }

@@ -432,6 +432,26 @@ Le désert : sable, verre et grès. Livre : **Codex des Dunes** ; focus : sable,
 | **Djinn des sables** (Djinn of the Sands, épique) | Un djinn de sable tourbillonnant flotte à l'épaule du lanceur 15 s et lance des traits de sable sur l'ennemi le plus proche. |
 | **Simoun** (Simoom, ultime) | Une immense tempête de sable suit le regard du lanceur 12 s : elle attire, fait tournoyer et aveugle les ennemis, sa foudre marque le sol de verre. |
 
+### Magie du Lotus
+
+Le lotus qui sort pur de la vase : pétales tranchants, étang sacré, racines et graines, la lumière de son cœur. Les
+fleurs sont de vrais lotus en 3D (anneaux de pétales galbés, blancs à la base et rosissant vers la pointe, veinés, autour
+d'un cœur d'étamines dorées et d'une tête à graines), avec leurs grandes feuilles rondes. Livre : **Codex du Lotus**
+(soie rose, un lotus sur une feuille de jade) ; focus : nénuphar, pétales roses, tulipe rose, pousse de cerisier.
+
+| Sort | Effet |
+|---|---|
+| **Pétales tranchants** (Razor Petals, commun) | Cinq pétales en éventail, tournoyants, le bord en feu : chacun tranche le premier ennemi sur son chemin puis éclate en petits pétales. |
+| **Bouton de lotus** (Lotus Bud, commun) | Un grand bouton jaillit autour de l'ennemi visé et le retient (la lumière filtre entre ses pétales), puis éclot d'un coup et le projette en l'air. |
+| **Étang sacré** (Sacred Pond, peu commun) | Une eau claire couverte de feuilles et de fleurs de lotus autour du lanceur (5 blocs, 10 s) : elle soigne son camp chaque seconde et éteint ses flammes ; les ennemis y sont ralentis et affaiblis. |
+| **Trône de lotus** (Lotus Throne, peu commun) | Un grand lotus s'ouvre sous les pieds du lanceur et le porte 10 s, un halo de lumière derrière sa tête : Résistance I, chute lente, soin ; un pétale part frapper l'ennemi le plus proche toutes les 1,5 s. |
+| **Racines de la vase** (Roots of the Mire, rare) | Le sol visé devient une boue noire (4 blocs) où remuent les racines noueuses du lotus : les ennemis s'enlisent, sont attirés au centre et saisis toutes les 1,5 s. |
+| **Cosse de graines** (Seed Pod, rare) | Une cosse de lotus flotte à l'épaule du lanceur 12 s et tire ses graines sur l'ennemi le plus proche ; un petit lotus éclot là où elles frappent. |
+| **Mandala de lotus** (Lotus Mandala, épique) | Un vaste mandala de pétales se dessine en lumière au sol visé (7 blocs) ; ses trois anneaux s'embrasent l'un après l'autre, du cœur vers l'extérieur, frappant, soulevant et marquant ce qui s'y tient. |
+| **Lanternes de lotus** (Lotus Lanterns, épique) | 5 à 7 lanternes en forme de lotus, une flamme dans chacune, s'élèvent puis dérivent chacune vers son ennemi et éclatent sur lui en une fleur de feu. |
+| **Tempête de pétales** (Petal Storm, épique) | Un tourbillon de pétales enveloppe le lanceur 8 s (4,5 blocs) : les ennemis pris dedans sont tailladés toutes les demi-secondes, emportés et aveuglés. |
+| **Lotus aux mille pétales** (Thousand-Petal Lotus, ultime) | Un étang de lumière s'ouvre et un immense lotus en sort, s'ouvrant anneau après anneau ; en pleine éclosion un pilier de lumière tombe à travers son cœur (10 blocs) : ennemis frappés, soulevés, ralentis et marqués, alliés soignés ; puis ses pétales tombent un à un sur les ennemis restants. |
+
 ### Rituels (sorts de groupe)
 
 Ce n'est pas une école : des rituels à plusieurs, lents et spectaculaires. Ils se font avec la **Craie rituelle**

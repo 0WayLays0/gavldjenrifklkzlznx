@@ -243,6 +243,16 @@ import com.waylays.arcanes.spells.sand.SunLensSpell;
 import com.waylays.arcanes.spells.sand.SandfallSpell;
 import com.waylays.arcanes.spells.sand.SandDjinnSpell;
 import com.waylays.arcanes.spells.sand.SimoomSpell;
+import com.waylays.arcanes.spells.lotus.RazorPetalsSpell;
+import com.waylays.arcanes.spells.lotus.LotusBudSpell;
+import com.waylays.arcanes.spells.lotus.SacredPondSpell;
+import com.waylays.arcanes.spells.lotus.LotusThroneSpell;
+import com.waylays.arcanes.spells.lotus.MireRootsSpell;
+import com.waylays.arcanes.spells.lotus.SeedPodSpell;
+import com.waylays.arcanes.spells.lotus.LotusMandalaSpell;
+import com.waylays.arcanes.spells.lotus.LotusLanternsSpell;
+import com.waylays.arcanes.spells.lotus.PetalStormSpell;
+import com.waylays.arcanes.spells.lotus.ThousandPetalLotusSpell;
 import com.waylays.arcanes.spells.echo.SoundWaveSpell;
 import com.waylays.arcanes.spells.echo.ShriekSpell;
 import com.waylays.arcanes.spells.echo.EchoStepSpell;
@@ -559,6 +569,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SANDFALL = register(new SandfallSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SAND_DJINN = register(new SandDjinnSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> SIMOOM = register(new SimoomSpell());
+
+    // Lotus Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RAZOR_PETALS = register(new RazorPetalsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LOTUS_BUD = register(new LotusBudSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SACRED_POND = register(new SacredPondSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LOTUS_THRONE = register(new LotusThroneSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MIRE_ROOTS = register(new MireRootsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SEED_POD = register(new SeedPodSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LOTUS_MANDALA = register(new LotusMandalaSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LOTUS_LANTERNS = register(new LotusLanternsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PETAL_STORM = register(new PetalStormSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> THOUSAND_PETAL_LOTUS = register(new ThousandPetalLotusSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

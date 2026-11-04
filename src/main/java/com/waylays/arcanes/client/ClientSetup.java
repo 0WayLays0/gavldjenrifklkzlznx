@@ -323,6 +323,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.ECHO_SCENE.get(), com.waylays.arcanes.client.render.EchoSceneRenderer::new);
         event.registerEntityRenderer(ModEntities.SAND_LANCE.get(), com.waylays.arcanes.client.render.SandLanceRenderer::new);
         event.registerEntityRenderer(ModEntities.SAND_SCENE.get(), com.waylays.arcanes.client.render.SandSceneRenderer::new);
+        event.registerEntityRenderer(ModEntities.LOTUS_SCENE.get(), com.waylays.arcanes.client.render.LotusSceneRenderer::new);
         event.registerEntityRenderer(ModEntities.AMETHYST_BRIDGE.get(), com.waylays.arcanes.client.render.AmethystBridgeRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
@@ -415,6 +416,7 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.WINDS_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.ECHOES_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.DUNES_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.LOTUS_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }
