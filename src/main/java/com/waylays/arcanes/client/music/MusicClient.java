@@ -85,7 +85,11 @@ public final class MusicClient {
         g.pose().pushPose();
         g.pose().translate(x + 11, y + 11, 0);
         g.pose().mulPose(Axis.ZP.rotationDegrees((Util.getMillis() / 6f) % 360));
+        // Blending on again just before it: the fills above may have turned it off
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         g.blit(RECORD, -9, -9, 18, 18, 0, 0, 128, 128, 128, 128);
+        RenderSystem.disableBlend();
         g.pose().popPose();
         g.drawString(font, title, x + 24, y + 3, 0xFFFFE6A0, true);
         String sub = t.artist != null ? t.artist : "♪";

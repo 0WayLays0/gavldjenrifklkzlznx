@@ -153,8 +153,19 @@ public class MusicScreen extends Screen {
     private void icon(GuiGraphics g, Icon icon, int x, int y, int size, int color) {
         int i = icon.ordinal();
         g.setColor((color >> 16 & 0xFF) / 255f, (color >> 8 & 0xFF) / 255f, (color & 0xFF) / 255f, (color >>> 24) / 255f);
-        g.blit(ICONS, x, y, size, size, (i % 8) * 32, (i / 8) * 32, 32, 32, 256, 96);
+        blended(() -> g.blit(ICONS, x, y, size, size, (i % 8) * 32, (i / 8) * 32, 32, 32, 256, 96));
         g.setColor(1, 1, 1, 1);
+    }
+
+    /**
+     * Draws with blending on: drawing text turns it off again, and a texture drawn without it shows its soft edges and
+     * see-through light (the shine on the record) as solid white.
+     */
+    private static void blended(Runnable draw) {
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        draw.run();
+        RenderSystem.disableBlend();
     }
 
     private static boolean in(double mx, double my, int x0, int y0, int x1, int y1) {
@@ -307,7 +318,7 @@ public class MusicScreen extends Screen {
         for (MusicLibrary.Track tr : tracks) {
             total += tr.lengthMs;
         }
-        String info = Component.translatable("ui.arcanes_oublies.music.count", tracks.size()).getString() + (total > 0 ? "  ·  " + time(total) : "");
+        String info = Component.translatable(tracks.size() == 1 ? "ui.arcanes_oublies.music.count_one" : "ui.arcanes_oublies.music.count", tracks.size()).getString() + (total > 0 ? "  ·  " + time(total) : "");
         small(g, info, LIST_X0 + 8 + font.width(head), 33.5f, DIM);
         if (!tracks.isEmpty()) {
             button(g, Icon.PLAY, LIST_X1 - 10, 31, 10, mx, my, true, Component.translatable("ui.arcanes_oublies.music.play_all"));
@@ -404,9 +415,9 @@ public class MusicScreen extends Screen {
         g.pose().pushPose();
         g.pose().translate(cx, cy, 0);
         g.pose().mulPose(Axis.ZP.rotationDegrees(recordAngle));
-        g.blit(RECORD, -23, -23, 46, 46, 0, 0, 128, 128, 128, 128);
+        blended(() -> g.blit(RECORD, -23, -23, 46, 46, 0, 0, 128, 128, 128, 128));
         g.pose().popPose();
-        g.blit(SHINE, cx - 23, cy - 23, 46, 46, 0, 0, 128, 128, 128, 128);
+        blended(() -> g.blit(SHINE, cx - 23, cy - 23, 46, 46, 0, 0, 128, 128, 128, 128));
         // The tone arm: on the record while it plays, lifted off when not
         float arm = playing ? 28 : 8;
         g.pose().pushPose();

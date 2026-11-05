@@ -1639,6 +1639,7 @@
   "ui.arcanes_oublies.music.delete_playlist": "Delete this playlist",
   "ui.arcanes_oublies.music.no_playlist": "No playlist yet: make one with +",
   "ui.arcanes_oublies.music.count": "%s tracks",
+  "ui.arcanes_oublies.music.count_one": "%s track",
   "ui.arcanes_oublies.music.play_all": "Play all",
   "ui.arcanes_oublies.music.favorite": "Add to favourites",
   "ui.arcanes_oublies.music.unfavorite": "Remove from favourites",
