@@ -20,6 +20,7 @@ public final class ArcanesNetwork {
         registrar.playToClient(PlayAnimationPacket.TYPE, PlayAnimationPacket.STREAM_CODEC, PlayAnimationPacket::handle);
         registrar.playToClient(GoldCoatPacket.TYPE, GoldCoatPacket.STREAM_CODEC, GoldCoatPacket::handle);
         registrar.playToServer(AltarRitualPacket.TYPE, AltarRitualPacket.STREAM_CODEC, AltarRitualPacket::handle);
+        MusicPackets.register(registrar);
     }
 
     /** Plays the player animation {@code animation} on {@code player}, for them and everyone around. */

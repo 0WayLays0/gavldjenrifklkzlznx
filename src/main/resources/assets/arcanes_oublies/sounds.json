@@ -1,0 +1,64 @@
+{
+  "music_player.r8": {
+    "sounds": [
+      {
+        "name": "arcanes_oublies:music/silence",
+        "stream": true,
+        "attenuation_distance": 8
+      }
+    ]
+  },
+  "music_player.r16": {
+    "sounds": [
+      {
+        "name": "arcanes_oublies:music/silence",
+        "stream": true,
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "music_player.r24": {
+    "sounds": [
+      {
+        "name": "arcanes_oublies:music/silence",
+        "stream": true,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "music_player.r32": {
+    "sounds": [
+      {
+        "name": "arcanes_oublies:music/silence",
+        "stream": true,
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "music_player.r48": {
+    "sounds": [
+      {
+        "name": "arcanes_oublies:music/silence",
+        "stream": true,
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "music_player.r64": {
+    "sounds": [
+      {
+        "name": "arcanes_oublies:music/silence",
+        "stream": true,
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "music_player.self": {
+    "sounds": [
+      {
+        "name": "arcanes_oublies:music/silence",
+        "stream": true
+      }
+    ]
+  }
+}

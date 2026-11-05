@@ -211,7 +211,7 @@ public final class ClientSmokeTest {
                 }
             }
             case SETTLING -> {
-                if (creativeTab(mc) && ticks >= SETTLE_TICKS) {
+                if (creativeTab(mc) && musicPlayer(mc) && ticks >= SETTLE_TICKS) {
                     mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
                     stage = Stage.CASTING;
                     ticks = 0;
@@ -550,6 +550,95 @@ public final class ClientSmokeTest {
         creativeTick = ticks;
         creativeFrame = frames;
         return creativeStep > 7;
+    }
+
+    private static int musicStep;
+    private static int musicTick;
+
+    /**
+     * The music player: the tune that comes with the addon (an MP3) must decode, and play on the player (where the game
+     * has a sound device); its window is opened over it (photographed with {@code music} in {@code arcanes.shots}).
+     * Returns whether it is done.
+     */
+    private static boolean musicPlayer(Minecraft mc) {
+        if (musicStep > 2) {
+            return true;
+        }
+        if (musicStep == 0 && ticks < 30) {
+            return false;
+        }
+        try {
+            switch (musicStep) {
+                case 0 -> {
+                    var lib = com.waylays.arcanes.client.music.MusicLibrary.get();
+                    var track = lib.track("builtin:valse_des_arcanes");
+                    if (track == null) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the music player has not got its built-in tune");
+                        musicStep = 3;
+                        return true;
+                    }
+                    // Decoded here and now: the MP3 decoder must be there and work
+                    byte[] data = track.read();
+                    var stream = new com.waylays.arcanes.client.music.MusicStream(data, track.ext, 2000, false, null);
+                    double sum = 0;
+                    int n = 0;
+                    for (int k = 0; k < 4; k++) {
+                        java.nio.ByteBuffer buf = stream.read(44100);
+                        while (buf != null && buf.remaining() >= 2) {
+                            double v = buf.getShort() / 32768.0;
+                            sum += v * v;
+                            n++;
+                        }
+                    }
+                    stream.close();
+                    double rms = n > 0 ? Math.sqrt(sum / n) : 0;
+                    int length = com.waylays.arcanes.client.music.MusicDecoders.lengthMs(data, track.ext);
+                    if (n < 40000 || rms < .01 || length < 20000) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the built-in tune did not decode ({} samples, loudness {}, {} ms long)", n, rms, length);
+                    } else {
+                        log("music player: the built-in tune decodes ({} samples, loudness {}, {} ms long)", n, String.format(java.util.Locale.ROOT, "%.3f", rms),
+                                length);
+                    }
+                    mc.setScreen(new com.waylays.arcanes.client.music.MusicScreen());
+                    com.waylays.arcanes.client.music.MusicPlayer.play(track, lib.all());
+                    musicTick = ticks;
+                    musicStep = 1;
+                }
+                case 1 -> {
+                    if (com.waylays.arcanes.client.music.MusicPlayer.loading() && ticks - musicTick < 200 || ticks - musicTick < 70) {
+                        return false;
+                    }
+                    long at = com.waylays.arcanes.client.music.MusicPlayer.positionMs();
+                    boolean active = com.waylays.arcanes.client.music.MusicPlayer.soundActive();
+                    if (com.waylays.arcanes.client.music.MusicPlayer.current() == null || at < 1500) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the music player did not play its tune (at {} ms)", at);
+                    } else {
+                        log("music player: playing, {} ms in, sound {}", at, active ? "playing on the player" : "not heard (no sound device?)");
+                    }
+                    if (SHOTS.contains("music")) {
+                        screenshot(mc, "music_player");
+                    }
+                    musicTick = ticks;
+                    musicStep = 2;
+                }
+                case 2 -> {
+                    com.waylays.arcanes.client.music.MusicPlayer.stop();
+                    mc.setScreen(null);
+                    musicStep = 3;
+                }
+                default -> {
+                }
+            }
+        } catch (Throwable t) {
+            failures.incrementAndGet();
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the music player", t);
+            mc.setScreen(null);
+            musicStep = 3;
+        }
+        return musicStep > 2;
     }
 
     /**

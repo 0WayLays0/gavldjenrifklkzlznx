@@ -89,6 +89,14 @@ dependencies {
     implementation "top.theillusivec4.curios:curios-neoforge:${curios_version}"
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     implementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animator_version}"
+    // MP3 decoding for the music player (JLayer, LGPL), carried inside the mod's jar
+    jarJar(implementation("javazoom:jlayer")) {
+        version {
+            strictly '[1.0.1,2.0)'
+            prefer '1.0.1'
+        }
+        transitive = false
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {

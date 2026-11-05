@@ -511,6 +511,29 @@ bleu à leur centre, une clé de remontage sur le dos) ; focus : horloge, lingot
 | **Bombardement en dirigeable** (Airship Bombardment, épique) | Un dirigeable de toile et de laiton survole la zone visée en larguant 10 bombes qui éclatent dans le feu et la fumée. |
 | **Grand Mécanisme** (Great Mechanism, ultime) | Un grand engrenage sous le lanceur, un anneau denté autour du terrain (12 blocs), huit grands engrenages et des pistons à vapeur, un astrolabe au cœur d'énergie bleue qui lance des arcs ; puis la surcharge : une vague de lumière bleue frappe et projette tous les ennemis et protège le camp du lanceur. |
 
+### Lecteur de musique
+
+Un lecteur de musique en jeu, ouvert avec la touche **M** (modifiable dans les commandes, catégorie Arcanes Oublies).
+
+- **Ta musique** : dépose tes fichiers **MP3, OGG ou WAV** dans le dossier `arcanes_music` du jeu (à côté de `saves` et
+  `mods` ; le bouton dossier du lecteur l'ouvre, les sous-dossiers sont lus aussi), puis clique sur Actualiser. Le titre
+  et l'artiste écrits dans le fichier (tags ID3, commentaires Vorbis) sont affichés, sinon le nom du fichier. Une valse
+  originale, « Valse des Arcanes », est fournie avec l'addon pour essayer.
+- **Le son est sur toi** : la musique joue depuis ton personnage, le suit et s'entend de plus en plus fort en
+  s'approchant. Tu choisis sa **portée** (8, 16, 24, 32, 48 ou 64 blocs, ou « Moi » pour être seul à l'entendre) et son
+  **volume**. En multijoueur, les joueurs dans ta portée l'entendent : le fichier leur est transmis par le serveur
+  (24 Mo au plus) ; le volume « Disques » des options règle ce que chacun entend.
+- **Lecture** : lecture/pause, précédent, suivant, barre de progression cliquable et glissable, aléatoire, répétition
+  (aucune, tout, ce titre). La musique continue quand le lecteur est fermé, une note s'affiche en haut à droite quand
+  un titre commence, et la musique du jeu s'efface pendant ce temps.
+- **Favoris et playlists** : l'étoile d'un titre le met dans les favoris ; les playlists se créent avec +, se remplissent
+  avec le + de chaque titre, se vident avec la croix et se suppriment avec la corbeille. Recherche par titre ou artiste.
+  Le tout est gardé dans `config/arcanes_oublies-music.json`.
+- **L'écran** : une fenêtre bleu nuit cadrée d'or (une lyre en haut, des volutes aux coins), un disque qui tourne sous
+  son bras de lecture, des barres qui dansent sur la musique.
+
+Décodage MP3 : JLayer (javazoom, LGPL), embarqué dans le jar de l'addon.
+
 ### Rituels (sorts de groupe)
 
 Ce n'est pas une école : des rituels à plusieurs, lents et spectaculaires. Ils se font avec la **Craie rituelle**
