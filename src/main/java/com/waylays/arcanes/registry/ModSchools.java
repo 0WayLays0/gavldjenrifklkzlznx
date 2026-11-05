@@ -441,6 +441,22 @@ public final class ModSchools {
             CLOCKWORK_MAGIC
     ));
 
+    /** Music Magic: notes of gold, staves of light, and phantom instruments that play for the caster. */
+    public static final ResourceLocation MELODY_RESOURCE = ArcanesOublies.id("melody");
+    public static final TagKey<Item> MELODY_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("melody_focus"));
+    public static final ResourceKey<DamageType> MELODY_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("melody_magic"));
+    public static final int MELODY_COLOR = 0xFF8AD8;
+
+    public static final DeferredHolder<SchoolType, SchoolType> MELODY = SCHOOLS.register(MELODY_RESOURCE.getPath(), () -> new SchoolType(
+            MELODY_RESOURCE,
+            MELODY_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".melody").withStyle(Style.EMPTY.withColor(MELODY_COLOR)),
+            ModAttributes.MELODY_SPELL_POWER,
+            ModAttributes.MELODY_MAGIC_RESIST,
+            SoundEvents.NOTE_BLOCK_CHIME,
+            MELODY_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

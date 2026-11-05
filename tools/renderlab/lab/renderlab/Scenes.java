@@ -42,6 +42,7 @@ import com.waylays.arcanes.client.render.lotus.*;
 import com.waylays.arcanes.client.render.gem.*;
 import com.waylays.arcanes.client.render.aurora.*;
 import com.waylays.arcanes.client.render.clockwork.*;
+import com.waylays.arcanes.client.render.melody.*;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import net.minecraft.util.Mth;
@@ -908,6 +909,96 @@ public final class Scenes {
                 Vector3f o = new Vector3f(0, 0, 0);
                 ClockMachineModels.mechanism(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 240, 12, age < 30 ? 999 : (age - 30) % 10, new Vector3f(6, 1.1f, 4), 30, 200, 3,
                         LIGHT);
+            }
+            case "mparts" -> {
+                // A clef, a violin and a note side by side, face on
+                Vector3f o = new Vector3f(-2, 0, 0);
+                com.mojang.blaze3d.vertex.PoseStack ps = Lab.at(o);
+                MelodyMesh.clef(ps, ctx.rec(), 2.5f, LIGHT);
+                Vector3f o2 = new Vector3f(1, 1.2f, 0);
+                MelodyMesh.violin(Lab.at(o2), ctx.rec(), Lab.view(ctx, o2), 2f, age / 40f, LIGHT);
+                Vector3f o3 = new Vector3f(3, .5f, 0);
+                MelodyMesh.note(Lab.at(o3), ctx.rec(), Lab.view(ctx, o3), MelodyMesh.Note.PAIR, 1.4f, MelodyMesh.ROSE, 1, LIGHT);
+            }
+            case "mnote" -> {
+                caster(ctx, 0, -3);
+                husk(ctx, 0, 0, 7);
+                for (int k = 0; k < 3; k++) {
+                    Vector3f d = new Vector3f((k - 1) * .16f, 0, 1).normalize();
+                    Vector3f o = new Vector3f(d).mul(1 + age * .9f).add(0, 1.3f, -2.5f);
+                    MelodyModels.note(Lab.at(o), ctx.rec(), Lab.view(ctx, o), d, age, false, 0, k * 31, LIGHT);
+                }
+            }
+            case "mslash" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 1, 0, 3);
+                husk(ctx, -2, 0, 2.5f);
+                Vector3f o = new Vector3f(0, 0, 0);
+                MelodyModels.staffSlash(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 16, 4.5f, 2.6f, 6, 3, LIGHT);
+            }
+            case "msoothe" -> {
+                caster(ctx, 0, 0);
+                Vector3f o = new Vector3f(0, 0, 0);
+                MelodyModels.soothe(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 100, 6, 20, 3, LIGHT);
+            }
+            case "mcresc" -> {
+                caster(ctx, 0, -3);
+                husk(ctx, 0, 0, 10);
+                Vector3f o = new Vector3f(0, 1.3f, -1.8f + age * .8f);
+                MelodyModels.crescendo(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, false, 0, 18, .7f, 3.2f, 3, LIGHT);
+            }
+            case "mlull" -> {
+                husk(ctx, 1.5f, 0, 1);
+                husk(ctx, -2, 0, -1);
+                Vector3f o = new Vector3f(0, 0, 0);
+                MelodyModels.lullaby(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 200, 5, 15, 3, LIGHT);
+            }
+            case "mdrum" -> {
+                caster(ctx, 2, -1);
+                husk(ctx, -3, 0, 3);
+                Vector3f o = new Vector3f(0, 0, 0);
+                MelodyInstrumentModels.drum(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, 1), age, 200, 14, 20, 16, 6, 3, LIGHT);
+            }
+            case "mharp" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 3, 0, 8);
+                Vector3f o = new Vector3f(0, 0, 0);
+                Vector3f d = new Vector3f(0, 0, 1);
+                float since = age < 15 ? 999 : (age - 15) % 8;
+                Vector3f place = new Vector3f(d.z, 0, -d.x).mul(-1.3f).add(new Vector3f(d).mul(-.9f)).add(0, .3f, 0);
+                MelodyInstrumentModels.harp(Lab.at(o), ctx.rec(), Lab.view(ctx, o), d, place, age, 160, 15, 8, 6, since, age < 15 ? null : new Vector3f(3, 1.1f, 8), 3,
+                        LIGHT);
+            }
+            case "mtrump" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 1, 0, 7);
+                Vector3f o = new Vector3f(0, 0, 0);
+                Vector3f d = new Vector3f(0, 0, 1);
+                java.util.function.IntFunction<Vector3f> place = k -> {
+                    Vector3f side = new Vector3f(d.z, 0, -d.x);
+                    float t = (k - 2f) / 2f;
+                    return new Vector3f(side).mul(t * 2.6f).add(new Vector3f(d).mul(-.8f - .6f * t * t)).add(0, 2.4f + .7f * (1 - t * t), 0);
+                };
+                MelodyInstrumentModels.trumpets(Lab.at(o), ctx.rec(), Lab.view(ctx, o), d, age, 86, 5, 16, 20, 20, 3, place, 14, 3, LIGHT);
+            }
+            case "morgan" -> {
+                caster(ctx, 0, -9);
+                husk(ctx, 5, 0, -3);
+                Vector3f o = new Vector3f(0, 0, 0);
+                float since = age < 30 ? 999 : (age - 30) % 8;
+                MelodyInstrumentModels.organ(Lab.at(o), ctx.rec(), Lab.view(ctx, o), new Vector3f(0, 0, -1), age, 190, 12, 30, 8, 160, 6, since,
+                        age < 30 ? null : new Vector3f(5, 0, -3), 3, LIGHT);
+            }
+            case "morch" -> {
+                caster(ctx, 0, 0);
+                husk(ctx, 9, 0, 4);
+                Vector3f o = new Vector3f(0, 0, 0);
+                float since = age < 40 ? 999 : (age - 40) % 10;
+                final float a = age;
+                MelodyInstrumentModels.orchestra(Lab.at(o), ctx.rec(), Lab.view(ctx, o), age, 260, 14, 40, 8, k -> {
+                    float ang = k * (float) Math.PI * 2 / 8 + a * .012f;
+                    return new Vector3f((float) Math.cos(ang) * 6, 1.6f + .25f * (float) Math.sin(a * .08f + k), (float) Math.sin(ang) * 6);
+                }, 220, 8, since, age < 40 ? null : new Vector3f(9, 0, 4), 3, LIGHT);
             }
             default -> throw new IllegalArgumentException("no scene " + scene);
         }

@@ -511,6 +511,27 @@ bleu à leur centre, une clé de remontage sur le dos) ; focus : horloge, lingot
 | **Bombardement en dirigeable** (Airship Bombardment, épique) | Un dirigeable de toile et de laiton survole la zone visée en larguant 10 bombes qui éclatent dans le feu et la fumée. |
 | **Grand Mécanisme** (Great Mechanism, ultime) | Un grand engrenage sous le lanceur, un anneau denté autour du terrain (12 blocs), huit grands engrenages et des pistons à vapeur, un astrolabe au cœur d'énergie bleue qui lance des arcs ; puis la surcharge : une vague de lumière bleue frappe et projette tous les ennemis et protège le camp du lanceur. |
 
+### Magie de la Musique
+
+Des notes d'or qui brillent, des portées de lumière aux cinq lignes qui changent de couleur (rose, violet, or), une clé
+de sol d'or et des instruments fantômes : tambour de guerre, harpe, trompettes, orgue et violons. Livre : **Codex de la
+Symphonie** (velours prune parcouru de portées d'or chargées de notes, cadre d'or à petites lyres, une lyre d'or en relief
+sur chaque plat sur une lueur rose, des chevilles et des cordes d'or sur le dos, une volute de violon à chaque bout) ;
+focus : bloc musical, juke-box, corne de chèvre, éclat d'améthyste.
+
+| Sort | Effet |
+|---|---|
+| **Volée de notes** (Note Volley, commun) | 3 notes d'or (jusqu'à 5), chacune s'incurvant vers l'ennemi le plus devant elle, une petite portée de lumière derrière elle. |
+| **Tranche de portée** (Staff Slash, commun) | Une portée de cinq lignes de lumière balayée devant le lanceur comme une lame (4,5 blocs, en arc) : frappe et repousse. |
+| **Mélodie apaisante** (Soothing Melody, peu commun) | Un air doux pendant 5 s : chaque seconde, soigne le lanceur et ses alliés proches (6 blocs) et chasse poison et flétrissement. |
+| **Crescendo** (peu commun) | Des anneaux de son qui roulent en grandissant : plus ils ont voyagé, plus ils frappent fort et repoussent loin. |
+| **Berceuse** (Lullaby, rare) | Une clé de sol d'or au-dessus de la zone visée (5 blocs) : les ennemis s'endorment, immobiles, jusqu'à ce qu'un coup les réveille ou qu'ils sortent de la zone. |
+| **Tambour de guerre** (War Drum, rare) | Un grand tambour rouge cerclé d'or frappé par deux mailloches : chaque coup frappe les ennemis autour (6 blocs) et donne force et vitesse au camp du lanceur. |
+| **Harpe de lumière** (Harp of Light, rare) | Une harpe d'or flotte au-dessus de l'épaule du lanceur 8 s ; chaque corde pincée lance un rayon sur l'ennemi visible le plus proche (18 blocs). |
+| **Trompettes fantômes** (Phantom Trumpets, épique) | Cinq trompettes d'or en arc derrière le lanceur sonnent trois fanfares : chaque sonnerie frappe et projette les ennemis devant lui (14 blocs). |
+| **Orgue de la tempête** (Storm Organ, épique) | Un grand orgue aux tuyaux d'or s'élève là où l'on vise : chaque accord fait tomber une colonne de lumière sur un ennemi (12 blocs), puis un dernier grand accord frappe et projette tous les ennemis. |
+| **Orchestre fantôme** (Phantom Orchestra, ultime) | Huit violons en cercle, des portées de lumière qui tournent, une grande clé d'or : des notes tombent sur les ennemis, le camp du lanceur est soigné, accéléré et renforcé, les ennemis ralentis ; puis le final frappe tout le terrain (14 blocs) et protège le camp du lanceur. |
+
 ### Lecteur de musique
 
 Un lecteur de musique en jeu, ouvert avec la touche **M** (modifiable dans les commandes, catégorie Arcanes Oublies).

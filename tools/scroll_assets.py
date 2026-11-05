@@ -64,6 +64,8 @@ PALETTES = {
     "aurora": ["1c2a5a", "24346a", "2e4280", "141e44", "18244e", "6cf5c2", "3fc8a0", "1e6a5a", "e6eef8", "aab8cc", "6a7890"],
     # Brass-tinted parchment, the writing in the cores' blue, brass rod ends
     "clockwork": ["e8d6a8", "f0e2bc", "f8eed2", "cbb27a", "dcc490", "5accff", "2a8ad0", "16407a", "ffe498", "dea050", "76491e"],
+    # Rose-cream paper, the writing in plum and rose, gold rod ends
+    "melody": ["f4e2ea", "faeef4", "fff8fb", "d8bccb", "e8d0dc", "ff6fd8", "b43c9a", "5a1450", "ffe08a", "e0a840", "8a5a14"],
 }
 
 

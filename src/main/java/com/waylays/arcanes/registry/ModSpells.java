@@ -290,6 +290,16 @@ import com.waylays.arcanes.spells.clockwork.BrassAutomatonSpell;
 import com.waylays.arcanes.spells.clockwork.BrassLocomotiveSpell;
 import com.waylays.arcanes.spells.clockwork.AirshipBombardmentSpell;
 import com.waylays.arcanes.spells.clockwork.GreatMechanismSpell;
+import com.waylays.arcanes.spells.melody.NoteVolleySpell;
+import com.waylays.arcanes.spells.melody.StaffSlashSpell;
+import com.waylays.arcanes.spells.melody.SoothingMelodySpell;
+import com.waylays.arcanes.spells.melody.CrescendoSpell;
+import com.waylays.arcanes.spells.melody.LullabySpell;
+import com.waylays.arcanes.spells.melody.WarDrumSpell;
+import com.waylays.arcanes.spells.melody.HarpOfLightSpell;
+import com.waylays.arcanes.spells.melody.PhantomTrumpetsSpell;
+import com.waylays.arcanes.spells.melody.StormOrganSpell;
+import com.waylays.arcanes.spells.melody.PhantomOrchestraSpell;
 import com.waylays.arcanes.spells.echo.SoundWaveSpell;
 import com.waylays.arcanes.spells.echo.ShriekSpell;
 import com.waylays.arcanes.spells.echo.EchoStepSpell;
@@ -643,6 +653,18 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> BRASS_LOCOMOTIVE = register(new BrassLocomotiveSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> AIRSHIP_BOMBARDMENT = register(new AirshipBombardmentSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> GREAT_MECHANISM = register(new GreatMechanismSpell());
+
+    // Music Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> NOTE_VOLLEY = register(new NoteVolleySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> STAFF_SLASH = register(new StaffSlashSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SOOTHING_MELODY = register(new SoothingMelodySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CRESCENDO = register(new CrescendoSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LULLABY = register(new LullabySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> WAR_DRUM = register(new WarDrumSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> HARP_OF_LIGHT = register(new HarpOfLightSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PHANTOM_TRUMPETS = register(new PhantomTrumpetsSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> STORM_ORGAN = register(new StormOrganSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PHANTOM_ORCHESTRA = register(new PhantomOrchestraSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

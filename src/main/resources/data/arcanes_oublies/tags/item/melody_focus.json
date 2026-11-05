@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:note_block",
+    "minecraft:jukebox",
+    "minecraft:goat_horn",
+    "minecraft:amethyst_shard"
+  ]
+}
