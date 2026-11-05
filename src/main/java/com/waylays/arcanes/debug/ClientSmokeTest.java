@@ -602,6 +602,14 @@ public final class ClientSmokeTest {
                         log("music player: the built-in tune decodes ({} samples, loudness {}, {} ms long)", n, String.format(java.util.Locale.ROOT, "%.3f", rms),
                                 length);
                     }
+                    // Each range the music can carry is a sound event of its own: the sound manager must know them all
+                    for (int r : com.waylays.arcanes.client.music.MusicSoundInstance.RANGES) {
+                        var id = com.waylays.arcanes.client.music.MusicSoundInstance.location(r);
+                        if (mc.getSoundManager().getSoundEvent(id) == null) {
+                            failures.incrementAndGet();
+                            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the music player's sound event {} is not declared", id);
+                        }
+                    }
                     mc.setScreen(new com.waylays.arcanes.client.music.MusicScreen());
                     com.waylays.arcanes.client.music.MusicPlayer.play(track, lib.all());
                     musicTick = ticks;

@@ -45,6 +45,12 @@ public final class MusicPlayer {
     /** Restarts of a stream that stopped by itself (the player died, changed worlds) without getting anywhere. */
     private static int stalls;
     private static double stallFrom;
+    /**
+     * Whether the sound engine has played the current sound at all, and ticks since it was last tried: with no sound
+     * device (or the engine off) the music goes on silently, its clock running, and is tried again now and then.
+     */
+    private static boolean heardOnce;
+    private static int silentTicks;
     /** Pieces of the file still to send up to the server, and the next one. */
     private static int uploadNext = -1;
     private static int sentRange = -1;
@@ -239,6 +245,8 @@ public final class MusicPlayer {
             instance = new MusicSoundInstance(mc.player, stream, lib.volume, lib.range);
             mc.getSoundManager().play(instance);
             mc.getMusicManager().stopPlaying();
+            heardOnce = false;
+            silentTicks = 0;
         } catch (Exception | LinkageError e) {
             ArcanesOublies.LOGGER.warn("Could not play the music file {}", current.id, e);
             instance = null;
@@ -389,7 +397,11 @@ public final class MusicPlayer {
             return;
         }
         SoundManager sounds = mc.getSoundManager();
-        if (instance == null || !sounds.isActive(instance)) {
+        boolean active = instance != null && sounds.isActive(instance);
+        if (active) {
+            heardOnce = true;
+        }
+        if (!active) {
             boolean ended = instance != null && instance.stream().ended();
             int len = lengthMs();
             if (ended || len > 0 && positionMs >= len - 250) {
@@ -398,6 +410,12 @@ public final class MusicPlayer {
                     startAt(0);
                 } else {
                     step(1, false);
+                }
+            } else if (instance != null && !heardOnce) {
+                // It never started: no sound device, or the sound engine is off. The music goes on silently (its clock,
+                // the bars, the other players' music all go on), and is tried again every five seconds
+                if (++silentTicks >= 100) {
+                    startAt(positionMs);
                 }
             } else {
                 // Stopped by itself (the player died, changed worlds, the sounds were reloaded): on again from where it was

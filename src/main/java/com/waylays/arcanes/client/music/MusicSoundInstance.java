@@ -56,7 +56,8 @@ public final class MusicSoundInstance extends AbstractTickableSoundInstance {
         return best;
     }
 
-    private static net.minecraft.resources.ResourceLocation location(int range) {
+    /** The sound event music carrying {@code range} blocks is played as (declared in sounds.json). */
+    public static net.minecraft.resources.ResourceLocation location(int range) {
         int r = snap(range);
         return ArcanesOublies.id(r <= 0 ? "music_player.self" : "music_player.r" + r);
     }
