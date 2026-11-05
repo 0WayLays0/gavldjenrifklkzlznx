@@ -1702,5 +1702,11 @@
   "ui.arcanes_oublies.lulls": "Puts Enemies to Sleep Until Struck",
   "ui.arcanes_oublies.rallies": "Each Beat Gives Allies Strength and Speed",
   "ui.arcanes_oublies.blasts": "%s Blasts of %s Damage",
-  "ui.arcanes_oublies.finale": "Finale: %s Damage"
+  "ui.arcanes_oublies.finale": "Finale: %s Damage",
+  "ui.arcanes_oublies.music.search_or_link": "Search, or paste a link",
+  "ui.arcanes_oublies.music.downloading": "Downloading the music...",
+  "ui.arcanes_oublies.music.downloaded": "Added to the library: %s",
+  "ui.arcanes_oublies.music.not_audio": "That link is not an audio file (MP3, OGG or WAV): video pages cannot be played",
+  "ui.arcanes_oublies.music.too_big": "That file is too big (%s MB at most)",
+  "ui.arcanes_oublies.music.download_failed": "Could not download it: %s"
 }

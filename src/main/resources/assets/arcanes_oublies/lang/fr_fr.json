@@ -1702,5 +1702,11 @@
   "ui.arcanes_oublies.lulls": "Endort les ennemis jusqu'à ce qu'ils soient frappés",
   "ui.arcanes_oublies.rallies": "Chaque coup donne force et vitesse aux alliés",
   "ui.arcanes_oublies.blasts": "%s sonneries de %s dégâts",
-  "ui.arcanes_oublies.finale": "Final : %s dégâts"
+  "ui.arcanes_oublies.finale": "Final : %s dégâts",
+  "ui.arcanes_oublies.music.search_or_link": "Rechercher, ou coller un lien",
+  "ui.arcanes_oublies.music.downloading": "Téléchargement de la musique...",
+  "ui.arcanes_oublies.music.downloaded": "Ajouté à la bibliothèque : %s",
+  "ui.arcanes_oublies.music.not_audio": "Ce lien n'est pas un fichier audio (MP3, OGG ou WAV) : les pages de vidéos ne peuvent pas être jouées",
+  "ui.arcanes_oublies.music.too_big": "Ce fichier est trop gros (%s Mo au plus)",
+  "ui.arcanes_oublies.music.download_failed": "Téléchargement impossible : %s"
 }

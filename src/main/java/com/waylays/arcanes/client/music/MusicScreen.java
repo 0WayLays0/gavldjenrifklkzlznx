@@ -91,9 +91,9 @@ public class MusicScreen extends Screen {
         int l = left(), t = top();
         search = new EditBox(font, l + 226, t + 9, 90, 10, Component.translatable("ui.arcanes_oublies.music.search"));
         search.setBordered(false);
-        search.setMaxLength(48);
+        search.setMaxLength(512);
         search.setTextColor(TEXT);
-        search.setHint(Component.translatable("ui.arcanes_oublies.music.search").withColor(FAINT));
+        search.setHint(Component.translatable("ui.arcanes_oublies.music.search_or_link").withColor(FAINT));
         search.setResponder(s -> scroll = 0);
         addRenderableWidget(search);
         newPlaylist = new EditBox(font, l + SIDE_X0 + 14, t + PL_Y + 1, 70, 10, Component.translatable("ui.arcanes_oublies.music.new_playlist"));
@@ -840,6 +840,12 @@ public class MusicScreen extends Screen {
                 newPlaylist.setVisible(false);
                 return true;
             }
+        }
+        if (search.isFocused() && (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) && MusicDownloader.isLink(search.getValue())) {
+            // A link to an audio file pasted in the search field: downloaded into the music folder
+            MusicDownloader.download(search.getValue());
+            search.setValue("");
+            return true;
         }
         if (!search.isFocused() && !newPlaylist.isFocused() && key == GLFW.GLFW_KEY_SPACE) {
             MusicPlayer.togglePause();
