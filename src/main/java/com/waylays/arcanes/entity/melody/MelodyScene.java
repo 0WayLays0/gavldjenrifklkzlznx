@@ -185,15 +185,18 @@ public class MelodyScene extends SpellEffectEntity {
         return id >= 0 ? level().getEntity(id) : null;
     }
 
-    /** Where the {@code k}th of {@code n} trumpets stands, from the caster's feet: in an arc behind and above them. */
+    /**
+     * Where the {@code k}th of {@code n} trumpets stands, from the caster's feet: in an arc before them and above their
+     * eyes, the middle one furthest ahead, so they are seen in first person as in third.
+     */
     public static Vector3f trumpetAt(int k, Vector3f dir) {
         Vector3f d = flat(dir);
         Vector3f side = new Vector3f(d.z, 0, -d.x);
         float t = (k - (TRUMPETS - 1) * .5f) / ((TRUMPETS - 1) * .5f);
         float across = t * 2.6f;
-        float up = 2.4f + .7f * (1 - t * t);
-        float back = -.8f - .6f * t * t;
-        return new Vector3f(side).mul(across).add(new Vector3f(d).mul(back)).add(0, up, 0);
+        float up = 2.55f + .4f * (1 - t * t);
+        float ahead = 1f + .4f * (1 - t * t);
+        return new Vector3f(side).mul(across).add(new Vector3f(d).mul(ahead)).add(0, up, 0);
     }
 
     /** Where the {@code k}th violin of the orchestra stands, from its middle, {@code age} ticks after it was called. */
@@ -202,10 +205,10 @@ public class MelodyScene extends SpellEffectEntity {
         return new Vector3f(Mth.cos(a) * ORCH_RING, 1.6f + .25f * Mth.sin(age * .08f + k), Mth.sin(a) * ORCH_RING);
     }
 
-    /** The harp's place beside its caster: over their shoulder, behind them. */
+    /** The harp's place beside its caster: at their right hand, a little ahead, seen at the edge of a first-person view. */
     public static Vector3f harpAt(Vector3f dir) {
         Vector3f d = flat(dir);
-        return new Vector3f(d.z, 0, -d.x).mul(-1.3f).add(new Vector3f(d).mul(-.9f)).add(0, .3f, 0);
+        return new Vector3f(d.z, 0, -d.x).mul(-1.6f).add(new Vector3f(d).mul(1.1f)).add(0, .3f, 0);
     }
 
     public static Vector3f flat(Vector3f dir) {

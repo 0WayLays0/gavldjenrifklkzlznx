@@ -74,7 +74,7 @@ public final class MelodyModels {
         Vector3f d = unit(dir);
         float grow = Math.min(1, age / 3f);
         int glow = MelodyMesh.hue(BossMesh.hash(seed) * .9f);
-        MelodyMesh.noteFacing(poseStack, buffer, view, new Vector3f(), MelodyMesh.kind(seed), .35f * Mth.sin(age * .45f + seed), .75f * grow, glow, 1, light);
+        MelodyMesh.noteFacing(poseStack, buffer, view, new Vector3f(), MelodyMesh.kind(seed), .35f * Mth.sin(age * .45f + seed), .95f * grow, glow, 1, light);
         // A short staff of light trailing behind it, waving
         int n = 10;
         Vector3f s = side(d);

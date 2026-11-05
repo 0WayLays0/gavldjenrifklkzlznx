@@ -172,11 +172,11 @@ public final class MelodyInstrumentModels {
             poseStack.translate(pos.x, pos.y, pos.z);
             poseStack.mulPose(turn);
             poseStack.scale(up, up, up);
-            poseStack.translate(0, 0, -.9f);
-            MelodyMesh.trumpet(poseStack, buffer, 1.9f, light);
+            poseStack.translate(0, 0, -.8f);
+            MelodyMesh.trumpet(poseStack, buffer, 1.6f, light);
             poseStack.popPose();
             Vector3f out = turn.transform(new Vector3f(0, 0, 1));
-            Vector3f bell = new Vector3f(pos).add(new Vector3f(out).mul(1.0f * up));
+            Vector3f bell = new Vector3f(pos).add(new Vector3f(out).mul(.8f * up));
             MelodyMesh.glow(poseStack, buffer, view, bell, 1.2f + (since < 8 ? 2.5f * (1 - since / 8) : 0), GOLD_LIGHT, fade * (since < 8 ? .9f : .3f), light);
             // Rings of sound flying from the bell after each blast
             if (since < 12) {
@@ -309,7 +309,7 @@ public final class MelodyInstrumentModels {
             poseStack.translate(at.x, at.y, at.z);
             poseStack.mulPose(turn);
             poseStack.scale(vin, vin, vin);
-            MelodyMesh.violin(poseStack, buffer, MelodyMesh.local(view, at, turn), 1.5f, .5f + .5f * Mth.sin(age * .25f + k * .8f), light);
+            MelodyMesh.violin(poseStack, buffer, MelodyMesh.local(view, at, turn), 2.1f, .5f + .5f * Mth.sin(age * .25f + k * .8f), light);
             poseStack.popPose();
             MelodyMesh.glow(poseStack, buffer, view, at, 2.4f, MelodyMesh.hue(k / (float) violins), vin * .35f, light);
             // A note springing from each violin now and then

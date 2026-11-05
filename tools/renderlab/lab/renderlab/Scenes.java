@@ -920,6 +920,12 @@ public final class Scenes {
                 Vector3f o3 = new Vector3f(3, .5f, 0);
                 MelodyMesh.note(Lab.at(o3), ctx.rec(), Lab.view(ctx, o3), MelodyMesh.Note.PAIR, 1.4f, MelodyMesh.ROSE, 1, LIGHT);
             }
+            case "mtone" -> {
+                // One trumpet as the mesh draws it: from the origin along +Z; a marker at +Z 3
+                husk(ctx, 0, 0, 3);
+                Vector3f o = new Vector3f(0, 1, 0);
+                MelodyMesh.trumpet(Lab.at(o), ctx.rec(), 1.6f, LIGHT);
+            }
             case "mnote" -> {
                 caster(ctx, 0, -3);
                 husk(ctx, 0, 0, 7);
@@ -965,7 +971,7 @@ public final class Scenes {
                 Vector3f o = new Vector3f(0, 0, 0);
                 Vector3f d = new Vector3f(0, 0, 1);
                 float since = age < 15 ? 999 : (age - 15) % 8;
-                Vector3f place = new Vector3f(d.z, 0, -d.x).mul(-1.3f).add(new Vector3f(d).mul(-.9f)).add(0, .3f, 0);
+                Vector3f place = new Vector3f(d.z, 0, -d.x).mul(-1.6f).add(new Vector3f(d).mul(1.1f)).add(0, .3f, 0);
                 MelodyInstrumentModels.harp(Lab.at(o), ctx.rec(), Lab.view(ctx, o), d, place, age, 160, 15, 8, 6, since, age < 15 ? null : new Vector3f(3, 1.1f, 8), 3,
                         LIGHT);
             }
@@ -977,7 +983,7 @@ public final class Scenes {
                 java.util.function.IntFunction<Vector3f> place = k -> {
                     Vector3f side = new Vector3f(d.z, 0, -d.x);
                     float t = (k - 2f) / 2f;
-                    return new Vector3f(side).mul(t * 2.6f).add(new Vector3f(d).mul(-.8f - .6f * t * t)).add(0, 2.4f + .7f * (1 - t * t), 0);
+                    return new Vector3f(side).mul(t * 2.6f).add(new Vector3f(d).mul(1f + .4f * (1 - t * t))).add(0, 2.55f + .4f * (1 - t * t), 0);
                 };
                 MelodyInstrumentModels.trumpets(Lab.at(o), ctx.rec(), Lab.view(ctx, o), d, age, 86, 5, 16, 20, 20, 3, place, 14, 3, LIGHT);
             }
