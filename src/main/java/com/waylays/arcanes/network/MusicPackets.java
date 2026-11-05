@@ -38,7 +38,7 @@ public final class MusicPackets {
         registrar.playToClient(Data.TYPE, Data.CODEC, Data::handle);
     }
 
-    private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> type(String name) {
+    private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> payload(String name) {
         return new CustomPacketPayload.Type<>(ArcanesOublies.id("music_" + name));
     }
 
@@ -51,7 +51,7 @@ public final class MusicPackets {
      */
     public record Start(String hash, String title, float volume, int range, boolean loop, int offsetMs, int lengthMs, int size)
             implements CustomPacketPayload {
-        public static final Type<Start> TYPE = type("start");
+        public static final Type<Start> TYPE = payload("start");
         public static final StreamCodec<FriendlyByteBuf, Start> CODEC = CustomPacketPayload.codec(Start::write, Start::new);
 
         Start(FriendlyByteBuf buf) {
@@ -83,7 +83,7 @@ public final class MusicPackets {
 
     /** A player stops their music. */
     public record Stop() implements CustomPacketPayload {
-        public static final Type<Stop> TYPE = type("stop");
+        public static final Type<Stop> TYPE = payload("stop");
         public static final StreamCodec<FriendlyByteBuf, Stop> CODEC = StreamCodec.unit(new Stop());
 
         @Override
@@ -100,7 +100,7 @@ public final class MusicPackets {
 
     /** A player asks for the file of a track they hear but have not got. */
     public record Request(String hash) implements CustomPacketPayload {
-        public static final Type<Request> TYPE = type("request");
+        public static final Type<Request> TYPE = payload("request");
         public static final StreamCodec<FriendlyByteBuf, Request> CODEC = CustomPacketPayload.codec(Request::write, Request::new);
 
         Request(FriendlyByteBuf buf) {
@@ -125,7 +125,7 @@ public final class MusicPackets {
 
     /** A piece ({@code index} of {@code total}) of the file of a track, sent up by the player playing it. */
     public record Upload(String hash, int index, int total, byte[] data) implements CustomPacketPayload {
-        public static final Type<Upload> TYPE = type("upload");
+        public static final Type<Upload> TYPE = payload("upload");
         public static final StreamCodec<FriendlyByteBuf, Upload> CODEC = CustomPacketPayload.codec(Upload::write, Upload::new);
 
         Upload(FriendlyByteBuf buf) {
@@ -156,7 +156,7 @@ public final class MusicPackets {
     /** The player with entity {@code entityId} plays this track, {@code offsetMs} into it: heard here if in range. */
     public record Play(int entityId, String hash, String title, float volume, int range, boolean loop, int offsetMs, int lengthMs)
             implements CustomPacketPayload {
-        public static final Type<Play> TYPE = type("play");
+        public static final Type<Play> TYPE = payload("play");
         public static final StreamCodec<FriendlyByteBuf, Play> CODEC = CustomPacketPayload.codec(Play::write, Play::new);
 
         Play(FriendlyByteBuf buf) {
@@ -186,7 +186,7 @@ public final class MusicPackets {
 
     /** The player with entity {@code entityId} stopped their music (or went out of range). */
     public record Halt(int entityId) implements CustomPacketPayload {
-        public static final Type<Halt> TYPE = type("halt");
+        public static final Type<Halt> TYPE = payload("halt");
         public static final StreamCodec<FriendlyByteBuf, Halt> CODEC = CustomPacketPayload.codec(Halt::write, Halt::new);
 
         Halt(FriendlyByteBuf buf) {
@@ -209,7 +209,7 @@ public final class MusicPackets {
 
     /** The server asks the player playing a track to send its file up: someone near needs it. */
     public record SendUp(String hash) implements CustomPacketPayload {
-        public static final Type<SendUp> TYPE = type("send_up");
+        public static final Type<SendUp> TYPE = payload("send_up");
         public static final StreamCodec<FriendlyByteBuf, SendUp> CODEC = CustomPacketPayload.codec(SendUp::write, SendUp::new);
 
         SendUp(FriendlyByteBuf buf) {
@@ -232,7 +232,7 @@ public final class MusicPackets {
 
     /** A piece ({@code index} of {@code total}) of a track's file, passed on by the server. */
     public record Data(String hash, int index, int total, byte[] data) implements CustomPacketPayload {
-        public static final Type<Data> TYPE = type("data");
+        public static final Type<Data> TYPE = payload("data");
         public static final StreamCodec<FriendlyByteBuf, Data> CODEC = CustomPacketPayload.codec(Data::write, Data::new);
 
         Data(FriendlyByteBuf buf) {
