@@ -164,7 +164,7 @@ public final class RemoteMusic {
             MusicStream stream = new MusicStream(file, ext, ms, h.play.loop(), null);
             h.instance = new MusicSoundInstance(source, stream, h.play.volume(), h.play.range());
             mc.getSoundManager().play(h.instance);
-        } catch (Exception e) {
+        } catch (Exception | LinkageError e) {
             ArcanesOublies.LOGGER.warn("Could not play the music of {}", source.getName().getString(), e);
             h.instance = null;
         }

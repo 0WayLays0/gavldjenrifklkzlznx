@@ -635,7 +635,10 @@ public final class ClientSmokeTest {
             }
         } catch (Throwable t) {
             failures.incrementAndGet();
-            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the music player", t);
+            // On one line, so CI shows what went wrong
+            StackTraceElement where = java.util.Arrays.stream(t.getStackTrace()).filter(f -> f.getClassName().startsWith("com.waylays.")).findFirst().orElse(null);
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the music player: {}{}{}", t, t.getCause() != null ? " (caused by " + t.getCause() + ")" : "",
+                    where != null ? " at " + where : "", t);
             mc.setScreen(null);
             musicStep = 3;
         }

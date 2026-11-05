@@ -97,6 +97,8 @@ dependencies {
         }
         transitive = false
     }
+    // Not a mod, so the game does not see it in dev unless it is put on the runs' classpath (in the built jar it is carried inside)
+    additionalRuntimeClasspath "javazoom:jlayer:1.0.1"
 }
 
 tasks.withType(JavaCompile).configureEach {

@@ -180,7 +180,7 @@ public final class MusicLibrary {
                 if (t.lengthMs == 0) {
                     try {
                         t.lengthMs = MusicDecoders.lengthMs(t.read(), t.ext);
-                    } catch (Exception e) {
+                    } catch (Exception | LinkageError e) {
                         ArcanesOublies.LOGGER.debug("Could not tell how long {} lasts", t.id, e);
                     }
                 }

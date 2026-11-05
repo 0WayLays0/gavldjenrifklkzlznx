@@ -239,7 +239,7 @@ public final class MusicPlayer {
             instance = new MusicSoundInstance(mc.player, stream, lib.volume, lib.range);
             mc.getSoundManager().play(instance);
             mc.getMusicManager().stopPlaying();
-        } catch (Exception e) {
+        } catch (Exception | LinkageError e) {
             ArcanesOublies.LOGGER.warn("Could not play the music file {}", current.id, e);
             instance = null;
             return;
