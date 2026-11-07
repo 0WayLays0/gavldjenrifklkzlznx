@@ -269,17 +269,23 @@ def flip_icons():
         d.line([(x * s, y * s) for x, y in pts], fill=(120, 255, 120, 255), width=int(s * .12), joint="curve")
         ell(d, s, .75, .68, .06, .06, fill=(255, 80, 80, 255))
 
-    def ring(d, s, img):
-        ell(d, s, .38, .7, .12, .09, fill=W_)
-        d.line((.49 * s, .7 * s, .49 * s, .24 * s), fill=W_, width=int(s * .07))
-        poly(d, s, [(.49, .22), (.78, .32), (.78, .44), (.49, .34)], W_)
-
     def calc(d, s, img):
         d.rounded_rectangle((.24 * s, .16 * s, .76 * s, .84 * s), radius=.05 * s, fill=(40, 44, 52, 255))
         d.rectangle((.3 * s, .22 * s, .7 * s, .36 * s), fill=(170, 230, 170, 255))
         for r in range(3):
             for c in range(3):
                 d.rectangle(((.31 + c * .14) * s, (.44 + r * .12) * s, (.41 + c * .14) * s, (.52 + r * .12) * s), fill=W_)
+
+    def news(d, s, img):
+        # A folded newspaper: the masthead, a picture, columns of print
+        d.rounded_rectangle((.16 * s, .2 * s, .84 * s, .8 * s), radius=.04 * s, fill=W_)
+        d.rectangle((.22 * s, .26 * s, .78 * s, .35 * s), fill=(40, 40, 50, 255))
+        d.rectangle((.22 * s, .41 * s, .46 * s, .6 * s), fill=(210, 50, 50, 255))
+        ell(d, s, .34, .48, .05, .06, fill=(255, 150, 150, 255))
+        for r in range(4):
+            d.rectangle((.52 * s, (.41 + r * .055) * s, .78 * s, (.44 + r * .055) * s), fill=(120, 130, 150, 255))
+        for r in range(2):
+            d.rectangle((.22 * s, (.66 + r * .06) * s, .78 * s, (.69 + r * .06) * s), fill=(120, 130, 150, 255))
 
     def settings(d, s, img):
         for k in range(8):
@@ -292,7 +298,7 @@ def flip_icons():
     spec = {"messages": ((90, 170, 255), (20, 70, 190), envelope), "contacts": ((255, 170, 80), (210, 90, 20), book),
             "calls": ((110, 230, 120), (20, 140, 50), calls), "camera": ((200, 200, 210), (110, 110, 125), camera),
             "gallery": ((255, 130, 190), (190, 40, 120), gallery), "snake": ((60, 70, 60), (14, 22, 14), snake),
-            "ring": ((190, 120, 255), (100, 40, 200), ring), "calc": ((150, 160, 175), (70, 80, 95), calc),
+            "news": ((255, 110, 110), (170, 20, 30), news), "calc": ((150, 160, 175), (70, 80, 95), calc),
             "settings": ((120, 200, 220), (30, 110, 140), settings)}
     return {k: kit.icon(t, b, f, n=32) for k, (t, b, f) in spec.items()}
 

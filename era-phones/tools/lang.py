@@ -121,6 +121,9 @@ T = {
     P + "handle_hint": ("name", "nom"),
     P + "journal_title": ("The Town Courier", "Le Courrier de la Ville"),
     P + "no_news": ("No news today", "Pas de nouvelles aujourd'hui"),
+    P + "news_portal": ("VOXA News", "Infos VOXA"),
+    P + "new_article": ("%s new article", "%s nouvel article"),
+    P + "new_articles": ("%s new articles", "%s nouveaux articles"),
     P + "swipe": ("Swipe up to open", "Glisse vers le haut pour ouvrir"),
     P + "search": ("Search", "Rechercher"),
     P + "photos": ("PHOTOS", "PHOTOS"),
@@ -174,7 +177,7 @@ APPS = {"telephone": ("Phone", "Téléphone"), "messages": ("Messages", "Message
         "appel": ("Call", "Appel")}
 MENU = {"messages": ("Messages", "Messages"), "contacts": ("Directory", "Répertoire"), "calls": ("Call log", "Journal d'appels"),
         "snake": ("Games", "Jeux"), "calc": ("Calculator", "Calculatrice"), "ring": ("Ringing", "Sonnerie"), "number": ("My number", "Mon numéro"),
-        "camera": ("Camera", "Appareil photo"), "gallery": ("Gallery", "Galerie"), "settings": ("Settings", "Réglages")}
+        "camera": ("Camera", "Appareil photo"), "gallery": ("Gallery", "Galerie"), "settings": ("Settings", "Réglages"), "news": ("News", "Infos")}
 CALL_END = {"bad_number": ("Wrong number", "Numéro invalide"), "no_network": ("No network", "Pas de réseau"), "busy": ("Busy", "Occupé"),
             "unassigned": ("Number not assigned", "Numéro non attribué"), "unreachable": ("Cannot be reached", "Correspondant injoignable"),
             "declined": ("Call declined", "Appel refusé"), "no_answer": ("No answer", "Pas de réponse"), "ended": ("Call ended", "Appel terminé"),

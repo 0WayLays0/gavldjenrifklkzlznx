@@ -173,8 +173,10 @@ public final class PhoneService {
         }
         if (phone.era == Era.SMART) {
             sendFeed(p, d, number);
-            sendNews(p, d);
             sendWeather(p);
+        }
+        if (phone.era == Era.SMART || phone.era == Era.FLIP) {
+            sendNews(p, d);
         }
         CallService.resend(p);
     }

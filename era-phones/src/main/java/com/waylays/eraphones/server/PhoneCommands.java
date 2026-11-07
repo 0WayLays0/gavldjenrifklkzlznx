@@ -112,7 +112,9 @@ public final class PhoneCommands {
         String t = title;
         for (ServerPlayer p : c.getSource().getServer().getPlayerList().getPlayers()) {
             for (Map.Entry<String, ItemStack> e : PhoneService.carried(p).entrySet()) {
-                if (PhoneItem.era(e.getValue()) == com.waylays.eraphones.Era.SMART && PhoneItem.battery(e.getValue()) > 0) {
+                com.waylays.eraphones.Era era = PhoneItem.era(e.getValue());
+                // The smartphone's Journal and the flip phone's news both carry the town's articles
+                if ((era == com.waylays.eraphones.Era.SMART || era == com.waylays.eraphones.Era.FLIP) && PhoneItem.battery(e.getValue()) > 0) {
                     net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p, new com.waylays.eraphones.network.PhoneNet.Notice("news", t, text, e.getKey()));
                     if (PhoneService.isOpen(p.getUUID())) {
                         PhoneService.sendNews(p, d);

@@ -183,6 +183,12 @@ public final class SmokeTest {
         });
         STEPS.add(() -> command(mc, "me ouvre lentement la porte de la cave"));
         STEPS.add(() -> command(mc, "roll 1d20"));
+        // Two articles for the town's news (the smartphone's Journal, the flip phone's news)
+        STEPS.add(() -> command(mc, "telephone journal Fête foraine : le cirque s'installe au parc | Les roulottes sont arrivées cette nuit. "
+                + "Personne ne les a vues entrer en ville, mais le chapiteau rouge et blanc se dresse déjà près de l'ancienne usine."));
+        STEPS.add(() -> command(mc, "telephone journal Un enfant porté disparu près des égouts | Un garçon de six ans n'est pas rentré hier soir. "
+                + "Un voisin dit avoir vu un ballon rouge flotter au-dessus de la bouche d'égout de la rue des Saules. "
+                + "La police demande à toute personne ayant des informations de se manifester. Les enfants sont priés de ne pas sortir après la tombée de la nuit."));
         STEPS.add(() -> {
             shot(mc, "rp_chat");
             if (!mc.player.getDisplayName().getString().equals("Bill Denbrough")) {
@@ -232,9 +238,13 @@ public final class SmokeTest {
         STEPS.add(() -> shot(mc, "flip_idle"));
         keys(mc, "flip_menu", "ok");
         keys(mc, "flip_contacts", "right", "ok");
-        keys(mc, "flip_camera_menu", "end", "ok", "down");
+        keys(mc, "flip_camera_menu", "end", "ok", "down", "right");
         keys(mc, "flip_write", "end", "ok", "ok", "ok", "5", "5", "5", "0", "1", "4", "2", "ok", "4", "4", "3", "3", "5", "5", "5", "6", "6", "6");
-        keys(mc, "flip_snake", "end", "ok", "down", "right", "right", "ok");
+        keys(mc, "flip_snake", "end", "ok", "down", "down", "ok");
+        // The flip phone's news: the headlines, then the newest article
+        keys(mc, "flip_news", "end", "ok", "4");
+        keys(mc, "flip_article", "ok");
+        keys(mc, "flip_settings", "end", "ok", "9");
         // The GSM: standby, the menu's first entries, typing a number
         STEPS.add(() -> open(mc, 2));
         STEPS.add(() -> shot(mc, "gsm_idle"));

@@ -348,7 +348,8 @@ public final class PhoneClient {
         while (NOTES.size() > 12) {
             NOTES.remove(NOTES.size() - 1);
         }
-        boolean viewing = mc.screen instanceof SmartScreen ps && ps.current() != null && ps.current().id.equals(app);
+        boolean viewing = mc.screen instanceof SmartScreen ps && ps.current() != null && ps.current().id.equals(app)
+                || "journal".equals(app) && mc.screen instanceof com.waylays.eraphones.client.retro.FlipScreen f && f.readingNews();
         if (!viewing) {
             UNSEEN.merge(app, 1, Integer::sum);
         }

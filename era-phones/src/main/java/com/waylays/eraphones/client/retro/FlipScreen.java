@@ -6,9 +6,11 @@ import com.waylays.eraphones.client.PhoneClient;
 import com.waylays.eraphones.client.PhoneHud;
 import com.waylays.eraphones.client.PhoneSettings;
 import com.waylays.eraphones.client.PhoneUI;
+import com.waylays.eraphones.network.PhoneNet;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
@@ -18,16 +20,21 @@ import java.util.List;
  * The 2004 flip phone, opened: a brushed silver shell, a colour screen in the lid (a wallpaper, the time large, the
  * operator), and below the hinge two soft keys, a four-way pad round its OK, the green and the red keys and the digits.
  * Its menu is a grid of nine glossy icons; it has a small camera (photos of 160 by 120, a little washed out), a gallery,
- * polyphonic rings and colour themes.
+ * the operator's news (the town's articles, as the game masters publish them), polyphonic rings and colour themes.
  */
 public class FlipScreen extends MenuPhone {
-    private static final String[] ITEMS = {"messages", "contacts", "calls", "camera", "gallery", "snake", "ring", "calc", "settings"};
-    private static final String GALLERY = "gallery", SETTINGS = "settings", THEME = "theme";
+    private static final String[] ITEMS = {"messages", "contacts", "calls", "news", "camera", "gallery", "snake", "calc", "settings"};
+    private static final String GALLERY = "gallery", SETTINGS = "settings", THEME = "theme", NEWS = "news", ARTICLE = "article";
+    /** A headline's row in the news list. */
+    private static final int NEWS_ROW = 18;
     /** Each theme: the bars' top and bottom colours, the highlight. */
     private static final int[][] THEMES = {{0xFF3A7AE0, 0xFF143A8A, 0xFF7AC0FF}, {0xFFE04A9A, 0xFF8A1A5A, 0xFFFF9AD0}, {0xFF3AB06A, 0xFF145A30, 0xFF8AF0B0},
             {0xFFE0802A, 0xFF8A3A0A, 0xFFFFC07A}};
     private static final String[] THEME_NAMES = {"blue", "pink", "green", "orange"};
     private int photo;
+    /** The article being read, and how far down it (body pixels). */
+    private int article;
+    private float articleScroll, articleMax;
 
     public FlipScreen() {
         this(null);
@@ -52,7 +59,18 @@ public class FlipScreen extends MenuPhone {
         }
         if ("photo".equals(app)) {
             go(GALLERY);
+        } else if ("journal".equals(app)) {
+            openNews();
         }
+    }
+
+    /** Whether the news are on the screen (an article coming in then is not news to the badge). */
+    public boolean readingNews() {
+        return view.equals(NEWS) || view.equals(ARTICLE);
+    }
+
+    private static int index(String item) {
+        return java.util.Arrays.asList(ITEMS).indexOf(item);
     }
 
     @Override
@@ -147,6 +165,12 @@ public class FlipScreen extends MenuPhone {
         if (missed > 0) {
             PhoneUI.round(g, x0 + 10, y, w - 20, 12, 4, 0xAA000000);
             PhoneUI.centered(g, tr("phone.eraphones.missed_short", missed), cx, y + 3, 0xFFFF9A9A, .58f);
+            y += 15;
+        }
+        int articles = PhoneClient.badge("journal");
+        if (articles > 0 && y < y0 + h - 26) {
+            PhoneUI.round(g, x0 + 10, y, w - 20, 12, 4, 0xAA000000);
+            PhoneUI.centered(g, tr(articles == 1 ? "phone.eraphones.new_article" : "phone.eraphones.new_articles", articles), cx, y + 3, 0xFF9AD8FF, .58f);
         }
         softkeys(g, tr("phone.eraphones.menu"), tr("phone.eraphones.directory"));
     }
@@ -304,10 +328,21 @@ public class FlipScreen extends MenuPhone {
                 go(SETTINGS);
                 return true;
             }
+            case "news" -> {
+                openNews();
+                return true;
+            }
             default -> {
                 return false;
             }
         }
+    }
+
+    /** The operator's news: the headlines, asked afresh. */
+    private void openNews() {
+        go(NEWS);
+        PhoneClient.seen("journal");
+        PhoneClient.ask(6, "");
     }
 
     @Override
@@ -332,7 +367,9 @@ public class FlipScreen extends MenuPhone {
             }
             case SETTINGS -> {
                 header(g, tr("phone.eraphones.menu.settings"));
-                list(g, List.of(tr("phone.eraphones.theme"), tr("phone.eraphones.my_number")), List.of("", PhoneClient.number), sel, 0);
+                String profile = tr(PhoneClient.silent ? "phone.eraphones.profile.silent" : "phone.eraphones.profile.normal");
+                list(g, List.of(tr("phone.eraphones.theme"), tr("phone.eraphones.ringing"), tr("phone.eraphones.my_number")),
+                        List.of(tr("phone.eraphones.theme." + THEME_NAMES[Math.floorMod(PhoneSettings.get().theme, 4)]), profile, ""), sel, 0);
                 softkeys(g, tr("phone.eraphones.select"), tr("phone.eraphones.back"));
                 return true;
             }
@@ -348,10 +385,98 @@ public class FlipScreen extends MenuPhone {
                 softkeys(g, tr("phone.eraphones.select"), tr("phone.eraphones.back"));
                 return true;
             }
+            case NEWS -> {
+                newsList(g, now);
+                return true;
+            }
+            case ARTICLE -> {
+                newsArticle(g);
+                return true;
+            }
             default -> {
                 return false;
             }
         }
+    }
+
+    /** The headlines, newest first: each a title and how long ago, the chosen one lit in the theme's colours. */
+    private void newsList(GuiGraphics g, long now) {
+        int[] t = theme();
+        header(g, tr("phone.eraphones.news_portal"));
+        List<PhoneNet.NewsView> news = PhoneClient.news;
+        if (news.isEmpty()) {
+            PhoneUI.paragraph(g, tr("phone.eraphones.no_news"), x0 + w / 2f, y0 + 50, w - 16, 0xFFB0C0D8, .62f);
+            softkeys(g, "", tr("phone.eraphones.back"));
+            return;
+        }
+        sel = Math.max(0, Math.min(sel, news.size() - 1));
+        int rows = Math.max(1, (h - 34) / NEWS_ROW);
+        if (sel < scroll) {
+            scroll = sel;
+        } else if (sel >= scroll + rows) {
+            scroll = sel - rows + 1;
+        }
+        int y = y0 + 22;
+        for (int i = scroll; i < news.size() && i < scroll + rows; i++) {
+            PhoneNet.NewsView n = news.get(i);
+            boolean on = i == sel;
+            if (on) {
+                PhoneUI.gradient(g, x0 + 2, y - 1, w - 4, NEWS_ROW - 1, 3, t[2], t[0]);
+            }
+            // The bullet: a small square in the theme's colour, blinking on the newest headline
+            boolean blink = i == 0 && now % 1000 < 600;
+            g.fill(x0 + 5, y + 2, x0 + 9, y + 6, on ? 0xFF0A1020 : blink ? 0xFFFFE070 : t[2]);
+            PhoneUI.text(g, PhoneUI.fit(n.title(), w - 18, .62f), x0 + 12, y + 1, on ? 0xFF0A1020 : 0xFFFFFFFF, .62f);
+            PhoneUI.text(g, PhoneUI.ago(n.time()), x0 + 12, y + 9, on ? 0xFF1A2A44 : 0xFF8AA0C0, .5f);
+            y += NEWS_ROW;
+        }
+        if (news.size() > rows) {
+            int track = rows * NEWS_ROW - 2, bar = Math.max(6, track * rows / news.size());
+            int by = y0 + 22 + (track - bar) * scroll / Math.max(1, news.size() - rows);
+            g.fill(x0 + w - 2, y0 + 22, x0 + w - 1, y0 + 22 + track, 0x33FFFFFF);
+            g.fill(x0 + w - 2, by, x0 + w - 1, by + bar, PhoneUI.alpha(t[2], .9f));
+        }
+        softkeys(g, tr("phone.eraphones.read"), tr("phone.eraphones.back"));
+    }
+
+    /** One article: its title large, how long ago, a rule, then its text, scrolled with the pad. */
+    private void newsArticle(GuiGraphics g) {
+        List<PhoneNet.NewsView> news = PhoneClient.news;
+        if (news.isEmpty()) {
+            go(NEWS);
+            return;
+        }
+        article = Math.floorMod(article, news.size());
+        PhoneNet.NewsView n = news.get(article);
+        int[] t = theme();
+        header(g, tr("phone.eraphones.menu.news") + " " + (article + 1) + "/" + news.size());
+        int top = y0 + 21, bottom = y0 + h - 12;
+        clip(g, x0, top, x0 + w, bottom);
+        float y = top + 3 - articleScroll;
+        List<FormattedCharSequence> title = PhoneUI.wrap(n.title(), w - 10, .78f);
+        PhoneUI.lines(g, title, x0 + 4, y, 0xFFFFFFFF, .78f);
+        y += title.size() * 10 * .78f + 1;
+        PhoneUI.text(g, PhoneUI.ago(n.time()), x0 + 4, y, t[2], .5f);
+        y += 7;
+        g.fill(x0 + 4, (int) y, x0 + w - 6, (int) y + 1, PhoneUI.alpha(t[2], .6f));
+        y += 4;
+        if (!n.text().isEmpty()) {
+            List<FormattedCharSequence> body = PhoneUI.wrap(n.text(), w - 10, .6f);
+            PhoneUI.lines(g, body, x0 + 4, y, 0xFFE8EEF8, .6f);
+            y += body.size() * 6;
+        }
+        g.disableScissor();
+        float shown = bottom - top;
+        float content = y + articleScroll - top + 4;
+        articleMax = Math.max(0, content - shown);
+        articleScroll = Math.max(0, Math.min(articleScroll, articleMax));
+        if (articleMax > 0) {
+            int track = (int) shown - 4, bar = Math.max(6, (int) (track * shown / content));
+            int by = top + 2 + (int) ((track - bar) * articleScroll / articleMax);
+            g.fill(x0 + w - 2, top + 2, x0 + w - 1, top + 2 + track, 0x33FFFFFF);
+            g.fill(x0 + w - 2, by, x0 + w - 1, by + bar, PhoneUI.alpha(t[2], .9f));
+        }
+        softkeys(g, news.size() > 1 ? "◀ ▶" : "", tr("phone.eraphones.back"));
     }
 
     @Override
@@ -367,19 +492,24 @@ public class FlipScreen extends MenuPhone {
                     return false;
                 } else if (id.equals("back")) {
                     go(MENU);
-                    sel = 4;
+                    sel = index(GALLERY);
                 } else if (id.equals("ok") && files.isEmpty()) {
                     PhoneClient.photo();
                 }
                 return true;
             }
             case SETTINGS -> {
-                if (id.equals("up") || id.equals("down")) {
-                    sel = 1 - sel;
+                if (id.equals("up")) {
+                    sel = Math.floorMod(sel - 1, 3);
+                } else if (id.equals("down")) {
+                    sel = Math.floorMod(sel + 1, 3);
                 } else if (id.equals("ok")) {
                     if (sel == 0) {
                         go(THEME);
                         sel = Math.floorMod(PhoneSettings.get().theme, 4);
+                    } else if (sel == 1) {
+                        go(RING);
+                        sel = PhoneClient.silent ? 1 : 0;
                     } else {
                         go(NUMBER);
                     }
@@ -387,7 +517,56 @@ public class FlipScreen extends MenuPhone {
                     return false;
                 } else if (id.equals("back")) {
                     go(MENU);
-                    sel = 8;
+                    sel = index(SETTINGS);
+                }
+                return true;
+            }
+            case RING, NUMBER -> {
+                // The ringing and one's number are in the settings here: back goes back there
+                if (!id.equals("back") && !(view.equals(NUMBER) && id.equals("ok"))) {
+                    return false;
+                }
+                int from = view.equals(RING) ? 1 : 2;
+                go(SETTINGS);
+                sel = from;
+                return true;
+            }
+            case NEWS -> {
+                int count = PhoneClient.news.size();
+                if (id.equals("up") || id.equals("left")) {
+                    sel = count == 0 ? 0 : Math.floorMod(sel - 1, count);
+                } else if (id.equals("down") || id.equals("right")) {
+                    sel = count == 0 ? 0 : Math.floorMod(sel + 1, count);
+                } else if ((id.equals("ok") || id.equals("5")) && sel < count) {
+                    article = sel;
+                    articleScroll = 0;
+                    view = ARTICLE;
+                    PhoneClient.beep(SoundEvents.BOOK_PAGE_TURN, 1.4f, .5f);
+                } else if (id.equals("end")) {
+                    return false;
+                } else if (id.equals("back")) {
+                    go(MENU);
+                    sel = index(NEWS);
+                }
+                return true;
+            }
+            case ARTICLE -> {
+                int count = PhoneClient.news.size();
+                if (id.equals("up") || id.equals("2")) {
+                    articleScroll = Math.max(0, articleScroll - 12);
+                } else if (id.equals("down") || id.equals("8")) {
+                    articleScroll = Math.min(articleMax, articleScroll + 12);
+                } else if ((id.equals("left") || id.equals("4")) && count > 1) {
+                    article = Math.floorMod(article - 1, count);
+                    articleScroll = 0;
+                } else if ((id.equals("right") || id.equals("6") || id.equals("ok")) && count > 1) {
+                    article = Math.floorMod(article + 1, count);
+                    articleScroll = 0;
+                } else if (id.equals("end")) {
+                    return false;
+                } else if (id.equals("back")) {
+                    go(NEWS);
+                    sel = article;
                 }
                 return true;
             }
