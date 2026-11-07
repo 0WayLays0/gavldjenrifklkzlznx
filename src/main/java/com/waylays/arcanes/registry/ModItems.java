@@ -102,6 +102,9 @@ public final class ModItems {
     public static final DeferredHolder<Item, Item> BONE_BLADE = ITEMS.register("bone_blade", com.waylays.arcanes.item.BoneBladeItem::new);
 
     /** Ritual Chalk: chooses a group ritual and draws its circle on the ground (32 circles). */
+    /** The Arcanophone: a magic phone (messages, contacts, map, camera, bank...); see client/phone. */
+    public static final DeferredHolder<Item, Item> ARCANOPHONE = ITEMS.register("arcanophone",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.EPIC)));
     public static final DeferredHolder<Item, Item> RITUAL_CHALK = ITEMS.register("ritual_chalk",
             () -> new com.waylays.arcanes.ritual.RitualChalkItem(new Item.Properties().stacksTo(1).durability(32).rarity(Rarity.UNCOMMON)));
 

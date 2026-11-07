@@ -6,7 +6,7 @@ All art is original (Iron's Spells' license forbids reusing its assets). Run fro
 Needs Pillow. Re-running overwrites the files it writes (see main() here and in explosion_assets.py, book_assets.py,
 errethys_assets.py, physical_assets.py, boss_assets.py, rune_assets.py, glyph_assets.py,
 token_assets.py, verdigris_assets.py, wall_assets.py, ritual_assets.py, gem_assets.py, gold_assets.py, cosmos_assets.py,
-bone_assets.py, wood_assets.py, water_assets.py, fire_assets.py, wind_assets.py, echo_assets.py, sand_assets.py, lotus_assets.py, aurora_assets.py, clockwork_assets.py, melody_assets.py, mend_assets.py, trap_assets.py, music_assets.py, creative_assets.py and scroll_assets.py) and nothing else.
+bone_assets.py, wood_assets.py, water_assets.py, fire_assets.py, wind_assets.py, echo_assets.py, sand_assets.py, lotus_assets.py, aurora_assets.py, clockwork_assets.py, melody_assets.py, mend_assets.py, trap_assets.py, phone_assets.py, music_assets.py, creative_assets.py and scroll_assets.py) and nothing else.
 """
 import json
 import math
@@ -717,6 +717,8 @@ def main():
     mend_assets.main()
     import trap_assets
     trap_assets.main()
+    import phone_assets
+    phone_assets.main()
     import music_assets
     music_assets.main()
     import creative_assets

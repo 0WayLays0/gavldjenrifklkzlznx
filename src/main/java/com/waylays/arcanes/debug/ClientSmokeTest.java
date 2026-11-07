@@ -211,7 +211,7 @@ public final class ClientSmokeTest {
                 }
             }
             case SETTLING -> {
-                if (creativeTab(mc) && musicPlayer(mc) && ticks >= SETTLE_TICKS) {
+                if (creativeTab(mc) && musicPlayer(mc) && phone(mc) && ticks >= SETTLE_TICKS) {
                     mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
                     stage = Stage.CASTING;
                     ticks = 0;
@@ -702,6 +702,71 @@ public final class ClientSmokeTest {
     }
 
     /** The last frame drawn, halved and logged as base64 JPEG lines (a picture never fails the run). */
+    private static int phoneStep;
+    private static int phoneTick;
+    private static final String[] PHONE_APPS = {"meteo", "carte", "missives", "banque", "grimoire", "calcul", "horloge", "reglages"};
+
+    /**
+     * The Arcanophone: taken out, locked (photographed with {@code phone} in {@code arcanes.shots}), unlocked to its home
+     * screen, then a few of its apps opened in turn. Returns whether it is done.
+     */
+    private static boolean phone(Minecraft mc) {
+        if (phoneStep < 0) {
+            return true;
+        }
+        try {
+            boolean shots = SHOTS.contains("phone");
+            if (phoneStep == 0) {
+                mc.setScreen(new com.waylays.arcanes.client.phone.PhoneScreen());
+                phoneTick = ticks;
+                phoneStep = 1;
+                return false;
+            }
+            if (ticks - phoneTick < 14) {
+                return false;
+            }
+            if (!(mc.screen instanceof com.waylays.arcanes.client.phone.PhoneScreen ps)) {
+                failures.incrementAndGet();
+                ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the phone did not stay open");
+                phoneStep = -1;
+                return true;
+            }
+            if (phoneStep == 1) {
+                if (shots) {
+                    screenshot(mc, "phone_lock");
+                }
+                ps.unlockNow();
+            } else if (phoneStep == 2) {
+                if (shots) {
+                    screenshot(mc, "phone_home");
+                }
+            } else if (phoneStep - 3 < PHONE_APPS.length) {
+                if (shots && phoneStep > 3) {
+                    screenshot(mc, "phone_" + PHONE_APPS[phoneStep - 4]);
+                }
+                ps.open(PHONE_APPS[phoneStep - 3], 90, 200);
+            } else {
+                if (shots) {
+                    screenshot(mc, "phone_" + PHONE_APPS[PHONE_APPS.length - 1]);
+                }
+                log("phone: opened, unlocked and {} apps shown", PHONE_APPS.length);
+                mc.setScreen(null);
+                phoneStep = -1;
+                return true;
+            }
+            phoneStep++;
+            phoneTick = ticks;
+            return false;
+        } catch (Throwable t) {
+            failures.incrementAndGet();
+            StackTraceElement where = java.util.Arrays.stream(t.getStackTrace()).filter(f -> f.getClassName().startsWith("com.waylays.")).findFirst().orElse(null);
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the phone: {}{}", t, where != null ? " at " + where : "", t);
+            mc.setScreen(null);
+            phoneStep = -1;
+            return true;
+        }
+    }
+
     private static void screenshot(Minecraft mc, String name) {
         try (NativeImage shot = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
             int f = Math.max(1, shot.getWidth() / SHOT_WIDTH);

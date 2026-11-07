@@ -571,6 +571,31 @@ allonge les malédictions.
 | **Champ de mines** (Minefield, épique) | Sept mines autour du point visé, chacune une malédiction différente. |
 | **Toile maudite** (Cursed Web, ultime) | Une toile de 10 blocs : toutes les 2 s, chaque ennemi dedans subit une nouvelle malédiction, à tour de rôle. |
 
+### Arcanophone (téléphone magique)
+
+Un smartphone magique à tenir en jeu : touche **N** (si on porte l'objet *Arcanophone* ; recette : 6 lingots de fer, un
+éclat d'améthyste, une vitre, une poudre de redstone), ou clic droit avec l'objet. Coque de titane violet, écran de
+verrouillage (grande horloge du monde, date, notifications, glisser vers le haut), île runique en haut de l'écran qui
+s'ouvre quand un message arrive, fonds d'écran animés (nébuleuse, aurore, abysses, braises), barre d'état (heure du
+monde, « réseau » = mana, « batterie » = vie), widgets Météo et Photos, 12 applis et un dock de 4. Noms, icônes et
+logos originaux.
+
+| Appli | Ce qu'elle fait |
+|---|---|
+| **Missives** | Messages entre joueurs, gardés par le serveur : un message attend le joueur absent, notification à son arrivée. |
+| **Contacts** | Joueurs enregistrés, en ligne ou non ; ajout, écrire, trouver sur la carte ; partager sa position avec ses contacts. |
+| **Appareil** | Le monde vu à travers l'écran ; prend une photo sans l'interface (dossier `arcanes_phone/photos`). |
+| **Photos** | Galerie des photos, en grand, suppression. |
+| **Carte** | Carte en direct des alentours (couleurs des blocs chargés), flèche du joueur, contacts qui partagent leur position, lieux marqués. |
+| **Météo** | Biome, température, ciel, 6 prochaines heures, quand la pluie viendra ou cessera (données du serveur), lune, soleil. |
+| **Musique** | Le lecteur de musique dans le téléphone (disque, contrôles, bibliothèque). |
+| **Banque** | Compte d'émeraudes gardé par le serveur : déposer, retirer, envoyer à un joueur (même absent), historique. |
+| **Échos** | Réseau social du serveur : publications courtes, j'aime. |
+| **Grimoire** | Vie, mana, niveau, faim, armure, effets actifs, position. |
+| **Horloge** | Heure du monde (cadran à aiguilles), heure réelle, chronomètre. |
+| **Boussole** | Rose des vents qui tourne avec le joueur, cap, direction et distance du point d'apparition et des lieux marqués. |
+| **Calculette**, **Notes**, **Dés** (d4 à d100), **Réglages** | Fond d'écran, finition de la coque, sons, ne pas déranger, partage de position. |
+
 ### Lecteur de musique
 
 Un lecteur de musique en jeu, ouvert avec la touche **M** (modifiable dans les commandes, catégorie Arcanes Oublies).
