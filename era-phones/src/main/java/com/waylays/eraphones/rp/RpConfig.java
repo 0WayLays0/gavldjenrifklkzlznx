@@ -6,7 +6,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public final class RpConfig {
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.BooleanValue LOCAL_CHAT;
-    public static final ModConfigSpec.IntValue SAY_RANGE, ACTION_RANGE, WHISPER_RANGE, SHOUT_RANGE, HIDE_PERMISSION;
+    public static final ModConfigSpec.IntValue SAY_RANGE, ACTION_RANGE, WHISPER_RANGE, SHOUT_RANGE, HIDE_PERMISSION, HORROR_PERMISSION, VOICE_PERMISSION;
     public static final ModConfigSpec.BooleanValue NAMEPLATES, BUBBLES, PHONE_VOICE;
 
     static {
@@ -22,13 +22,15 @@ public final class RpConfig {
         NAMEPLATES = b.comment("Whether the character's name shows over their head").define("nameplates", true);
         BUBBLES = b.comment("Whether what is said and done also shows in a bubble over the head (off: in the chat only)").define("bubbles", false);
         PHONE_VOICE = b.comment("With Simple Voice Chat: whether the two ends of a phone call hear each other's voice").define("phoneVoice", true);
+        HORROR_PERMISSION = b.comment("The permission level needed for /horreur (sounds, visions, fog, a red balloon...)").defineInRange("horreurPermission", 2, 0, 4);
+        VOICE_PERMISSION = b.comment("The permission level needed for /voix (with Simple Voice Chat: a changed voice)").defineInRange("voixPermission", 2, 0, 4);
         b.pop();
         SPEC = b.build();
     }
 
     private RpConfig() {}
 
-    static int get(ModConfigSpec.IntValue v, int fallback) {
+    public static int get(ModConfigSpec.IntValue v, int fallback) {
         try {
             return v.get();
         } catch (IllegalStateException e) {

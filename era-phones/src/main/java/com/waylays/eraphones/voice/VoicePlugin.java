@@ -1,6 +1,7 @@
 package com.waylays.eraphones.voice;
 
 import com.waylays.eraphones.EraPhones;
+import com.waylays.eraphones.horror.Voices;
 import com.waylays.eraphones.rp.RpConfig;
 import com.waylays.eraphones.rp.RpVisibility;
 import com.waylays.eraphones.server.CallService;
@@ -15,9 +16,10 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.UUID;
 
 /**
- * With Simple Voice Chat (only loaded if it is installed): the voice of someone seen by one player only (/voir) reaches
- * only those who see them; and the two ends of a phone call hear each other wherever they are, as through the phone,
- * while those standing near each still hear them speak.
+ * With Simple Voice Chat (only loaded if it is installed): a voice put on with /voix (the masked caller, a demon, a
+ * clown...) replaces the speaker's own, for all who hear them; the voice of someone seen by one player only (/voir)
+ * reaches only those who see them; and the two ends of a phone call hear each other wherever they are, as through the
+ * phone, while those standing near each still hear them speak.
  */
 @ForgeVoicechatPlugin
 public class VoicePlugin implements VoicechatPlugin {
@@ -37,6 +39,7 @@ public class VoicePlugin implements VoicechatPlugin {
             return;
         }
         VoicechatServerApi api = event.getVoicechat();
+        changeVoice(event, sender, speaker, api);
         if (RpVisibility.hidden(speaker)) {
             // Heard only by those who see them
             event.cancel();
@@ -61,6 +64,28 @@ public class VoicePlugin implements VoicechatPlugin {
             }
         }
     }
+
+    /** The speaker's voice put on before anyone hears it (so also through /voir and the phone). */
+    private void changeVoice(MicrophonePacketEvent event, VoicechatConnection sender, ServerPlayer speaker, VoicechatServerApi api) {
+        String voice = Voices.of(speaker.getUUID());
+        try {
+            byte[] changed = VoiceStreams.process(api, speaker.getUUID(), voice, event.getPacket().getOpusEncodedData());
+            if (changed == null) {
+                return;
+            }
+            event.getPacket().setOpusEncodedData(changed);
+            if (Voices.listening(speaker.getUUID())) {
+                api.sendStaticSoundPacketTo(sender, event.getPacket().toStaticSoundPacket());
+            }
+        } catch (Throwable t) {
+            if (!warned) {
+                warned = true;
+                EraPhones.LOGGER.warn("The voice {} could not be put on: {}", voice, t.toString());
+            }
+        }
+    }
+
+    private boolean warned;
 
     private static boolean phoneVoice() {
         try {

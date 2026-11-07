@@ -79,5 +79,6 @@ public final class RpEvents {
     @SubscribeEvent
     public static void onCommands(RegisterCommandsEvent event) {
         RpCommands.register(event.getDispatcher());
+        com.waylays.eraphones.horror.HorrorCommands.register(event.getDispatcher());
     }
 }

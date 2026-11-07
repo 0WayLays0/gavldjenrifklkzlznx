@@ -27,6 +27,11 @@ public final class PhoneNet {
 
     private PhoneNet() {}
 
+    /** {@code s} no longer than {@code max} characters. */
+    static String cut(String s, int max) {
+        return s == null ? "" : s.length() <= max ? s : s.substring(0, max - 1) + "…";
+    }
+
     public static void register(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar r = event.registrar("1");
         r.playToServer(Open.TYPE, Open.CODEC, (p, c) -> server(c, pl -> PhoneService.open(pl, p.slot())));
@@ -388,6 +393,14 @@ public final class PhoneNet {
      */
     public record Notice(String kind, String title, String text, String number) implements CustomPacketPayload {
         public static final Type<Notice> TYPE = payload("notice");
+
+        /** Cut to what the packet carries (a long article would otherwise break the connection). */
+        public Notice {
+            title = cut(title, 96);
+            text = cut(text, TEXT);
+            number = cut(number, NAME);
+        }
+
         public static final StreamCodec<FriendlyByteBuf, Notice> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeUtf(p.kind, 16);
             b.writeUtf(p.title, 96);
@@ -426,6 +439,11 @@ public final class PhoneNet {
     /** A line said during the call ({@code mine}: by this phone's holder). */
     public record CallLine(boolean mine, String text) implements CustomPacketPayload {
         public static final Type<CallLine> TYPE = payload("call_line");
+
+        public CallLine {
+            text = cut(text, TEXT);
+        }
+
         public static final StreamCodec<FriendlyByteBuf, CallLine> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeBoolean(p.mine);
             b.writeUtf(p.text, TEXT);
@@ -440,6 +458,11 @@ public final class PhoneNet {
     /** The phone goes wrong for {@code ticks}: static, a shape in it, and {@code text} if any (a game master's doing). */
     public record Haunt(int ticks, String text) implements CustomPacketPayload {
         public static final Type<Haunt> TYPE = payload("haunt");
+
+        public Haunt {
+            text = cut(text, TEXT);
+        }
+
         public static final StreamCodec<FriendlyByteBuf, Haunt> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeVarInt(p.ticks);
             b.writeUtf(p.text, TEXT);

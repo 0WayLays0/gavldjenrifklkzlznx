@@ -61,6 +61,39 @@ cri), permission de `/voir`, noms au-dessus des têtes, bulles au-dessus des tê
 | `/telephone numeros <joueur>` | Les numéros que porte un joueur. |
 | `/telephone recharger` | Recharge le téléphone en main. |
 
+### `/horreur` : ce que seules les victimes voient et entendent
+
+`joueurs` accepte un pseudo ou un sélecteur (`@a`, `@a[distance=..15]`…). Rien n'apparaît dans le chat des victimes.
+
+| Commande | Effet |
+| --- | --- |
+| `/horreur son <joueurs> <son> [ici]` | Un son qu'eux seuls entendent, placé autour d'eux (ou là où se tient le maître du jeu avec `ici`) : `pas` (des pas qui approchent dans leur dos), `toc` (on frappe), `porte` (une porte qui grince), `rire`, `enfants` (des rires d'enfants), `murmures`, `souffle` (une respiration dans la nuque), `coeur` (un cœur qui s'accélère), `cri`, `manege` (une boîte à musique qui se dérègle), `glas` (une cloche au loin), `gouttes`. |
+| `/horreur murmure <joueurs> <texte>` | Des mots chuchotés dans leur tête : ils s'écrivent lettre par lettre au milieu de l'écran, en rouge, en tremblant. |
+| `/horreur brouillard <joueurs> [secondes]` | Un brouillard épais se referme autour d'eux (60 s par défaut). |
+| `/horreur coupure <joueurs> [secondes]` | La lumière vacille puis s'éteint ; un éclair de lumière de temps en temps ; elle revient en clignotant. |
+| `/horreur sang <joueurs> [secondes]` | Du sang coule du haut de l'écran, les bords rougissent au rythme d'un cœur. |
+| `/horreur sursaut <joueurs> [texte]` | Un visage surgit en plein écran avec un cri, l'image tremble (texte facultatif en dessous). |
+| `/horreur ballon <joueurs> [ici]` | Un ballon rouge flotte devant eux (ou là où se tient le maître du jeu), se balance au bout de sa ficelle pendant 20 s, s'envole puis éclate. Les autres joueurs ne le voient pas. |
+| `/horreur flotter <joueurs> [secondes]` | Ils s'élèvent lentement et flottent (6 s par défaut), puis redescendent doucement, sans dégâts. |
+| `/horreur vertige <joueurs> [secondes]` | Le monde tangue autour d'eux. |
+| `/horreur tremblement <joueurs> [secondes]` | Le sol tremble et gronde. |
+| `/horreur stop <joueurs>` | Arrête tout pour eux (sons à venir, visions, vertige ; ceux qui flottent redescendent doucement). |
+
+### `/voix` : changer de voix (Simple Voice Chat)
+
+Avec Simple Voice Chat sur le serveur, la voix du micro est transformée **sur le serveur**, avant que quiconque
+l'entende : les joueurs n'ont rien à installer de plus, et la voix changée passe aussi par `/voir` et par le téléphone.
+
+| Commande | Effet |
+| --- | --- |
+| `/voix` | La liste des voix et la tienne. |
+| `/voix <voix> [joueurs]` | Prendre une voix (ou la donner à des joueurs : un personnage possédé…) : `masque` (très grave, rauque, métallique, façon appel masqué), `demon` (deux voix très basses à la fois, déchirées), `clown` (plus aiguë, qui ondule et tremble), `enfant`, `grave`, `radio` (vieille radio qui grésille), `egouts` (un écho qui vient de loin), `spectre` (un souffle de murmure). |
+| `/voix normale [joueurs]` | Retrouver sa voix. |
+| `/voix ecoute` | S'entendre soi-même avec la voix changée, pour l'essayer (encore une fois pour arrêter). |
+
+Les voix durent jusqu'au redémarrage du serveur. Permissions : `horreurPermission` et `voixPermission` (2 par défaut)
+dans `serverconfig/eraphones-server.toml`.
+
 ## Développement
 
 - Images, modèles 3D et textes : `python3 era-phones/tools/gen_assets.py` (numpy, pillow).

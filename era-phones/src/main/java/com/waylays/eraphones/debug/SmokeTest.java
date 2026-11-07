@@ -197,6 +197,23 @@ public final class SmokeTest {
                 log("rp: the character's name is shown");
             }
         });
+        // The game masters' tools of fear, on oneself: each shown, then stopped
+        STEPS.add(() -> {
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            command(mc, "voix masque");
+            command(mc, "voix normale");
+            command(mc, "horreur son @s rire");
+            command(mc, "horreur murmure @s Tu flotteras aussi...");
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "horror_whisper"));
+        horror(mc, "horror_blood", "horreur sang @s 8", 2);
+        horror(mc, "horror_blackout", "horreur coupure @s 8", 2);
+        horror(mc, "horror_fog", "horreur brouillard @s 30", 4);
+        horror(mc, "horror_balloon", "horreur ballon @s", 2);
+        horror(mc, "horror_face", "horreur sursaut @s Tu flotteras", 1);
+        STEPS.add(() -> command(mc, "horreur stop @s"));
         String[] names = {"smartphone", "clapet", "gsm", "radiotelephone"};
         // Held: first person, then from the front
         for (int k = 0; k < 4; k++) {
@@ -273,6 +290,19 @@ public final class SmokeTest {
     }
 
     /** Presses the keys of the retro phone open, then photographs it. */
+    /** Ends the effects before, sends {@code cmd}, waits {@code steps}, takes the shot. */
+    private static void horror(Minecraft mc, String shot, String cmd, int steps) {
+        STEPS.add(() -> {
+            command(mc, "horreur stop @s");
+            command(mc, cmd);
+        });
+        for (int i = 1; i < steps; i++) {
+            STEPS.add(() -> {
+            });
+        }
+        STEPS.add(() -> shot(mc, shot));
+    }
+
     private static void keys(Minecraft mc, String shot, String... ids) {
         STEPS.add(() -> {
             if (!(mc.screen instanceof RetroScreen r)) {
