@@ -81,8 +81,9 @@ cri), permission de `/voir`, noms au-dessus des têtes, bulles au-dessus des tê
 
 ### `/voix` : changer de voix (Simple Voice Chat)
 
-Avec Simple Voice Chat sur le serveur, la voix du micro est transformée **sur le serveur**, avant que quiconque
-l'entende : les joueurs n'ont rien à installer de plus, et la voix changée passe aussi par `/voir` et par le téléphone.
+Avec Simple Voice Chat sur le serveur (version 2.5.27 ou plus récente, de décembre 2024), la voix du micro est
+transformée **sur le serveur**, avant que quiconque l'entende : les joueurs n'ont rien à installer de plus, et la voix
+changée passe aussi par `/voir` et par le téléphone. Avec une version plus ancienne, la voix reste normale.
 
 | Commande | Effet |
 | --- | --- |
