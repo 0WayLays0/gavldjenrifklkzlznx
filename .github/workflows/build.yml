@@ -2,6 +2,9 @@ name: Build & Test
 
 on:
   push:
+    paths-ignore:
+      - 'era-phones/**'
+      - '.github/workflows/era-phones.yml'
   workflow_dispatch:
 
 concurrency:

@@ -1,0 +1,158 @@
+name: Era Phones
+
+on:
+  push:
+    paths:
+      - 'era-phones/**'
+      - '.github/workflows/era-phones.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: era-phones-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Simple Voice Chat API versions on its maven
+        run: |
+          curl -s "https://maven.maxhenkel.de/repository/public/de/maxhenkel/voicechat/voicechat-api/maven-metadata.xml" | grep -oE '<(version|latest|release)>2\.[0-9.]*' | tail -n 10 || true
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: eraphones-${{ runner.os }}-${{ hashFiles('era-phones/build.gradle', 'era-phones/settings.gradle', 'era-phones/gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            eraphones-${{ runner.os }}-
+            gradle121-${{ runner.os }}-
+
+      - name: Build (compile, jar)
+        working-directory: era-phones
+        run: |
+          set -o pipefail
+          chmod +x ../gradlew
+          ../gradlew build --stacktrace --console=plain 2>&1 | tee build.log
+
+      - name: Run GameTests on a headless server
+        timeout-minutes: 15
+        working-directory: era-phones
+        run: |
+          set -o pipefail
+          ../gradlew runGameTestServer --console=plain 2>&1 | tee gametest.log
+          grep -q "required tests passed" gametest.log || { echo "::error::The GameTests did not all pass (or never ran)"; exit 1; }
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: era-phones-jar
+          path: era-phones/build/libs/era-phones-*.jar
+          if-no-files-found: error
+
+      - name: Report
+        if: always()
+        working-directory: era-phones
+        run: |
+          if [ -f build.log ]; then
+            echo "--- compiler errors ---"
+            grep -E "error:|FAILED|What went wrong|Could not (find|resolve)" -A3 build.log | head -n 400 || true
+          fi
+          if [ -f gametest.log ]; then
+            echo "--- gametests ---"
+            grep -E "GameTest|required tests|failed|Exception|Caused by|ERROR" gametest.log | head -n 200 || true
+          fi
+
+  client-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache Gradle (client)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: eraphones-client-${{ runner.os }}-${{ hashFiles('era-phones/build.gradle', 'era-phones/settings.gradle', 'era-phones/gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            eraphones-client-${{ runner.os }}-
+            eraphones-${{ runner.os }}-
+            gradle121-client-${{ runner.os }}-
+
+      - name: Install virtual display
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils > /dev/null
+
+      - name: Run client smoke test
+        timeout-minutes: 32
+        working-directory: era-phones
+        run: |
+          chmod +x ../gradlew
+          mkdir -p run
+          printf 'onboardAccessibility:false\nskipMultiplayerWarning:true\ntutorialStep:none\nnarrator:0\nsoundCategory_master:0.0\nrenderDistance:6\nsimulationDistance:6\npauseOnLostFocus:false\nguiScale:2\n' > run/options.txt
+          export LIBGL_ALWAYS_SOFTWARE=1
+          set +e
+          timeout --kill-after=30s 1800 xvfb-run -a -s "-screen 0 1280x720x24" ../gradlew runClient -Peraphones.autotest=true --console=plain > client.log 2>&1
+          code=$?
+          set -e
+          echo "CLIENT_EXIT=$code" >> "$GITHUB_ENV"
+
+      - name: Report (client)
+        if: always()
+        working-directory: era-phones
+        run: |
+          LOG=run/logs/latest.log
+          [ -f "$LOG" ] || LOG=client.log
+          echo "client exit code: ${CLIENT_EXIT:-unknown}"
+          echo "--- failures ---"
+          { grep -h '\[SmokeTest\] FAIL' "$LOG" || true; } | cut -c1-400 | head -n 40
+          echo "::group::[SmokeTest] lines"
+          { grep -h '\[SmokeTest\]' "$LOG" || true; } | cut -c1-400 | head -n 80
+          echo "::endgroup::"
+          echo "::group::Exceptions through mod code"
+          { grep -nE -B8 -A12 '^[[:space:]]+at com\.waylays\.' "$LOG" || true; } | cut -c1-300 | head -n 200
+          echo "::endgroup::"
+          for f in run/crash-reports/*.txt; do
+            [ -f "$f" ] || continue
+            echo "::group::$f"
+            head -n 150 "$f" | cut -c1-300
+            echo "::endgroup::"
+          done
+          echo "::group::Screenshots (base64 JPEG)"
+          { grep -h '\[SmokeShot\]' "$LOG" || true; } | sed 's/.*\[SmokeShot\] /SHOT /'
+          echo "::endgroup::"
+          echo "--- tail of client.log ---"
+          tail -n 40 client.log | cut -c1-300 || true
+
+      - name: Verdict
+        if: always()
+        working-directory: era-phones
+        run: |
+          LOG=run/logs/latest.log
+          [ -f "$LOG" ] || LOG=client.log
+          if ls run/crash-reports/*.txt > /dev/null 2>&1; then echo "::error::The client crashed"; exit 1; fi
+          if grep -q '\[SmokeTest\] FAIL' "$LOG"; then echo "::error::Smoke test reported a failure"; exit 1; fi
+          if ! grep -q '\[SmokeTest\] PASS' "$LOG"; then echo "::error::No PASS line (exit code ${CLIENT_EXIT:-unknown})"; exit 1; fi
+          echo "Client smoke test passed"
