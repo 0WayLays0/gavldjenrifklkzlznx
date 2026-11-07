@@ -99,7 +99,6 @@ public final class ModCreativeTabs {
                 // The rituals are not a school: their chalk comes first
                 output.accept(ModItems.RITUAL_CHALK.get());
                 output.accept(ModItems.ALTAR_OF_RITES.get());
-                output.accept(ModItems.ARCANOPHONE.get());
                 for (Section section : SECTIONS) {
                     section.books().forEach(book -> output.accept(book.get()));
                     for (var entry : ModSpells.SPELLS.getEntries()) {
