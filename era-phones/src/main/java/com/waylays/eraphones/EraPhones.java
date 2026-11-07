@@ -7,13 +7,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 
 /**
- * Téléphones d'Époque: four telephones for role play, one for each era (a 1985 brick radiotelephone, a 1997 GSM
- * handset, a 2004 flip phone, a 2026 smartphone). Each phone has its own number; the directory, the messages and the
- * calls belong to that number, so whoever holds the phone holds the line. Nothing on them speaks of anything outside
- * the story: no account names, only numbers and the names their owners write.
+ * Téléphones d'Époque: a role-play server's mod. Four telephones, one for each era (a 1985 brick radiotelephone, a 1997
+ * GSM handset, a 2004 flip phone, a 2026 smartphone): each has its own number; the directory, the messages and the calls
+ * belong to that number, so whoever holds the phone holds the line. And the role play itself: characters' names, speech
+ * heard around the speaker, /me, /do, /roll, /try, whispers and shouts, bubbles over the heads, and /voir (seen and
+ * heard by one player only, Simple Voice Chat included). Nothing speaks of anything outside the story.
  */
 @Mod(EraPhones.MODID)
 public final class EraPhones {
@@ -23,6 +25,7 @@ public final class EraPhones {
     public EraPhones(IEventBus modBus, ModContainer container) {
         EraRegistry.register(modBus);
         modBus.addListener(PhoneNet::register);
+        container.registerConfig(ModConfig.Type.SERVER, com.waylays.eraphones.rp.RpConfig.SPEC);
     }
 
     public static ResourceLocation id(String path) {

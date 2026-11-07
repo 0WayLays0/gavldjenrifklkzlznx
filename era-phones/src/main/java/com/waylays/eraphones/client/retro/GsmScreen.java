@@ -16,7 +16,7 @@ import java.util.List;
  * green and the red, C to go back, two arrows, and rubber digits that write letters when pressed again.
  */
 public class GsmScreen extends MenuPhone {
-    private static final String[] MENU = {"messages", "contacts", "calls", "snake", "calc", "ring", "number"};
+    private static final String[] ITEMS = {"messages", "contacts", "calls", "snake", "calc", "ring", "number"};
     private static final int[] CONTRAST = {0xFFB4CC84, 0xFFA2BE70, 0xFF94B262, 0xFF84A452};
 
     public GsmScreen() {
@@ -42,7 +42,7 @@ public class GsmScreen extends MenuPhone {
 
     @Override
     protected String[] menu() {
-        return MENU;
+        return ITEMS;
     }
 
     private int lcd() {
@@ -108,7 +108,7 @@ public class GsmScreen extends MenuPhone {
 
     @Override
     protected void menuScreen(GuiGraphics g, long now) {
-        String id = MENU[sel];
+        String id = ITEMS[sel];
         PhoneUI.right(g, (sel + 1) + "", x0 + w - 3, y0 + 2, fg(), .55f);
         PhoneUI.blend();
         g.setColor(0.11f, 0.16f, 0.07f, 1);

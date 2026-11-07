@@ -49,7 +49,19 @@ neoForge {
 }
 
 repositories {
+    maven {
+        name = 'Simple Voice Chat'
+        url = 'https://maven.maxhenkel.de/repository/public'
+        content {
+            includeGroup 'de.maxhenkel.voicechat'
+        }
+    }
     mavenCentral()
+}
+
+dependencies {
+    // Simple Voice Chat's API, to build against only: the mod works without it, and with it when it is installed
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
 }
 
 tasks.withType(JavaCompile).configureEach {

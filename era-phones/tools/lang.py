@@ -186,6 +186,41 @@ MOON = [("Full moon", "Pleine lune"), ("Waning gibbous", "Gibbeuse décroissante
         ("Waning crescent", "Dernier croissant"), ("New moon", "Nouvelle lune"), ("Waxing crescent", "Premier croissant"),
         ("First quarter", "Premier quartier"), ("Waxing gibbous", "Gibbeuse croissante")]
 
+RP = {
+    "stranger": ("A stranger", "Un inconnu"),
+    "says": ("says:", "dit :"),
+    "rolls": ("rolls %s:", "lance %s :"),
+    "tries": ("tries to", "tente de"),
+    "success": ("Success", "Réussite"),
+    "failure": ("Failure", "Échec"),
+    "whispers": ("whispers:", "chuchote :"),
+    "whispers_something": ("whispers something.", "chuchote quelque chose."),
+    "shouts": ("shouts:", "crie :"),
+    "bad_name": ("A first name and a last name of 2 to 16 letters each", "Un prénom et un nom de 2 à 16 lettres chacun"),
+    "named": ("You are now %s.", "Tu es désormais %s."),
+    "bad_dice": ("Dice are written like 1d20, 2d6 or 100", "Les dés s'écrivent comme 1d20, 2d6 ou 100"),
+    "description_set": ("Your description is set: others read it with /examiner", "Ta description est enregistrée : les autres la lisent avec /examiner"),
+    "description_cleared": ("Your description is cleared", "Ta description est effacée"),
+    "too_far": ("Too far to be seen", "Trop loin pour être vu"),
+    "no_description": ("Nothing in particular.", "Rien de particulier."),
+    "hidden_all": ("No one sees or hears you any more.", "Plus personne ne te voit ni ne t'entend."),
+    "seen_only_by": ("Only %s can see and hear you now.", "Seul(s) %s peut/peuvent désormais te voir et t'entendre."),
+    "seen_by_all": ("Everyone sees and hears you again.", "Tout le monde te voit et t'entend de nouveau."),
+    "still_hidden": ("You are still seen by your chosen ones only (/voir tous to be seen again)", "Tu n'es toujours vu que par tes élus (/voir tous pour réapparaître)"),
+    "choose_name": ("Choose your character's name: /setname First Last", "Choisis le nom de ton personnage : /setname Prénom Nom"),
+    "help.setname": ("First Last: your character's name", "Prénom Nom : le nom de ton personnage"),
+    "help.me": ("action: what your character does", "action : ce que fait ton personnage"),
+    "help.do": ("description: what is there, what happens around", "description : ce qu'il y a, ce qui se passe autour"),
+    "help.roll": ("[1d20]: rolls dice for all around to see", "[1d20] : lance des dés devant tout le monde"),
+    "help.try": ("action: tries something, success or failure", "action : tente quelque chose, réussite ou échec"),
+    "help.chuchoter": ("message: whispered, heard only very close", "message : chuchoté, entendu de tout près seulement"),
+    "help.crier": ("message: shouted, heard from far", "message : crié, entendu de loin"),
+    "help.hrp": ("message: out of character, to everyone", "message : hors personnage, à tout le monde"),
+    "help.desc": ("[text]: what others see of you", "[texte] : ce que les autres voient de toi"),
+    "help.examiner": ("player: look closely at someone", "joueur : regarder quelqu'un de près"),
+    "help.voir": ("player|tous|personne: be seen and heard by them only", "joueur|tous|personne : n'être vu et entendu que par eux"),
+}
+
 
 def all_texts():
     t = dict(T)
@@ -201,6 +236,8 @@ def all_texts():
         t[P + "weekday." + str(i)] = v
     for i, v in enumerate(MOON):
         t[P + "moon." + str(i)] = v
+    for k, v in RP.items():
+        t["rp.eraphones." + k] = v
     return t
 
 

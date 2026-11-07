@@ -53,6 +53,7 @@ public final class PhoneNet {
         r.playToClient(CallState.TYPE, CallState.CODEC, (p, c) -> PhoneClient.callState(p));
         r.playToClient(CallLine.TYPE, CallLine.CODEC, (p, c) -> PhoneClient.callLine(p));
         r.playToClient(Haunt.TYPE, Haunt.CODEC, (p, c) -> PhoneClient.haunt(p));
+        com.waylays.eraphones.rp.RpNet.register(r);
     }
 
     private static void server(IPayloadContext context, java.util.function.Consumer<ServerPlayer> handler) {
@@ -61,7 +62,7 @@ public final class PhoneNet {
         }
     }
 
-    private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> type(String name) {
+    private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> payload(String name) {
         return new CustomPacketPayload.Type<>(EraPhones.id(name));
     }
 
@@ -85,7 +86,7 @@ public final class PhoneNet {
 
     /** The phone in {@code slot} (inventory index, 40 the off hand) is being used. */
     public record Open(int slot) implements CustomPacketPayload {
-        public static final Type<Open> TYPE = type("open");
+        public static final Type<Open> TYPE = payload("open");
         public static final StreamCodec<FriendlyByteBuf, Open> CODEC = CustomPacketPayload.codec((p, b) -> b.writeVarInt(p.slot), b -> new Open(b.readVarInt()));
 
         @Override
@@ -95,7 +96,7 @@ public final class PhoneNet {
     }
 
     public record Close() implements CustomPacketPayload {
-        public static final Type<Close> TYPE = type("close");
+        public static final Type<Close> TYPE = payload("close");
         public static final StreamCodec<FriendlyByteBuf, Close> CODEC = StreamCodec.unit(new Close());
 
         @Override
@@ -110,7 +111,7 @@ public final class PhoneNet {
      * 11 the conversations.
      */
     public record Ask(int what, String arg) implements CustomPacketPayload {
-        public static final Type<Ask> TYPE = type("ask");
+        public static final Type<Ask> TYPE = payload("ask");
         public static final StreamCodec<FriendlyByteBuf, Ask> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeVarInt(p.what);
             b.writeUtf(p.arg, NAME);
@@ -123,7 +124,7 @@ public final class PhoneNet {
     }
 
     public record Sms(String to, String text) implements CustomPacketPayload {
-        public static final Type<Sms> TYPE = type("sms");
+        public static final Type<Sms> TYPE = payload("sms");
         public static final StreamCodec<FriendlyByteBuf, Sms> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeUtf(p.to, NAME);
             b.writeUtf(p.text, TEXT);
@@ -137,7 +138,7 @@ public final class PhoneNet {
 
     /** Saves {@code number} in the directory as {@code name} (or removes it). */
     public record ContactEdit(String name, String number, boolean remove) implements CustomPacketPayload {
-        public static final Type<ContactEdit> TYPE = type("contact");
+        public static final Type<ContactEdit> TYPE = payload("contact");
         public static final StreamCodec<FriendlyByteBuf, ContactEdit> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeUtf(p.name, NAME);
             b.writeUtf(p.number, NAME);
@@ -152,7 +153,7 @@ public final class PhoneNet {
 
     /** Posts {@code text} on the social network ({@code like} >= 0: likes or unlikes that post instead). */
     public record Post(String text, int like) implements CustomPacketPayload {
-        public static final Type<Post> TYPE = type("post");
+        public static final Type<Post> TYPE = payload("post");
         public static final StreamCodec<FriendlyByteBuf, Post> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeUtf(p.text, POST);
             b.writeVarInt(p.like + 1);
@@ -166,7 +167,7 @@ public final class PhoneNet {
 
     /** The name this line signs its posts with. */
     public record Handle(String handle) implements CustomPacketPayload {
-        public static final Type<Handle> TYPE = type("handle");
+        public static final Type<Handle> TYPE = payload("handle");
         public static final StreamCodec<FriendlyByteBuf, Handle> CODEC = CustomPacketPayload.codec((p, b) -> b.writeUtf(p.handle, NAME), b -> new Handle(b.readUtf(NAME)));
 
         @Override
@@ -176,7 +177,7 @@ public final class PhoneNet {
     }
 
     public record Dial(String number) implements CustomPacketPayload {
-        public static final Type<Dial> TYPE = type("dial");
+        public static final Type<Dial> TYPE = payload("dial");
         public static final StreamCodec<FriendlyByteBuf, Dial> CODEC = CustomPacketPayload.codec((p, b) -> b.writeUtf(p.number, NAME), b -> new Dial(b.readUtf(NAME)));
 
         @Override
@@ -186,7 +187,7 @@ public final class PhoneNet {
     }
 
     public record Answer(boolean accept) implements CustomPacketPayload {
-        public static final Type<Answer> TYPE = type("answer");
+        public static final Type<Answer> TYPE = payload("answer");
         public static final StreamCodec<FriendlyByteBuf, Answer> CODEC = CustomPacketPayload.codec((p, b) -> b.writeBoolean(p.accept), b -> new Answer(b.readBoolean()));
 
         @Override
@@ -196,7 +197,7 @@ public final class PhoneNet {
     }
 
     public record HangUp() implements CustomPacketPayload {
-        public static final Type<HangUp> TYPE = type("hang_up");
+        public static final Type<HangUp> TYPE = payload("hang_up");
         public static final StreamCodec<FriendlyByteBuf, HangUp> CODEC = StreamCodec.unit(new HangUp());
 
         @Override
@@ -207,7 +208,7 @@ public final class PhoneNet {
 
     /** A line said into the phone during a call. */
     public record Speak(String text) implements CustomPacketPayload {
-        public static final Type<Speak> TYPE = type("speak");
+        public static final Type<Speak> TYPE = payload("speak");
         public static final StreamCodec<FriendlyByteBuf, Speak> CODEC = CustomPacketPayload.codec((p, b) -> b.writeUtf(p.text, TEXT), b -> new Speak(b.readUtf(TEXT)));
 
         @Override
@@ -220,7 +221,7 @@ public final class PhoneNet {
 
     /** The line of the phone opened: its number, its era, its social name, whether it shares its position, whether it is silent. */
     public record Hello(String number, int era, String handle, boolean sharing, boolean silent) implements CustomPacketPayload {
-        public static final Type<Hello> TYPE = type("hello");
+        public static final Type<Hello> TYPE = payload("hello");
         public static final StreamCodec<FriendlyByteBuf, Hello> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeUtf(p.number, NAME);
             b.writeVarInt(p.era);
@@ -238,7 +239,7 @@ public final class PhoneNet {
     public record Conv(String number, String display, String last, boolean lastMine, long time, int unread) {}
 
     public record Inbox(List<Conv> convs) implements CustomPacketPayload {
-        public static final Type<Inbox> TYPE = type("inbox");
+        public static final Type<Inbox> TYPE = payload("inbox");
         public static final StreamCodec<FriendlyByteBuf, Inbox> CODEC = CustomPacketPayload.codec((p, b) -> list(b, p.convs, (o, c) -> {
             o.writeUtf(c.number, NAME);
             o.writeUtf(c.display, NAME);
@@ -257,7 +258,7 @@ public final class PhoneNet {
     public record Line(boolean mine, String text, long time) {}
 
     public record Thread(String number, String display, List<Line> lines) implements CustomPacketPayload {
-        public static final Type<Thread> TYPE = type("thread");
+        public static final Type<Thread> TYPE = payload("thread");
         public static final StreamCodec<FriendlyByteBuf, Thread> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeUtf(p.number, NAME);
             b.writeUtf(p.display, NAME);
@@ -278,7 +279,7 @@ public final class PhoneNet {
     public record ContactView(String name, String number, boolean sharing) {}
 
     public record Contacts(List<ContactView> contacts) implements CustomPacketPayload {
-        public static final Type<Contacts> TYPE = type("contacts");
+        public static final Type<Contacts> TYPE = payload("contacts");
         public static final StreamCodec<FriendlyByteBuf, Contacts> CODEC = CustomPacketPayload.codec((p, b) -> list(b, p.contacts, (o, c) -> {
             o.writeUtf(c.name, NAME);
             o.writeUtf(c.number, NAME);
@@ -295,7 +296,7 @@ public final class PhoneNet {
     public record CallView(String number, String display, int kind, long time, int seconds) {}
 
     public record CallLog(List<CallView> calls) implements CustomPacketPayload {
-        public static final Type<CallLog> TYPE = type("call_log");
+        public static final Type<CallLog> TYPE = payload("call_log");
         public static final StreamCodec<FriendlyByteBuf, CallLog> CODEC = CustomPacketPayload.codec((p, b) -> list(b, p.calls, (o, c) -> {
             o.writeUtf(c.number, NAME);
             o.writeUtf(c.display, NAME);
@@ -313,7 +314,7 @@ public final class PhoneNet {
     public record PostView(int id, String handle, String text, long time, int likes, boolean liked, boolean mine) {}
 
     public record Feed(List<PostView> posts) implements CustomPacketPayload {
-        public static final Type<Feed> TYPE = type("feed");
+        public static final Type<Feed> TYPE = payload("feed");
         public static final StreamCodec<FriendlyByteBuf, Feed> CODEC = CustomPacketPayload.codec((p, b) -> list(b, p.posts, (o, x) -> {
             o.writeVarInt(x.id);
             o.writeUtf(x.handle, NAME);
@@ -333,7 +334,7 @@ public final class PhoneNet {
     public record NewsView(String title, String text, long time) {}
 
     public record NewsList(List<NewsView> news) implements CustomPacketPayload {
-        public static final Type<NewsList> TYPE = type("news");
+        public static final Type<NewsList> TYPE = payload("news");
         public static final StreamCodec<FriendlyByteBuf, NewsList> CODEC = CustomPacketPayload.codec((p, b) -> list(b, p.news, (o, x) -> {
             o.writeUtf(x.title, 96);
             o.writeUtf(x.text, 512);
@@ -349,7 +350,7 @@ public final class PhoneNet {
     public record Spot(String display, String number, double x, double z, String dimension) {}
 
     public record Positions(List<Spot> spots) implements CustomPacketPayload {
-        public static final Type<Positions> TYPE = type("positions");
+        public static final Type<Positions> TYPE = payload("positions");
         public static final StreamCodec<FriendlyByteBuf, Positions> CODEC = CustomPacketPayload.codec((p, b) -> list(b, p.spots, (o, s) -> {
             o.writeUtf(s.display, NAME);
             o.writeUtf(s.number, NAME);
@@ -366,7 +367,7 @@ public final class PhoneNet {
 
     /** The coming weather: ticks of clear weather left, of rain, of thunder, and whether it rains or thunders. */
     public record Weather(int clear, int rain, int thunder, boolean raining, boolean thundering) implements CustomPacketPayload {
-        public static final Type<Weather> TYPE = type("weather");
+        public static final Type<Weather> TYPE = payload("weather");
         public static final StreamCodec<FriendlyByteBuf, Weather> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeVarInt(p.clear);
             b.writeVarInt(p.rain);
@@ -386,7 +387,7 @@ public final class PhoneNet {
      * "missed" (a missed call), or "info" ({@code text} a translation key, {@code title} its argument).
      */
     public record Notice(String kind, String title, String text, String number) implements CustomPacketPayload {
-        public static final Type<Notice> TYPE = type("notice");
+        public static final Type<Notice> TYPE = payload("notice");
         public static final StreamCodec<FriendlyByteBuf, Notice> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeUtf(p.kind, 16);
             b.writeUtf(p.title, 96);
@@ -406,7 +407,7 @@ public final class PhoneNet {
      * and {@code display} the other end.
      */
     public record CallState(int state, String mine, String number, String display, long since, String reason) implements CustomPacketPayload {
-        public static final Type<CallState> TYPE = type("call_state");
+        public static final Type<CallState> TYPE = payload("call_state");
         public static final StreamCodec<FriendlyByteBuf, CallState> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeVarInt(p.state);
             b.writeUtf(p.mine, NAME);
@@ -424,7 +425,7 @@ public final class PhoneNet {
 
     /** A line said during the call ({@code mine}: by this phone's holder). */
     public record CallLine(boolean mine, String text) implements CustomPacketPayload {
-        public static final Type<CallLine> TYPE = type("call_line");
+        public static final Type<CallLine> TYPE = payload("call_line");
         public static final StreamCodec<FriendlyByteBuf, CallLine> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeBoolean(p.mine);
             b.writeUtf(p.text, TEXT);
@@ -438,7 +439,7 @@ public final class PhoneNet {
 
     /** The phone goes wrong for {@code ticks}: static, a shape in it, and {@code text} if any (a game master's doing). */
     public record Haunt(int ticks, String text) implements CustomPacketPayload {
-        public static final Type<Haunt> TYPE = type("haunt");
+        public static final Type<Haunt> TYPE = payload("haunt");
         public static final StreamCodec<FriendlyByteBuf, Haunt> CODEC = CustomPacketPayload.codec((p, b) -> {
             b.writeVarInt(p.ticks);
             b.writeUtf(p.text, TEXT);

@@ -306,6 +306,16 @@ public final class CallService {
         }
     }
 
+    /** The player at the other end of {@code player}'s call, while they are talking; null otherwise. */
+    @Nullable
+    public static UUID otherEnd(UUID player) {
+        Call c = of(player);
+        if (c == null || !c.talking) {
+            return null;
+        }
+        return player.equals(c.caller) ? c.callee : c.caller;
+    }
+
     /** Who is on a call (its phone drains faster), by number. */
     static boolean talking(String number) {
         Call c = of(number);

@@ -162,7 +162,35 @@ public final class SmokeTest {
         mc.player.getInventory().selected = slot;
     }
 
+    /** Runs a command as the player, on the server. */
+    private static void command(Minecraft mc, String cmd) {
+        IntegratedServer server = mc.getSingleplayerServer();
+        java.util.UUID id = mc.player.getUUID();
+        server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p != null) {
+                server.getCommands().performPrefixedCommand(p.createCommandSourceStack(), cmd);
+            }
+        });
+    }
+
     private static void plan(Minecraft mc) {
+        // The role play: a character's name, an action in a bubble over the head, a roll of the dice
+        STEPS.add(() -> {
+            select(mc, 5);
+            mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+            command(mc, "setname Bill Denbrough");
+        });
+        STEPS.add(() -> command(mc, "me ouvre lentement la porte de la cave"));
+        STEPS.add(() -> command(mc, "roll 1d20"));
+        STEPS.add(() -> {
+            shot(mc, "rp_bubbles");
+            if (!mc.player.getDisplayName().getString().equals("Bill Denbrough")) {
+                fail("the character's name is not shown: {}", mc.player.getDisplayName().getString());
+            } else {
+                log("rp: the character's name and the bubbles are shown");
+            }
+        });
         String[] names = {"smartphone", "clapet", "gsm", "radiotelephone"};
         // Held: first person, then from the front
         for (int k = 0; k < 4; k++) {

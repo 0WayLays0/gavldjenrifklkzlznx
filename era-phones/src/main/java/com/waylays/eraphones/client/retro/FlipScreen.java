@@ -21,7 +21,7 @@ import java.util.List;
  * polyphonic rings and colour themes.
  */
 public class FlipScreen extends MenuPhone {
-    private static final String[] MENU = {"messages", "contacts", "calls", "camera", "gallery", "snake", "ring", "calc", "settings"};
+    private static final String[] ITEMS = {"messages", "contacts", "calls", "camera", "gallery", "snake", "ring", "calc", "settings"};
     private static final String GALLERY = "gallery", SETTINGS = "settings", THEME = "theme";
     /** Each theme: the bars' top and bottom colours, the highlight. */
     private static final int[][] THEMES = {{0xFF3A7AE0, 0xFF143A8A, 0xFF7AC0FF}, {0xFFE04A9A, 0xFF8A1A5A, 0xFFFF9AD0}, {0xFF3AB06A, 0xFF145A30, 0xFF8AF0B0},
@@ -67,7 +67,7 @@ public class FlipScreen extends MenuPhone {
 
     @Override
     protected String[] menu() {
-        return MENU;
+        return ITEMS;
     }
 
     private int[] theme() {
@@ -155,7 +155,7 @@ public class FlipScreen extends MenuPhone {
     protected void menuScreen(GuiGraphics g, long now) {
         int[] t = theme();
         PhoneUI.gradient(g, x0, y0 + 9, w, 11, 0, t[0], t[1]);
-        PhoneUI.centered(g, tr("phone.eraphones.menu." + MENU[sel]), x0 + w / 2f, y0 + 11.5f, 0xFFFFFFFF, .65f);
+        PhoneUI.centered(g, tr("phone.eraphones.menu." + ITEMS[sel]), x0 + w / 2f, y0 + 11.5f, 0xFFFFFFFF, .65f);
         int cw = w / 3, ch = 30;
         for (int i = 0; i < 9; i++) {
             int cx = x0 + i % 3 * cw, cy = y0 + 22 + i / 3 * ch;
@@ -165,7 +165,7 @@ public class FlipScreen extends MenuPhone {
             }
             PhoneUI.blend();
             int s = i == sel ? 26 : 22;
-            g.blit(EraPhones.id("textures/gui/phone/clapet_" + MENU[i] + ".png"), cx + cw / 2 - s / 2, cy + ch / 2 - s / 2, s, s, 0, 0, 32, 32, 32, 32);
+            g.blit(EraPhones.id("textures/gui/phone/clapet_" + ITEMS[i] + ".png"), cx + cw / 2 - s / 2, cy + ch / 2 - s / 2, s, s, 0, 0, 32, 32, 32, 32);
         }
         softkeys(g, tr("phone.eraphones.select"), tr("phone.eraphones.back"));
     }
