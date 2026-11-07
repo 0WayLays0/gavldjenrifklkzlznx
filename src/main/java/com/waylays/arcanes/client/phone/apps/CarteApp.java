@@ -157,7 +157,7 @@ public class CarteApp extends PhoneApp {
         if (mc.player != null && mc.level != null) {
             BlockPos b = mc.player.blockPosition();
             PhoneUI.text(g, "⌖ " + b.getX() + ", " + b.getY() + ", " + b.getZ(), X0 + 12, ty + 5, PhoneUI.WHITE, .65f);
-            String biome = mc.level.getBiome(b).unwrapKey().map(k -> Component.translatable("biome." + k.location().toLanguageKey()).getString())
+            String biome = mc.level.getBiome(b).unwrapKey().map(key -> Component.translatable("biome." + key.location().toLanguageKey()).getString())
                     .orElse("");
             PhoneUI.text(g, PhoneUI.fit(biome, 80, .55f), X0 + 12, ty + 15, PhoneUI.DIM, .55f);
         }
