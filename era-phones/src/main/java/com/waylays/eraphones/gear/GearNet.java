@@ -33,6 +33,7 @@ public final class GearNet {
         r.playToServer(Walkie.TYPE, Walkie.CODEC, GearNet::walkie);
         r.playToServer(Radio.TYPE, Radio.CODEC, GearNet::radio);
         r.playToServer(Vcr.TYPE, Vcr.CODEC, GearNet::vcr);
+        r.playToServer(Note.TYPE, Note.CODEC, GearNet::note);
         r.playToClient(Card.TYPE, Card.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.card(p));
         r.playToClient(Stations.TYPE, Stations.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.stations(p));
     }
@@ -78,6 +79,32 @@ public final class GearNet {
 
         @Override
         public Type<Vcr> type() {
+            return TYPE;
+        }
+    }
+
+    public static final int NOTE_TITLE = 48, NOTE_TEXT = 2000;
+
+    /** The sheet of paper in hand, written: its title, text, paper, ink, typed or by hand; signed if {@code sign}. */
+    public record Note(boolean offhand, String title, String text, int style, int ink, boolean typed, boolean sign) implements CustomPacketPayload {
+        public static final Type<Note> TYPE = payload("note");
+        public static final StreamCodec<FriendlyByteBuf, Note> CODEC = CustomPacketPayload.codec((p, b) -> {
+            b.writeBoolean(p.offhand);
+            b.writeUtf(p.title, NOTE_TITLE);
+            b.writeUtf(p.text, NOTE_TEXT);
+            b.writeVarInt(p.style);
+            b.writeVarInt(p.ink);
+            b.writeBoolean(p.typed);
+            b.writeBoolean(p.sign);
+        }, b -> new Note(b.readBoolean(), b.readUtf(NOTE_TITLE), b.readUtf(NOTE_TEXT), b.readVarInt(), b.readVarInt(), b.readBoolean(), b.readBoolean()));
+
+        public Note {
+            title = title.length() > NOTE_TITLE ? title.substring(0, NOTE_TITLE) : title;
+            text = text.length() > NOTE_TEXT ? text.substring(0, NOTE_TEXT) : text;
+        }
+
+        @Override
+        public Type<Note> type() {
             return TYPE;
         }
     }
@@ -141,6 +168,31 @@ public final class GearNet {
         s.set(com.waylays.eraphones.registry.GearRegistry.CHANNEL.get(), Math.max(1, Math.min(16, p.channel)));
         if (was != Gear.on(s)) {
             sp.level().playSound(null, sp.blockPosition(), com.waylays.eraphones.registry.GearRegistry.TALKIE_SQUELCH.get(), SoundSource.PLAYERS, .4f, 1.2f);
+        }
+    }
+
+    private static void note(Note p, IPayloadContext c) {
+        if (!(c.player() instanceof ServerPlayer sp)) {
+            return;
+        }
+        InteractionHand hand = p.offhand ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+        ItemStack held = sp.getItemInHand(hand);
+        if (!(held.getItem() instanceof NoteItem) || NoteItem.signed(held)) {
+            return;
+        }
+        // One sheet written on; the blank ones it came from stay
+        ItemStack sheet = held.getCount() > 1 ? held.split(1) : held;
+        sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_TITLE.get(), p.title.strip());
+        sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_TEXT.get(), p.text);
+        sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_STYLE.get(), Math.floorMod(p.style, 5));
+        sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_INK.get(), Math.floorMod(p.ink, 5));
+        sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_TYPED.get(), p.typed);
+        if (p.sign) {
+            sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_AUTHOR.get(), com.waylays.eraphones.rp.RpService.name(sp));
+            sp.level().playSound(null, sp.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, .7f, 1.1f);
+        }
+        if (sheet != held && !sp.getInventory().add(sheet)) {
+            sp.drop(sheet, false);
         }
     }
 

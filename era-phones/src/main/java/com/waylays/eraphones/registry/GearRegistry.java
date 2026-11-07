@@ -54,6 +54,8 @@ public final class GearRegistry {
 
     /** Whether a torch or a walkie-talkie is switched on. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> POWER = component("power", Codec.BOOL, ByteBufCodecs.BOOL);
+    /** A torch broken by a game master (/lampe casser): it no longer lights. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> BROKEN = component("broken", Codec.BOOL, ByteBufCodecs.BOOL);
     /** A walkie-talkie's channel, 1 to 16. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CHANNEL = component("channel", Codec.INT, ByteBufCodecs.VAR_INT);
     /** A cassette's recording (a file the game masters put on the server), its label, how far the tape is wound (samples). */
@@ -65,6 +67,13 @@ public final class GearRegistry {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_NAME = text("card_name");
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_NUMBER = text("card_number");
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_DESC = text("card_desc");
+    /** A sheet of paper: its title and text, its paper (0-4), its ink (0-4), written by hand or typed, who signed it. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NOTE_TITLE = text("note_title");
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NOTE_TEXT = text("note_text");
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> NOTE_STYLE = component("note_style", Codec.INT, ByteBufCodecs.VAR_INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> NOTE_INK = component("note_ink", Codec.INT, ByteBufCodecs.VAR_INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> NOTE_TYPED = component("note_typed", Codec.BOOL, ByteBufCodecs.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NOTE_AUTHOR = text("note_author");
     /** A newspaper's headline and article. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NEWS_TITLE = text("news_title");
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NEWS_TEXT = text("news_text");
@@ -95,6 +104,8 @@ public final class GearRegistry {
     public static final DeferredHolder<Item, Item> VCR_ITEM = EraRegistry.ITEMS.register("magnetoscope", () -> new BlockItem(VCR.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> CASSETTE = EraRegistry.ITEMS.register("cassette", () -> new CassetteItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<Item, Item> ID_CARD = EraRegistry.ITEMS.register("carte_identite", () -> new IdCardItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> NOTE = EraRegistry.ITEMS.register("feuille",
+            () -> new com.waylays.eraphones.gear.NoteItem(new Item.Properties().stacksTo(16)));
     public static final DeferredHolder<Item, Item> NEWSPAPER = EraRegistry.ITEMS.register("journal_papier", () -> new NewspaperItem(new Item.Properties().stacksTo(16)));
 
     /** The money: dollar bills and coins, by face value in cents. */
@@ -140,6 +151,7 @@ public final class GearRegistry {
                     out.accept(m.get());
                 }
                 out.accept(ID_CARD.get());
+                out.accept(NOTE.get());
                 out.accept(NEWSPAPER.get());
             }).build());
 

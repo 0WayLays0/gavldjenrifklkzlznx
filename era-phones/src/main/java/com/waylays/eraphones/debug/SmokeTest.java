@@ -369,6 +369,21 @@ public final class SmokeTest {
                     paper.getOrDefault(com.waylays.eraphones.registry.GearRegistry.NEWS_TEXT.get(), ""));
         });
         STEPS.add(() -> shot(mc, "gear_newspaper"));
+        // A sheet of paper: written on, then signed and read
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            ItemStack blank = new ItemStack(com.waylays.eraphones.registry.GearRegistry.NOTE.get());
+            mc.setScreen(new com.waylays.eraphones.gear.client.NoteEditScreen(net.minecraft.world.InteractionHand.MAIN_HAND, blank));
+        });
+        STEPS.add(() -> shot(mc, "gear_note_edit"));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            mc.setScreen(new com.waylays.eraphones.gear.client.NoteReadScreen(new com.waylays.eraphones.gear.client.NotePage.Data("Pour Bill",
+                    "Rendez-vous ce soir à la vieille maison au bout de la rue.\n\n"
+                    + "Viens seul. Apporte la lampe torche et des piles neuves. Ne dis rien aux autres.\n\nOn flotte tous, en bas.",
+                    0, 1, false, "Un ami")));
+        });
+        STEPS.add(() -> shot(mc, "gear_note_read"));
         STEPS.add(() -> {
             mc.setScreen(null);
             log("gear: torch, walkie-talkie, radio, video recorder, card and newspaper shown");

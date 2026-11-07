@@ -1,5 +1,6 @@
 package com.waylays.eraphones.gear.client;
 
+import com.waylays.eraphones.EraPhones;
 import com.waylays.eraphones.client.PhoneUI;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -9,6 +10,7 @@ import java.util.List;
 
 /** The newspaper, open: yellowed paper, the masthead between double rules, the headline, the article (scrolled). */
 public class NewspaperScreen extends GearScreen {
+    private static final net.minecraft.resources.ResourceLocation PAPER = EraPhones.id("textures/gui/gear/paper.png");
     private final String title, text;
     private float scroll, max;
 
@@ -20,20 +22,12 @@ public class NewspaperScreen extends GearScreen {
 
     @Override
     protected void draw(GuiGraphics g, long now) {
-        PhoneUI.round(g, 3, 4, 258, 298, 4, 0x60000000);
-        g.fillGradient(0, 0, 256, 296, 0xFFF1E9D2, 0xFFE2D6B6);
-        // Foxing at the edges
-        java.util.Random r = new java.util.Random(31);
-        for (int i = 0; i < 40; i++) {
-            int x = r.nextBoolean() ? r.nextInt(14) : 242 + r.nextInt(14), y = r.nextInt(296);
-            g.fill(x, y, x + 1 + r.nextInt(3), y + 1 + r.nextInt(3), 0x18603A10);
-        }
-        PhoneUI.centered(g, Component.translatable("phone.eraphones.journal_title").getString().toUpperCase(), 128, 12, 0xFF1A1410, 1.3f);
-        g.fill(12, 28, 244, 29, 0xFF1A1410);
-        g.fill(12, 31, 244, 32, 0xFF1A1410);
+        panel(g, PAPER, 0, 0, 260, 300);
+        String mast = Component.translatable("phone.eraphones.journal_title").getString().toUpperCase();
+        PhoneUI.centered(g, mast, 128.6f, 11, 0xFF1A1410, 1.45f);
+        PhoneUI.centered(g, mast, 128, 11, 0xFF1A1410, 1.45f);
         PhoneUI.text(g, Component.translatable("gear.eraphones.paper_edition").getString(), 14, 35, 0xFF5A4A38, .55f);
         PhoneUI.right(g, Component.translatable("gear.eraphones.paper_price").getString(), 242, 35, 0xFF5A4A38, .55f);
-        g.fill(12, 43, 244, 44, 0x601A1410);
         int top = 50, bottom = 286;
         // Clipped to the page's column
         g.enableScissor(Math.round(px + 10 * scale), Math.round(py + top * scale), Math.round(px + 246 * scale), Math.round(py + bottom * scale));

@@ -38,11 +38,54 @@ public final class GearCommands {
                     c.getSource().sendSuccess(() -> Component.translatable("gear.eraphones.off_air").withStyle(ChatFormatting.GRAY), false);
                     return 1;
                 })));
+        d.register(Commands.literal("lampe").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+                .then(Commands.argument("joueurs", EntityArgument.players())
+                        .then(Commands.literal("eteindre").executes(c -> torches(c, "eteindre", 0)))
+                        .then(Commands.literal("clignoter").executes(c -> torches(c, "clignoter", 10))
+                                .then(Commands.argument("secondes", IntegerArgumentType.integer(1, 600))
+                                        .executes(c -> torches(c, "clignoter", IntegerArgumentType.getInteger(c, "secondes")))))
+                        .then(Commands.literal("casser").executes(c -> torches(c, "casser", 0)))
+                        .then(Commands.literal("reparer").executes(c -> torches(c, "reparer", 0)))));
         d.register(Commands.literal("identite").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.literal("delivrer").then(Commands.argument("joueur", EntityArgument.player()).executes(GearCommands::issue))));
         d.register(Commands.literal("journal").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.literal("imprimer").then(Commands.argument("exemplaires", IntegerArgumentType.integer(1, 64))
                         .then(Commands.argument("article", StringArgumentType.greedyString()).executes(GearCommands::print)))));
+    }
+
+    /** What a game master does to the targets' torches: out, flickering, broken, mended. */
+    private static int torches(CommandContext<CommandSourceStack> c, String what, int seconds) throws CommandSyntaxException {
+        java.util.Collection<ServerPlayer> targets = EntityArgument.getPlayers(c, "joueurs");
+        int n = 0;
+        for (ServerPlayer p : targets) {
+            if (what.equals("clignoter")) {
+                Beams.flicker(c.getSource().getServer(), p.getUUID(), seconds * 20);
+                n++;
+                continue;
+            }
+            for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
+                ItemStack s = p.getInventory().getItem(i);
+                if (!(s.getItem() instanceof FlashlightItem)) {
+                    continue;
+                }
+                n++;
+                switch (what) {
+                    case "eteindre" -> Gear.setOn(s, false);
+                    case "casser" -> {
+                        Gear.setOn(s, false);
+                        s.set(GearRegistry.BROKEN.get(), true);
+                    }
+                    default -> s.remove(GearRegistry.BROKEN.get());
+                }
+            }
+            if (what.equals("casser") || what.equals("eteindre")) {
+                p.level().playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.LEVER_CLICK, net.minecraft.sounds.SoundSource.PLAYERS,
+                        .4f, what.equals("casser") ? .6f : 1.2f);
+            }
+        }
+        int count = n;
+        c.getSource().sendSuccess(() -> Component.translatable("gear.eraphones.torches_done", what, count).withStyle(ChatFormatting.GRAY), false);
+        return count;
     }
 
     private static int tapes(CommandContext<CommandSourceStack> c) {

@@ -112,15 +112,14 @@ def disc(color, rim, mark=None):
 # ------------------------------------------------------------------------------------------------ in hand
 
 TORCH = {
-    "thirdperson_righthand": {"rotation": [0, -90, 15], "translation": [0, 3.5, 1], "scale": [0.7, 0.7, 0.7]},
-    "thirdperson_lefthand": {"rotation": [0, 90, -15], "translation": [0, 3.5, 1], "scale": [0.7, 0.7, 0.7]},
-    "firstperson_righthand": {"rotation": [0, -90, 8], "translation": [1.5, 3.5, 1], "scale": [0.6, 0.6, 0.6]},
-    "firstperson_lefthand": {"rotation": [0, 90, -8], "translation": [1.5, 3.5, 1], "scale": [0.6, 0.6, 0.6]},
+    "thirdperson_righthand": {"rotation": [-10, -90, 0], "translation": [0, 3, 0.5], "scale": [0.62, 0.62, 0.62]},
+    "thirdperson_lefthand": {"rotation": [-10, 90, 0], "translation": [0, 3, 0.5], "scale": [0.62, 0.62, 0.62]},
+    "firstperson_righthand": {"rotation": [0, -100, 10], "translation": [0, 3.5, -1], "scale": [0.42, 0.42, 0.42]},
+    "firstperson_lefthand": {"rotation": [0, -80, -10], "translation": [0, 3.5, -1], "scale": [0.42, 0.42, 0.42]},
     "ground": {"rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]},
-    "gui": {"rotation": [25, -30, 40], "translation": [0, 0, 0], "scale": [0.85, 0.85, 0.85]},
-    "fixed": {"rotation": [0, 0, 40], "translation": [0, 0, 0], "scale": [0.9, 0.9, 0.9]},
+    "gui": {"rotation": [30, 225, 0], "translation": [0, 0, 0], "scale": [0.85, 0.85, 0.85]},
+    "fixed": {"rotation": [0, 90, 0], "translation": [0, 0, 0], "scale": [0.9, 0.9, 0.9]},
 }
-
 
 def upright_display(gui_scale=0.85):
     d = dict(models.HELD)
@@ -161,22 +160,22 @@ def lens(tile):
 
 def flashlight():
     """A torch of the time: a matte black metal body with a knurled grip, a red push switch, a chrome bezel round a
-    wide lens, a rounded tail cap. Clean faces, no ridges."""
+    wide lens, a rounded tail cap. It lies along z, its lens to the north: held like the phones (whose face looks back
+    at the holder), it points away from them, where they look."""
     m = Model("lampe_torche")
-    cy = cz = 8
+    cx = cy = 8
     black, chrome = (46, 48, 54), (176, 180, 190)
-    # Tail cap, body, grip band
-    smooth_octo(m, 2.2, 3.2, cy, cz, 1.25, chrome, end_a=disc((150, 154, 162), (110, 114, 122)))
-    smooth_octo(m, 3.2, 10.4, cy, cz, 1.3, black)
-    smooth_octo(m, 4.4, 7.2, cy, cz, 1.36, (34, 35, 40))
-    # The neck widening into the head, the chrome bezel, the lens
-    smooth_octo(m, 10.4, 11.4, cy, cz, 1.6, black)
-    smooth_octo(m, 11.4, 13.2, cy, cz, 2.05, black)
-    smooth_octo(m, 13.2, 13.8, cy, cz, 2.2, chrome, end_b=lens)
+    # The head and its lens to the north, then the neck, the body, the grip, the tail
+    octo(m, "z", 2.2, 2.8, cx, cy, 2.2, chrome, end_a=lens)
+    octo(m, "z", 2.8, 4.6, cx, cy, 2.05, black)
+    octo(m, "z", 4.6, 5.6, cx, cy, 1.6, black)
+    octo(m, "z", 5.6, 12.8, cx, cy, 1.3, black)
+    octo(m, "z", 8.8, 11.6, cx, cy, 1.36, (34, 35, 40))
+    octo(m, "z", 12.8, 13.8, cx, cy, 1.25, chrome, end_b=disc((150, 154, 162), (110, 114, 122)))
     # The push switch, red rubber, on top
-    m.box([8.2, cy + 1.25, cz - .55], [9.4, cy + 1.7, cz + .55], {"up": facet((200, 44, 40), 1.2), "south": facet((200, 44, 40), .9),
-                                                                  "north": facet((200, 44, 40), .7), "east": facet((200, 44, 40), .8),
-                                                                  "west": facet((200, 44, 40), .8)})
+    red = (200, 44, 40)
+    m.box([cx - .55, cy + 1.25, 6.6], [cx + .55, cy + 1.7, 7.8], {"up": facet(red, 1.2), "north": facet(red, .9), "south": facet(red, .7),
+                                                                "east": facet(red, .8), "west": facet(red, .8)})
     held(m, TORCH)
 
 
@@ -437,6 +436,20 @@ def id_card():
     return img.filter(ImageFilter.GaussianBlur(.4)).resize((32, 32), Image.LANCZOS)
 
 
+def sheet():
+    """A sheet of paper, a corner turned, a few lines written on it."""
+    s = 4
+    img = Image.new("RGBA", (32 * s, 32 * s), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.polygon([(7 * s, 4 * s), (21 * s, 4 * s), (26 * s, 9 * s), (26 * s, 28 * s), (7 * s, 28 * s)], fill=(246, 244, 236, 255), outline=(150, 146, 132, 255))
+    d.polygon([(21 * s, 4 * s), (21 * s, 9 * s), (26 * s, 9 * s)], fill=(216, 212, 198, 255), outline=(150, 146, 132, 255))
+    for k in range(6):
+        y = (11 + k * 2.6) * s
+        d.line((9.5 * s, y, (23 - (k % 3) * 2.5) * s, y), fill=(40, 60, 130, 255), width=s // 2 + 1)
+    d.line((15 * s, 25.5 * s, 23 * s, 25 * s), fill=(40, 60, 130, 255), width=s // 2)
+    return img.filter(ImageFilter.GaussianBlur(.4)).resize((32, 32), Image.LANCZOS)
+
+
 def newspaper():
     s = 4
     img = Image.new("RGBA", (32 * s, 32 * s), (0, 0, 0, 0))
@@ -543,6 +556,7 @@ def main():
         flat(money_id(cents), coin(cents) if tint is None else bill(cents // 100, tint))
     flat("carte_identite", id_card())
     flat("journal_papier", newspaper())
+    flat("feuille", sheet())
     sounds()
     recipes()
 

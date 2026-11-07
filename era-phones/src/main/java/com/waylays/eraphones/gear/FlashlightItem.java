@@ -28,6 +28,11 @@ public class FlashlightItem extends Item {
         ItemStack stack = player.getItemInHand(hand);
         if (!level.isClientSide) {
             boolean on = !stack.getOrDefault(com.waylays.eraphones.registry.GearRegistry.POWER.get(), false);
+            if (on && Gear.broken(stack)) {
+                player.displayClientMessage(Component.translatable("gear.eraphones.broken_torch").withStyle(ChatFormatting.GRAY), true);
+                level.playSound(null, player.blockPosition(), SoundEvents.LEVER_CLICK, SoundSource.PLAYERS, .5f, .7f);
+                return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+            }
             if (on && Gear.battery(stack) <= 0) {
                 player.displayClientMessage(Component.translatable("gear.eraphones.flat").withStyle(ChatFormatting.GRAY), true);
                 on = false;
@@ -55,6 +60,9 @@ public class FlashlightItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        if (Gear.broken(stack)) {
+            tooltip.add(Component.translatable("gear.eraphones.broken").withStyle(ChatFormatting.RED));
+        }
         tooltip.add(Component.translatable(Gear.on(stack) ? "gear.eraphones.on" : "gear.eraphones.off").withStyle(Gear.on(stack) ? ChatFormatting.YELLOW : ChatFormatting.DARK_GRAY));
         tooltip.add(Component.translatable("tooltip.eraphones.battery", Gear.battery(stack) / 10).withStyle(ChatFormatting.DARK_GREEN));
         tooltip.add(Component.translatable("item.eraphones.lampe_torche.help").withStyle(ChatFormatting.DARK_GRAY));

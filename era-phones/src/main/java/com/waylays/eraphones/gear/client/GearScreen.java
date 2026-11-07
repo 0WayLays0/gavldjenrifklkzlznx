@@ -85,7 +85,7 @@ public abstract class GearScreen extends Screen {
     public boolean mouseClicked(double mx, double my, int button) {
         double lx = (mx - px) / scale, ly = (my - py) / scale;
         for (Key k : keys) {
-            if (k.in(lx, ly)) {
+            if (k.in(lx, ly) && active(k)) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.STONE_BUTTON_CLICK_ON, 1.6f, .35f));
                 pressed(k.id);
                 return true;
@@ -104,6 +104,46 @@ public abstract class GearScreen extends Screen {
     }
 
     // ---------------------------------------------------------------- drawing helpers
+
+    /** A face drawn by the art tools: two texture pixels to a unit, laid at the body's corner. */
+    protected static void panel(GuiGraphics g, net.minecraft.resources.ResourceLocation tex, int x, int y, int w, int h) {
+        PhoneUI.blend();
+        g.blit(tex, x, y, w, h, 0, 0, w * 2, h * 2, w * 2, h * 2);
+    }
+
+    /** A sprite of {@code size} units centred on ({@code cx}, {@code cy}), turned {@code degrees}. */
+    protected static void sprite(GuiGraphics g, net.minecraft.resources.ResourceLocation tex, float cx, float cy, float size, int texSize, float degrees) {
+        PhoneUI.blend();
+        g.pose().pushPose();
+        g.pose().translate(cx, cy, 0);
+        g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(degrees));
+        g.pose().scale(size / texSize, size / texSize, 1);
+        g.blit(tex, -texSize / 2, -texSize / 2, 0, 0, texSize, texSize, texSize, texSize);
+        g.pose().popPose();
+    }
+
+    /** Scissors to a rectangle of the body (in its units). */
+    protected void clip(GuiGraphics g, float x0, float y0, float x1, float y1) {
+        g.enableScissor(Math.round(px + x0 * scale), Math.round(py + y0 * scale), Math.round(px + x1 * scale), Math.round(py + y1 * scale));
+    }
+
+    /** The light of a key under the mouse (or held lit). */
+    protected void lit(GuiGraphics g, Key k, int argb) {
+        PhoneUI.round(g, k.x(), k.y(), k.w(), k.h(), Math.min(k.w(), k.h()) / 3, argb);
+    }
+
+    /** Whether a key is there to press now. */
+    protected boolean active(Key k) {
+        return true;
+    }
+
+    protected void hoverLight(GuiGraphics g) {
+        for (Key k : keys) {
+            if (hover(k) && active(k)) {
+                lit(g, k, 0x30FFFFFF);
+            }
+        }
+    }
 
     /** A round button of {@code color}, pressed-in under the mouse, its {@code label} on it. */
     protected void button(GuiGraphics g, Key k, int color, String label, int labelColor) {

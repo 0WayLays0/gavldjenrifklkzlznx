@@ -34,7 +34,11 @@ import java.util.UUID;
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class Beams {
-    public static final int REACH = 24;
+    public static final int REACH = 18;
+    /** Torches flickering (a game master's doing), by holder: until when (server ticks). */
+    private static final Map<UUID, Long> FLICKER = new HashMap<>();
+    private static final java.util.Random RANDOM = new java.util.Random();
+    private static final java.util.Set<UUID> DARK = new java.util.HashSet<>();
     /** A full set of batteries lasts this many ticks. */
     public static final int LIFE = 24000;
     private static final Map<UUID, List<GlobalPos>> LIT = new HashMap<>();
@@ -43,9 +47,35 @@ public final class Beams {
 
     @SubscribeEvent
     public static void onTick(ServerTickEvent.Post event) {
+        long now = event.getServer().getTickCount();
         for (ServerPlayer p : event.getServer().getPlayerList().getPlayers()) {
             ItemStack torch = lit(p);
-            List<GlobalPos> now = new ArrayList<>(2);
+            Long until = FLICKER.get(p.getUUID());
+            if (until != null && until < now) {
+                FLICKER.remove(p.getUUID());
+                DARK.remove(p.getUUID());
+                until = null;
+            }
+            // Flickering: out for a moment now and then, sometimes for longer, buzzing
+            if (torch != null && until != null) {
+                boolean dark = DARK.contains(p.getUUID());
+                if (dark ? RANDOM.nextFloat() < .25f : RANDOM.nextFloat() < .18f) {
+                    dark = !dark;
+                    if (dark) {
+                        DARK.add(p.getUUID());
+                    } else {
+                        DARK.remove(p.getUUID());
+                    }
+                    if (RANDOM.nextFloat() < .5f) {
+                        p.level().playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.LEVER_CLICK,
+                                net.minecraft.sounds.SoundSource.PLAYERS, .15f, 1.8f + RANDOM.nextFloat() * .3f);
+                    }
+                }
+                if (dark) {
+                    torch = null;
+                }
+            }
+            List<GlobalPos> lit = new ArrayList<>(2);
             if (torch != null) {
                 if (p.tickCount % (LIFE / Gear.FULL) == 0 && !p.getAbilities().instabuild) {
                     Gear.setBattery(torch, Gear.battery(torch) - 1);
@@ -56,23 +86,28 @@ public final class Beams {
                 BlockHitResult hit = level.clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, p));
                 Vec3 at = hit.getType() == HitResult.Type.MISS ? end : hit.getLocation().subtract(p.getLookAngle().scale(.6));
                 double dist = at.distanceTo(eye);
-                // Brighter near, fainter far, as a real beam spreads
-                int level1 = (int) Math.round(15 - Math.max(0, dist - 6) / (REACH - 6) * 6);
-                place(level, BlockPos.containing(at), level1, now);
-                place(level, BlockPos.containing(eye), 7, now);
+                // A soft beam: brighter near, fainter far, as a real one spreads; a faint spill round the holder
+                int level1 = (int) Math.round(10 - Math.max(0, dist - 4) / (REACH - 4) * 5);
+                place(level, BlockPos.containing(at), level1, lit);
+                place(level, BlockPos.containing(eye), 3, lit);
             }
             List<GlobalPos> before = LIT.getOrDefault(p.getUUID(), List.of());
             for (GlobalPos g : before) {
-                if (!now.contains(g)) {
+                if (!lit.contains(g)) {
                     clear(event.getServer().getLevel(g.dimension()), g.pos());
                 }
             }
-            if (now.isEmpty()) {
+            if (lit.isEmpty()) {
                 LIT.remove(p.getUUID());
             } else {
-                LIT.put(p.getUUID(), now);
+                LIT.put(p.getUUID(), lit);
             }
         }
+    }
+
+    /** Makes the torch {@code p} holds flicker for {@code ticks}. */
+    public static void flicker(net.minecraft.server.MinecraftServer server, UUID p, int ticks) {
+        FLICKER.put(p, (long) server.getTickCount() + ticks);
     }
 
     /** The lit torch {@code p} holds, if any. */

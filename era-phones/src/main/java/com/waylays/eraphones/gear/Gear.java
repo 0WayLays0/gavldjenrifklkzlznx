@@ -18,7 +18,11 @@ public final class Gear {
     }
 
     public static boolean on(ItemStack stack) {
-        return stack.getOrDefault(GearRegistry.POWER.get(), false) && battery(stack) > 0;
+        return stack.getOrDefault(GearRegistry.POWER.get(), false) && battery(stack) > 0 && !broken(stack);
+    }
+
+    public static boolean broken(ItemStack stack) {
+        return stack.getOrDefault(GearRegistry.BROKEN.get(), false);
     }
 
     public static void setOn(ItemStack stack, boolean on) {

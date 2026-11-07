@@ -47,6 +47,15 @@ public final class GearClient {
         Minecraft.getInstance().setScreen(new NewspaperScreen(title, text));
     }
 
+    /** A sheet of paper used: written on if it is not signed yet, else read. */
+    public static void openNote(InteractionHand hand, net.minecraft.world.item.ItemStack stack) {
+        if (com.waylays.eraphones.gear.NoteItem.signed(stack)) {
+            Minecraft.getInstance().setScreen(new NoteReadScreen(NotePage.Data.of(stack)));
+        } else {
+            Minecraft.getInstance().setScreen(new NoteEditScreen(hand, stack));
+        }
+    }
+
     public static void card(GearNet.Card card) {
         Minecraft.getInstance().setScreen(new CardScreen(card));
     }

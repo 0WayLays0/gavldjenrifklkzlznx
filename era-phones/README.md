@@ -12,13 +12,13 @@ Contenu original (noms, modèles, sonneries, icônes) : aucune marque réelle ; 
 
 Quatre onglets : **Époque RP · Téléphones**, **· Lumière & radio** (lampe torche, piles, talkie-walkie, poste de
 radio), **· Son & image** (magnétoscope, cassette), **· Vie quotidienne** (pièces et billets, carte d'identité,
-journal).
+feuille de papier, journal).
 
 ## Les objets des années 80
 
 | Objet | Ce qu'il fait |
 | --- | --- |
-| Lampe torche | Clic droit pour l'allumer ou l'éteindre. Tenue (dans n'importe quelle main), elle éclaire là où elle pointe, jusqu'à 24 blocs (plus fort de près), et un peu autour de soi. Un jeu de piles dure 20 minutes. |
+| Lampe torche | Clic droit pour l'allumer ou l'éteindre. Tenue (dans n'importe quelle main), elle éclaire doucement là où elle pointe, jusqu'à 18 blocs (un peu plus fort de près), et à peine autour de soi. Un jeu de piles dure 20 minutes. |
 | Piles | Clic droit avec une lampe torche ou un talkie-walkie dans l'autre main : piles neuves. |
 | Talkie-walkie | Clic droit : sa façade (marche/arrêt, canal 1 à 16, piles). Avec Simple Voice Chat, en le tenant en main et en parlant, ta voix sort (avec un son de radio) des talkies allumés sur le même canal, où qu'ils soient dans l'inventaire, et ceux qui sont autour l'entendent aussi. Un « kssht » au début de chaque message. |
 | Poste de radio (bloc) | Clic droit : allumer, régler la fréquence (88 à 108 FM, cadran à faire glisser, molette ou boutons) et le volume. Il grésille entre les stations ; l'œil magique s'allume quand une station passe. Une station, c'est un maître du jeu qui fait `/radio emettre 100.3` : sa voix sort des radios réglées dessus (`/radio arreter` pour finir). |
@@ -26,6 +26,7 @@ journal).
 | Pièces et billets | 10 et 25 cents, billets de 1, 5, 10, 20, 50 et 100 dollars (dessins originaux). |
 | Carte d'identité | Vierge, elle est établie au nom de la première personne qui l'utilise (nom RP, signalement de `/desc`, numéro). Clic droit pour la regarder (avec la photo du visage du personnage), clic droit sur quelqu'un pour la lui montrer. |
 | Journal | Imprimé par les maîtres du jeu ; clic droit pour le lire. |
+| Feuille de papier | Clic droit : on écrit dessus avec la page sous les yeux qui se remplit en direct (titre, texte jusqu'à 2000 caractères avec retours à la ligne), on choisit le papier (feuille de carnet, papier à lettre, vieux parchemin, post-it, page arrachée), l'encre (noire, bleue, rouge, verte, crayon) et l'écriture (à la main, penchée, ou tapée à la machine). « Garder » en fait un brouillon qu'on peut reprendre ; « Signer » la ferme avec le nom du personnage : ensuite, clic droit pour la lire, page entière à l'écran (molette pour les longs textes). Une pile de feuilles vierges en donne une écrite à la fois. |
 
 ### Commandes des maîtres du jeu pour ces objets
 
@@ -34,6 +35,7 @@ journal).
 | `/cassette liste` | Les fichiers MP3 disponibles (à mettre dans `config/eraphones/cassettes/` du serveur). |
 | `/cassette graver <fichier> <titre>` | Donne une cassette de ce fichier, avec ce titre sur l'étiquette. Elle ne peut plus être modifiée. |
 | `/radio emettre <fréquence>` · `/radio arreter` | Passer à l'antenne sur une fréquence (ta voix sort des radios réglées dessus), ou s'arrêter. |
+| `/lampe <joueurs> eteindre` · `clignoter [secondes]` · `casser` · `reparer` | Éteindre leurs lampes torches, les faire clignoter (10 s par défaut, avec de petits grésillements), les casser (elles ne s'allument plus, « Cassée » dans la description) ou les réparer. |
 | `/identite delivrer <joueur>` | Donne à ce joueur une carte d'identité établie à son nom. |
 | `/journal imprimer <exemplaires> Titre \| texte` | Imprime le journal (jusqu'à 64 exemplaires). |
 
