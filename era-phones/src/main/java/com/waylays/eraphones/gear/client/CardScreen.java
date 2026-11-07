@@ -31,7 +31,7 @@ public class CardScreen extends GearScreen {
         try {
             id = UUID.fromString(card.owner());
         } catch (IllegalArgumentException e) {
-            return DefaultPlayerSkin.getDefaultSkin();
+            return DefaultPlayerSkin.get(new UUID(0, 0));
         }
         var conn = Minecraft.getInstance().getConnection();
         PlayerInfo info = conn == null ? null : conn.getPlayerInfo(id);
