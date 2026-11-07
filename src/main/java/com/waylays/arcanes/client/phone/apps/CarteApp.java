@@ -151,14 +151,20 @@ public class CarteApp extends PhoneApp {
             g.pose().popPose();
         }
         PhoneUI.text(g, "N", x + size / 2f - 2, y + 3, 0xFFFF5C6E, .7f);
-        // Under the map: where the player is, the places marked
+        // Under the map: a card with where the player is (and the biome), the button to mark it; then the places marked
         int ty = y + size + 6;
-        if (mc.player != null) {
+        PhoneUI.glass(g, X0 + 6, ty, X1 - X0 - 12, 26, 9, 0x24FFFFFF);
+        if (mc.player != null && mc.level != null) {
             BlockPos b = mc.player.blockPosition();
-            PhoneUI.text(g, "⌖ " + b.getX() + ", " + b.getY() + ", " + b.getZ(), X0 + 8, ty, PhoneUI.WHITE, .65f);
+            PhoneUI.text(g, "⌖ " + b.getX() + ", " + b.getY() + ", " + b.getZ(), X0 + 12, ty + 5, PhoneUI.WHITE, .65f);
+            String biome = mc.level.getBiome(b).unwrapKey().map(k -> Component.translatable("biome." + k.location().toLanguageKey()).getString())
+                    .orElse("");
+            PhoneUI.text(g, PhoneUI.fit(biome, 80, .55f), X0 + 12, ty + 15, PhoneUI.DIM, .55f);
         }
-        boolean hm = button(g, X1 - 58, ty - 3, 50, 13, Component.translatable("phone.arcanes_oublies.mark").getString(), 0xFF2E7AD0, mx, my);
-        ty += 14;
+        button(g, X1 - 58, ty + 6, 48, 13, Component.translatable("phone.arcanes_oublies.mark").getString(), 0xFF2E7AD0, mx, my);
+        ty += 32;
+        PhoneUI.text(g, Component.translatable("phone.arcanes_oublies.places").getString().toUpperCase(), X0 + 10, ty, PhoneUI.FAINT, .55f);
+        ty += 9;
         int n = 0;
         for (String w : PhoneSettings.get().waypoints) {
             double[] p = parse(w);
@@ -166,13 +172,22 @@ public class CarteApp extends PhoneApp {
                 continue;
             }
             n++;
-            double d = Math.hypot(p[0] - mc.player.getX(), p[1] - mc.player.getZ());
-            PhoneUI.text(g, n + "  " + w.split(";")[0], X0 + 10, ty, PhoneUI.GOLD, .6f);
-            PhoneUI.right(g, (int) d + " m   ×", X1 - 10, ty, PhoneUI.DIM, .6f);
-            ty += 9;
-            if (ty > Y1 - 6) {
+            if (ty > Y1 - 12) {
                 break;
             }
+            double d = Math.hypot(p[0] - mc.player.getX(), p[1] - mc.player.getZ());
+            boolean hover = PhoneUI.in(mx, my, X0 + 6, ty - 1, X1 - X0 - 12, 12);
+            PhoneUI.round(g, X0 + 6, ty - 1, X1 - X0 - 12, 12, 5, hover ? 0x22FFFFFF : 0x12FFFFFF);
+            PhoneUI.round(g, X0 + 9, ty + 1, 8, 8, 4, 0xFFFFD27A);
+            PhoneUI.centered(g, String.valueOf(n), X0 + 13, ty + 2.5f, 0xFF201010, .55f);
+            PhoneUI.text(g, PhoneUI.fit(w.split(";")[0], 70, .6f), X0 + 21, ty + 2, PhoneUI.WHITE, .6f);
+            PhoneUI.right(g, (int) d + " m", X1 - 24, ty + 2, PhoneUI.DIM, .6f);
+            PhoneUI.text(g, "✕", X1 - 18, ty + 2, PhoneUI.alpha(PhoneUI.RED, .9f), .6f);
+            ty += 13;
+        }
+        if (n == 0) {
+            PhoneUI.paragraph(g, Component.translatable("phone.arcanes_oublies.no_places").getString(), (X0 + X1) / 2f, ty + 4, X1 - X0 - 30,
+                    PhoneUI.FAINT, .6f);
         }
     }
 
@@ -210,7 +225,7 @@ public class CarteApp extends PhoneApp {
             return true;
         }
         int size = X1 - X0 - 12, ty = Y0 + 2 + size + 6;
-        if (PhoneUI.in(mx, my, X1 - 58, ty - 3, 50, 13) && mc.player != null) {
+        if (PhoneUI.in(mx, my, X1 - 58, ty + 6, 48, 13) && mc.player != null) {
             click();
             BlockPos b = mc.player.blockPosition();
             PhoneSettings s = PhoneSettings.get();
@@ -218,16 +233,19 @@ public class CarteApp extends PhoneApp {
             s.save();
             return true;
         }
-        ty += 14;
+        ty += 32 + 9;
         PhoneSettings s = PhoneSettings.get();
         for (int i = 0; i < s.waypoints.size(); i++) {
-            if (PhoneUI.in(mx, my, X1 - 20, ty - 1, 14, 9)) {
+            if (parse(s.waypoints.get(i)) == null) {
+                continue;
+            }
+            if (PhoneUI.in(mx, my, X1 - 22, ty - 1, 16, 12)) {
                 click();
                 s.waypoints.remove(i);
                 s.save();
                 return true;
             }
-            ty += 9;
+            ty += 13;
         }
         return true;
     }

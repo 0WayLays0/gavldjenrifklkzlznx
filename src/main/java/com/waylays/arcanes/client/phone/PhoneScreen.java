@@ -2,6 +2,8 @@ package com.waylays.arcanes.client.phone;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.waylays.arcanes.ArcanesOublies;
+import com.waylays.arcanes.client.music.MusicLibrary;
+import com.waylays.arcanes.client.music.MusicPlayer;
 import com.waylays.arcanes.client.phone.apps.PhoneApps;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -30,6 +32,7 @@ public class PhoneScreen extends Screen {
             "des"};
     public static final String[] DOCK = {"missives", "contacts", "photo", "musique"};
     private static final String[] WALLPAPERS = {"nebula", "aurora", "abyss", "ember"};
+    private static final ResourceLocation RECORD = ArcanesOublies.id("textures/gui/music/record.png");
     /** The finishes of the body (a tint over the titanium). */
     public static final int[] FINISHES = {0xFFFFFFFF, 0xFFFFE0A0, 0xFF9AA0B8, 0xFFFFB0D0};
 
@@ -47,6 +50,8 @@ public class PhoneScreen extends Screen {
     private boolean locked = true;
     private long unlockedAt = -1;
     private float dragFrom = -1, drag;
+    /** Where the music card was drawn on the lock screen, -1 when none. */
+    private int nowPlayingY = -1;
     private boolean camera;
 
     // Where the phone is on the screen this frame, and how big
@@ -261,23 +266,32 @@ public class PhoneScreen extends Screen {
         float out = unlockedAt > 0 ? PhoneUI.ease((now - unlockedAt) / 450f) : 0;
         float lift = locked ? Math.max(0, drag) : SH * out;
         float a = 1 - out;
+        // Kept inside the screen as it slides away
+        clip(g, SX, SY, SX + SW, SY + SH);
         g.pose().pushPose();
         g.pose().translate(0, -lift, 0);
-        // The date, the time large
+        // The date, the time large, a soft light behind it
+        PhoneUI.glow(g, SX + SW / 2f, SY + 64, 150, PhoneUI.alpha(0x30FFFFFF, a));
         String date = PhoneClient.dateLine();
-        PhoneUI.centered(g, date, SX + SW / 2f, SY + 40, PhoneUI.alpha(0xFFFFFFFF, .85f * a), .8f);
+        PhoneUI.centered(g, PhoneUI.fit(date, SW - 20, .8f), SX + SW / 2f, SY + 40, PhoneUI.alpha(0xFFFFFFFF, .85f * a), .8f);
         String clock = PhoneClient.clock();
-        g.pose().pushPose();
         float big = 3.4f;
         float w = PhoneUI.width(clock, big);
         PhoneUI.text(g, clock, SX + SW / 2f - w / 2f + 1, SY + 50 + 1, PhoneUI.alpha(0x66000000, a), big);
         PhoneUI.text(g, clock, SX + SW / 2f - w / 2f, SY + 50, PhoneUI.alpha(0xFFFFFFFF, a), big);
-        g.pose().popPose();
+        // Four round widgets: mana, health, experience, the weather
+        lockWidgets(g, SY + 102, a, time);
+        int y = SY + 124;
+        // What plays, if anything
+        nowPlayingY = -1;
+        if (MusicPlayer.current() != null) {
+            nowPlayingY = y;
+            nowPlaying(g, y, a, mx, my + (int) lift, now);
+            y += 46;
+        }
         // The waiting notifications, stacked
-        int y = SY + 96;
-        int shown = 0;
         for (PhoneClient.Note n : PhoneClient.notes()) {
-            if (shown >= 4) {
+            if (y + 30 > SY + SH - 52) {
                 break;
             }
             PhoneUI.glass(g, SX + 8, y, SW - 16, 30, 10, PhoneUI.alpha(0x88201830, a));
@@ -286,7 +300,6 @@ public class PhoneScreen extends Screen {
             PhoneUI.right(g, PhoneUI.ago(n.time()), SX + SW - 13, y + 6, PhoneUI.alpha(0xFFB8B4C8, a), .6f);
             PhoneUI.text(g, PhoneUI.fit(n.text(), 112, .65f), SX + 36, y + 17, PhoneUI.alpha(0xFFD8D4E8, a), .65f);
             y += 34;
-            shown++;
         }
         // The two round buttons and the hint to swipe up
         for (int k = 0; k < 2; k++) {
@@ -295,9 +308,67 @@ public class PhoneScreen extends Screen {
             PhoneUI.icon(g, k == 0 ? "horloge" : "photo", bx - 7, SY + SH - 42, 14);
         }
         float pulse = .55f + .45f * Mth.sin(time * 3);
+        PhoneUI.centered(g, "⌃", SX + SW / 2f, SY + SH - 27 - 2 * pulse, PhoneUI.alpha(0xFFFFFFFF, pulse * a), .7f);
         PhoneUI.centered(g, Component.translatable("phone.arcanes_oublies.swipe").getString(), SX + SW / 2f, SY + SH - 20,
                 PhoneUI.alpha(0xFFFFFFFF, pulse * a), .6f);
         g.pose().popPose();
+        g.disableScissor();
+    }
+
+    /** The lock screen's round widgets: rings for mana, health and experience (with their value), the sky and its warmth. */
+    private void lockWidgets(GuiGraphics g, float cy, float a, float time) {
+        var p = minecraft.player;
+        float mana = PhoneClient.manaFraction(), hp = PhoneClient.healthFraction(), xp = p == null ? 0 : p.experienceProgress;
+        float[] fractions = {mana, hp, xp};
+        int[] colors = {0xFFB98CFF, 0xFFFF5C7A, 0xFF7CF08A};
+        String[] glyphs = {"✦", "♥", "★"};
+        String[] values = {Math.round(mana * 100) + "%", p == null ? "" : String.valueOf(Math.round(p.getHealth())),
+                p == null ? "" : String.valueOf(p.experienceLevel)};
+        for (int k = 0; k < 4; k++) {
+            float cx = SX + SW / 2f + (k - 1.5f) * 34;
+            PhoneUI.round(g, (int) cx - 14, (int) cy - 14, 28, 28, 14, PhoneUI.alpha(0x50120A20, a));
+            if (k < 3) {
+                PhoneUI.ring(g, cx, cy, 11, fractions[k], PhoneUI.alpha(colors[k], a), 32);
+                PhoneUI.centered(g, glyphs[k], cx, cy - 7, PhoneUI.alpha(colors[k], a), .55f);
+                PhoneUI.centered(g, values[k], cx, cy, PhoneUI.alpha(0xFFFFFFFF, a), .6f);
+            } else {
+                PhoneClient.Sky sky = PhoneClient.sky();
+                weatherGlyph(g, sky.night() ? (sky.rain() ? 4 : 1) : sky.rain() ? (sky.thunder() ? 3 : 2) : 0, cx, cy - 4, 3.5f, time);
+                PhoneUI.centered(g, sky.temperature() + "°", cx + 1, cy + 3, PhoneUI.alpha(0xFFFFFFFF, a), .6f);
+            }
+        }
+    }
+
+    /** The card of the music playing: the record turning, the title, where it is, play/pause. */
+    private void nowPlaying(GuiGraphics g, int y, float a, int mx, int my, long now) {
+        MusicLibrary.Track t = MusicPlayer.current();
+        if (t == null) {
+            return;
+        }
+        PhoneUI.glass(g, SX + 8, y, SW - 16, 40, 12, PhoneUI.alpha(0x88201830, a));
+        PhoneUI.glow(g, SX + 24, y + 20, 40, PhoneUI.alpha(MusicPlayer.playing() ? 0x66FF5AA0 : 0x22FF5AA0, a));
+        g.pose().pushPose();
+        g.pose().translate(SX + 24, y + 20, 0);
+        g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(MusicPlayer.playing() ? (now % 3000) * .12f : 0));
+        PhoneUI.blend();
+        g.blit(RECORD, -12, -12, 24, 24, 0, 0, 128, 128, 128, 128);
+        g.pose().popPose();
+        PhoneUI.text(g, PhoneUI.fit(t.title, SW - 80, .7f), SX + 42, y + 7, PhoneUI.alpha(0xFFFFFFFF, a), .7f);
+        PhoneUI.text(g, PhoneUI.fit(t.artist == null ? "" : t.artist, SW - 80, .55f), SX + 42, y + 16, PhoneUI.alpha(0xFFB8B4C8, a), .55f);
+        int bx = SX + 42, bw = SW - 66;
+        float at = Math.min(1, MusicPlayer.positionMs() / (float) Math.max(1, MusicPlayer.lengthMs()));
+        PhoneUI.round(g, bx, y + 29, bw, 2, 1, PhoneUI.alpha(0x44FFFFFF, a));
+        PhoneUI.round(g, bx, y + 29, Math.max(2, (int) (bw * at)), 2, 1, PhoneUI.alpha(0xFFFF7AD9, a));
+        // Play / pause, on the right
+        int px = SX + SW - 24, py = y + 9;
+        boolean hover = PhoneUI.in(mx, my, px - 2, py - 2, 14, 14);
+        PhoneUI.round(g, px - 2, py - 2, 14, 14, 7, PhoneUI.alpha(hover ? 0x44FFFFFF : 0x22FFFFFF, a));
+        if (MusicPlayer.playing()) {
+            g.fill(px + 2, py + 2, px + 4, py + 8, PhoneUI.alpha(0xFFFFFFFF, a));
+            g.fill(px + 6, py + 2, px + 8, py + 8, PhoneUI.alpha(0xFFFFFFFF, a));
+        } else {
+            PhoneUI.text(g, "▶", px + 2, py + 1, PhoneUI.alpha(0xFFFFFFFF, a), .75f);
+        }
     }
 
     /** Unlocks at once (the client smoke test). */
@@ -370,9 +441,8 @@ public class PhoneScreen extends Screen {
         PhoneClient.Sky sky = PhoneClient.sky();
         int top = sky.night() ? 0xEE24306A : sky.rain() ? 0xEE4A5A78 : 0xEE3C86D8;
         int bottom = sky.night() ? 0xEE121838 : sky.rain() ? 0xEE2A3448 : 0xEE2A5AA8;
-        PhoneUI.round(g, x, y, w, h, 14, top);
-        PhoneUI.round(g, x, y + h / 2, w, h / 2, 14, bottom);
-        PhoneUI.round(g, x, y + h / 2 - 8, w, 16, 2, PhoneUI.mix(top, bottom, .5f));
+        PhoneUI.gradient(g, x, y, w, h, 14, top, bottom);
+        PhoneUI.glow(g, x + w - 14, y + 11, 60, sky.night() ? 0x22C8D8FF : 0x33FFE0A0);
         PhoneUI.text(g, PhoneUI.fit(sky.place() + " ➤", 84, .65f), x + 8, y + 6, 0xFFFFFFFF, .65f);
         PhoneUI.text(g, sky.temperature() + "°", x + 8, y + 15, 0xFFFFFFFF, 2.2f);
         weatherGlyph(g, sky.night() ? (sky.rain() ? 4 : 1) : sky.rain() ? (sky.thunder() ? 3 : 2) : 0, x + w - 14, y + 11, 9, time);
@@ -456,9 +526,7 @@ public class PhoneScreen extends Screen {
         int r = (int) Mth.lerp(e, 9, SR);
         if (!a.seeThrough()) {
             int[] bg = a.background();
-            PhoneUI.round(g, (int) x0, (int) y0, (int) (x1 - x0), (int) (y1 - y0), r, bg[0]);
-            PhoneUI.round(g, (int) x0, (int) (y0 + (y1 - y0) / 2), (int) (x1 - x0), (int) ((y1 - y0) / 2), r, bg[1]);
-            PhoneUI.round(g, (int) x0, (int) (y0 + (y1 - y0) / 2 - 8), (int) (x1 - x0), 16, 2, PhoneUI.mix(bg[0], bg[1], .5f));
+            PhoneUI.gradient(g, (int) x0, (int) y0, (int) (x1 - x0), (int) (y1 - y0), r, bg[0], bg[1]);
         }
         if (e < .35f) {
             PhoneUI.icon(g, a.id, (x0 + x1) / 2 - 12, (y0 + y1) / 2 - 12, 24);
@@ -546,6 +614,11 @@ public class PhoneScreen extends Screen {
             if (PhoneUI.in(mx, my, SX + SW - 44, SY + SH - 52, 44, 34)) {
                 unlock();
                 open("photo", SX + SW - 22, SY + SH - 35);
+                return true;
+            }
+            if (nowPlayingY >= 0 && PhoneUI.in(mx, my, SX + SW - 26, nowPlayingY + 7, 14, 14)) {
+                clickSound();
+                MusicPlayer.togglePause();
                 return true;
             }
             dragFrom = (float) my;

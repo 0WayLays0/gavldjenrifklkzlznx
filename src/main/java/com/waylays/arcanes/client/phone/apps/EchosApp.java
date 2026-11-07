@@ -42,7 +42,7 @@ public class EchosApp extends PhoneApp {
         clip(g, Y0 + 22, Y1);
         int y = Y0 + 24 - (int) scroll;
         if (PhoneClient.feed.isEmpty()) {
-            PhoneUI.centered(g, Component.translatable("phone.arcanes_oublies.no_echoes").getString(), (X0 + X1) / 2f, Y0 + 60, PhoneUI.DIM, .65f);
+            PhoneUI.paragraph(g, Component.translatable("phone.arcanes_oublies.no_echoes").getString(), (X0 + X1) / 2f, Y0 + 60, X1 - X0 - 28, PhoneUI.DIM, .65f);
         }
         for (PhonePackets.PostView p : PhoneClient.feed) {
             List<FormattedCharSequence> lines = PhoneUI.wrap(p.text(), X1 - X0 - 26, .65f);

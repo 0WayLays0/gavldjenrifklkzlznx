@@ -53,7 +53,7 @@ public class NotesApp extends PhoneApp {
         header(g, title(), mx, my, "+");
         if (s.notes.isEmpty()) {
             PhoneUI.icon(g, "notes", (X0 + X1) / 2f - 16, Y0 + 60, 32);
-            PhoneUI.centered(g, Component.translatable("phone.arcanes_oublies.no_notes").getString(), (X0 + X1) / 2f, Y0 + 100, PhoneUI.DIM, .65f);
+            PhoneUI.paragraph(g, Component.translatable("phone.arcanes_oublies.no_notes").getString(), (X0 + X1) / 2f, Y0 + 100, X1 - X0 - 28, PhoneUI.DIM, .65f);
             return;
         }
         int y = Y0 + 4;

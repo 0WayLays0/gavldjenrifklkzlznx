@@ -67,6 +67,66 @@ public final class PhoneUI {
         g.setColor(1, 1, 1, 1);
     }
 
+    /**
+     * A rounded rectangle shading from {@code top} to {@code bottom}: the rounded caps in their colour, the middle a
+     * smooth gradient (no piece drawn twice, so translucent colours stay even).
+     */
+    public static void gradient(GuiGraphics g, int x, int y, int w, int h, int r, int top, int bottom) {
+        if (w <= 0 || h <= 0) {
+            return;
+        }
+        r = Math.max(1, Math.min(r, Math.min(w, h) / 2));
+        int c = 12, t = 48;
+        blend();
+        tint(g, top);
+        g.blit(ROUND, x, y, r, r, 0, 0, c, c, t, t);
+        g.blit(ROUND, x + w - r, y, r, r, t - c, 0, c, c, t, t);
+        if (w > 2 * r) {
+            g.blit(ROUND, x + r, y, w - 2 * r, r, c, 0, t - 2 * c, c, t, t);
+        }
+        tint(g, bottom);
+        g.blit(ROUND, x, y + h - r, r, r, 0, t - c, c, c, t, t);
+        g.blit(ROUND, x + w - r, y + h - r, r, r, t - c, t - c, c, c, t, t);
+        if (w > 2 * r) {
+            g.blit(ROUND, x + r, y + h - r, w - 2 * r, r, c, t - c, t - 2 * c, c, t, t);
+        }
+        g.setColor(1, 1, 1, 1);
+        if (h > 2 * r) {
+            g.fillGradient(x, y + r, x + w, y + h - r, top, bottom);
+        }
+    }
+
+    /**
+     * A ring gauge round ({@code cx}, {@code cy}): {@code dots} small marks on a circle of radius {@code r}, the first
+     * {@code fraction} of them lit in {@code color}, the rest faint; it starts at the top and runs clockwise.
+     */
+    public static void ring(GuiGraphics g, float cx, float cy, float r, float fraction, int color, int dots) {
+        int lit = Math.round(Math.max(0, Math.min(1, fraction)) * dots);
+        for (int k = 0; k < dots; k++) {
+            float a = k / (float) dots * (float) (Math.PI * 2);
+            g.pose().pushPose();
+            g.pose().translate(cx + (float) Math.sin(a) * r, cy - (float) Math.cos(a) * r, 0);
+            g.pose().mulPose(com.mojang.math.Axis.ZP.rotation(a));
+            g.fill(-1, -1, 1, 1, k < lit ? color : alpha(0x40FFFFFF, (color >>> 24) / 255f));
+            g.pose().popPose();
+        }
+    }
+
+    /** {@code s} wrapped to {@code w} and each line centred on {@code cx}; returns the height it took. */
+    public static int paragraph(GuiGraphics g, String s, float cx, float y, float w, int color, float scale) {
+        Font font = Minecraft.getInstance().font;
+        List<FormattedCharSequence> lines = wrap(s, w, scale);
+        for (int i = 0; i < lines.size(); i++) {
+            float lw = font.width(lines.get(i)) * scale;
+            g.pose().pushPose();
+            g.pose().translate(cx - lw / 2, y + i * 10 * scale, 0);
+            g.pose().scale(scale, scale, 1);
+            g.drawString(font, lines.get(i), 0, 0, color, false);
+            g.pose().popPose();
+        }
+        return Math.round(lines.size() * 10 * scale);
+    }
+
     /** A panel of frosted glass: a translucent fill, a brighter rim at its top. */
     public static void glass(GuiGraphics g, int x, int y, int w, int h, int r, int argb) {
         round(g, x, y, w, h, r, argb);

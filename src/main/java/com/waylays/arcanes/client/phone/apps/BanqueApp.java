@@ -57,18 +57,31 @@ public class BanqueApp extends PhoneApp {
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
         header(g, title(), mx, my, null);
-        // The card
+        // The card: an emerald gradient, a sheen sweeping over it, the chip, a contactless mark, the number
         int cx = X0 + 8, cy = Y0 + 2, cw = X1 - X0 - 16, ch = 60;
-        PhoneUI.round(g, cx, cy, cw, ch, 10, 0xFF0E8A5A);
-        PhoneUI.round(g, cx, cy + ch / 2, cw, ch / 2, 10, 0xFF07563A);
-        PhoneUI.round(g, cx, cy + ch / 2 - 6, cw, 12, 2, 0xFF0B7049);
-        PhoneUI.glow(g, cx + cw - 20, cy + 14, 50, 0x5560FFB0);
-        PhoneUI.text(g, "ÉMERAUDE · ARCANES", cx + 8, cy + 7, 0xDDFFFFFF, .5f);
-        PhoneUI.round(g, cx + 8, cy + 16, 14, 10, 2, 0xFFE8C46A);
-        PhoneUI.text(g, Component.translatable("phone.arcanes_oublies.balance").getString(), cx + 8, cy + 32, 0xCCFFFFFF, .55f);
-        PhoneUI.text(g, PhoneClient.balance + " ◆", cx + 8, cy + 40, PhoneUI.WHITE, 1.4f);
-        PhoneUI.right(g, mc.player != null ? mc.player.getGameProfile().getName() : "", cx + cw - 8, cy + ch - 10, 0xCCFFFFFF, .55f);
-        PhoneUI.icon(g, "banque", cx + cw - 22, cy + 6, 14);
+        PhoneUI.round(g, cx + 1, cy + 2, cw, ch, 10, 0x55000000);
+        PhoneUI.gradient(g, cx, cy, cw, ch, 10, 0xFF13A36B, 0xFF064A32);
+        long now = System.currentTimeMillis();
+        float sweep = (now % 5000) / 5000f;
+        phone.clip(g, cx, cy, cx + cw, cy + ch);
+        PhoneUI.glow(g, cx - 30 + sweep * (cw + 60), cy + ch / 2f, 70, 0x2EFFFFFF);
+        PhoneUI.glow(g, cx + cw - 18, cy + 10, 60, 0x4460FFB0);
+        unclip(g);
+        PhoneUI.text(g, Component.translatable("phone.arcanes_oublies.card_brand").getString(), cx + 8, cy + 7, 0xDDFFFFFF, .5f);
+        PhoneUI.icon(g, "banque", cx + cw - 20, cy + 4, 13);
+        // The chip, its contacts
+        PhoneUI.gradient(g, cx + 8, cy + 16, 14, 11, 2, 0xFFF4D98A, 0xFFC99A3E);
+        g.fill(cx + 8, cy + 21, cx + 22, cy + 22, 0x66805A20);
+        g.fill(cx + 14, cy + 16, cx + 15, cy + 27, 0x66805A20);
+        // Contactless: three arcs
+        for (int k = 0; k < 3; k++) {
+            PhoneUI.text(g, ")", cx + 27 + k * 2.6f, cy + 17.5f - k * .2f, PhoneUI.alpha(0xFFFFFFFF, .85f - k * .2f), .6f + k * .12f);
+        }
+        String tail = mc.player == null ? "0000" : String.format("%04d", Math.floorMod(mc.player.getUUID().hashCode(), 10000));
+        PhoneUI.text(g, "••••  ••••  " + tail, cx + 44, cy + 19, 0xDDFFFFFF, .55f);
+        PhoneUI.text(g, Component.translatable("phone.arcanes_oublies.balance").getString(), cx + 8, cy + 33, 0xCCFFFFFF, .5f);
+        PhoneUI.text(g, PhoneClient.balance + " ◆", cx + 8, cy + 41, PhoneUI.WHITE, 1.4f);
+        PhoneUI.right(g, mc.player != null ? mc.player.getGameProfile().getName().toUpperCase() : "", cx + cw - 8, cy + ch - 10, 0xCCFFFFFF, .5f);
         // Carried, and the three actions
         PhoneUI.text(g, Component.translatable("phone.arcanes_oublies.carried", carried()).getString(), X0 + 10, Y0 + 68, PhoneUI.DIM, .6f);
         int bw = (X1 - X0 - 24) / 3;
@@ -89,6 +102,11 @@ public class BanqueApp extends PhoneApp {
         int y = Y0 + (mode >= 0 ? 132 : 100);
         PhoneUI.text(g, Component.translatable("phone.arcanes_oublies.history").getString().toUpperCase(), X0 + 10, y, PhoneUI.FAINT, .55f);
         y += 9;
+        if (PhoneClient.history.isEmpty()) {
+            PhoneUI.glass(g, X0 + 8, y, X1 - X0 - 16, 34, 9, 0x22FFFFFF);
+            PhoneUI.paragraph(g, Component.translatable("phone.arcanes_oublies.no_history").getString(), (X0 + X1) / 2f, y + 8, X1 - X0 - 30,
+                    PhoneUI.DIM, .6f);
+        }
         for (PhonePackets.TxnView t : PhoneClient.history) {
             boolean in = t.amount() > 0;
             PhoneUI.round(g, X0 + 8, y, 14, 14, 7, in ? 0x3360E0A0 : 0x33FF6070);

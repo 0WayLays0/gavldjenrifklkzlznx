@@ -704,7 +704,8 @@ public final class ClientSmokeTest {
     /** The last frame drawn, halved and logged as base64 JPEG lines (a picture never fails the run). */
     private static int phoneStep;
     private static int phoneTick;
-    private static final String[] PHONE_APPS = {"meteo", "carte", "missives", "banque", "grimoire", "calcul", "horloge", "reglages"};
+    private static final String[] PHONE_APPS = {"meteo", "carte", "missives", "banque", "grimoire", "calcul", "horloge", "reglages", "musique", "echos",
+            "contacts", "galerie", "notes", "boussole", "des"};
 
     /**
      * The Arcanophone: taken out, locked (photographed with {@code phone} in {@code arcanes.shots}), unlocked to its home

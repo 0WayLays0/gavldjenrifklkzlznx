@@ -69,7 +69,7 @@ public class MissivesApp extends PhoneApp {
         List<PhonePackets.Conv> convs = PhoneClient.inbox;
         if (convs.isEmpty()) {
             PhoneUI.icon(g, "missives", (X0 + X1) / 2f - 16, Y0 + 60, 32);
-            PhoneUI.centered(g, Component.translatable("phone.arcanes_oublies.no_messages").getString(), (X0 + X1) / 2f, Y0 + 100, PhoneUI.DIM, .7f);
+            PhoneUI.paragraph(g, Component.translatable("phone.arcanes_oublies.no_messages").getString(), (X0 + X1) / 2f, Y0 + 100, X1 - X0 - 28, PhoneUI.DIM, .7f);
             return;
         }
         clip(g, Y0, Y1);
