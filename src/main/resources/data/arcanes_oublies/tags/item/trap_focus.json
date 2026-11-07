@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:tripwire_hook",
+    "minecraft:string",
+    "minecraft:spider_eye",
+    "minecraft:fermented_spider_eye"
+  ]
+}

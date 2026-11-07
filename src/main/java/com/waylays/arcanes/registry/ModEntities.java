@@ -700,6 +700,14 @@ public final class ModEntities {
             EntityType.Builder.<com.waylays.arcanes.entity.melody.MelodyScene>of(com.waylays.arcanes.entity.melody.MelodyScene::new, MobCategory.MISC)
                     .sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
 
+    // Mending Magic, Trap Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<com.waylays.arcanes.entity.mend.MendScene>> MEND_SCENE = register("mend_scene",
+            EntityType.Builder.<com.waylays.arcanes.entity.mend.MendScene>of(com.waylays.arcanes.entity.mend.MendScene::new, MobCategory.MISC)
+                    .sized(.5f, .5f).clientTrackingRange(12).updateInterval(1).fireImmune());
+    public static final DeferredHolder<EntityType<?>, EntityType<com.waylays.arcanes.entity.trap.TrapScene>> TRAP_SCENE = register("trap_scene",
+            EntityType.Builder.<com.waylays.arcanes.entity.trap.TrapScene>of(com.waylays.arcanes.entity.trap.TrapScene::new, MobCategory.MISC)
+                    .sized(1f, .2f).clientTrackingRange(12).updateInterval(1).fireImmune());
+
     // Lotus Magic
     public static final DeferredHolder<EntityType<?>, EntityType<LotusScene>> LOTUS_SCENE = register("lotus_scene",
             EntityType.Builder.<LotusScene>of(LotusScene::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());

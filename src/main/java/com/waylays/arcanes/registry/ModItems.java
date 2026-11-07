@@ -93,6 +93,10 @@ public final class ModItems {
             () -> spellbook(10, ModAttributes.CLOCKWORK_SPELL_POWER));
     public static final DeferredHolder<Item, Item> SYMPHONY_CODEX = ITEMS.register("symphony_codex",
             () -> spellbook(10, ModAttributes.MELODY_SPELL_POWER));
+    public static final DeferredHolder<Item, Item> CODEX_OF_MENDING = ITEMS.register("codex_of_mending",
+            () -> spellbook(10, ModAttributes.MEND_SPELL_POWER));
+    public static final DeferredHolder<Item, Item> TRAPPERS_CODEX = ITEMS.register("trappers_codex",
+            () -> spellbook(10, ModAttributes.TRAP_SPELL_POWER));
 
     /** The Bone Blade grown out of the caster's elbow by Elbow Blade: a weapon for a while (see BoneBladeItem). */
     public static final DeferredHolder<Item, Item> BONE_BLADE = ITEMS.register("bone_blade", com.waylays.arcanes.item.BoneBladeItem::new);

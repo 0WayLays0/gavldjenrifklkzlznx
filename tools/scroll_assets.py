@@ -66,6 +66,10 @@ PALETTES = {
     "clockwork": ["e8d6a8", "f0e2bc", "f8eed2", "cbb27a", "dcc490", "5accff", "2a8ad0", "16407a", "ffe498", "dea050", "76491e"],
     # Rose-cream paper, the writing in plum and rose, gold rod ends
     "melody": ["f4e2ea", "faeef4", "fff8fb", "d8bccb", "e8d0dc", "ff6fd8", "b43c9a", "5a1450", "ffe08a", "e0a840", "8a5a14"],
+    # Ivory paper, the writing in emerald, gold rod ends
+    "mend": ["f0ecdc", "f6f2e6", "fffcf2", "d6ceb2", "e6dfc8", "52d68e", "1f9a5a", "0c5030", "ffe8a0", "e0b050", "8a6018"],
+    # Dark hide-brown paper, the writing in poison green, brass rod ends
+    "trap": ["5a4640", "66504a", "745e56", "463630", "503e38", "a0ff60", "4ec040", "1e6a1e", "f0d890", "d6aa50", "785624"],
 }
 
 

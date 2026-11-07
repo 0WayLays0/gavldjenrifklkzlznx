@@ -532,6 +532,45 @@ focus : bloc musical, juke-box, corne de chèvre, éclat d'améthyste.
 | **Orgue de la tempête** (Storm Organ, épique) | Un grand orgue aux tuyaux d'or s'élève là où l'on vise : chaque accord fait tomber une colonne de lumière sur un ennemi (12 blocs), puis un dernier grand accord frappe et projette tous les ennemis. |
 | **Orchestre fantôme** (Phantom Orchestra, ultime) | Huit violons en cercle, des portées de lumière qui tournent, une grande clé d'or : des notes tombent sur les ennemis, le camp du lanceur est soigné, accéléré et renforcé, les ennemis ralentis ; puis le final frappe tout le terrain (14 blocs) et protège le camp du lanceur. |
 
+### Magie des Soins
+
+Des soins qui ne touchent qu'un seul allié à la fois, chacun à sa façon : on vise un allié (sinon soi-même). Lumière verte
+et dorée. Livre : **Codex de la Guérison** (cuir ivoire, un arbre de vie d'or aux feuilles vertes, un cœur d'émeraude) ;
+focus : pomme d'or, tranche de pastèque scintillante, larme de ghast, baies sucrées.
+
+| Sort | Effet |
+|---|---|
+| **Fil de vie** (Lifethread, commun) | Un fil de lumière dorée relie le lanceur à l'allié : il le soigne chaque demi-seconde pendant 6 s, tant qu'il reste à moins de 16 blocs. |
+| **Suture** (commun) | Soigne d'autant plus que l'allié est blessé (jusqu'au double au bord de la mort). |
+| **Soin en écho** (Echoing Mend, peu commun) | Un soin, puis deux échos 2 s et 4 s après, chacun moitié du précédent. |
+| **Purge** (peu commun) | Retire tous les effets négatifs et soigne pour chacun retiré. |
+| **Bourgeon de soin** (Mending Bud, rare) | Un bourgeon de lumière au-dessus de l'allié (20 s) qui éclot quand il passe sous la moitié de sa vie : grand soin et régénération. |
+| **Feu follet gardien** (Guardian Wisp, rare) | Un feu follet tourne autour de l'allié et soigne la moitié de chaque blessure, un instant après. |
+| **Pacte de sang** (Blood Pact, rare) | Le lanceur donne un peu de sa vie : l'allié est soigné de trois fois ce coût (jamais le dernier cœur). |
+| **Rembobinage** (Rewind, épique) | La vie de l'allié revient au plus haut qu'elle a été dans les 5 dernières secondes. |
+| **Cocon** (Cocoon, épique) | 3 s dans un cocon de lumière : aucun coup ne passe, l'allié guérit mais ne peut pas bouger. |
+| **Seconde vie** (Second Life, ultime) | Une auréole d'or : si l'allié devait mourir pendant qu'elle brille, il se relève à mi-vie, purifié et protégé. |
+
+### Magie des Pièges
+
+Des pièges cachés au sol, à peine visibles, qui ne paralysent jamais : aucun étourdissement, aucun enracinement, seulement
+des affaiblissements. Livre : **Codex du Trappeur** (cuir sombre cousu, une mâchoire de fer et un œil vert poison sur
+chaque plat, fermoirs de laiton) ; focus : crochet, ficelle, œil d'araignée, œil d'araignée fermenté. La puissance des sorts
+allonge les malédictions.
+
+| Sort | Effet |
+|---|---|
+| **Collet de ronces** (Bramble Snare, commun) | Poison et lenteur. |
+| **Glyphe de faiblesse** (Hex Glyph, commun) | Faiblesse II et coups ralentis. |
+| **Saigneur** (Bloodletter, peu commun) | Saignement. |
+| **Mine de suie** (Soot Mine, peu commun) | Un nuage noir : cécité et marque lumineuse sur tous les ennemis proches (3,5 blocs). |
+| **Mâchoire de rouille** (Rust Jaw, rare) | Rouille et armure brisée. |
+| **Piège à écho** (Echo Trap, rare) | Se déclenche 5 fois, sur chaque ennemi qui passe ; à chaque reprise du même ennemi, lenteur et faiblesse montent d'un cran (jusqu'à III). |
+| **Porteur de peste** (Plague Carrier, rare) | Poison et faim ; pendant 8 s la victime transmet la peste aux ennemis proches. |
+| **Piège sangsue** (Leech Trap, épique) | Flétrissement ; tant qu'il dure, le lanceur se soigne chaque seconde. |
+| **Champ de mines** (Minefield, épique) | Sept mines autour du point visé, chacune une malédiction différente. |
+| **Toile maudite** (Cursed Web, ultime) | Une toile de 10 blocs : toutes les 2 s, chaque ennemi dedans subit une nouvelle malédiction, à tour de rôle. |
+
 ### Lecteur de musique
 
 Un lecteur de musique en jeu, ouvert avec la touche **M** (modifiable dans les commandes, catégorie Arcanes Oublies).

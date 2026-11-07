@@ -83,7 +83,9 @@ public final class ModCreativeTabs {
             new Section(ModSchools.LOTUS, () -> new ItemStack(ModItems.LOTUS_CODEX.get()), List.of(ModItems.LOTUS_CODEX)),
             new Section(ModSchools.AURORA, () -> new ItemStack(ModItems.BOREAL_CODEX.get()), List.of(ModItems.BOREAL_CODEX)),
             new Section(ModSchools.CLOCKWORK, () -> new ItemStack(ModItems.CLOCKMAKERS_CODEX.get()), List.of(ModItems.CLOCKMAKERS_CODEX)),
-            new Section(ModSchools.MELODY, () -> new ItemStack(ModItems.SYMPHONY_CODEX.get()), List.of(ModItems.SYMPHONY_CODEX)));
+            new Section(ModSchools.MELODY, () -> new ItemStack(ModItems.SYMPHONY_CODEX.get()), List.of(ModItems.SYMPHONY_CODEX)),
+            new Section(ModSchools.MEND, () -> new ItemStack(ModItems.CODEX_OF_MENDING.get()), List.of(ModItems.CODEX_OF_MENDING)),
+            new Section(ModSchools.TRAP, () -> new ItemStack(ModItems.TRAPPERS_CODEX.get()), List.of(ModItems.TRAPPERS_CODEX)));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup." + ArcanesOublies.MODID))

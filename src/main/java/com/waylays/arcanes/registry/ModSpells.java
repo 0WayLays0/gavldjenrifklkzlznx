@@ -300,6 +300,26 @@ import com.waylays.arcanes.spells.melody.HarpOfLightSpell;
 import com.waylays.arcanes.spells.melody.PhantomTrumpetsSpell;
 import com.waylays.arcanes.spells.melody.StormOrganSpell;
 import com.waylays.arcanes.spells.melody.PhantomOrchestraSpell;
+import com.waylays.arcanes.spells.mend.LifethreadSpell;
+import com.waylays.arcanes.spells.mend.SutureSpell;
+import com.waylays.arcanes.spells.mend.EchoHealSpell;
+import com.waylays.arcanes.spells.mend.PurgeSpell;
+import com.waylays.arcanes.spells.mend.MendingBudSpell;
+import com.waylays.arcanes.spells.mend.GuardianWispSpell;
+import com.waylays.arcanes.spells.mend.BloodPactSpell;
+import com.waylays.arcanes.spells.mend.RewindSpell;
+import com.waylays.arcanes.spells.mend.CocoonSpell;
+import com.waylays.arcanes.spells.mend.SecondLifeSpell;
+import com.waylays.arcanes.spells.trap.BrambleSnareSpell;
+import com.waylays.arcanes.spells.trap.HexGlyphSpell;
+import com.waylays.arcanes.spells.trap.BloodletterSpell;
+import com.waylays.arcanes.spells.trap.SootMineSpell;
+import com.waylays.arcanes.spells.trap.RustJawSpell;
+import com.waylays.arcanes.spells.trap.EchoTrapSpell;
+import com.waylays.arcanes.spells.trap.PlagueCarrierSpell;
+import com.waylays.arcanes.spells.trap.LeechTrapSpell;
+import com.waylays.arcanes.spells.trap.MinefieldSpell;
+import com.waylays.arcanes.spells.trap.CursedWebSpell;
 import com.waylays.arcanes.spells.echo.SoundWaveSpell;
 import com.waylays.arcanes.spells.echo.ShriekSpell;
 import com.waylays.arcanes.spells.echo.EchoStepSpell;
@@ -665,6 +685,30 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> PHANTOM_TRUMPETS = register(new PhantomTrumpetsSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> STORM_ORGAN = register(new StormOrganSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> PHANTOM_ORCHESTRA = register(new PhantomOrchestraSpell());
+
+    // Mending Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LIFETHREAD = register(new LifethreadSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SUTURE = register(new SutureSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ECHO_HEAL = register(new EchoHealSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PURGE = register(new PurgeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MENDING_BUD = register(new MendingBudSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> GUARDIAN_WISP = register(new GuardianWispSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BLOOD_PACT = register(new BloodPactSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> REWIND = register(new RewindSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> COCOON = register(new CocoonSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SECOND_LIFE = register(new SecondLifeSpell());
+
+    // Trap Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BRAMBLE_SNARE = register(new BrambleSnareSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> HEX_GLYPH = register(new HexGlyphSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> BLOODLETTER = register(new BloodletterSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SOOT_MINE = register(new SootMineSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> RUST_JAW = register(new RustJawSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> TRAP_ECHO_TRAP = register(new EchoTrapSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PLAGUE_CARRIER = register(new PlagueCarrierSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LEECH_TRAP = register(new LeechTrapSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MINEFIELD = register(new MinefieldSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CURSED_WEB = register(new CursedWebSpell());
 
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());

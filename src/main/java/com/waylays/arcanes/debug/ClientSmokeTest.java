@@ -406,7 +406,9 @@ public final class ClientSmokeTest {
                     : school.equals(ModSchools.LOTUS_RESOURCE) ? ModItems.LOTUS_CODEX.get()
                     : school.equals(ModSchools.AURORA_RESOURCE) ? ModItems.BOREAL_CODEX.get()
                     : school.equals(ModSchools.CLOCKWORK_RESOURCE) ? ModItems.CLOCKMAKERS_CODEX.get()
-                    : school.equals(ModSchools.MELODY_RESOURCE) ? ModItems.SYMPHONY_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get();
+                    : school.equals(ModSchools.MELODY_RESOURCE) ? ModItems.SYMPHONY_CODEX.get()
+                    : school.equals(ModSchools.MEND_RESOURCE) ? ModItems.CODEX_OF_MENDING.get()
+                    : school.equals(ModSchools.TRAP_RESOURCE) ? ModItems.TRAPPERS_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get();
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(book));
             // A sturdy target dummy 6 blocks in front of the player, at eye level of the raycast
             Vec3 forward = Vec3.directionFromRotation(0, player.getYRot());

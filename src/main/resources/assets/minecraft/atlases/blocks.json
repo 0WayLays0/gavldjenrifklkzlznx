@@ -30,7 +30,9 @@
         "arcanes_lotus": "arcanes_oublies:item/scroll_palettes/lotus",
         "arcanes_aurora": "arcanes_oublies:item/scroll_palettes/aurora",
         "arcanes_clockwork": "arcanes_oublies:item/scroll_palettes/clockwork",
-        "arcanes_melody": "arcanes_oublies:item/scroll_palettes/melody"
+        "arcanes_melody": "arcanes_oublies:item/scroll_palettes/melody",
+        "arcanes_mend": "arcanes_oublies:item/scroll_palettes/mend",
+        "arcanes_trap": "arcanes_oublies:item/scroll_palettes/trap"
       }
     }
   ]

@@ -457,6 +457,38 @@ public final class ModSchools {
             MELODY_MAGIC
     ));
 
+    /** Mending Magic: healing laid on one ally at a time, each spell its own way of keeping them alive. */
+    public static final ResourceLocation MEND_RESOURCE = ArcanesOublies.id("mend");
+    public static final TagKey<Item> MEND_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("mend_focus"));
+    public static final ResourceKey<DamageType> MEND_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("mend_magic"));
+    public static final int MEND_COLOR = 0x7CFFB0;
+
+    public static final DeferredHolder<SchoolType, SchoolType> MEND = SCHOOLS.register(MEND_RESOURCE.getPath(), () -> new SchoolType(
+            MEND_RESOURCE,
+            MEND_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".mend").withStyle(Style.EMPTY.withColor(MEND_COLOR)),
+            ModAttributes.MEND_SPELL_POWER,
+            ModAttributes.MEND_MAGIC_RESIST,
+            sound(SoundEvents.AMETHYST_BLOCK_CHIME),
+            MEND_MAGIC
+    ));
+
+    /** Trap Magic: traps hidden on the ground that never stun, only weaken: poison, bleeding, rust, curses. */
+    public static final ResourceLocation TRAP_RESOURCE = ArcanesOublies.id("trap");
+    public static final TagKey<Item> TRAP_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("trap_focus"));
+    public static final ResourceKey<DamageType> TRAP_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("trap_magic"));
+    public static final int TRAP_COLOR = 0x9CE05A;
+
+    public static final DeferredHolder<SchoolType, SchoolType> TRAP = SCHOOLS.register(TRAP_RESOURCE.getPath(), () -> new SchoolType(
+            TRAP_RESOURCE,
+            TRAP_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".trap").withStyle(Style.EMPTY.withColor(TRAP_COLOR)),
+            ModAttributes.TRAP_SPELL_POWER,
+            ModAttributes.TRAP_MAGIC_RESIST,
+            sound(SoundEvents.TRIPWIRE_CLICK_ON),
+            TRAP_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */
