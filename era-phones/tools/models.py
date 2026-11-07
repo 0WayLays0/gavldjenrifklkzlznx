@@ -205,8 +205,8 @@ class Model:
 
 
 HELD = {
-    "thirdperson_righthand": {"rotation": [-10, 90, 0], "translation": [0, 3, 0.5], "scale": [0.55, 0.55, 0.55]},
-    "thirdperson_lefthand": {"rotation": [-10, -90, 0], "translation": [0, 3, 0.5], "scale": [0.55, 0.55, 0.55]},
+    "thirdperson_righthand": {"rotation": [-10, 90, 0], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+    "thirdperson_lefthand": {"rotation": [-10, -90, 0], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
     "firstperson_righthand": {"rotation": [0, -100, 12], "translation": [-1, 5, -1.5], "scale": [0.5, 0.5, 0.5]},
     "firstperson_lefthand": {"rotation": [0, -80, -12], "translation": [-1, 5, -1.5], "scale": [0.5, 0.5, 0.5]},
     "ground": {"rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [0.45, 0.45, 0.45]},

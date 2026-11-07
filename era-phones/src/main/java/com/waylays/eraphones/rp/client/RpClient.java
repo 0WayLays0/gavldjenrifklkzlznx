@@ -127,7 +127,7 @@ public final class RpClient {
             float ly = y;
             for (FormattedCharSequence line : lines) {
                 float x = -font.width(line) / 2f;
-                int bg = (int) (alpha * .45f) << 24;
+                int bg = (int) (alpha * .62f) << 24 | 0x0A0A12;
                 font.drawInBatch(line, x, ly, alpha << 24 | (s.color & 0xFFFFFF), false, m, event.getMultiBufferSource(), Font.DisplayMode.NORMAL, bg,
                         event.getPackedLight());
                 ly += 10;
