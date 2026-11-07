@@ -54,14 +54,14 @@ public final class RpService {
             double d = p.distanceTo(from);
             if (p == from || d <= range) {
                 p.sendSystemMessage(line);
-                if (bubble != null && RpConfig.get(RpConfig.BUBBLES, true) && p != from) {
+                if (bubble != null && RpConfig.get(RpConfig.BUBBLES, false) && p != from) {
                     PacketDistributor.sendToPlayer(p, new RpNet.Bubble(from.getId(), bubble, bubbleColor));
                 }
             } else if (far != null && d <= farRange) {
                 p.sendSystemMessage(far);
             }
         }
-        if (bubble != null && RpConfig.get(RpConfig.BUBBLES, true)) {
+        if (bubble != null && RpConfig.get(RpConfig.BUBBLES, false)) {
             PacketDistributor.sendToPlayer(from, new RpNet.Bubble(from.getId(), bubble, bubbleColor));
         }
     }

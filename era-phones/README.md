@@ -35,7 +35,7 @@ messages). Les messages attendent sur le serveur si le téléphone est éteint, 
 | --- | --- |
 | `/setname Prénom Nom` | Le nom du personnage remplace le pseudo partout (au-dessus de la tête, liste des joueurs, tout ce qui est dit). |
 | *(chat normal)* | Parole entendue autour (20 blocs) : « Bill Denbrough dit : « … » ». |
-| `/me action` | Action en violet italique, dans le chat et dans une bulle au-dessus de la tête. |
+| `/me action` | Action en violet italique, dans le chat (rien au-dessus de la tête). |
 | `/do description` | Description de la scène (ambre). |
 | `/roll [100]` | « Bill Denbrough a lancé un dé sur 100 : 42 » (dé sur 100 par défaut ; aussi `1d20`, `2d6`…). |
 | `/try action` | Tente quelque chose : réussite ou échec. |
@@ -48,7 +48,7 @@ messages). Les messages attendent sur le serveur si le téléphone est éteint, 
 | `/rp` · `/rp qui` · `/rp nom joueur Prénom Nom` | Aide ; pour les maîtres du jeu : qui joue qui, nommer un personnage. |
 
 Réglages serveur (`serverconfig/eraphones-server.toml`) : chat local oui/non, portées (parole, actions, chuchotement,
-cri), permission de `/voir`, noms au-dessus des têtes, bulles, voix au téléphone.
+cri), permission de `/voir`, noms au-dessus des têtes, bulles au-dessus des têtes (désactivées par défaut), voix au téléphone.
 
 ## Outils des maîtres du jeu (horreur)
 

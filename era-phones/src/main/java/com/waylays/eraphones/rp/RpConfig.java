@@ -20,7 +20,7 @@ public final class RpConfig {
         SHOUT_RANGE = b.comment("How far a shout carries (blocks)").defineInRange("shoutRange", 48, 10, 400);
         HIDE_PERMISSION = b.comment("The permission level needed for /voir (2: game masters)").defineInRange("voirPermission", 2, 0, 4);
         NAMEPLATES = b.comment("Whether the character's name shows over their head").define("nameplates", true);
-        BUBBLES = b.comment("Whether what is said and done shows in a bubble over the head").define("bubbles", true);
+        BUBBLES = b.comment("Whether what is said and done also shows in a bubble over the head (off: in the chat only)").define("bubbles", false);
         PHONE_VOICE = b.comment("With Simple Voice Chat: whether the two ends of a phone call hear each other's voice").define("phoneVoice", true);
         b.pop();
         SPEC = b.build();

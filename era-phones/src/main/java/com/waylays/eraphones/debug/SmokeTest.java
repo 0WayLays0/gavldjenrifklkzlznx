@@ -175,7 +175,7 @@ public final class SmokeTest {
     }
 
     private static void plan(Minecraft mc) {
-        // The role play: a character's name, an action in a bubble over the head, a roll of the dice
+        // The role play: a character's name, an action, a roll of the dice (in the chat)
         STEPS.add(() -> {
             select(mc, 5);
             mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
@@ -184,11 +184,11 @@ public final class SmokeTest {
         STEPS.add(() -> command(mc, "me ouvre lentement la porte de la cave"));
         STEPS.add(() -> command(mc, "roll 1d20"));
         STEPS.add(() -> {
-            shot(mc, "rp_bubbles");
+            shot(mc, "rp_chat");
             if (!mc.player.getDisplayName().getString().equals("Bill Denbrough")) {
                 fail("the character's name is not shown: {}", mc.player.getDisplayName().getString());
             } else {
-                log("rp: the character's name and the bubbles are shown");
+                log("rp: the character's name is shown");
             }
         });
         String[] names = {"smartphone", "clapet", "gsm", "radiotelephone"};
