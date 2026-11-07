@@ -22,7 +22,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Husk;
+import net.minecraft.world.entity.monster.Vindicator;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -35,7 +35,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
  * Server-side checks run by CI for Mending Magic and Trap Magic: both schools are there with their ten spells; healing
  * reaches the one ally it is laid on (the thread, the echo, suture, purge, the bud blooming, the wisp answering a wound,
  * Rewind undoing wounds, the cocoon letting no blow through, a second life undoing a death); traps spring on enemies,
- * curse them and never root or stun them; the echo trap grows stronger; the plague passes on; the cursed web curses.
+ * curse them (living ones: poison does not take on the undead) and never root or stun them; the echo trap grows stronger; the plague passes on; the cursed web curses.
  */
 @GameTestHolder(ArcanesOublies.MODID)
 @PrefixGameTestTemplate(false)
@@ -48,8 +48,8 @@ public final class MendTrapGameTests {
         return w;
     }
 
-    private static Husk husk(GameTestHelper helper, double x, double z) {
-        return helper.spawnWithNoFreeWill(EntityType.HUSK, new Vec3(x, 2, z));
+    private static Vindicator foe(GameTestHelper helper, double x, double z) {
+        return helper.spawnWithNoFreeWill(EntityType.VINDICATOR, new Vec3(x, 2, z));
     }
 
     private static void done(GameTestHelper helper) {
@@ -152,7 +152,7 @@ public final class MendTrapGameTests {
     public static void trapsCurseWithoutStun(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = witch(helper, 4.5, .5);
-        Husk a = husk(helper, 1.5, 4.5), b = husk(helper, 4.5, 4.5), c = husk(helper, 7.5, 4.5);
+        Vindicator a = foe(helper, 1.5, 4.5), b = foe(helper, 4.5, 4.5), c = foe(helper, 7.5, 4.5);
         TrapScene.spawn(helper.getLevel(), caster, TrapScene.Kind.SNARE, helper.absoluteVec(new Vec3(1.5, 2, 4.5)), 1, 600, 1, 0);
         TrapScene.spawn(helper.getLevel(), caster, TrapScene.Kind.RUST, helper.absoluteVec(new Vec3(4.5, 2, 4.5)), 1, 600, 1, 0);
         TrapScene.spawn(helper.getLevel(), caster, TrapScene.Kind.BLEED, helper.absoluteVec(new Vec3(7.5, 2, 4.5)), 1, 600, 1, 0);
@@ -177,9 +177,9 @@ public final class MendTrapGameTests {
     public static void echoPlagueAndWeb(GameTestHelper helper) {
         GameTestSetup.clearLeftovers(helper);
         Witch caster = witch(helper, 4.5, .5);
-        Husk echoed = husk(helper, 1.5, 7.5);
-        Husk carrier = husk(helper, 7.5, 7.5), near = husk(helper, 7.5, 5.5);
-        Husk webbed = husk(helper, 4.5, 4.5);
+        Vindicator echoed = foe(helper, 1.5, 7.5);
+        Vindicator carrier = foe(helper, 7.5, 7.5), near = foe(helper, 7.5, 5.5);
+        Vindicator webbed = foe(helper, 4.5, 4.5);
         TrapScene.spawn(helper.getLevel(), caster, TrapScene.Kind.ECHO, helper.absoluteVec(new Vec3(1.5, 2, 7.5)), 1, 600, 1, 0);
         TrapScene.spawn(helper.getLevel(), caster, TrapScene.Kind.PLAGUE, helper.absoluteVec(new Vec3(7.5, 2, 7.5)), 1, 600, 1, 0);
         TrapScene web = TrapScene.spawn(helper.getLevel(), caster, TrapScene.Kind.WEB, helper.absoluteVec(new Vec3(4.5, 2, 4.5)), 3, 400, 1, 0);
