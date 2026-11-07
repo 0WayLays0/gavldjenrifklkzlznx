@@ -22,11 +22,12 @@ import java.util.List;
 public final class NotePage {
     public static final int W = 200, H = 260;
     public static final int[] INKS = {0xFF1A1A24, 0xFF1C3A8A, 0xFF9A1C1C, 0xFF1C6A3A, 0xFF5E5E68};
-    public static final String[] STYLES = {"carnet", "lettre", "parchemin", "postit", "dechiree"};
+    public static final String[] STYLES = {"carnet", "lettre", "parchemin", "postit", "dechiree", "quadrille", "fiche", "vieux"};
 
     /** Where each paper is written: left, right, the title's line, the first line, the gap between lines, the last line. */
     private static final float[][] AREA = {{34, 188, 30, 44, 10, 250}, {22, 178, 22, 46, 9.5f, 240}, {24, 176, 24, 44, 9.5f, 238},
-            {22, 178, 34, 52, 9.5f, 192}, {34, 188, 26, 44, 10, 250}};
+            {22, 178, 34, 52, 9.5f, 192}, {34, 188, 28, 44, 10, 250}, {14, 186, 24, 42, 9.5f, 246}, {14, 186, 60, 73, 9, 182},
+            {24, 176, 26, 44, 9.5f, 238}};
 
     public record Data(String title, String text, int style, int ink, boolean typed, String author) {
         public static Data of(ItemStack stack) {

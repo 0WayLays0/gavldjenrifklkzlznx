@@ -184,7 +184,7 @@ public final class GearNet {
         ItemStack sheet = held.getCount() > 1 ? held.split(1) : held;
         sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_TITLE.get(), p.title.strip());
         sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_TEXT.get(), p.text);
-        sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_STYLE.get(), Math.floorMod(p.style, 5));
+        sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_STYLE.get(), Math.floorMod(p.style, 8));
         sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_INK.get(), Math.floorMod(p.ink, 5));
         sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_TYPED.get(), p.typed);
         if (p.sign) {

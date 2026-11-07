@@ -449,85 +449,164 @@ def paper():
 # ------------------------------------------------------------------------------------------------ the sheets of paper
 
 NOTE_W, NOTE_H = 200, 260
+NOTE_STYLES = 8
+
+
+def fibre_noise(h, w, rng, scales=((6, .5), (24, .3), (80, .2))):
+    """Paper's grain: noise at several sizes, the fine fibres stretched a little along the sheet."""
+    out = np.zeros((h, w))
+    for div, weight in scales:
+        small = rng.random((max(2, h // div), max(2, w // (div * 2))))
+        out += np.asarray(Image.fromarray((small * 255).astype(np.uint8)).resize((w, h), Image.BICUBIC), float) / 255 * weight
+    return out
+
+
+def creases(h, w, rng, count, strength):
+    """Folds and crumples: lines across the sheet, light on one side, dark on the other."""
+    ys, xs = np.mgrid[0:h, 0:w].astype(float)
+    shade = np.zeros((h, w))
+    for _ in range(count):
+        a = rng.uniform(0, math.pi)
+        nx, ny = math.cos(a), math.sin(a)
+        c = rng.uniform(.2, .8) * w * nx + rng.uniform(.2, .8) * h * ny
+        dist = xs * nx + ys * ny - c
+        width = S(rng.uniform(.6, 1.6))
+        shade += np.tanh(dist / width) * np.exp(-(dist / (width * 3)) ** 2) * strength * rng.uniform(.5, 1)
+    return shade
+
+
+def stain(h, w, cx, cy, r, rng):
+    """A coffee ring: a darker rim, a faint inside."""
+    ys, xs = np.mgrid[0:h, 0:w].astype(float)
+    d = np.hypot(xs - cx, ys - cy) / r
+    wob = 1 + .012 * np.sin(np.arctan2(ys - cy, xs - cx) * 3 + rng.uniform(0, 6))
+    d = d * wob
+    return np.exp(-((d - 1) / .035) ** 2) * .8 + (d < 1) * .18
 
 
 def note(style):
-    """A page to write on: a lined notebook leaf, a letter, a parchment, a sticky note, a torn page."""
+    """A page to write on: a notebook leaf, a letter, an old parchment, a sticky note, a torn page, graph paper, an
+    index card, an old stained sheet."""
     W, H = NOTE_W, NOTE_H
     img = canvas(W, H)
-    rng = np.random.default_rng(100 + style)
+    rng = np.random.default_rng(200 + style)
     w, h = img.size
     ys, xs = np.mgrid[0:h, 0:w].astype(float) / (K * SS)
-    fibres = np.asarray(Image.fromarray((rng.random((h // 6, w // 6)) * 255).astype(np.uint8)).resize((w, h), Image.BICUBIC), float) / 255
-    if style == 3:
-        shape = box(14, 30, 186, 202)
-        top, bottom = (255, 238, 120), (246, 214, 80)
-    else:
-        shape = box(4, 4, 196, 256)
-        top, bottom = {0: ((250, 250, 246), (238, 238, 230)), 1: ((246, 240, 224), (234, 224, 200)),
-                       2: ((236, 216, 170), (206, 176, 120)), 4: ((248, 248, 242), (232, 232, 224))}[style]
-    rgb = vgrad(w, h, top, bottom) + (fibres[..., None] - .5) * (24 if style == 2 else 10)
+    colours = {0: ((252, 252, 248), (240, 240, 232)), 1: ((248, 243, 228), (236, 228, 206)), 2: ((232, 208, 156), (200, 166, 108)),
+               3: ((255, 240, 128), (248, 218, 86)), 4: ((250, 250, 246), (236, 236, 228)), 5: ((250, 252, 250), (238, 242, 238)),
+               6: ((252, 250, 244), (242, 238, 228)), 7: ((238, 226, 196), (214, 196, 156))}
+    top, bottom = colours[style]
+    rgb = vgrad(w, h, top, bottom)
+    grain = fibre_noise(h, w, rng)
+    rgb += (grain[..., None] - .5) * (34 if style in (2, 7) else 14)
+    # The sheet's outline
     m = Image.new("L", img.size, 0)
     md = ImageDraw.Draw(m)
-    if style == 4:
-        # The torn top edge
-        pts = [(S(4), S(256)), (S(196), S(256)), (S(196), S(14))]
-        x = 196
+    if style == 3:
+        md.rectangle(box(14, 30, 186, 202), fill=255)
+    elif style == 6:
+        md.rounded_rectangle(box(6, 50, 194, 186), radius=S(2), fill=255)
+    elif style == 4:
+        pts = [(S(4), S(256)), (S(196), S(256)), (S(196), S(16))]
+        x = 196.0
         while x > 4:
-            pts.append((S(x), S(10 + rng.uniform(0, 7))))
-            x -= rng.uniform(2, 6)
-        pts.append((S(4), S(12)))
+            pts.append((S(x), S(12 + rng.uniform(0, 6) + 2 * math.sin(x * .07))))
+            x -= rng.uniform(1.2, 4)
+        pts.append((S(4), S(14)))
         md.polygon(pts, fill=255)
-    elif style == 2:
-        # Parchment: ragged all round
+    elif style in (2, 7):
         pts = []
-        for k in range(160):
-            t = k / 160 * 4
+        n = 240
+        for k in range(n):
+            t = k / n * 4
             side = int(t)
             f = t - side
+            amp = 2.6 if style == 2 else 1.2
+            j = rng.uniform(-amp, amp) + math.sin(k * .3) * amp * .5
             if side == 0:
-                x, y = 6 + f * 188, 6
+                x, y = 6 + f * 188, 6 + j
             elif side == 1:
-                x, y = 194, 6 + f * 248
+                x, y = 194 + j, 6 + f * 248
             elif side == 2:
-                x, y = 194 - f * 188, 254
+                x, y = 194 - f * 188, 254 + j
             else:
-                x, y = 6, 254 - f * 248
-            j = rng.uniform(-2.2, 2.2)
-            pts.append((S(x + (j if side % 2 else 0)), S(y + (0 if side % 2 else j))))
+                x, y = 6 + j, 254 - f * 248
+            pts.append((S(x), S(y)))
         md.polygon(pts, fill=255)
     else:
-        md.rounded_rectangle(shape, radius=S(2 if style != 3 else 1), fill=255)
-    shadow(img, (0, 0, w, h), 0, 0, 0)
-    sh = m.filter(ImageFilter.GaussianBlur(S(3)))
+        md.rounded_rectangle(box(4, 4, 196, 256), radius=S(1.5), fill=255)
+    # Holes punched through the notebook leaf
+    if style == 0:
+        for y in (40, 130, 220):
+            md.ellipse(box(10, y - 3.6, 17.2, y + 3.6), fill=0)
+    # The shadow under the sheet, softer away from the light
+    sh = m.filter(ImageFilter.GaussianBlur(S(3.5)))
     shl = Image.new("RGBA", img.size, (0, 0, 0, 0))
-    shl.putalpha(Image.fromarray((np.asarray(sh, float) * .5).astype(np.uint8)))
-    img.alpha_composite(shl, (0, S(3)))
-    if style == 2:
-        edge = np.asarray(m.filter(ImageFilter.GaussianBlur(S(6))), float) / 255
-        rgb *= (.55 + .45 * edge)[..., None]
+    shl.putalpha(Image.fromarray((np.asarray(sh, float) * .45).astype(np.uint8)))
+    img.alpha_composite(shl, (int(S(1.5)), int(S(3))))
+    inside = np.asarray(m, float) / 255
+    edge = np.asarray(m.filter(ImageFilter.GaussianBlur(S(7))), float) / 255
+    # Light falls from the top left; the edges darken a touch; old papers darken and brown at their edges
+    rgb *= (1.03 - .07 * (xs / W + ys / H) / 2)[..., None]
+    if style in (2, 7):
+        rgb *= (.5 + .5 * edge ** .7)[..., None]
+        rgb -= ((1 - edge) * 40)[..., None] * np.array([.2, .5, 1])
+    if style in (2, 4, 7):
+        rgb += creases(h, w, rng, 7 if style != 4 else 4, 18)[..., None]
+    if style == 7:
+        for _ in range(2):
+            st = stain(h, w, S(rng.uniform(50, 160)), S(rng.uniform(150, 230)), S(rng.uniform(18, 26)), rng)
+            rgb -= st[..., None] * np.array([30, 48, 70])
+        for _ in range(30):
+            cx, cy, r = rng.uniform(10, 190), rng.uniform(10, 250), rng.uniform(.8, 3)
+            sp = np.exp(-((xs - cx) ** 2 + (ys - cy) ** 2) / (r * r))
+            rgb -= sp[..., None] * np.array([30, 45, 70]) * rng.uniform(.3, .9)
     if style == 3:
-        rgb -= np.clip((ys - 180) / 22, 0, 1)[..., None] * 18
+        # The sticky band, and the bottom corner lifting off the board
+        band = (ys >= 30) & (ys < 44)
+        rgb[band] *= .97
+        curl = np.clip(((xs - 150) + (ys - 166)) / 36, 0, 1)
+        rgb += (curl ** 2 * 26)[..., None]
+        rgb -= (np.clip(1 - np.abs((xs - 150) + (ys - 166) - 34) / 3, 0, 1) * 30)[..., None]
     paste_masked(img, rgb, m)
     d = ImageDraw.Draw(img, "RGBA")
     if style in (0, 4):
-        for y in range(46, 252, 10):
-            d.line((S(8), S(y), S(192), S(y)), fill=(120, 160, 220, 150), width=int(S(.45)))
-        d.line((S(30), S(14 if style == 4 else 6), S(30), S(254)), fill=(220, 90, 90, 170), width=int(S(.5)))
+        d.line((S(8), S(30 if style == 0 else 34), S(192), S(30 if style == 0 else 34)), fill=(120, 160, 220, 110), width=int(S(.4)))
+        for y in range(44, 252, 10):
+            d.line((S(8), S(y), S(192), S(y)), fill=(110, 150, 214, 150), width=int(S(.45)))
+        d.line((S(30), S(16 if style == 4 else 5), S(30), S(255)), fill=(222, 86, 86, 170), width=int(S(.55)))
         if style == 0:
             for y in (40, 130, 220):
-                d.ellipse(box(10, y - 4, 18, y + 4), fill=(60, 60, 70, 255))
-                d.ellipse(box(10.6, y - 3.4, 17.4, y + 3.4), fill=(30, 30, 34, 255))
+                d.ellipse(box(9.6, y - 4, 17.6, y + 4), outline=(190, 190, 186, 255), width=int(S(.5)))
     elif style == 1:
-        d.rectangle(box(12, 12, 188, 248), outline=(170, 150, 110, 140), width=int(S(.5)))
-        d.line((S(20), S(36), S(180), S(36)), fill=(170, 150, 110, 160), width=int(S(.5)))
-    elif style == 3:
-        d.rectangle(box(14, 30, 186, 44), fill=(240, 220, 90, 255))
+        d.rectangle(box(11, 11, 189, 249), outline=(170, 146, 100, 150), width=int(S(.5)))
+        d.rectangle(box(13, 13, 187, 247), outline=(170, 146, 100, 90), width=int(S(.3)))
+        for cx, cy in ((13, 13), (187, 13), (13, 247), (187, 247)):
+            d.ellipse(box(cx - 2.2, cy - 2.2, cx + 2.2, cy + 2.2), outline=(170, 146, 100, 160), width=int(S(.4)))
+        d.line((S(30), S(36), S(170), S(36)), fill=(170, 146, 100, 160), width=int(S(.5)))
+        # A watermark in the middle of the sheet
+        wm = Image.new("RGBA", img.size, (0, 0, 0, 0))
+        wd = ImageDraw.Draw(wm)
+        wd.ellipse(box(70, 100, 130, 160), outline=(160, 140, 100, 26), width=int(S(2)))
+        wd.text((S(100), S(130)), "V", font=font("DejaVuSerif-Bold.ttf", 34), fill=(160, 140, 100, 22), anchor="mm")
+        img.alpha_composite(wm)
+    elif style == 5:
+        for k in range(0, 256, 5):
+            major = k % 25 == 0
+            col = (120, 170, 150, 110 if major else 55)
+            if 4 < k < 256:
+                d.line((S(4), S(k), S(196), S(k)), fill=col, width=int(S(.35 if major else .25)))
+            if 4 < k < 196:
+                d.line((S(k), S(4), S(k), S(256)), fill=col, width=int(S(.35 if major else .25)))
+    elif style == 6:
+        d.line((S(8), S(64), S(192), S(64)), fill=(220, 80, 80, 200), width=int(S(.6)))
+        for y in range(74, 184, 9):
+            d.line((S(8), S(y), S(192), S(y)), fill=(110, 150, 214, 140), width=int(S(.4)))
     finish(img, f"note_{style}")
 
 
 def main():
-    for k in range(5):
+    for k in range(NOTE_STYLES):
         note(k)
     vcr()
     cassette_face()
