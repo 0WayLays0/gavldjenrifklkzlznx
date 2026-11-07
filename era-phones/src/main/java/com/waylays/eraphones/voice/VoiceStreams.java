@@ -44,6 +44,7 @@ final class VoiceStreams {
      */
     @Nullable
     static byte[] process(VoicechatApi api, UUID speaker, @Nullable String voice, byte[] data) {
+        voice = voice == null ? null : voice + "@" + com.waylays.eraphones.horror.Voices.strength(speaker);
         Stream s = STREAMS.get(speaker);
         if (voice == null) {
             if (s != null) {
@@ -53,7 +54,8 @@ final class VoiceStreams {
             return null;
         }
         if (s == null || !s.voice.equals(voice)) {
-            VoiceFx.Chain chain = VoiceFx.chain(voice);
+            int at = voice.indexOf('@');
+            VoiceFx.Chain chain = VoiceFx.chain(voice.substring(0, at), Integer.parseInt(voice.substring(at + 1)));
             if (chain == null) {
                 return null;
             }

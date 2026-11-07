@@ -14,6 +14,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class Voices {
     private static final Map<UUID, String> VOICE = new ConcurrentHashMap<>();
     private static final Set<UUID> LISTENING = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, Integer> STRENGTH = new ConcurrentHashMap<>();
+
+    /** How strong {@code player}'s voice is put on, 10 to 100 percent (the rest their own). */
+    public static int strength(UUID player) {
+        return STRENGTH.getOrDefault(player, 100);
+    }
+
+    public static void setStrength(UUID player, int percent) {
+        STRENGTH.put(player, Math.max(10, Math.min(100, percent)));
+    }
 
     private Voices() {}
 

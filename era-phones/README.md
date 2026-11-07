@@ -88,7 +88,8 @@ changée passe aussi par `/voir` et par le téléphone. Avec une version plus an
 | Commande | Effet |
 | --- | --- |
 | `/voix` | La liste des voix et la tienne. |
-| `/voix <voix> [joueurs]` | Prendre une voix (ou la donner à des joueurs : un personnage possédé…) : `masque` (très grave, rauque, métallique, façon appel masqué), `demon` (deux voix très basses à la fois, déchirées), `clown` (plus aiguë, qui ondule et tremble), `enfant`, `grave`, `radio` (vieille radio qui grésille), `egouts` (un écho qui vient de loin), `spectre` (un souffle de murmure). |
+| `/voix <voix> [joueurs]` | Prendre une voix (ou la donner à des joueurs : un personnage possédé…). La hauteur et le timbre (la forme de la bouche et de la gorge) sont changés séparément : une voix grave garde une vraie bouche au lieu de sonner « ralentie ». `masque` (voix d'homme beaucoup trop grave, rauque, métallique, façon appel masqué), `demon` (deux gorges énormes, salle de pierre), `clown` (aiguë et chantante, un grognement caché dessous), `possede` (tes mots chantés par un accord sombre, vocodeur), `legion` (plusieurs voix à la fois), `robot` (une note bourdonnante qui parle), `geant`, `grave`, `enfant`, `spectre` (un souffle sans gorge), `egouts` (tunnel de béton), `radio`, `glitch` (voix qui se dérègle : saute, bégaie, se désagrège). |
+| `/voix dose <10-100> [joueurs]` | Dose de l'effet en pourcentage (le reste est la vraie voix). 100 par défaut. |
 | `/voix normale [joueurs]` | Retrouver sa voix. |
 | `/voix ecoute` | S'entendre soi-même avec la voix changée, pour l'essayer (encore une fois pour arrêter). |
 

@@ -75,6 +75,9 @@ public final class HorrorCommands {
         d.register(Commands.literal("voix").requires(s -> s.hasPermission(RpConfig.get(RpConfig.VOICE_PERMISSION, 2)))
                 .executes(HorrorCommands::voices)
                 .then(Commands.literal("ecoute").executes(HorrorCommands::listen))
+                .then(Commands.literal("dose").then(Commands.argument("pourcent", IntegerArgumentType.integer(10, 100))
+                        .executes(c -> dose(c, List.of(c.getSource().getPlayerOrException())))
+                        .then(Commands.argument("joueurs", EntityArgument.players()).executes(c -> dose(c, EntityArgument.getPlayers(c, "joueurs"))))))
                 .then(Commands.argument("voix", StringArgumentType.word())
                         .suggests((c, b) -> {
                             List<String> all = new ArrayList<>(List.of(VoiceFx.VOICES));
@@ -178,6 +181,15 @@ public final class HorrorCommands {
             Voices.set(p.getUUID(), voice);
             c.getSource().sendSuccess(() -> Component.translatable(voice == null ? "rp.eraphones.voice.normal" : "rp.eraphones.voice.set",
                     p.getDisplayName(), voiceName(voice)).withStyle(ChatFormatting.GRAY), false);
+        }
+        return targets.size();
+    }
+
+    private static int dose(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> targets) {
+        int percent = IntegerArgumentType.getInteger(c, "pourcent");
+        for (ServerPlayer p : targets) {
+            Voices.setStrength(p.getUUID(), percent);
+            c.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.voice.dose_set", p.getDisplayName(), percent).withStyle(ChatFormatting.GRAY), false);
         }
         return targets.size();
     }

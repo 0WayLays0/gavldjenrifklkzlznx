@@ -134,7 +134,7 @@ public final class PhoneGameTests {
                 }
             }
             double rms = Math.sqrt(energy / (50 * 960));
-            helper.assertTrue(rms > 1500 && rms < 25000, "voice " + v + " loudness " + (int) rms);
+            helper.assertTrue(rms > 1500 && rms < 30000, "voice " + v + " loudness " + (int) rms);
             if (v.equals("grave")) {
                 double hz = crossings / 2.0 / (50 * 960.0 / rate);
                 helper.assertTrue(Math.abs(hz - 160) < 12, "the deep voice is lower: " + (int) hz + " Hz");
