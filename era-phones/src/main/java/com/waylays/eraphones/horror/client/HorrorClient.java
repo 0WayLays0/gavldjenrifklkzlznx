@@ -40,12 +40,16 @@ import java.util.Random;
 
 /**
  * What a game master puts before one player's senses, and theirs alone: words whispered in their head, letter by
- * letter; fog closing in; the lights flickering and going out; blood running down; a face rushing at them; the ground
+ * letter; fog closing in; the lights flickering and going out; a little blood at the edges of their sight; the ground
  * shaking; a red balloon floating in the world, bobbing on its string, until it bursts.
  */
 @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT)
 public final class HorrorClient {
-    private static final ResourceLocation FACE = EraPhones.id("textures/gui/horror/face.png");
+    private static final ResourceLocation BLOOD_EDGE = EraPhones.id("textures/gui/horror/blood_edge.png");
+    private static final ResourceLocation BLOOD_DRIP = EraPhones.id("textures/gui/horror/blood_drip.png");
+    private static final ResourceLocation[] BLOOD_SPLATS = {EraPhones.id("textures/gui/horror/blood_splat_0.png"),
+            EraPhones.id("textures/gui/horror/blood_splat_1.png"), EraPhones.id("textures/gui/horror/blood_splat_2.png"),
+            EraPhones.id("textures/gui/horror/blood_splat_3.png")};
     private static final ResourceLocation BALLOON = EraPhones.id("textures/horror/balloon.png");
 
     private static final class Active {
@@ -117,10 +121,6 @@ public final class HorrorClient {
                 play("block.lever.click", .5f, .8f);
             }
             case "sang" -> play("entity.warden.heartbeat", 1, 1);
-            case "sursaut" -> {
-                play("entity.elder_guardian.curse", .9f, 1);
-                play("entity.ghast.scream", .6f, .9f);
-            }
             case "tremblement" -> play("entity.warden.emerge", .6f, .9f);
             default -> {
             }
@@ -184,9 +184,6 @@ public final class HorrorClient {
         if ((a = active("murmure")) != null) {
             whisper(g, a, w, h);
         }
-        if ((a = active("sursaut")) != null) {
-            face(g, a, w, h);
-        }
     }
 
     /** A dark frame round the screen, {@code strength} its darkest at the very edge. */
@@ -206,27 +203,54 @@ public final class HorrorClient {
         }
     }
 
-    /** Blood running down from the top of the screen, a red edge beating like a heart. */
+    /** Draws {@code tex} at {@code alpha}, a part of it ({@code v0}, {@code vh} of a {@code tw} x {@code th} texture) stretched to the box. */
+    private static void sprite(GuiGraphics g, ResourceLocation tex, float x, float y, float w, float h, float v0, float vh, int tw, int th, float alpha) {
+        if (alpha <= .01f || w < 1 || h < 1) {
+            return;
+        }
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShaderColor(1, 1, 1, clamp(alpha));
+        g.pose().pushPose();
+        g.pose().translate(x, y, 0);
+        g.pose().scale(w / 64f, h / 64f, 1);
+        g.blit(tex, 0, 0, 64, 64, 0, v0, tw, (int) Math.max(1, vh), tw, th);
+        g.pose().popPose();
+        RenderSystem.setShaderColor(1, 1, 1, 1);
+        RenderSystem.disableBlend();
+    }
+
+    /**
+     * Blood, sparingly: a dark red veil at the edges beating like a heart, a few slow runs from the top of the sight,
+     * swelling into a drop as they go, and one spatter in a corner.
+     */
     private static void blood(GuiGraphics g, Active a, int w, int h) {
-        float f = a.fade(.3f, 1.5f), t = a.age();
-        float beat = (float) Math.pow(Math.max(0, Math.sin(t * Math.PI * 2 * 1.1)), 6);
-        vignette(g, w, h, 0x7A0000, f * (.7f + .3f * beat));
-        g.fillGradient(0, 0, w, (int) (h * .07f), ((int) (200 * f) << 24) | 0x5A0000, 0x005A0000);
+        float f = a.fade(.8f, 2f), t = a.age();
+        float beat = (float) Math.pow(Math.max(0, Math.sin(t * Math.PI * 2 * 1.05)), 8);
+        sprite(g, BLOOD_EDGE, 0, 0, w, h, 0, 512, 512, 512, f * (.42f + .18f * beat));
         Random r = new Random(a.seed);
-        int count = 10 + w / 40;
-        for (int i = 0; i < count; i++) {
-            float x = r.nextFloat() * w, width = 1.5f + r.nextFloat() * 4, speed = 12 + r.nextFloat() * 45, delay = r.nextFloat() * 2.5f;
-            float len = Math.min(h * (.35f + r.nextFloat() * .6f), Math.max(0, t - delay) * speed);
-            if (len <= 0) {
+        // One spatter, partly off a corner, coming in with a little start
+        float pop = easeOut(clamp(t / .35f));
+        float size = h * .34f * (.85f + .15f * pop);
+        boolean left = r.nextBoolean(), top = r.nextBoolean();
+        float sx = left ? -size * .3f : w - size * .7f, sy = top ? -size * .3f : h - size * .7f;
+        sprite(g, BLOOD_SPLATS[r.nextInt(BLOOD_SPLATS.length)], sx, sy, size, size, 0, 256, 256, 256, f * .85f * pop);
+        // A few runs from the top, slowing as they go
+        int runs = 5;
+        float unit = Math.max(1, h / 240f);
+        for (int i = 0; i < runs; i++) {
+            float x = w * (.08f + .84f * (i + r.nextFloat() * .7f) / runs);
+            float width = (4 + r.nextFloat() * 4) * unit;
+            float delay = r.nextFloat() * 1.5f, speed = .12f + r.nextFloat() * .1f;
+            float reach = h * (.18f + r.nextFloat() * .32f);
+            float grown = clamp((t - delay) * speed);
+            float len = reach * (1 - (1 - grown) * (1 - grown));
+            if (len < 2) {
                 continue;
             }
-            int alpha = (int) (215 * f);
-            int dark = alpha << 24 | 0x4A0000, bright = alpha << 24 | 0x8A0A0A;
-            g.fillGradient((int) x, 0, (int) (x + width), (int) len, dark, bright);
-            // The drop at its end, a little wider
-            int dy = (int) len;
-            g.fill((int) (x - .6f), dy - 2, (int) (x + width + .6f), dy + 1, bright);
-            g.fill((int) x, dy + 1, (int) (x + width), dy + 2, bright);
+            // The run's own end (its drop) shows at the bottom; the top of the texture stretched behind it
+            float shown = Math.min(512, 512 * len / (h * .55f));
+            sprite(g, BLOOD_DRIP, x, 0, width, len, 512 - shown, shown, 32, 512, f * .95f);
         }
     }
 
@@ -307,48 +331,6 @@ public final class HorrorClient {
         return lines;
     }
 
-    /** A face rushing at the screen, shaking, the screen flashing red; words under it if there are any. */
-    private static void face(GuiGraphics g, Active a, int w, int h) {
-        float t = a.age(), left = a.left();
-        float f = clamp(left / .3f);
-        if (f <= 0) {
-            return;
-        }
-        float zoom = t < .12f ? 1.7f - t / .12f * .6f : 1.1f + (t - .12f) * .05f;
-        Random r = new Random(System.currentTimeMillis() / 40);
-        float shake = 7 * f;
-        g.fill(0, 0, w, h, (int) (235 * f) << 24);
-        int size = (int) (h * .92f * zoom);
-        float x = (w - size) / 2f + (r.nextFloat() - .5f) * shake * 2, y = (h - size) / 2f + (r.nextFloat() - .5f) * shake * 2;
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        boolean flash = (System.currentTimeMillis() / 60) % 5 == 0;
-        RenderSystem.setShaderColor(1, flash ? .55f : 1, flash ? .55f : 1, f);
-        g.pose().pushPose();
-        g.pose().translate(x, y, 0);
-        g.pose().scale(size / 256f, size / 256f, 1);
-        g.blit(FACE, 0, 0, 0, 0, 256, 256, 256, 256);
-        g.pose().popPose();
-        RenderSystem.setShaderColor(1, 1, 1, 1);
-        RenderSystem.disableBlend();
-        if (t < .1f) {
-            g.fill(0, 0, w, h, (int) (200 * (1 - t / .1f)) << 24 | 0xFFFFFF);
-        }
-        if (!a.text.isEmpty()) {
-            Font font = Minecraft.getInstance().font;
-            float scale = Math.max(1.5f, Math.min(3, w / 220f));
-            String s = a.text.toUpperCase();
-            float tx = (w - font.width(s) * scale) / 2 + (r.nextFloat() - .5f) * shake, ty = h * .82f;
-            g.pose().pushPose();
-            g.pose().translate(tx, ty, 0);
-            g.pose().scale(scale, scale, 1);
-            int alpha = (int) (255 * f);
-            g.drawString(font, s, 1, 1, alpha << 24, false);
-            g.drawString(font, s, 0, 0, alpha << 24 | 0xE01010, false);
-            g.pose().popPose();
-        }
-    }
-
     // ---------------------------------------------------------------- the world
 
     @SubscribeEvent
@@ -386,10 +368,6 @@ public final class HorrorClient {
         if (a != null) {
             strength = Math.max(strength, 1.6f * a.fade(.8f, 1.5f));
         }
-        a = active("sursaut");
-        if (a != null) {
-            strength = Math.max(strength, 3 * clamp(a.left() / .3f));
-        }
         if (strength <= 0) {
             return;
         }
@@ -397,6 +375,10 @@ public final class HorrorClient {
         event.setYaw(event.getYaw() + (float) (Math.sin(t * 37) + Math.sin(t * 23.3)) * .5f * strength);
         event.setPitch(event.getPitch() + (float) (Math.sin(t * 41) + Math.sin(t * 19.7)) * .5f * strength);
         event.setRoll(event.getRoll() + (float) Math.sin(t * 29) * .6f * strength);
+    }
+
+    private static float easeOut(float t) {
+        return 1 - (1 - t) * (1 - t) * (1 - t);
     }
 
     private static float lerp(float a, float b, float t) {

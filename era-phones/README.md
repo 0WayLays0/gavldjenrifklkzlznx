@@ -1,10 +1,41 @@
-# Téléphones d'Époque & RP
+# Époque RP
 
-Mod NeoForge 1.21.1 **séparé** (son propre `.jar`, sans Arcanes Oubliés ni Iron's Spells) pour un serveur de jeu de
-rôle : quatre téléphones d'époque et les commandes de RP. Tout reste dans le personnage : on ne voit jamais un pseudo
+Mod NeoForge 1.21.1 **séparé** (son propre `.jar`, `epoque-rp-<version>.jar`, sans Arcanes Oubliés ni Iron's Spells)
+pour un serveur de jeu de rôle : téléphones d'époque, objets du quotidien des années 80 (lampe torche, talkie-walkie,
+poste de radio, magnétoscope et cassettes, argent, carte d'identité, journal), commandes de RP et outils des maîtres
+du jeu. L'identifiant interne du mod reste `eraphones` : les objets déjà dans les mondes sont conservés. Tout reste dans le personnage : on ne voit jamais un pseudo
 de compte, seulement des numéros, les noms enregistrés dans les répertoires et les noms des personnages.
 
 Contenu original (noms, modèles, sonneries, icônes) : aucune marque réelle ; l'opérateur fictif s'appelle **VOXA**.
+
+## Le menu créatif
+
+Quatre onglets : **Époque RP · Téléphones**, **· Lumière & radio** (lampe torche, piles, talkie-walkie, poste de
+radio), **· Son & image** (magnétoscope, cassette), **· Vie quotidienne** (pièces et billets, carte d'identité,
+journal).
+
+## Les objets des années 80
+
+| Objet | Ce qu'il fait |
+| --- | --- |
+| Lampe torche | Clic droit pour l'allumer ou l'éteindre. Tenue (dans n'importe quelle main), elle éclaire là où elle pointe, jusqu'à 24 blocs (plus fort de près), et un peu autour de soi. Un jeu de piles dure 20 minutes. |
+| Piles | Clic droit avec une lampe torche ou un talkie-walkie dans l'autre main : piles neuves. |
+| Talkie-walkie | Clic droit : sa façade (marche/arrêt, canal 1 à 16, piles). Avec Simple Voice Chat, en le tenant en main et en parlant, ta voix sort (avec un son de radio) des talkies allumés sur le même canal, où qu'ils soient dans l'inventaire, et ceux qui sont autour l'entendent aussi. Un « kssht » au début de chaque message. |
+| Poste de radio (bloc) | Clic droit : allumer, régler la fréquence (88 à 108 FM, cadran à faire glisser, molette ou boutons) et le volume. Il grésille entre les stations ; l'œil magique s'allume quand une station passe. Une station, c'est un maître du jeu qui fait `/radio emettre 100.3` : sa voix sort des radios réglées dessus (`/radio arreter` pour finir). |
+| Magnétoscope (bloc) + cassette | Clic droit sur le magnétoscope avec une cassette en main pour l'insérer (ou bouton « Insérer » sur sa façade). Touches : ⏏ éjecter, ◀◀ rembobiner, ▶ lecture, ❚❚ pause, ■ stop, ▶▶ avance rapide ; compteur de bande. Le son sort du magnétoscope (16 blocs autour, Simple Voice Chat requis). Comme une vraie bande : pour revenir au début il faut rembobiner, et on entend tout défiler à l'envers ; la cassette éjectée garde l'endroit où en était la bande. |
+| Pièces et billets | 10 et 25 cents, billets de 1, 5, 10, 20, 50 et 100 dollars (dessins originaux). |
+| Carte d'identité | Vierge, elle est établie au nom de la première personne qui l'utilise (nom RP, signalement de `/desc`, numéro). Clic droit pour la regarder (avec la photo du visage du personnage), clic droit sur quelqu'un pour la lui montrer. |
+| Journal | Imprimé par les maîtres du jeu ; clic droit pour le lire. |
+
+### Commandes des maîtres du jeu pour ces objets
+
+| Commande | Effet |
+| --- | --- |
+| `/cassette liste` | Les fichiers MP3 disponibles (à mettre dans `config/eraphones/cassettes/` du serveur). |
+| `/cassette graver <fichier> <titre>` | Donne une cassette de ce fichier, avec ce titre sur l'étiquette. Elle ne peut plus être modifiée. |
+| `/radio emettre <fréquence>` · `/radio arreter` | Passer à l'antenne sur une fréquence (ta voix sort des radios réglées dessus), ou s'arrêter. |
+| `/identite delivrer <joueur>` | Donne à ce joueur une carte d'identité établie à son nom. |
+| `/journal imprimer <exemplaires> Titre \| texte` | Imprime le journal (jusqu'à 64 exemplaires). |
 
 ## Les téléphones
 
@@ -71,8 +102,7 @@ cri), permission de `/voir`, noms au-dessus des têtes, bulles au-dessus des tê
 | `/horreur murmure <joueurs> <texte>` | Des mots chuchotés dans leur tête : ils s'écrivent lettre par lettre au milieu de l'écran, en rouge, en tremblant. |
 | `/horreur brouillard <joueurs> [secondes]` | Un brouillard épais se referme autour d'eux (60 s par défaut). |
 | `/horreur coupure <joueurs> [secondes]` | La lumière vacille puis s'éteint ; un éclair de lumière de temps en temps ; elle revient en clignotant. |
-| `/horreur sang <joueurs> [secondes]` | Du sang coule du haut de l'écran, les bords rougissent au rythme d'un cœur. |
-| `/horreur sursaut <joueurs> [texte]` | Un visage surgit en plein écran avec un cri, l'image tremble (texte facultatif en dessous). |
+| `/horreur sang <joueurs> [secondes]` | Un peu de sang au bord de la vue : un voile rouge qui bat comme un cœur, quelques coulures lentes, une éclaboussure dans un coin. |
 | `/horreur ballon <joueurs> [ici]` | Un ballon rouge flotte devant eux (ou là où se tient le maître du jeu), se balance au bout de sa ficelle pendant 20 s, s'envole puis éclate. Les autres joueurs ne le voient pas. |
 | `/horreur flotter <joueurs> [secondes]` | Ils s'élèvent lentement et flottent (6 s par défaut), puis redescendent doucement, sans dégâts. |
 | `/horreur vertige <joueurs> [secondes]` | Le monde tangue autour d'eux. |

@@ -208,11 +208,10 @@ public final class SmokeTest {
         STEPS.add(() -> {
         });
         STEPS.add(() -> shot(mc, "horror_whisper"));
-        horror(mc, "horror_blood", "horreur sang @s 8", 2);
+        horror(mc, "horror_blood", "horreur sang @s 12", 4);
         horror(mc, "horror_blackout", "horreur coupure @s 8", 2);
         horror(mc, "horror_fog", "horreur brouillard @s 30", 4);
         horror(mc, "horror_balloon", "horreur ballon @s", 2);
-        horror(mc, "horror_face", "horreur sursaut @s Tu flotteras", 1);
         STEPS.add(() -> command(mc, "horreur stop @s"));
         String[] names = {"smartphone", "clapet", "gsm", "radiotelephone"};
         // Held: first person, then from the front
@@ -278,7 +277,105 @@ public final class SmokeTest {
             mc.setScreen(null);
             log("phones: four opened and gone through");
         });
+        gear(mc);
     }
+
+    /** The things: a lit torch in hand, the walkie-talkie's face, a radio and a video recorder set down and opened, an
+     * identity card, the newspaper. */
+    private static void gear(Minecraft mc) {
+        IntegratedServer server = mc.getSingleplayerServer();
+        java.util.UUID id = mc.player.getUUID();
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            ItemStack torch = new ItemStack(com.waylays.eraphones.registry.GearRegistry.FLASHLIGHT.get());
+            com.waylays.eraphones.gear.Gear.setOn(torch, true);
+            p.getInventory().setItem(5, torch);
+            ItemStack walkie = new ItemStack(com.waylays.eraphones.registry.GearRegistry.WALKIE.get());
+            com.waylays.eraphones.gear.Gear.setOn(walkie, true);
+            p.getInventory().setItem(6, walkie);
+            p.getInventory().setItem(7, new ItemStack(com.waylays.eraphones.registry.GearRegistry.ID_CARD.get()));
+            ItemStack paper = new ItemStack(com.waylays.eraphones.registry.GearRegistry.NEWSPAPER.get());
+            paper.set(com.waylays.eraphones.registry.GearRegistry.NEWS_TITLE.get(), "Le cirque s'installe au parc");
+            paper.set(com.waylays.eraphones.registry.GearRegistry.NEWS_TEXT.get(), "Les roulottes sont arrivées cette nuit. Personne ne les a vues "
+                    + "entrer en ville, mais le chapiteau rouge et blanc se dresse déjà près de l'ancienne usine. Les enfants sont priés de rentrer "
+                    + "avant la tombée de la nuit.");
+            p.getInventory().setItem(8, paper);
+            // A table in front: the radio and the video recorder on it, facing the player
+            net.minecraft.core.BlockPos base = p.blockPosition().relative(p.getDirection(), 2);
+            net.minecraft.core.Direction face = p.getDirection().getOpposite();
+            net.minecraft.core.BlockPos side = base.relative(p.getDirection().getClockWise());
+            p.serverLevel().setBlockAndUpdate(base, com.waylays.eraphones.registry.GearRegistry.RADIO.get().defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, face));
+            p.serverLevel().setBlockAndUpdate(side, com.waylays.eraphones.registry.GearRegistry.VCR.get().defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, face));
+            if (p.serverLevel().getBlockEntity(base) instanceof com.waylays.eraphones.gear.block.RadioBlockEntity r) {
+                r.set(true, 1003, 6);
+            }
+            p.serverLevel().setDayTime(18000);
+            radioPos = base;
+            vcrPos = side;
+        }));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            select(mc, 5);
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "gear_torch_night"));
+        STEPS.add(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT));
+        STEPS.add(() -> shot(mc, "gear_torch_front"));
+        STEPS.add(() -> {
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            select(mc, 6);
+        });
+        STEPS.add(() -> shot(mc, "gear_walkie_held"));
+        STEPS.add(() -> com.waylays.eraphones.gear.client.GearClient.openWalkie(net.minecraft.world.InteractionHand.MAIN_HAND));
+        STEPS.add(() -> shot(mc, "gear_walkie"));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            command(mc, "time set noon");
+            mc.player.setXRot(35);
+        });
+        STEPS.add(() -> shot(mc, "gear_blocks"));
+        STEPS.add(() -> {
+            if (radioPos != null) {
+                com.waylays.eraphones.gear.client.GearClient.openRadio(radioPos);
+            }
+        });
+        STEPS.add(() -> shot(mc, "gear_radio"));
+        STEPS.add(() -> {
+            if (vcrPos != null) {
+                com.waylays.eraphones.gear.client.GearClient.openVcr(vcrPos);
+            }
+        });
+        STEPS.add(() -> shot(mc, "gear_vcr"));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            select(mc, 7);
+            com.waylays.eraphones.gear.client.GearClient.card(new com.waylays.eraphones.gear.GearNet.Card(mc.player.getUUID().toString(),
+                    "Bill Denbrough", "412-63-1980", "Grand, mince, cheveux roux, bégaie un peu quand il a peur.", ""));
+        });
+        STEPS.add(() -> shot(mc, "gear_card"));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            select(mc, 8);
+            ItemStack paper = mc.player.getMainHandItem();
+            com.waylays.eraphones.gear.client.GearClient.openNewspaper(
+                    paper.getOrDefault(com.waylays.eraphones.registry.GearRegistry.NEWS_TITLE.get(), ""),
+                    paper.getOrDefault(com.waylays.eraphones.registry.GearRegistry.NEWS_TEXT.get(), ""));
+        });
+        STEPS.add(() -> shot(mc, "gear_newspaper"));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            log("gear: torch, walkie-talkie, radio, video recorder, card and newspaper shown");
+        });
+    }
+
+    private static net.minecraft.core.BlockPos radioPos, vcrPos;
 
     private static void open(Minecraft mc, int slot) {
         mc.setScreen(null);

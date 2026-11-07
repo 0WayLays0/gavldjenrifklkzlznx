@@ -15,7 +15,7 @@ public final class HorrorNet {
     }
 
     /**
-     * The effect {@code kind} ("murmure", "brouillard", "coupure", "sang", "sursaut", "ballon", "tremblement", or "stop"
+     * The effect {@code kind} ("murmure", "brouillard", "coupure", "sang", "ballon", "tremblement", or "stop"
      * to end them all) for {@code ticks}, with its words if it has any, at a place if it has one.
      */
     public record Effect(String kind, int ticks, String text, double x, double y, double z) implements CustomPacketPayload {

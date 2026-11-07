@@ -1,0 +1,18 @@
+{
+  "radio_static": {
+    "sounds": [
+      {
+        "name": "eraphones:radio_static"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.radio_static"
+  },
+  "talkie_squelch": {
+    "sounds": [
+      {
+        "name": "eraphones:talkie_squelch"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.talkie_squelch"
+  }
+}

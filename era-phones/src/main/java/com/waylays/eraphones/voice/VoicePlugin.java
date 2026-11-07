@@ -31,6 +31,19 @@ public class VoicePlugin implements VoicechatPlugin {
     @Override
     public void registerEvents(EventRegistration registration) {
         registration.registerEvent(MicrophonePacketEvent.class, this::onMicrophone);
+        registration.registerEvent(de.maxhenkel.voicechat.api.events.VoicechatServerStartedEvent.class, e -> {
+            gear = new GearVoice(e.getVoicechat());
+            com.waylays.eraphones.gear.Audio.set(gear);
+        });
+        registration.registerEvent(de.maxhenkel.voicechat.api.events.VoicechatServerStoppedEvent.class, e -> {
+            gear = null;
+            com.waylays.eraphones.gear.Audio.set(null);
+        });
+        registration.registerEvent(de.maxhenkel.voicechat.api.events.PlayerDisconnectedEvent.class, e -> {
+            if (gear != null) {
+                gear.forget(e.getPlayerUuid());
+            }
+        });
     }
 
     private void onMicrophone(MicrophonePacketEvent event) {
@@ -40,6 +53,16 @@ public class VoicePlugin implements VoicechatPlugin {
         }
         VoicechatServerApi api = event.getVoicechat();
         changeVoice(event, sender, speaker, api);
+        if (gear != null) {
+            try {
+                gear.transmit(speaker, event.getPacket().getOpusEncodedData());
+            } catch (Throwable t) {
+                if (!gearWarned) {
+                    gearWarned = true;
+                    EraPhones.LOGGER.warn("Walkie-talkie or radio voice failed: {}", t.toString());
+                }
+            }
+        }
         if (RpVisibility.hidden(speaker)) {
             // Heard only by those who see them
             event.cancel();
@@ -85,7 +108,8 @@ public class VoicePlugin implements VoicechatPlugin {
         }
     }
 
-    private boolean warned;
+    private boolean warned, gearWarned;
+    private volatile GearVoice gear;
 
     private static boolean phoneVoice() {
         try {

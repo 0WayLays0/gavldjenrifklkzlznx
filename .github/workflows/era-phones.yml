@@ -58,8 +58,8 @@ jobs:
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
-          name: era-phones-jar
-          path: era-phones/build/libs/era-phones-*.jar
+          name: epoque-rp-jar
+          path: era-phones/build/libs/epoque-rp-*.jar
           if-no-files-found: error
 
       - name: Report

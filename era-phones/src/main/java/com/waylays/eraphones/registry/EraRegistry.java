@@ -45,7 +45,7 @@ public final class EraRegistry {
     public static final DeferredHolder<Item, Item> CHARGER = ITEMS.register("chargeur", () -> new ChargerItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register("phones", () -> CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.eraphones"))
+            .title(Component.translatable("itemGroup.eraphones.telephones"))
             .icon(() -> new ItemStack(PHONES.get(Era.SMART).get()))
             .displayItems((params, out) -> {
                 for (Era era : Era.values()) {

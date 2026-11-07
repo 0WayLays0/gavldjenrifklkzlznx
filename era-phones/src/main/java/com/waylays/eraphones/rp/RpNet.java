@@ -19,6 +19,7 @@ public final class RpNet {
         r.playToClient(Bubble.TYPE, Bubble.CODEC, (p, c) -> com.waylays.eraphones.rp.client.RpClient.bubble(p));
         r.playToClient(Nameplates.TYPE, Nameplates.CODEC, (p, c) -> com.waylays.eraphones.rp.client.RpClient.nameplates(p));
         com.waylays.eraphones.horror.HorrorNet.register(r);
+        com.waylays.eraphones.gear.GearNet.register(r);
     }
 
     private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> payload(String name) {

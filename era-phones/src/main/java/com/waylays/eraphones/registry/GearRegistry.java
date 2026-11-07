@@ -1,0 +1,153 @@
+package com.waylays.eraphones.registry;
+
+import com.mojang.serialization.Codec;
+import com.waylays.eraphones.EraPhones;
+import com.waylays.eraphones.gear.BatteryItem;
+import com.waylays.eraphones.gear.CassetteItem;
+import com.waylays.eraphones.gear.FlashlightItem;
+import com.waylays.eraphones.gear.IdCardItem;
+import com.waylays.eraphones.gear.NewspaperItem;
+import com.waylays.eraphones.gear.WalkieItem;
+import com.waylays.eraphones.gear.block.RadioBlock;
+import com.waylays.eraphones.gear.block.RadioBlockEntity;
+import com.waylays.eraphones.gear.block.VcrBlock;
+import com.waylays.eraphones.gear.block.VcrBlockEntity;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * The things of the role play besides the phones: a torch and its batteries, a walkie-talkie, a table radio, a video
+ * recorder and its cassettes, money, an identity card, a newspaper; what they carry (power, channel, the tape, the
+ * card's holder, the paper's article); their sounds; and the creative tabs, one per kind of thing.
+ */
+public final class GearRegistry {
+    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(EraPhones.MODID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, EraPhones.MODID);
+    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, EraPhones.MODID);
+
+    private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> component(String name, Codec<T> codec,
+            net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf, T> stream) {
+        return EraRegistry.COMPONENTS.register(name, () -> DataComponentType.<T>builder().persistent(codec).networkSynchronized(stream).build());
+    }
+
+    private static DeferredHolder<DataComponentType<?>, DataComponentType<String>> text(String name) {
+        return component(name, Codec.STRING, ByteBufCodecs.STRING_UTF8);
+    }
+
+    /** Whether a torch or a walkie-talkie is switched on. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> POWER = component("power", Codec.BOOL, ByteBufCodecs.BOOL);
+    /** A walkie-talkie's channel, 1 to 16. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CHANNEL = component("channel", Codec.INT, ByteBufCodecs.VAR_INT);
+    /** A cassette's recording (a file the game masters put on the server), its label, how far the tape is wound (samples). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> TAPE = text("tape");
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> TAPE_LABEL = text("tape_label");
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> TAPE_POS = component("tape_pos", Codec.LONG, ByteBufCodecs.VAR_LONG);
+    /** An identity card's holder (their account, their character's name), its number, what it says of them. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_OWNER = text("card_owner");
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_NAME = text("card_name");
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_NUMBER = text("card_number");
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_DESC = text("card_desc");
+    /** A newspaper's headline and article. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NEWS_TITLE = text("news_title");
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NEWS_TEXT = text("news_text");
+
+    public static final DeferredHolder<SoundEvent, SoundEvent> RADIO_STATIC = sound("radio_static");
+    public static final DeferredHolder<SoundEvent, SoundEvent> TALKIE_SQUELCH = sound("talkie_squelch");
+
+    private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
+        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(EraPhones.id(name)));
+    }
+
+    public static final DeferredBlock<RadioBlock> RADIO = BLOCKS.register("radio",
+            () -> new RadioBlock(BlockBehaviour.Properties.of().strength(1.2f).sound(SoundType.WOOD).noOcclusion()));
+    public static final DeferredBlock<VcrBlock> VCR = BLOCKS.register("magnetoscope",
+            () -> new VcrBlock(BlockBehaviour.Properties.of().strength(1.2f).sound(SoundType.METAL).noOcclusion()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RadioBlockEntity>> RADIO_BE = BLOCK_ENTITIES.register("radio",
+            () -> BlockEntityType.Builder.of(RadioBlockEntity::new, RADIO.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<VcrBlockEntity>> VCR_BE = BLOCK_ENTITIES.register("magnetoscope",
+            () -> BlockEntityType.Builder.of(VcrBlockEntity::new, VCR.get()).build(null));
+
+    public static final DeferredHolder<Item, Item> FLASHLIGHT = EraRegistry.ITEMS.register("lampe_torche",
+            () -> new FlashlightItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> BATTERIES = EraRegistry.ITEMS.register("piles", () -> new BatteryItem(new Item.Properties().stacksTo(16)));
+    public static final DeferredHolder<Item, Item> WALKIE = EraRegistry.ITEMS.register("talkie_walkie",
+            () -> new WalkieItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
+    public static final DeferredHolder<Item, Item> RADIO_ITEM = EraRegistry.ITEMS.register("radio", () -> new BlockItem(RADIO.get(), new Item.Properties()));
+    public static final DeferredHolder<Item, Item> VCR_ITEM = EraRegistry.ITEMS.register("magnetoscope", () -> new BlockItem(VCR.get(), new Item.Properties()));
+    public static final DeferredHolder<Item, Item> CASSETTE = EraRegistry.ITEMS.register("cassette", () -> new CassetteItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> ID_CARD = EraRegistry.ITEMS.register("carte_identite", () -> new IdCardItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> NEWSPAPER = EraRegistry.ITEMS.register("journal_papier", () -> new NewspaperItem(new Item.Properties().stacksTo(16)));
+
+    /** The money: dollar bills and coins, by face value in cents. */
+    public static final int[] MONEY_CENTS = {10, 25, 100, 500, 1000, 2000, 5000, 10000};
+    public static final List<DeferredHolder<Item, Item>> MONEY = new ArrayList<>();
+
+    static {
+        for (int cents : MONEY_CENTS) {
+            MONEY.add(EraRegistry.ITEMS.register(moneyId(cents), () -> new Item(new Item.Properties().stacksTo(64))));
+        }
+    }
+
+    public static String moneyId(int cents) {
+        return cents < 100 ? "piece_" + cents + "c" : "billet_" + cents / 100;
+    }
+
+    // ---------------------------------------------------------------- the creative tabs, one per kind of thing
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB_LIGHT = EraRegistry.TABS.register("lumiere_radio", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.eraphones.lumiere_radio"))
+            .icon(() -> new ItemStack(FLASHLIGHT.get()))
+            .withTabsBefore(EraRegistry.TAB.getId())
+            .displayItems((p, out) -> {
+                out.accept(FLASHLIGHT.get());
+                out.accept(BATTERIES.get());
+                out.accept(WALKIE.get());
+                out.accept(RADIO_ITEM.get());
+            }).build());
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB_TAPE = EraRegistry.TABS.register("son_image", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.eraphones.son_image"))
+            .icon(() -> new ItemStack(VCR_ITEM.get()))
+            .withTabsBefore(TAB_LIGHT.getId())
+            .displayItems((p, out) -> {
+                out.accept(VCR_ITEM.get());
+                out.accept(CASSETTE.get());
+            }).build());
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB_DAILY = EraRegistry.TABS.register("vie_quotidienne", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.eraphones.vie_quotidienne"))
+            .icon(() -> new ItemStack(MONEY.get(5).get()))
+            .withTabsBefore(TAB_TAPE.getId())
+            .displayItems((p, out) -> {
+                for (DeferredHolder<Item, Item> m : MONEY) {
+                    out.accept(m.get());
+                }
+                out.accept(ID_CARD.get());
+                out.accept(NEWSPAPER.get());
+            }).build());
+
+    private GearRegistry() {}
+
+    public static void register(IEventBus bus) {
+        BLOCKS.register(bus);
+        BLOCK_ENTITIES.register(bus);
+        SOUNDS.register(bus);
+    }
+}

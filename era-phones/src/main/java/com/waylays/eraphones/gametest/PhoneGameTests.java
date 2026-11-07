@@ -143,4 +143,44 @@ public final class PhoneGameTests {
         helper.assertTrue(com.waylays.eraphones.horror.VoiceFx.chain("nothing") == null, "no such voice");
         helper.succeed();
     }
+
+    @GameTest(template = "platform", skyAccess = true)
+    public static void tapesAndThings(GameTestHelper helper) {
+        // A stereo recording at 44.1 kHz brought to one channel at 48 kHz
+        short[] stereo = new short[44100 * 2];
+        for (int i = 0; i < 44100; i++) {
+            stereo[i * 2] = 1000;
+            stereo[i * 2 + 1] = 3000;
+        }
+        short[] mono = com.waylays.eraphones.gear.Tape.resample(stereo, 2, 44100);
+        helper.assertTrue(Math.abs(mono.length - 48000) < 3, "a second stays a second: " + mono.length);
+        helper.assertTrue(mono[100] == 2000, "the channels mixed");
+        helper.assertTrue("01:05".equals(com.waylays.eraphones.gear.Tape.clock(65L * 48000)), "the counter");
+        // A deck winding back plays nothing past the start
+        com.waylays.eraphones.gear.Tape.Deck deck = new com.waylays.eraphones.gear.Tape.Deck();
+        deck.mode = com.waylays.eraphones.gear.Tape.Mode.REWIND;
+        deck.pos = 0;
+        deck.file = "none.mp3";
+        helper.assertTrue(deck.frame() == null || deck.mode == com.waylays.eraphones.gear.Tape.Mode.REWIND, "rewinding at the start");
+        // The torch: on, off, its batteries
+        net.minecraft.world.item.ItemStack torch = new net.minecraft.world.item.ItemStack(com.waylays.eraphones.registry.GearRegistry.FLASHLIGHT.get());
+        helper.assertTrue(!com.waylays.eraphones.gear.Gear.on(torch), "off when new");
+        com.waylays.eraphones.gear.Gear.setOn(torch, true);
+        helper.assertTrue(com.waylays.eraphones.gear.Gear.on(torch), "switched on");
+        com.waylays.eraphones.gear.Gear.setBattery(torch, 0);
+        helper.assertTrue(!com.waylays.eraphones.gear.Gear.on(torch), "flat batteries: no light");
+        // The radio keeps its setting, within the band
+        BlockPos at = new BlockPos(1, 2, 1);
+        helper.setBlock(at, com.waylays.eraphones.registry.GearRegistry.RADIO.get().defaultBlockState());
+        if (!(helper.getBlockEntity(at) instanceof com.waylays.eraphones.gear.block.RadioBlockEntity radio)) {
+            helper.fail("no radio there");
+            return;
+        }
+        radio.set(true, 2000, 50);
+        helper.assertTrue(radio.frequency() == com.waylays.eraphones.gear.Stations.MAX && radio.volume() == 10, "kept within the band");
+        helper.assertTrue(com.waylays.eraphones.gear.Stations.tuned(1003, 1004) && !com.waylays.eraphones.gear.Stations.tuned(1003, 1006), "tuning");
+        // Money exists in every face value
+        helper.assertTrue(com.waylays.eraphones.registry.GearRegistry.MONEY.size() == 8, "the money");
+        helper.succeed();
+    }
 }

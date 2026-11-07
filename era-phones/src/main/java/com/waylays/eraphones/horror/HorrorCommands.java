@@ -21,11 +21,11 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * The game masters' commands of fear: /horreur (sounds, a whisper in the head, fog, the lights going out, blood, a face,
+ * The game masters' commands of fear: /horreur (sounds, a whisper in the head, fog, the lights going out, blood,
  * a red balloon, floating, dizziness, the ground shaking, and stop) and /voix (a changed voice, with Simple Voice Chat).
  */
 public final class HorrorCommands {
-    private static final String[] TOOLS = {"son", "murmure", "brouillard", "coupure", "sang", "sursaut", "ballon", "flotter", "vertige", "tremblement", "stop"};
+    private static final String[] TOOLS = {"son", "murmure", "brouillard", "coupure", "sang", "ballon", "flotter", "vertige", "tremblement", "stop"};
 
     private HorrorCommands() {}
 
@@ -59,10 +59,6 @@ public final class HorrorCommands {
                     HorrorService.dizzy(t, s * 20);
                     return done(c, "vertige", t);
                 }))
-                .then(Commands.literal("sursaut").then(Commands.argument("joueurs", EntityArgument.players())
-                        .executes(c -> on(c, (cc, t) -> scare(cc, t, "")))
-                        .then(Commands.argument("texte", StringArgumentType.greedyString())
-                                .executes(c -> on(c, (cc, t) -> scare(cc, t, StringArgumentType.getString(cc, "texte")))))))
                 .then(Commands.literal("ballon").then(Commands.argument("joueurs", EntityArgument.players())
                         .executes(c -> on(c, (cc, t) -> balloon(cc, t, null)))
                         .then(Commands.literal("ici").executes(c -> on(c, (cc, t) -> balloon(cc, t, cc.getSource().getPosition().add(0, 1.6, 0)))))))
@@ -107,11 +103,6 @@ public final class HorrorCommands {
     private static int show(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> t, String kind, int seconds) {
         HorrorService.show(t, kind, seconds * 20, "", null);
         return done(c, kind, t);
-    }
-
-    private static int scare(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> t, String text) {
-        HorrorService.show(t, "sursaut", 36, text, null);
-        return done(c, "sursaut", t);
     }
 
     private static int balloon(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> t, Vec3 at) {

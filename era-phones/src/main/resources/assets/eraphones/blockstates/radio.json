@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "eraphones:block/radio"
+    },
+    "facing=west": {
+      "model": "eraphones:block/radio",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "eraphones:block/radio",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "eraphones:block/radio",
+      "y": 270
+    }
+  }
+}

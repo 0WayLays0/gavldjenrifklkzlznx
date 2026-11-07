@@ -80,5 +80,6 @@ public final class RpEvents {
     public static void onCommands(RegisterCommandsEvent event) {
         RpCommands.register(event.getDispatcher());
         com.waylays.eraphones.horror.HorrorCommands.register(event.getDispatcher());
+        com.waylays.eraphones.gear.GearCommands.register(event.getDispatcher());
     }
 }

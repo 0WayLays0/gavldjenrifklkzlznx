@@ -30,7 +30,7 @@ import java.util.UUID;
 /**
  * The game masters' tools of fear. Sounds only their victims hear, placed round them (steps coming up from behind,
  * knocks, a laugh, children giggling, a music box...), played step by step over the following seconds; what is shown
- * to their senses alone (a whisper in the head, fog, the lights going out, blood, a face, a red balloon, the ground
+ * to their senses alone (a whisper in the head, fog, the lights going out, blood, a red balloon, the ground
  * shaking); and what is done to their bodies (floating up, dizziness).
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
