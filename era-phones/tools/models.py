@@ -205,10 +205,10 @@ class Model:
 
 
 HELD = {
-    "thirdperson_righthand": {"rotation": [-10, 90, 0], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
-    "thirdperson_lefthand": {"rotation": [-10, -90, 0], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
-    "firstperson_righthand": {"rotation": [0, -100, 12], "translation": [-1, 5, -1.5], "scale": [0.5, 0.5, 0.5]},
-    "firstperson_lefthand": {"rotation": [0, -80, -12], "translation": [-1, 5, -1.5], "scale": [0.5, 0.5, 0.5]},
+    "thirdperson_righthand": {"rotation": [-10, 90, 0], "translation": [0, 3, 0.5], "scale": [0.6, 0.6, 0.6]},
+    "thirdperson_lefthand": {"rotation": [-10, -90, 0], "translation": [0, 3, 0.5], "scale": [0.6, 0.6, 0.6]},
+    "firstperson_righthand": {"rotation": [0, -100, 12], "translation": [0, 4, -1], "scale": [0.34, 0.34, 0.34]},
+    "firstperson_lefthand": {"rotation": [0, -80, -12], "translation": [0, 4, -1], "scale": [0.34, 0.34, 0.34]},
     "ground": {"rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [0.45, 0.45, 0.45]},
     "head": {"rotation": [0, 180, 0], "translation": [0, 13, 7], "scale": [1, 1, 1]},
 }
@@ -418,7 +418,7 @@ def chargeur():
     m.box([7.65, 1, 7.65], [8.35, 4, 8.35], {"*": cable})
     m.box([7.65, .4, 7.65], [12.4, 1.1, 8.35], {"*": cable})
     m.box([12, .1, 7.4], [13.6, 1.4, 8.6], {"*": lambda t: metal_edge(t, (40, 40, 44), (110, 110, 116))})
-    m.write({**HELD, "firstperson_righthand": {"rotation": [0, -45, 0], "translation": [0, 4, 0], "scale": [0.6, 0.6, 0.6]},
+    m.write({**HELD, "firstperson_righthand": {"rotation": [0, -45, 0], "translation": [0, 4, 0], "scale": [0.4, 0.4, 0.4]},
              "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.5, 0.5, 0.5]}})
 
 
