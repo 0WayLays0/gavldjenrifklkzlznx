@@ -176,14 +176,23 @@ public final class CallService {
         }
     }
 
+    /** A line said into the phone: those around hear it said, the other end hears it through the phone. */
     public static void speak(ServerPlayer p, String raw) {
         Call c = of(p.getUUID());
         String text = raw.strip();
         if (c == null || !c.talking || text.isEmpty()) {
             return;
         }
-        boolean isCaller = p.getUUID().equals(c.caller);
-        UUID other = isCaller ? c.callee : c.caller;
+        com.waylays.eraphones.rp.RpService.say(p, text.length() > 256 ? text.substring(0, 256) : text);
+    }
+
+    /** Passes what {@code p} just said to the other end of their call, if they are talking on one. */
+    public static void relay(ServerPlayer p, String text) {
+        Call c = of(p.getUUID());
+        if (c == null || !c.talking) {
+            return;
+        }
+        UUID other = p.getUUID().equals(c.caller) ? c.callee : c.caller;
         PacketDistributor.sendToPlayer(p, new PhoneNet.CallLine(true, text));
         if (other != null) {
             ServerPlayer o = p.server.getPlayerList().getPlayer(other);

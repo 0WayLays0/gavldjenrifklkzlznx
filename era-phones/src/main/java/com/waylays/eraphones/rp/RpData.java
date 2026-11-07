@@ -31,6 +31,8 @@ public class RpData extends SavedData {
     final Map<UUID, Identity> identities = new HashMap<>();
     /** Players seen only by these (an empty set: by no one). */
     final Map<UUID, Set<UUID>> seenOnlyBy = new HashMap<>();
+    /** Whether the names over the heads are hidden for everyone (/pseudos cacher). */
+    boolean hideNames;
 
     public static RpData get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(new Factory<>(RpData::new, RpData::load, null), NAME);
@@ -67,6 +69,15 @@ public class RpData extends SavedData {
         setDirty();
     }
 
+    public boolean hideNames() {
+        return hideNames;
+    }
+
+    public void hideNames(boolean hide) {
+        hideNames = hide;
+        setDirty();
+    }
+
     public void show(UUID id) {
         if (seenOnlyBy.remove(id) != null) {
             setDirty();
@@ -88,6 +99,7 @@ public class RpData extends SavedData {
             }
             d.seenOnlyBy.put(UUID.fromString(k), s);
         }
+        d.hideNames = tag.getBoolean("HideNames");
         return d;
     }
 
@@ -109,6 +121,7 @@ public class RpData extends SavedData {
             hid.put(k.toString(), l);
         });
         tag.put("SeenOnlyBy", hid);
+        tag.putBoolean("HideNames", hideNames);
         return tag;
     }
 }

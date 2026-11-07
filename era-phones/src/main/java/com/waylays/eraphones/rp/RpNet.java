@@ -17,6 +17,7 @@ public final class RpNet {
     public static void register(PayloadRegistrar r) {
         r.playToClient(Names.TYPE, Names.CODEC, (p, c) -> com.waylays.eraphones.rp.client.RpClient.names(p));
         r.playToClient(Bubble.TYPE, Bubble.CODEC, (p, c) -> com.waylays.eraphones.rp.client.RpClient.bubble(p));
+        r.playToClient(Nameplates.TYPE, Nameplates.CODEC, (p, c) -> com.waylays.eraphones.rp.client.RpClient.nameplates(p));
     }
 
     private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> payload(String name) {
@@ -45,6 +46,18 @@ public final class RpNet {
 
         @Override
         public Type<Names> type() {
+            return TYPE;
+        }
+    }
+
+    /** Whether the names over the heads are hidden. */
+    public record Nameplates(boolean hidden) implements CustomPacketPayload {
+        public static final Type<Nameplates> TYPE = payload("nameplates");
+        public static final StreamCodec<FriendlyByteBuf, Nameplates> CODEC = CustomPacketPayload.codec((p, b) -> b.writeBoolean(p.hidden),
+                b -> new Nameplates(b.readBoolean()));
+
+        @Override
+        public Type<Nameplates> type() {
             return TYPE;
         }
     }

@@ -231,7 +231,8 @@ public final class SmokeTest {
         STEPS.add(() -> open(mc, 1));
         STEPS.add(() -> shot(mc, "flip_idle"));
         keys(mc, "flip_menu", "ok");
-        keys(mc, "flip_contacts", "down", "ok");
+        keys(mc, "flip_contacts", "right", "ok");
+        keys(mc, "flip_camera_menu", "end", "ok", "down");
         keys(mc, "flip_write", "end", "ok", "ok", "ok", "5", "5", "5", "0", "1", "4", "2", "ok", "4", "4", "3", "3", "5", "5", "5", "6", "6", "6");
         keys(mc, "flip_snake", "end", "ok", "down", "right", "right", "ok");
         // The GSM: standby, the menu's first entries, typing a number

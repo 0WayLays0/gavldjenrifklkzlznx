@@ -363,7 +363,9 @@ public class FlipScreen extends MenuPhone {
                     photo--;
                 } else if (id.equals("right") || id.equals("down") || id.equals("6")) {
                     photo++;
-                } else if (id.equals("back") || id.equals("end")) {
+                } else if (id.equals("end")) {
+                    return false;
+                } else if (id.equals("back")) {
                     go(MENU);
                     sel = 4;
                 } else if (id.equals("ok") && files.isEmpty()) {
@@ -381,7 +383,9 @@ public class FlipScreen extends MenuPhone {
                     } else {
                         go(NUMBER);
                     }
-                } else if (id.equals("back") || id.equals("end")) {
+                } else if (id.equals("end")) {
+                    return false;
+                } else if (id.equals("back")) {
                     go(MENU);
                     sel = 8;
                 }
@@ -396,7 +400,9 @@ public class FlipScreen extends MenuPhone {
                     PhoneSettings s = PhoneSettings.get();
                     s.theme = sel;
                     s.save();
-                } else if (id.equals("back") || id.equals("end")) {
+                } else if (id.equals("end")) {
+                    return false;
+                } else if (id.equals("back")) {
                     go(SETTINGS);
                 }
                 return true;

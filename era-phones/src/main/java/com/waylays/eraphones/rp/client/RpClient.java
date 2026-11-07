@@ -34,6 +34,8 @@ public final class RpClient {
     private static final long LIFE = 7000, FADE = 800;
     private static final Map<UUID, String> NAMES = new HashMap<>();
     private static final Map<Integer, List<Said>> BUBBLES = new HashMap<>();
+    /** The server hides the names over the heads (/pseudos cacher). */
+    private static boolean namesHidden;
 
     private record Said(String text, int color, long at) {}
 
@@ -50,6 +52,10 @@ public final class RpClient {
                 pl.refreshDisplayName();
             }
         }
+    }
+
+    public static void nameplates(RpNet.Nameplates p) {
+        namesHidden = p.hidden();
     }
 
     public static void bubble(RpNet.Bubble p) {
@@ -78,6 +84,9 @@ public final class RpClient {
     }
 
     private static boolean nameplates() {
+        if (namesHidden) {
+            return false;
+        }
         try {
             return RpConfig.NAMEPLATES.get();
         } catch (IllegalStateException e) {
@@ -102,7 +111,7 @@ public final class RpClient {
         Font font = mc.font;
         PoseStack ps = event.getPoseStack();
         ps.pushPose();
-        ps.translate(0, player.getBbHeight() + (nameplates() ? 0.75 : 0.5), 0);
+        ps.translate(0, player.getBbHeight() + (nameplates() ? 0.62 : 0.4), 0);
         ps.mulPose(mc.getEntityRenderDispatcher().cameraOrientation());
         ps.scale(0.025f, -0.025f, 0.025f);
         Matrix4f m = ps.last().pose();
@@ -131,5 +140,6 @@ public final class RpClient {
     public static void onLeave(ClientPlayerNetworkEvent.LoggingOut event) {
         NAMES.clear();
         BUBBLES.clear();
+        namesHidden = false;
     }
 }

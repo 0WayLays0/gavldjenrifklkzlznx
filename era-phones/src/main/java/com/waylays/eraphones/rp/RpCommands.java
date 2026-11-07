@@ -29,8 +29,11 @@ public final class RpCommands {
         d.register(Commands.literal("setname")
                 .then(Commands.argument("prenom", StringArgumentType.word()).then(Commands.argument("nom", StringArgumentType.greedyString())
                         .executes(RpCommands::setName))));
-        d.register(Commands.literal("me").then(Commands.argument("action", StringArgumentType.greedyString())
-                .executes(c -> act(c, "action", RpService::me))));
+        // The game's own /me is replaced (it shows the account's name)
+        if (remove(d, "me")) {
+            d.register(Commands.literal("me").then(Commands.argument("action", StringArgumentType.greedyString())
+                    .executes(c -> act(c, "action", RpService::me))));
+        }
         d.register(Commands.literal("do").then(Commands.argument("description", StringArgumentType.greedyString())
                 .executes(c -> act(c, "description", RpService::doing))));
         d.register(Commands.literal("try").then(Commands.argument("action", StringArgumentType.greedyString())
@@ -41,7 +44,7 @@ public final class RpCommands {
                 .executes(c -> act(c, "message", RpService::shout))));
         d.register(Commands.literal("hrp").then(Commands.argument("message", StringArgumentType.greedyString())
                 .executes(c -> act(c, "message", RpService::ooc))));
-        d.register(Commands.literal("roll").executes(c -> roll(c, "1d20"))
+        d.register(Commands.literal("roll").executes(c -> roll(c, "100"))
                 .then(Commands.argument("des", StringArgumentType.word()).executes(c -> roll(c, StringArgumentType.getString(c, "des")))));
         d.register(Commands.literal("desc").executes(RpCommands::clearDescription)
                 .then(Commands.argument("texte", StringArgumentType.greedyString()).executes(RpCommands::description)));
@@ -56,11 +59,29 @@ public final class RpCommands {
                     }
                     return hide(c, ids);
                 })));
+        d.register(Commands.literal("pseudos").requires(s -> s.hasPermission(2))
+                .then(Commands.literal("cacher").executes(c -> nameplates(c, true)))
+                .then(Commands.literal("afficher").executes(c -> nameplates(c, false))));
         d.register(Commands.literal("rp").executes(RpCommands::help)
                 .then(Commands.literal("qui").requires(s -> s.hasPermission(2)).executes(RpCommands::who))
                 .then(Commands.literal("nom").requires(s -> s.hasPermission(2)).then(Commands.argument("cible", EntityArgument.player())
                         .then(Commands.argument("prenom", StringArgumentType.word()).then(Commands.argument("nom", StringArgumentType.greedyString())
                                 .executes(RpCommands::nameOther))))));
+    }
+
+    /** Takes a command the game already has out of the tree, so it can be given anew; false if it could not. */
+    private static boolean remove(CommandDispatcher<CommandSourceStack> d, String name) {
+        try {
+            for (String field : new String[] {"children", "literals"}) {
+                java.lang.reflect.Field f = com.mojang.brigadier.tree.CommandNode.class.getDeclaredField(field);
+                f.setAccessible(true);
+                ((java.util.Map<?, ?>) f.get(d.getRoot())).remove(name);
+            }
+            return true;
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            com.waylays.eraphones.EraPhones.LOGGER.warn("Could not replace the /{} command", name, e);
+            return d.getRoot().getChild(name) == null;
+        }
     }
 
     private interface Action {
@@ -195,8 +216,15 @@ public final class RpCommands {
         return 1;
     }
 
+    private static int nameplates(CommandContext<CommandSourceStack> c, boolean hidden) {
+        RpNameplates.set(c.getSource().getServer(), hidden);
+        c.getSource().sendSuccess(() -> Component.translatable(hidden ? "rp.eraphones.names_hidden" : "rp.eraphones.names_shown")
+                .withStyle(ChatFormatting.GRAY), true);
+        return 1;
+    }
+
     private static int help(CommandContext<CommandSourceStack> c) {
-        for (String line : new String[] {"setname", "me", "do", "roll", "try", "chuchoter", "crier", "hrp", "desc", "examiner", "voir"}) {
+        for (String line : new String[] {"setname", "me", "do", "roll", "try", "chuchoter", "crier", "hrp", "desc", "examiner", "voir", "pseudos"}) {
             c.getSource().sendSuccess(() -> Component.empty().append(RpService.colored("/" + line + " ", RpService.NAME))
                     .append(Component.translatable("rp.eraphones.help." + line).withStyle(ChatFormatting.GRAY)), false);
         }

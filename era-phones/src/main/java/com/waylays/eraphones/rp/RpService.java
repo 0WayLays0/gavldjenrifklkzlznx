@@ -70,6 +70,8 @@ public final class RpService {
         Component line = Component.empty().append(nameOf(p, NAME)).append(colored(" " + Component.translatable("rp.eraphones.says").getString() + " ", 0x9A9AA8))
                 .append(colored("« " + text + " »", SAY));
         tell(p, RpConfig.get(RpConfig.SAY_RANGE, 20), line, 0, null, "« " + text + " »", SAY);
+        // On the phone, the other end hears it too
+        com.waylays.eraphones.server.CallService.relay(p, text);
     }
 
     public static void me(ServerPlayer p, String text) {
@@ -94,12 +96,15 @@ public final class RpService {
                 each.append(i == 0 ? "" : " + ").append(r);
             }
         }
-        String dice = count + "d" + sides;
+        String what = count == 1 ? Component.translatable("rp.eraphones.rolls_one", sides).getString()
+                : Component.translatable("rp.eraphones.rolls_many", count, sides).getString();
         Component line = Component.empty().append(colored("⚄ ", ROLL)).append(nameOf(p, ROLL))
-                .append(colored(" " + Component.translatable("rp.eraphones.rolls", dice).getString() + " ", 0xD8C8A0))
+                .append(colored(" " + what + " ", 0xD8C8A0))
                 .append(colored(String.valueOf(total), ROLL).withStyle(ChatFormatting.BOLD))
                 .append(colored(count > 1 ? "  (" + each + ")" : "", 0x8A8070));
-        tell(p, RpConfig.get(RpConfig.ACTION_RANGE, 20), line, 0, null, "⚄ " + dice + " : " + total, ROLL);
+        String bubble = "⚄ " + (count == 1 ? Component.translatable("rp.eraphones.die_one", sides).getString()
+                : Component.translatable("rp.eraphones.die_many", count, sides).getString()) + " " + total;
+        tell(p, RpConfig.get(RpConfig.ACTION_RANGE, 20), line, 0, null, bubble, ROLL);
     }
 
     public static void attempt(ServerPlayer p, String text) {

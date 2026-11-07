@@ -60,6 +60,7 @@ public final class RpEvents {
             return;
         }
         PacketDistributor.sendToPlayer(p, new RpNet.Names(RpService.names(p.server), true));
+        RpNameplates.joined(p);
         if (RpService.named(p)) {
             RpService.syncName(p);
         } else {
