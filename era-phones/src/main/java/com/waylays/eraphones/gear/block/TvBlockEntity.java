@@ -107,12 +107,16 @@ public class TvBlockEntity extends BlockEntity {
         byte[] data = null;
         if (!Video.isVideo(deck.file) || deck.mode == Tape.Mode.STOP) {
             index = TvNet.BLUE;
+        } else if (Video.prepare(deck.file) == Video.State.FAILED) {
+            index = TvNet.FAILED;
+            data = Video.why(deck.file).getBytes(java.nio.charset.StandardCharsets.UTF_8);
         } else if (Video.prepare(deck.file) != Video.State.READY) {
             index = TvNet.LOADING;
+            data = new byte[] {(byte) Video.progress(deck.file)};
         } else {
             index = Video.index(deck.pos);
         }
-        if (index == shownFrame && now - shownAt < 60) {
+        if (index == shownFrame && now - shownAt < (index == TvNet.LOADING ? 20 : 60)) {
             return;
         }
         if (index >= 0) {

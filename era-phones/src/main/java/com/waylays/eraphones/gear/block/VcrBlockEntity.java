@@ -204,14 +204,18 @@ public class VcrBlockEntity extends BlockEntity {
         byte[] data = null;
         if (!com.waylays.eraphones.gear.Video.isVideo(file) || deck.mode == Tape.Mode.STOP && deck.pos == 0 && cassette.isEmpty()) {
             index = com.waylays.eraphones.gear.TvNet.BLUE;
+        } else if (com.waylays.eraphones.gear.Video.prepare(file) == com.waylays.eraphones.gear.Video.State.FAILED) {
+            index = com.waylays.eraphones.gear.TvNet.FAILED;
+            data = com.waylays.eraphones.gear.Video.why(file).getBytes(java.nio.charset.StandardCharsets.UTF_8);
         } else if (com.waylays.eraphones.gear.Video.prepare(file) != com.waylays.eraphones.gear.Video.State.READY) {
             index = com.waylays.eraphones.gear.TvNet.LOADING;
+            data = new byte[] {(byte) com.waylays.eraphones.gear.Video.progress(file)};
         } else if (deck.mode == Tape.Mode.STOP) {
             index = com.waylays.eraphones.gear.TvNet.BLUE;
         } else {
             index = com.waylays.eraphones.gear.Video.index(deck.pos);
         }
-        if (index == shownFrame && now - tvAt < 60) {
+        if (index == shownFrame && now - tvAt < (index == com.waylays.eraphones.gear.TvNet.LOADING ? 20 : 60)) {
             return;
         }
         if (index >= 0) {

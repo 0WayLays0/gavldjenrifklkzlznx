@@ -48,6 +48,9 @@ public final class TvClient {
         int state = NONE;
         long received, seen, drawn;
         TvHiss hiss;
+        /** A film being read: how far (percent); one that cannot be: its format. */
+        int progress;
+        String why = "";
         int seed = (int) System.nanoTime();
 
         Screen() {
@@ -69,7 +72,27 @@ public final class TvClient {
             }
         } else {
             s.state = p.index();
+            if (p.index() == TvNet.LOADING && p.data().length > 0) {
+                s.progress = p.data()[0] & 0xFF;
+            } else if (p.index() == TvNet.FAILED) {
+                s.why = new String(p.data(), java.nio.charset.StandardCharsets.UTF_8);
+            }
         }
+    }
+
+    /** What the screen at {@code pos} should say over its picture: nothing, how far a film is read, or why it cannot be. */
+    static net.minecraft.network.chat.Component caption(BlockPos pos) {
+        Screen s = SCREENS.get(pos);
+        if (s == null) {
+            return null;
+        }
+        if (s.state == TvNet.LOADING) {
+            return net.minecraft.network.chat.Component.translatable("tv.eraphones.loading", s.progress);
+        }
+        if (s.state == TvNet.FAILED) {
+            return net.minecraft.network.chat.Component.translatable("tv.eraphones.unreadable", s.why);
+        }
+        return null;
     }
 
     /** The texture of the screen at {@code pos}, brought up to date; called as the set is drawn. */
@@ -86,7 +109,7 @@ public final class TvClient {
             paint(s, now);
             s.texture.upload();
         }
-        boolean snow = s.state == NONE || s.state == TvNet.LOADING;
+        boolean snow = s.state == NONE || s.state == TvNet.LOADING || s.state == TvNet.FAILED;
         if (snow && (s.hiss == null || s.hiss.isStopped())) {
             s.hiss = new TvHiss(tv, s);
             Minecraft.getInstance().getSoundManager().play(s.hiss);
@@ -250,7 +273,7 @@ public final class TvClient {
 
         @Override
         public void tick() {
-            boolean snow = screen.state == NONE || screen.state == TvNet.LOADING;
+            boolean snow = screen.state == NONE || screen.state == TvNet.LOADING || screen.state == TvNet.FAILED;
             if (tv.isRemoved() || !tv.on() || !snow || System.currentTimeMillis() - screen.seen > 1500) {
                 stop();
             }

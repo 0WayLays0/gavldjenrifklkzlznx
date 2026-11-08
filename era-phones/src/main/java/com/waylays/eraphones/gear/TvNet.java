@@ -17,8 +17,10 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 public final class TvNet {
     /** No tape playing a film: the recorder's blue screen. */
     public static final int BLUE = -1;
-    /** A film still being read: snow. */
+    /** A film still being read (its progress, a byte, in the data): snow, and how far it is. */
     public static final int LOADING = -2;
+    /** A film that cannot be read (its format's name in the data). */
+    public static final int FAILED = -4;
     /** How far a screen is seen from (blocks). */
     public static final double SEEN = 40;
 

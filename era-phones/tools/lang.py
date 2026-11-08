@@ -18,6 +18,8 @@ T = {
     "itemGroup.eraphones.lumiere_radio": ("Époque RP · Light & radio", "Époque RP · Lumière & radio"),
     "itemGroup.eraphones.son_image": ("Époque RP · Sound & picture", "Époque RP · Son & image"),
     "itemGroup.eraphones.vie_quotidienne": ("Époque RP · Everyday life", "Époque RP · Vie quotidienne"),
+    "tv.eraphones.loading": ("READING THE TAPE... %s%%", "LECTURE DE LA CASSETTE… %s %%"),
+    "tv.eraphones.unreadable": ("This film's format (%s) cannot be read: convert it to H.264 MP4 (e.g. HandBrake), or install ffmpeg on the server", "Format du film (%s) illisible : convertis-le en MP4 H.264 (ex. HandBrake), ou installe ffmpeg sur le serveur"),
     "itemGroup.eraphones.horreur": ("Époque RP · Horror", "Époque RP · Horreur"),
     "block.eraphones.television": ("Television", "Télévision"),
     "block.eraphones.boite_a_musique": ("Music Box", "Boîte à musique"),

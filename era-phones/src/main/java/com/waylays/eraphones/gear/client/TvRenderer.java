@@ -35,6 +35,22 @@ public class TvRenderer implements BlockEntityRenderer<TvBlockEntity> {
         vc.addVertex(m, x1, y0, z).setColor(255, 255, 255, 255).setUv(1, 1).setLight(full);
         vc.addVertex(m, x1, y1, z).setColor(255, 255, 255, 255).setUv(1, 0).setLight(full);
         vc.addVertex(m, x0, y1, z).setColor(255, 255, 255, 255).setUv(0, 0).setLight(full);
+        // Words over the snow: a film being read, or one that cannot be
+        net.minecraft.network.chat.Component caption = TvClient.caption(tv.getBlockPos());
+        if (caption != null) {
+            net.minecraft.client.gui.Font font = net.minecraft.client.Minecraft.getInstance().font;
+            java.util.List<net.minecraft.util.FormattedCharSequence> lines = font.split(caption, 110);
+            float scale = (x1 - x0) / 130f;
+            pose.translate((x0 + x1) / 2, (y0 + y1) / 2, z + .002f);
+            pose.scale(scale, -scale, scale);
+            float y = -lines.size() * 10 / 2f;
+            for (net.minecraft.util.FormattedCharSequence line : lines) {
+                float w = font.width(line);
+                font.drawInBatch(line, -w / 2 + 1, y + 1, 0xFF000000, false, pose.last().pose(), buffers, net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, full);
+                font.drawInBatch(line, -w / 2, y, 0xFFFFFFFF, false, pose.last().pose(), buffers, net.minecraft.client.gui.Font.DisplayMode.NORMAL, 0, full);
+                y += 10;
+            }
+        }
         pose.popPose();
     }
 }

@@ -456,5 +456,7 @@
   "tooltip.eraphones.battery": "Batterie : %s %%",
   "tooltip.eraphones.charger": "Tiens-le avec un t\u00e9l\u00e9phone dans l'autre main et maintiens l'utilisation",
   "tooltip.eraphones.number": "Num\u00e9ro : %s",
-  "tooltip.eraphones.open": "Utilise-le, ou appuie sur la touche du t\u00e9l\u00e9phone s'il est dans ta barre d'action"
+  "tooltip.eraphones.open": "Utilise-le, ou appuie sur la touche du t\u00e9l\u00e9phone s'il est dans ta barre d'action",
+  "tv.eraphones.loading": "LECTURE DE LA CASSETTE\u2026 %s %%",
+  "tv.eraphones.unreadable": "Format du film (%s) illisible : convertis-le en MP4 H.264 (ex. HandBrake), ou installe ffmpeg sur le serveur"
 }

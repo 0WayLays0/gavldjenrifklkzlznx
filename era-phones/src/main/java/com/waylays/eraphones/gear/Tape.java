@@ -52,13 +52,16 @@ public final class Tape {
     /** The recording {@code file}, if read; starts reading it otherwise (null until then). */
     @Nullable
     public static short[] sound(String file) {
+        if (Video.isVideo(file)) {
+            // A film's sound comes with its pictures, read and kept by Video
+            return Video.sound(file);
+        }
         short[] pcm = LOADED.get(file);
         if (pcm != null) {
             return pcm;
         }
         Audio audio = Audio.get();
-        boolean film = Video.isVideo(file);
-        if ((audio != null || film) && LOADING.putIfAbsent(file, true) == null) {
+        if (audio != null && LOADING.putIfAbsent(file, true) == null) {
             Thread t = new Thread(() -> {
                 try {
                     Path p = folder().resolve(file).normalize();
@@ -66,17 +69,7 @@ public final class Tape {
                         EraPhones.LOGGER.warn("No cassette recording {}", file);
                         return;
                     }
-                    short[] s;
-                    if (film) {
-                        // A film's sound (AAC), read without Simple Voice Chat's help; its pictures prepared too
-                        VideoDecode.Sound snd = VideoDecode.sound(p.toFile());
-                        // A silent film: silence as long as its pictures
-                        s = snd == null ? new short[(int) Math.max(Audio.RATE, VideoDecode.duration(p.toFile()) * Audio.RATE)]
-                                : resample(snd.pcm(), snd.channels(), snd.rate());
-                        Video.prepare(file);
-                    } else {
-                        s = audio.decodeMp3(p);
-                    }
+                    short[] s = audio.decodeMp3(p);
                     if (s != null) {
                         LOADED.put(file, s);
                     }

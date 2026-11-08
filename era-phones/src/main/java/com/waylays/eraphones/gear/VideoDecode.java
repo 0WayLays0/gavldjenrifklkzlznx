@@ -39,8 +39,34 @@ public final class VideoDecode {
 
     /** Reads the pictures of {@code mp4} into {@code out}; returns how many frames it holds. */
     public static int pictures(File mp4, File out) throws Exception {
+        return pictures(mp4, out, pct -> {
+        });
+    }
+
+    /** The name of the film's picture format if this library reads it (H.264), else what it is, or "?" when unknown. */
+    public static String codec(File mp4) {
+        try (FileChannelWrapper ch = NIOUtils.readableChannel(mp4)) {
+            DemuxerTrack v = MP4Demuxer.createMP4Demuxer(ch).getVideoTrack();
+            if (v == null) {
+                return "?";
+            }
+            org.jcodec.common.Codec c = v.getMeta().getCodec();
+            return c == null ? "?" : c.name();
+        } catch (Throwable e) {
+            return "?";
+        }
+    }
+
+    /** As {@link #pictures(File, File)}, telling {@code progress} how far it is (0 to 100). */
+    public static int pictures(File mp4, File out, java.util.function.IntConsumer progress) throws Exception {
         try (FileChannelWrapper ch = NIOUtils.readableChannel(mp4); RandomAccessFile f = new RandomAccessFile(out, "rw")) {
             FrameGrab grab = FrameGrab.createFrameGrab(ch);
+            double total = 0;
+            try {
+                total = grab.getVideoTrack().getMeta().getTotalDuration();
+            } catch (Throwable ignored) {
+                // Unknown length: no progress shown
+            }
             f.setLength(0);
             f.writeInt(MAGIC);
             f.writeInt(W);
@@ -55,6 +81,9 @@ public final class VideoDecode {
             Deflater def = new Deflater(6);
             while ((pm = grab.getNativeFrameWithMetadata()) != null) {
                 double t = pm.getTimestamp(), d = pm.getDuration() > 0 ? pm.getDuration() : 1.0 / 25;
+                if (total > 0) {
+                    progress.accept((int) Math.min(99, t * 100 / total));
+                }
                 byte[] packed = null;
                 while (next < t + d - 1e-6) {
                     if (packed == null) {
