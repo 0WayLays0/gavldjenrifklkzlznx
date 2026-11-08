@@ -13,6 +13,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 import kit
+import gear_items
 import models
 from models import Model, vgrad, metal_edge, round_alpha, text, text_width
 
@@ -82,10 +83,10 @@ def octo(m, axis, a0, a1, cx, cy, r, side, end_a=None, end_b=None):
         m.box(frm, to, {f: paint(f, k) for f in long_faces[0]}, rotation=rot)
         frm, to = span(a, r)
         m.box(frm, to, {f: paint(f, k) for f in long_faces[1]}, rotation=rot)
-    # The caps: a square just past each end, painted round, its corners left clear
+    # The caps: a square just past each end, cut to the same octagon so nothing shows through, the end's own
+    # picture (a lens, a disc) laid over it. Every end is closed: where the next piece is thinner, the step shows.
+    base = side if not callable(side) else (54, 56, 62)
     for end, at, painter in ((ends[0], a0, end_a), (ends[1], a1, end_b)):
-        if painter is None:
-            continue
         lo, hi = (at - .02, at) if end in ("west", "down", "north") else (at, at + .02)
         if axis == "x":
             frm, to = [lo, cx - r, cy - r], [hi, cx + r, cy + r]
@@ -93,7 +94,22 @@ def octo(m, axis, a0, a1, cx, cy, r, side, end_a=None, end_b=None):
             frm, to = [cx - r, lo, cy - r], [cx + r, hi, cy + r]
         else:
             frm, to = [cx - r, cy - r, lo], [cx + r, cy + r, hi]
-        m.box(frm, to, {end: painter})
+        m.box(frm, to, {end: octagon_cap(base, light.get(end, .9), painter)})
+
+
+def octagon_cap(color, k, painter=None):
+    """An octagon filling its square (flat sides on the square's sides), shaded {k}; {painter} drawn over it."""
+    def p(tile):
+        w, h = tile.size
+        cap = Image.new("RGBA", tile.size, (0, 0, 0, 0))
+        pts = [(.5 + .5 * x, .5 + .5 * y) for x, y in ((1, T22), (T22, 1), (-T22, 1), (-1, T22), (-1, -T22), (-T22, -1), (T22, -1), (1, -T22))]
+        ImageDraw.Draw(cap).polygon([(x * (w - 1), y * (h - 1)) for x, y in pts], fill=shade(color, k))
+        if painter is not None:
+            top = Image.new("RGBA", tile.size, (0, 0, 0, 0))
+            painter(top)
+            cap.alpha_composite(top)
+        tile.paste(cap)
+    return p
 
 
 def disc(color, rim, mark=None):
@@ -124,11 +140,20 @@ TORCH = {
     "fixed": {"rotation": [0, 90, 0], "translation": [0, 0, 0], "scale": [0.9, 0.9, 0.9]},
 }
 
-def upright_display(gui_scale=0.85):
-    d = dict(models.HELD)
-    d["gui"] = {"rotation": [15, -25, 0], "translation": [0, 0, 0], "scale": [gui_scale] * 3}
-    d["fixed"] = {"rotation": [0, 180, 0], "translation": [0, 0, 0], "scale": [0.9, 0.9, 0.9]}
-    return d
+def upright_display(gui_scale=0.85, fp_scale=0.4, tp_scale=0.6):
+    """Something held upright: its face to the eyes in first person, a little turned toward the crosshair; upright in
+    the fist in third person, its face to its holder (the raised arm tilts the hand's frame back eighteen degrees, 72
+    rather than 90 rights it)."""
+    return {
+        "gui": {"rotation": [15, -25, 0], "translation": [0, 0, 0], "scale": [gui_scale] * 3},
+        "firstperson_righthand": {"rotation": [-4, -28, 6], "translation": [-1, 3, -1], "scale": [fp_scale] * 3},
+        "firstperson_lefthand": {"rotation": [-4, 28, -6], "translation": [-1, 3, -1], "scale": [fp_scale] * 3},
+        "thirdperson_righthand": {"rotation": [72, 0, 0], "translation": [0, 1.5, 3], "scale": [tp_scale] * 3},
+        "thirdperson_lefthand": {"rotation": [72, 0, 0], "translation": [0, 1.5, 3], "scale": [tp_scale] * 3},
+        "ground": {"rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [0.45] * 3},
+        "fixed": {"rotation": [0, 180, 0], "translation": [0, 0, 0], "scale": [0.9, 0.9, 0.9]},
+        "head": {"rotation": [0, 180, 0], "translation": [0, 13, 7], "scale": [1, 1, 1]},
+    }
 
 
 def held(m, display):
@@ -280,9 +305,11 @@ BLOCK_DISPLAY = {
     "gui": {"rotation": [30, 35, 0], "translation": [0, 1.5, 0], "scale": [0.72, 0.72, 0.72]},
     "ground": {"rotation": [0, 0, 0], "translation": [0, 3, 0], "scale": [0.3, 0.3, 0.3]},
     "fixed": {"rotation": [0, 180, 0], "translation": [0, 0, 0], "scale": [0.6, 0.6, 0.6]},
-    "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.375, 0.375, 0.375]},
-    "firstperson_righthand": {"rotation": [0, 45, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4]},
-    "firstperson_lefthand": {"rotation": [0, 225, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4]},
+    # Carried in front by its handle side, its face out; seen from behind and above in first person
+    "thirdperson_righthand": {"rotation": [72, 180, 0], "translation": [0, 2, 1], "scale": [0.36, 0.36, 0.36]},
+    "thirdperson_lefthand": {"rotation": [72, 180, 0], "translation": [0, 2, 1], "scale": [0.36, 0.36, 0.36]},
+    "firstperson_righthand": {"rotation": [8, -24, 0], "translation": [-1, 5.5, -2], "scale": [0.32, 0.32, 0.32]},
+    "firstperson_lefthand": {"rotation": [8, 24, 0], "translation": [-1, 5.5, -2], "scale": [0.32, 0.32, 0.32]},
 }
 
 
@@ -554,11 +581,7 @@ def main():
     cassette()
     radio()
     vcr()
-    for cents, tint in MONEY.items():
-        flat(money_id(cents), coin(cents) if tint is None else bill(cents // 100, tint))
-    flat("carte_identite", id_card())
-    flat("journal_papier", newspaper())
-    flat("feuille", sheet())
+    gear_items.main(MONEY, money_id)
     sounds()
     recipes()
 

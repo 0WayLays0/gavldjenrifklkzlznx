@@ -18,12 +18,13 @@ feuille de papier, journal).
 
 | Objet | Ce qu'il fait |
 | --- | --- |
-| Lampe torche | Clic droit pour l'allumer ou l'éteindre. Tenue (dans n'importe quelle main), elle éclaire doucement là où elle pointe, jusqu'à 18 blocs (un peu plus fort de près), et à peine autour de soi. Un jeu de piles dure 20 minutes. |
+| Lampe torche | Clic droit pour l'allumer ou l'éteindre. Tenue (dans n'importe quelle main), elle projette un faisceau doux depuis la lampe : le chemin devant soi est éclairé, de plus en plus faiblement jusqu'à 16 blocs, et la tache de lumière là où il tombe. Un jeu de piles dure 20 minutes. |
 | Piles | Clic droit avec une lampe torche ou un talkie-walkie dans l'autre main : piles neuves. |
 | Talkie-walkie | Clic droit : sa façade (marche/arrêt, canal 1 à 16, piles). Avec Simple Voice Chat, en le tenant en main et en parlant, ta voix sort (avec un son de radio) des talkies allumés sur le même canal, où qu'ils soient dans l'inventaire, et ceux qui sont autour l'entendent aussi. Un « kssht » au début de chaque message. |
 | Poste de radio (bloc) | Clic droit : allumer, régler la fréquence (88 à 108 FM, cadran à faire glisser, molette ou boutons) et le volume. Il grésille entre les stations ; l'œil magique s'allume quand une station passe. Une station, c'est un maître du jeu qui fait `/radio emettre 100.3` : sa voix sort des radios réglées dessus (`/radio arreter` pour finir). |
 | Magnétoscope (bloc) + cassette | Clic droit sur le magnétoscope avec une cassette en main pour l'insérer (ou bouton « Insérer » sur sa façade). Touches : ⏏ éjecter, ◀◀ rembobiner, ▶ lecture, ❚❚ pause, ■ stop, ▶▶ avance rapide ; compteur de bande. Le son sort du magnétoscope (16 blocs autour, Simple Voice Chat requis). Comme une vraie bande : pour revenir au début il faut rembobiner, et on entend tout défiler à l'envers ; la cassette éjectée garde l'endroit où en était la bande. |
-| Pièces et billets | 10 et 25 cents, billets de 1, 5, 10, 20, 50 et 100 dollars (dessins originaux). |
+| Pièces et billets | 10 et 25 cents (frappées en relief, tranche striée), billets de 1, 5, 10, 20, 50 et 100 dollars imprimés recto verso, en 3D (dessins originaux). |
+| Cassette vierge | Clic droit (staff) : le dossier des cassettes s'ouvre sur ton ordinateur et un écran liste les MP3 qui s'y trouvent ; choisis-en un, écris l'étiquette, « Graver ». Le fichier est envoyé au serveur (24 Mo au plus) et gravé pour toujours sur la cassette tenue. Un joueur sans droits voit seulement qu'elle est vierge. |
 | Carte d'identité | Vierge, elle est établie au nom de la première personne qui l'utilise (nom RP, signalement de `/desc`, numéro). Clic droit pour la regarder (avec la photo du visage du personnage), clic droit sur quelqu'un pour la lui montrer. |
 | Journal | Imprimé par les maîtres du jeu ; clic droit pour le lire. |
 | Feuille de papier | Clic droit : on écrit dessus avec la page sous les yeux qui se remplit en direct (titre, texte jusqu'à 2000 caractères avec retours à la ligne), on choisit le papier (feuille de carnet, papier à lettre, vieux parchemin, post-it, page arrachée, papier quadrillé, fiche bristol, vieux papier taché), l'encre (noire, bleue, rouge, verte, crayon) et l'écriture (à la main, penchée, ou tapée à la machine). « Garder » en fait un brouillon qu'on peut reprendre ; « Signer » la ferme avec le nom du personnage : ensuite, clic droit pour la lire, page entière à l'écran (molette pour les longs textes). Une pile de feuilles vierges en donne une écrite à la fois. |
@@ -32,7 +33,7 @@ feuille de papier, journal).
 
 | Commande | Effet |
 | --- | --- |
-| `/cassette liste` | Les fichiers MP3 disponibles (à mettre dans `config/eraphones/cassettes/` du serveur). |
+| `/cassette liste` | Les fichiers MP3 disponibles sur le serveur (`config/eraphones/cassettes/`, où arrivent aussi ceux gravés depuis le jeu). |
 | `/cassette graver <fichier> <titre>` | Donne une cassette de ce fichier, avec ce titre sur l'étiquette. Elle ne peut plus être modifiée. |
 | `/radio emettre <fréquence>` · `/radio arreter` | Passer à l'antenne sur une fréquence (ta voix sort des radios réglées dessus), ou s'arrêter. |
 | `/lampe <joueurs> eteindre` · `clignoter [secondes]` · `casser` · `reparer` | Éteindre leurs lampes torches, les faire clignoter (10 s par défaut, avec de petits grésillements), les casser (elles ne s'allument plus, « Cassée » dans la description) ou les réparer. |

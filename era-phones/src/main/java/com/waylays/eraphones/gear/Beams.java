@@ -27,14 +27,16 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * The torches' light. A lit torch held in either hand lights where it points, up to {@link #REACH} blocks away (an
- * invisible light set in the air just before what it hits, and a softer one round whoever holds it), moving with it;
+ * The torches' light. A lit torch held in either hand shines a beam where it points, up to {@link #REACH} blocks
+ * away: invisible lights strung along it from the lamp out, fainter with distance, and the patch it falls on;
  * and drains its batteries (a full set lasts twenty minutes). The lights are taken away when the torch goes out,
  * leaves the hand or its holder leaves.
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class Beams {
-    public static final int REACH = 18;
+    public static final int REACH = 16;
+    /** How far apart the lights along the beam are (blocks). */
+    private static final double STEP = 3;
     /** Torches flickering (a game master's doing), by holder: until when (server ticks). */
     private static final Map<UUID, Long> FLICKER = new HashMap<>();
     private static final java.util.Random RANDOM = new java.util.Random();
@@ -75,21 +77,28 @@ public final class Beams {
                     torch = null;
                 }
             }
-            List<GlobalPos> lit = new ArrayList<>(2);
+            List<GlobalPos> lit = new ArrayList<>(8);
             if (torch != null) {
                 if (p.tickCount % (LIFE / Gear.FULL) == 0 && !p.getAbilities().instabuild) {
                     Gear.setBattery(torch, Gear.battery(torch) - 1);
                 }
                 ServerLevel level = p.serverLevel();
                 Vec3 eye = p.getEyePosition();
-                Vec3 end = eye.add(p.getLookAngle().scale(REACH));
+                Vec3 dir = p.getLookAngle();
+                Vec3 end = eye.add(dir.scale(REACH));
                 BlockHitResult hit = level.clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, p));
-                Vec3 at = hit.getType() == HitResult.Type.MISS ? end : hit.getLocation().subtract(p.getLookAngle().scale(.6));
-                double dist = at.distanceTo(eye);
-                // A soft beam: brighter near, fainter far, as a real one spreads; a faint spill round the holder
-                int level1 = (int) Math.round(10 - Math.max(0, dist - 4) / (REACH - 4) * 5);
-                place(level, BlockPos.containing(at), level1, lit);
-                place(level, BlockPos.containing(eye), 3, lit);
+                boolean struck = hit.getType() != HitResult.Type.MISS;
+                double reach = struck ? hit.getLocation().distanceTo(eye) : REACH;
+                // The beam itself: soft lights strung along it from the lamp out, each a little fainter, so the
+                // ground and the walls before the holder are lit all the way, as a cone of light would
+                for (double t = 1.5; t < reach - 1; t += STEP) {
+                    place(level, BlockPos.containing(eye.add(dir.scale(t))), (int) Math.round(8 - t / REACH * 4), lit);
+                }
+                // The patch it falls on, brighter near, dimmer far
+                if (struck) {
+                    Vec3 at = hit.getLocation().subtract(dir.scale(.6));
+                    place(level, BlockPos.containing(at), (int) Math.round(9 - reach / REACH * 4), lit);
+                }
             }
             List<GlobalPos> before = LIT.getOrDefault(p.getUUID(), List.of());
             for (GlobalPos g : before) {

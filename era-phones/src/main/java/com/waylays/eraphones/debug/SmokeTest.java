@@ -386,9 +386,64 @@ public final class SmokeTest {
                     0, 1, false, "Un ami")));
         });
         STEPS.add(() -> shot(mc, "gear_note_read"));
+        // Every thing in hand, one after the other; a few as others see them; the inventory's icons
+        String[] held = {"piece_25c", "billet_20", "carte_identite", "journal_papier", "feuille", "cassette", "piles", "talkie_walkie", "radio",
+                "magnetoscope", "lampe_torche"};
+        for (String name : held) {
+            STEPS.add(() -> server.execute(() -> {
+                ServerPlayer p = server.getPlayerList().getPlayer(id);
+                if (p != null) {
+                    p.getInventory().setItem(0, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(com.waylays.eraphones.EraPhones.id(name))));
+                }
+            }));
+            STEPS.add(() -> {
+                mc.setScreen(null);
+                select(mc, 0);
+                mc.player.setXRot(10);
+            });
+            STEPS.add(() -> shot(mc, "held_" + name));
+        }
+        for (String name : new String[] {"billet_20", "talkie_walkie", "journal_papier", "lampe_torche"}) {
+            STEPS.add(() -> server.execute(() -> {
+                ServerPlayer p = server.getPlayerList().getPlayer(id);
+                if (p != null) {
+                    p.getInventory().setItem(0, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(com.waylays.eraphones.EraPhones.id(name))));
+                }
+            }));
+            STEPS.add(() -> {
+                select(mc, 0);
+                mc.player.setXRot(0);
+                mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+            });
+            STEPS.add(() -> shot(mc, "held3_" + name));
+            STEPS.add(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
+        }
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            String[] icons = {"piece_10c", "piece_25c", "billet_1", "billet_20", "billet_100", "carte_identite", "journal_papier", "feuille", "cassette"};
+            for (int k = 0; k < icons.length; k++) {
+                p.getInventory().setItem(k, new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(com.waylays.eraphones.EraPhones.id(icons[k]))));
+            }
+        }));
+        STEPS.add(() -> select(mc, 8));
+        STEPS.add(() -> shot(mc, "gear_icons"));
+        // A blank cassette's recording screen, a file waiting in the folder
+        STEPS.add(() -> {
+            try {
+                java.nio.file.Files.createDirectories(com.waylays.eraphones.gear.Tape.folder());
+                java.nio.file.Files.write(com.waylays.eraphones.gear.Tape.folder().resolve("Chanson du cirque.mp3"), new byte[180000]);
+            } catch (java.io.IOException e) {
+                fail("cannot write a test recording: {}", e.toString());
+            }
+            mc.setScreen(new com.waylays.eraphones.gear.client.BurnScreen(false));
+        });
+        STEPS.add(() -> shot(mc, "gear_burn"));
         STEPS.add(() -> {
             mc.setScreen(null);
-            log("gear: torch, walkie-talkie, radio, video recorder, card and newspaper shown");
+            log("gear: torch, walkie-talkie, radio, video recorder, card, newspaper, things in hand and the cassette screen shown");
         });
     }
 

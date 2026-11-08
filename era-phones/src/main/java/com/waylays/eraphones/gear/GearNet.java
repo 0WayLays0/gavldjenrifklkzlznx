@@ -34,6 +34,7 @@ public final class GearNet {
         r.playToServer(Radio.TYPE, Radio.CODEC, GearNet::radio);
         r.playToServer(Vcr.TYPE, Vcr.CODEC, GearNet::vcr);
         r.playToServer(Note.TYPE, Note.CODEC, GearNet::note);
+        TapeNet.register(r);
         r.playToClient(Card.TYPE, Card.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.card(p));
         r.playToClient(Stations.TYPE, Stations.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.stations(p));
     }

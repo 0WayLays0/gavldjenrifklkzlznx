@@ -162,6 +162,12 @@ public final class PhoneGameTests {
         deck.pos = 0;
         deck.file = "none.mp3";
         helper.assertTrue(deck.frame() == null || deck.mode == com.waylays.eraphones.gear.Tape.Mode.REWIND, "rewinding at the start");
+        // The names of the recordings sent from the game: kept in the folder, MP3 only
+        helper.assertTrue("evil.mp3".equals(com.waylays.eraphones.gear.TapeNet.clean("../../evil.mp3")), "no way out of the folder");
+        helper.assertTrue("Chanson du cirque.mp3".equals(com.waylays.eraphones.gear.TapeNet.clean("Chanson du cirque.mp3")), "a plain name kept");
+        helper.assertTrue(com.waylays.eraphones.gear.TapeNet.clean("chanson.wav") == null, "MP3 only");
+        helper.assertTrue(com.waylays.eraphones.gear.TapeNet.clean("..mp3") == null, "a name needed");
+        helper.assertTrue("a_b.mp3".equals(com.waylays.eraphones.gear.TapeNet.clean("a:b.mp3")), "odd marks replaced");
         // The torch: on, off, its batteries
         net.minecraft.world.item.ItemStack torch = new net.minecraft.world.item.ItemStack(com.waylays.eraphones.registry.GearRegistry.FLASHLIGHT.get());
         helper.assertTrue(!com.waylays.eraphones.gear.Gear.on(torch), "off when new");

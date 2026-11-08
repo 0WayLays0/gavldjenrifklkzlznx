@@ -96,8 +96,8 @@ def cut_ends(tile, cut, vertical):
 
 
 class Model:
-    def __init__(self, name, size=512):
-        self.name, self.size = name, size
+    def __init__(self, name, size=512, density=D):
+        self.name, self.size, self.d = name, size, density
         self.img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
         self.elements = []
         self.x = self.y = self.row = 0
@@ -121,7 +121,7 @@ class Model:
             p = paint.get(face, paint.get("*"))
             if p is None:
                 continue
-            x, y, w, h = self._alloc(fw * D, fh * D)
+            x, y, w, h = self._alloc(fw * self.d, fh * self.d)
             tile = Image.new("RGBA", (w, h), (0, 0, 0, 0))
             if callable(p):
                 p(tile)
@@ -138,7 +138,7 @@ class Model:
     def body(self, x0, y0, x1, y1, z0, z1, r, front, back, edge_dark, edge_light, corners=True, rotation=None):
         """A slab with rounded corners: {front} and {back} paint its faces, the edges are polished. Without {corners}
         (a slab turned on another axis, whose corner pieces could not follow) the edges run full length."""
-        rp = int(round(r * D))
+        rp = int(round(r * self.d))
 
         def face(paint):
             def p(tile):
