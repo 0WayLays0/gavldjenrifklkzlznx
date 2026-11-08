@@ -62,6 +62,15 @@ repositories {
 dependencies {
     // Simple Voice Chat's API, to build against only: the mod works without it, and with it when it is installed
     compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+    // JCodec (pure Java, BSD licence): reads the MP4 films on video cassettes (H.264 pictures, AAC sound). Packed
+    // inside the mod's jar, so nothing has to be installed; on the runs' classpath while developing.
+    jarJar(implementation("org.jcodec:jcodec")) {
+        version {
+            strictly '[0.2.5,0.3)'
+            prefer '0.2.5'
+        }
+    }
+    additionalRuntimeClasspath "org.jcodec:jcodec:0.2.5"
 }
 
 tasks.withType(JavaCompile).configureEach {

@@ -14,5 +14,14 @@
       }
     ],
     "subtitle": "subtitles.eraphones.talkie_squelch"
+  },
+  "boite_a_musique": {
+    "sounds": [
+      {
+        "name": "eraphones:boite_a_musique",
+        "attenuation_distance": 20
+      }
+    ],
+    "subtitle": "subtitles.eraphones.boite_a_musique"
   }
 }

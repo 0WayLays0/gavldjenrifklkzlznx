@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " B ",
+    "WPW",
+    " W "
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bone_meal"
+    },
+    "W": {
+      "item": "minecraft:pink_wool"
+    },
+    "P": {
+      "item": "minecraft:white_wool"
+    }
+  },
+  "result": {
+    "id": "eraphones:poupee",
+    "count": 1
+  }
+}

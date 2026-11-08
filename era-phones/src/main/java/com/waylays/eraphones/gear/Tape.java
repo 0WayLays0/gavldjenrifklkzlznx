@@ -37,7 +37,10 @@ public final class Tape {
         try {
             Files.createDirectories(folder());
             try (Stream<Path> s = Files.list(folder())) {
-                s.filter(p -> p.getFileName().toString().toLowerCase().endsWith(".mp3")).forEach(p -> out.add(p.getFileName().toString()));
+                s.filter(p -> {
+                    String n = p.getFileName().toString().toLowerCase();
+                    return n.endsWith(".mp3") || n.endsWith(".mp4");
+                }).forEach(p -> out.add(p.getFileName().toString()));
             }
         } catch (IOException e) {
             EraPhones.LOGGER.warn("Cannot list the cassettes: {}", e.toString());
@@ -54,7 +57,8 @@ public final class Tape {
             return pcm;
         }
         Audio audio = Audio.get();
-        if (audio != null && LOADING.putIfAbsent(file, true) == null) {
+        boolean film = Video.isVideo(file);
+        if ((audio != null || film) && LOADING.putIfAbsent(file, true) == null) {
             Thread t = new Thread(() -> {
                 try {
                     Path p = folder().resolve(file).normalize();
@@ -62,7 +66,17 @@ public final class Tape {
                         EraPhones.LOGGER.warn("No cassette recording {}", file);
                         return;
                     }
-                    short[] s = audio.decodeMp3(p);
+                    short[] s;
+                    if (film) {
+                        // A film's sound (AAC), read without Simple Voice Chat's help; its pictures prepared too
+                        VideoDecode.Sound snd = VideoDecode.sound(p.toFile());
+                        // A silent film: silence as long as its pictures
+                        s = snd == null ? new short[(int) Math.max(Audio.RATE, VideoDecode.duration(p.toFile()) * Audio.RATE)]
+                                : resample(snd.pcm(), snd.channels(), snd.rate());
+                        Video.prepare(file);
+                    } else {
+                        s = audio.decodeMp3(p);
+                    }
                     if (s != null) {
                         LOADED.put(file, s);
                     }
@@ -121,6 +135,8 @@ public final class Tape {
         public volatile String file;
         private final Random random = new Random();
         private float wow, hiss;
+        /** A film's sound through a worn tape and a small television speaker: its filters' memory, its drop-outs. */
+        private float low, high, lastIn, drop = 1, dropTo = 1;
 
         /** The next 20 ms of what comes out of the deck; null when the tape stops or reaches an end. */
         @Nullable
@@ -144,10 +160,27 @@ public final class Tape {
                         return null;
                     }
                     // A little wow and flutter, a little hiss: the sound of a tape
+                    boolean film = Video.isVideo(f);
+                    if (film && random.nextFloat() < .02f) {
+                        dropTo = random.nextFloat() < .35f ? .25f + random.nextFloat() * .4f : 1;
+                    }
                     for (int i = 0; i < out.length; i++) {
                         wow += 1f / Audio.RATE;
-                        double at = p + i + Math.sin(wow * Math.PI * 2 * .55) * 18 + Math.sin(wow * Math.PI * 2 * 7.3) * 1.5;
-                        out[i] = (short) Math.max(-32768, Math.min(32767, sample(pcm, at) * .92f + (random.nextFloat() - .5f) * 260));
+                        double w = film ? 2.4 : 1;
+                        double at = p + i + (Math.sin(wow * Math.PI * 2 * .55) * 18 + Math.sin(wow * Math.PI * 2 * 7.3) * 1.5) * w;
+                        float v = sample(pcm, at) * .92f;
+                        if (film) {
+                            // A small speaker: no deep bass, no bright top; pushed a little too hard; the tape dropping out
+                            low += (v - low) * .32f;
+                            high = .985f * (high + low - lastIn);
+                            lastIn = low;
+                            drop += (dropTo - drop) * .002f;
+                            float x = high * 1.7f * drop / 32768f;
+                            v = (float) Math.tanh(x) * 26000 + (random.nextFloat() - .5f) * 900;
+                        } else {
+                            v += (random.nextFloat() - .5f) * 260;
+                        }
+                        out[i] = (short) Math.max(-32768, Math.min(32767, v));
                     }
                     pos = p + out.length;
                 }
@@ -171,6 +204,30 @@ public final class Tape {
                 }
             }
             return out;
+        }
+
+        /**
+         * Moves the tape on by one game tick when no sound is drawn from it (no Simple Voice Chat): a film still runs
+         * on the television, silent.
+         */
+        public void advance() {
+            Mode m = mode;
+            String f = file;
+            if (f == null || m == Mode.STOP || m == Mode.PAUSE) {
+                return;
+            }
+            short[] pcm = sound(f);
+            if (pcm == null) {
+                return;
+            }
+            int step = Audio.RATE / 20 * (m == Mode.PLAY ? 1 : WIND) * (m == Mode.REWIND ? -1 : 1);
+            long p = pos + step;
+            if (p <= 0 || p >= pcm.length) {
+                pos = Math.max(0, Math.min(pcm.length, p));
+                mode = Mode.STOP;
+            } else {
+                pos = p;
+            }
         }
 
         private static float sample(short[] pcm, double at) {

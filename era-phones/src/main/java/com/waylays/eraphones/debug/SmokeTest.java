@@ -400,6 +400,81 @@ public final class SmokeTest {
                         mc.level.getBrightness(net.minecraft.world.level.LightLayer.SKY, at), model.getClass().getSimpleName(), quads, st.getRenderShape());
             }
         });
+        // A television on the recorder, a film made here and played into it; the doll and the music box beside them;
+        // the game master's remote; a narration
+        STEPS.add(() -> {
+            try {
+                java.nio.file.Files.createDirectories(com.waylays.eraphones.gear.Tape.folder());
+                testFilm(com.waylays.eraphones.gear.Tape.folder().resolve("Film test.mp4").toFile());
+            } catch (Exception e) {
+                fail("cannot make a test film: {}", e.toString());
+            }
+        });
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null || vcrPos == null || radioPos == null) {
+                return;
+            }
+            net.minecraft.core.Direction face = p.getDirection().getOpposite();
+            net.minecraft.core.Direction left = p.getDirection().getCounterClockWise();
+            p.serverLevel().setBlockAndUpdate(vcrPos.above(), com.waylays.eraphones.registry.GearRegistry.TV.get().defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, face)
+                    .setValue(com.waylays.eraphones.gear.block.TvBlock.LIT, true));
+            p.serverLevel().setBlockAndUpdate(radioPos.relative(left), com.waylays.eraphones.registry.GearRegistry.DOLL.get().defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, face));
+            p.serverLevel().setBlockAndUpdate(radioPos.relative(left, 2), com.waylays.eraphones.registry.GearRegistry.MUSIC_BOX_BLOCK.get().defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, face));
+        }));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            if (vcrPos != null) {
+                mc.player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, net.minecraft.world.phys.Vec3.atCenterOf(vcrPos.above()));
+            }
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "tv_blue"));
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null || vcrPos == null || !(p.serverLevel().getBlockEntity(vcrPos) instanceof com.waylays.eraphones.gear.block.VcrBlockEntity vcr)) {
+                fail("no video recorder to play the film in");
+                return;
+            }
+            ItemStack film = new ItemStack(com.waylays.eraphones.registry.GearRegistry.CASSETTE.get());
+            film.set(com.waylays.eraphones.registry.GearRegistry.TAPE.get(), "Film test.mp4");
+            film.set(com.waylays.eraphones.registry.GearRegistry.TAPE_LABEL.get(), "Film test");
+            ItemStack keep = p.getOffhandItem().copy();
+            p.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, film);
+            vcr.press(p, "insert");
+            vcr.press(p, "play");
+            p.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, keep);
+        }));
+        for (int k = 0; k < 4; k++) {
+            STEPS.add(() -> {
+            });
+        }
+        STEPS.add(() -> shot(mc, "tv_film"));
+        STEPS.add(() -> {
+            if (radioPos != null) {
+                mc.player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, net.minecraft.world.phys.Vec3.atCenterOf(radioPos));
+                mc.player.setXRot(28);
+            }
+        });
+        STEPS.add(() -> shot(mc, "horror_things"));
+        STEPS.add(() -> mc.setScreen(new com.waylays.eraphones.horror.client.RemoteScreen(
+                java.util.List.of(new java.util.UUID(1, 2).toString(), new java.util.UUID(3, 4).toString()), java.util.List.of("Bill (4 m)", "Beverly (12 m)"))));
+        STEPS.add(() -> shot(mc, "horror_remote"));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("narration", 400,
+                    "La pluie tombait sur la ville depuis trois jours, et personne ne voyait les ballons qui remontaient le courant.", 0, 0, 0));
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "narration"));
+        STEPS.add(() -> com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("stop", 0, "", 0, 0, 0)));
         // Every thing in hand, one after the other; a few as others see them; the inventory's icons (the hotbar is
         // put back after, the phones in it are looked at again at the end)
         STEPS.add(() -> server.execute(() -> {
@@ -411,7 +486,7 @@ public final class SmokeTest {
             }
         }));
         String[] held = {"piece_25c", "billet_20", "carte_identite", "journal_papier", "feuille", "cassette", "piles", "talkie_walkie", "radio",
-                "magnetoscope", "lampe_torche"};
+                "magnetoscope", "lampe_torche", "television", "ballon_rouge", "telecommande_mj", "poupee", "boite_a_musique"};
         for (String name : held) {
             STEPS.add(() -> server.execute(() -> {
                 ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -476,6 +551,28 @@ public final class SmokeTest {
             mc.setScreen(null);
             log("gear: torch, walkie-talkie, radio, video recorder, card, newspaper, things in hand and the cassette screen shown");
         });
+    }
+
+    /** A three-second film of colour bars with a black square crossing them, made with the same library that reads it. */
+    private static void testFilm(java.io.File out) throws java.io.IOException {
+        org.jcodec.api.SequenceEncoder enc = org.jcodec.api.SequenceEncoder.createSequenceEncoder(out, 10);
+        int[][] cols = {{255, 255, 255}, {255, 255, 0}, {0, 255, 255}, {0, 255, 0}, {255, 0, 255}, {255, 0, 0}, {0, 0, 255}};
+        for (int f = 0; f < 30; f++) {
+            org.jcodec.common.model.Picture pic = org.jcodec.common.model.Picture.create(160, 120, org.jcodec.common.model.ColorSpace.RGB);
+            byte[] d = pic.getPlaneData(0);
+            for (int y = 0; y < 120; y++) {
+                for (int x = 0; x < 160; x++) {
+                    int i = (y * 160 + x) * 3;
+                    int[] c = cols[x * 7 / 160];
+                    boolean square = Math.abs(x - (20 + f * 4)) < 14 && Math.abs(y - 60) < 14;
+                    for (int k = 0; k < 3; k++) {
+                        d[i + k] = (byte) ((square ? 16 : c[k]) - 128);
+                    }
+                }
+            }
+            enc.encodeNativeFrame(pic);
+        }
+        enc.finish();
     }
 
     private static net.minecraft.core.BlockPos radioPos, vcrPos;

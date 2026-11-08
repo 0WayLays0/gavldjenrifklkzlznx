@@ -551,9 +551,13 @@ def sounds():
     env = np.clip(t / .01, 0, 1) * np.clip((.3 - t) / .03, 0, 1)
     beep = np.sin(2 * np.pi * 1250 * t) * (t < .07) * .5
     ogg("talkie_squelch", (burst * .6 * env + beep) * .9)
+    import horror_items
+    ogg("boite_a_musique", horror_items.music_box_tune(rate))
     kit.write_json("sounds.json", {
         "radio_static": {"sounds": [{"name": "eraphones:radio_static"}], "subtitle": "subtitles.eraphones.radio_static"},
-        "talkie_squelch": {"sounds": [{"name": "eraphones:talkie_squelch"}], "subtitle": "subtitles.eraphones.talkie_squelch"}})
+        "talkie_squelch": {"sounds": [{"name": "eraphones:talkie_squelch"}], "subtitle": "subtitles.eraphones.talkie_squelch"},
+        "boite_a_musique": {"sounds": [{"name": "eraphones:boite_a_musique", "attenuation_distance": 20}],
+                            "subtitle": "subtitles.eraphones.boite_a_musique"}})
 
 
 # ------------------------------------------------------------------------------------------------ recipes
@@ -582,6 +586,8 @@ def main():
     radio()
     vcr()
     gear_items.main(MONEY, money_id)
+    import horror_items
+    horror_items.main()
     sounds()
     recipes()
 

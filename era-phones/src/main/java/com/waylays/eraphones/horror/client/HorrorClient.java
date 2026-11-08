@@ -103,6 +103,10 @@ public final class HorrorClient {
         }
     }
 
+    public static void openRemote(HorrorNet.OpenRemote p) {
+        Minecraft.getInstance().setScreen(new RemoteScreen(p.ids(), p.names()));
+    }
+
     public static void effect(HorrorNet.Effect e) {
         long now = System.currentTimeMillis();
         if (e.kind().equals("stop")) {
@@ -122,6 +126,7 @@ public final class HorrorClient {
             }
             case "sang" -> play("entity.warden.heartbeat", 1, 1);
             case "tremblement" -> play("entity.warden.emerge", .6f, .9f);
+            case "narration" -> play("block.amethyst_block.chime", .5f, .5f);
             default -> {
             }
         }
@@ -183,6 +188,57 @@ public final class HorrorClient {
         }
         if ((a = active("murmure")) != null) {
             whisper(g, a, w, h);
+        }
+        if ((a = active("narration")) != null) {
+            narration(g, a, w, h);
+        }
+    }
+
+    /**
+     * The narrator's words: black bands slide in at the top and bottom as in a film, the words written out one
+     * letter after another in italics, low in the frame, then everything fades.
+     */
+    private static void narration(GuiGraphics g, Active a, int w, int h) {
+        Font font = Minecraft.getInstance().font;
+        float f = a.fade(.6f, 1.2f);
+        if (f <= 0) {
+            return;
+        }
+        float ease = f * f * (3 - 2 * f);
+        int band = (int) (h * .1f * ease);
+        g.fill(0, 0, w, band, 0xF0000000);
+        g.fill(0, h - band, w, h, 0xF0000000);
+        float scale = Math.max(1, Math.min(2, w / 300f));
+        List<String> lines = wrap(font, a.text, (int) (w * .72f / scale));
+        float lh = 11 * scale;
+        float y = h - band - lines.size() * lh - 14 * scale;
+        int pad = (int) (8 * scale);
+        int widest = 0;
+        for (String l : lines) {
+            widest = Math.max(widest, font.width(l));
+        }
+        int bw = (int) (widest * scale) + pad * 2;
+        int alpha = (int) (255 * f);
+        // A soft shade behind the words
+        for (int i = 0; i < 6; i++) {
+            int inset = i * pad / 6;
+            g.fill((w - bw) / 2 + inset, (int) y - pad + inset / 2, (w + bw) / 2 - inset, (int) (y + lines.size() * lh) + pad - inset / 2,
+                    (int) (alpha * .09f) << 24);
+        }
+        int shown = (int) Math.max(0, (a.age() - .5f) / .035f);
+        int count = 0;
+        for (String line : lines) {
+            String part = line.substring(0, Math.max(0, Math.min(line.length(), shown - count)));
+            count += line.length();
+            float x = (w - font.width(line) * scale) / 2;
+            g.pose().pushPose();
+            g.pose().translate(x, y, 0);
+            g.pose().scale(scale, scale, 1);
+            net.minecraft.network.chat.Component c = net.minecraft.network.chat.Component.literal(part).withStyle(net.minecraft.ChatFormatting.ITALIC);
+            g.drawString(font, c, 1, 1, alpha << 24, false);
+            g.drawString(font, c, 0, 0, alpha << 24 | 0xF2E8D0, false);
+            g.pose().popPose();
+            y += lh;
         }
     }
 

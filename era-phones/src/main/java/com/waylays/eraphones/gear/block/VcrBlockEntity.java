@@ -27,6 +27,8 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class VcrBlockEntity extends BlockEntity {
     public static final float RANGE = 16;
+    /** How far a television may be from the recorder to show its tape (blocks). */
+    public static final int TV_REACH = 4;
     private ItemStack cassette = ItemStack.EMPTY;
     private final Tape.Deck deck = new Tape.Deck();
     private Object sound;
@@ -156,13 +158,72 @@ public class VcrBlockEntity extends BlockEntity {
         sound = null;
     }
 
+    /** The televisions beside the recorder (looked for every two seconds), and what was last shown on them. */
+    private final java.util.List<BlockPos> tvs = new java.util.ArrayList<>();
+    private int shownFrame = Integer.MIN_VALUE;
+    private long tvAt;
+
     public void serverTick() {
-        if (level == null || level.getGameTime() % 10 != 0) {
+        if (level == null) {
+            return;
+        }
+        long now = level.getGameTime();
+        Audio audio = Audio.get();
+        if (sound == null || audio == null || !audio.playing(sound)) {
+            deck.advance();
+        }
+        if (now % 40 == 0) {
+            findTvs();
+        }
+        if (now % 2 == 0 && !tvs.isEmpty()) {
+            feedTvs(now);
+        }
+        if (now % 10 != 0) {
             return;
         }
         // The tape stopped by itself (an end reached): the sound has ended with it
         if (deck.mode != shownMode || Math.abs(deck.pos - shownPos) >= Audio.RATE / 2) {
             changed();
+        }
+    }
+
+    private void findTvs() {
+        tvs.clear();
+        for (BlockPos p : BlockPos.betweenClosed(worldPosition.offset(-TV_REACH, -2, -TV_REACH), worldPosition.offset(TV_REACH, 2, TV_REACH))) {
+            if (level.getBlockEntity(p) instanceof TvBlockEntity) {
+                tvs.add(p.immutable());
+            }
+        }
+    }
+
+    /** Sends the frame under the heads to the televisions, when it changed (and now and then for whoever came near). */
+    private void feedTvs(long now) {
+        ServerLevel sl = (ServerLevel) level;
+        String file = deck.file;
+        int index;
+        byte[] data = null;
+        if (!com.waylays.eraphones.gear.Video.isVideo(file) || deck.mode == Tape.Mode.STOP && deck.pos == 0 && cassette.isEmpty()) {
+            index = com.waylays.eraphones.gear.TvNet.BLUE;
+        } else if (com.waylays.eraphones.gear.Video.prepare(file) != com.waylays.eraphones.gear.Video.State.READY) {
+            index = com.waylays.eraphones.gear.TvNet.LOADING;
+        } else if (deck.mode == Tape.Mode.STOP) {
+            index = com.waylays.eraphones.gear.TvNet.BLUE;
+        } else {
+            index = com.waylays.eraphones.gear.Video.index(deck.pos);
+        }
+        if (index == shownFrame && now - tvAt < 60) {
+            return;
+        }
+        if (index >= 0) {
+            data = com.waylays.eraphones.gear.Video.frame(file, index);
+            if (data == null) {
+                index = com.waylays.eraphones.gear.TvNet.BLUE;
+            }
+        }
+        shownFrame = index;
+        tvAt = now;
+        for (BlockPos tv : tvs) {
+            com.waylays.eraphones.gear.TvNet.show(sl, tv, index, data);
         }
     }
 

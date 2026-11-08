@@ -24,6 +24,11 @@ feuille de papier, journal).
 | Poste de radio (bloc) | Clic droit : allumer, régler la fréquence (88 à 108 FM, cadran à faire glisser, molette ou boutons) et le volume. Il grésille entre les stations ; l'œil magique s'allume quand une station passe. Une station, c'est un maître du jeu qui fait `/radio emettre 100.3` : sa voix sort des radios réglées dessus (`/radio arreter` pour finir). |
 | Magnétoscope (bloc) + cassette | Clic droit sur le magnétoscope avec une cassette en main pour l'insérer (ou bouton « Insérer » sur sa façade). Touches : ⏏ éjecter, ◀◀ rembobiner, ▶ lecture, ❚❚ pause, ■ stop, ▶▶ avance rapide ; compteur de bande. Le son sort du magnétoscope (16 blocs autour, Simple Voice Chat requis). Comme une vraie bande : pour revenir au début il faut rembobiner, et on entend tout défiler à l'envers ; la cassette éjectée garde l'endroit où en était la bande. |
 | Pièces et billets | 10 et 25 cents (frappées en relief, tranche striée), billets de 1, 5, 10, 20, 50 et 100 dollars imprimés recto verso, en 3D (dessins originaux). |
+| Télévision (bloc) | Clic droit pour l'allumer ou l'éteindre. Posée à 4 blocs ou moins d'un magnétoscope, elle montre la cassette vidéo (MP4) qu'il lit : image de vieux poste cathodique (lignes, couleurs qui bavent, image qui tremble et se déchire, bande d'interférence, bas de l'image abîmé par la bande), son de petit haut-parleur usé avec décrochages. Écran bleu sans cassette, neige et grésillement sans magnétoscope. Rembobiner ou avancer fait défiler l'image aussi. Le film est préparé une fois par le serveur (≈ 1 min pour 3 min de film), puis gardé. Sans Simple Voice Chat, l'image défile quand même, sans le son. |
+| Boîte à musique (bloc) | Clic droit : une petite valse en mineur, qui ralentit et baisse quand le ressort se détend (24 s). |
+| Poupée de porcelaine (bloc) | Sa tête se tourne vers le joueur le plus proche… seulement quand tu ne la regardes pas. |
+| Ballon rouge | Un ballon rouge au bout de sa ficelle, à tenir. |
+| Télécommande du MJ (staff) | Clic droit : liste des joueurs à 64 blocs (clique pour choisir), touches pour brouillard, coupure, sang, tremblement, flotter, vertige, ballon, tout arrêter, les 12 sons, et un texte à murmurer ou narrer. |
 | Cassette vierge | Clic droit (staff) : le dossier des cassettes s'ouvre sur ton ordinateur et un écran liste les MP3 qui s'y trouvent ; choisis-en un, écris l'étiquette, « Graver ». Le fichier est envoyé au serveur (24 Mo au plus) et gravé pour toujours sur la cassette tenue. Un joueur sans droits voit seulement qu'elle est vierge. |
 | Carte d'identité | Vierge, elle est établie au nom de la première personne qui l'utilise (nom RP, signalement de `/desc`, numéro). Clic droit pour la regarder (avec la photo du visage du personnage), clic droit sur quelqu'un pour la lui montrer. |
 | Journal | Imprimé par les maîtres du jeu ; clic droit pour le lire. |
@@ -33,6 +38,8 @@ feuille de papier, journal).
 
 | Commande | Effet |
 | --- | --- |
+| `/narration <texte>` | Narration sur l'écran de tous les joueurs (bandes noires de cinéma, texte qui s'écrit) et dans leur chat. |
+| `/narrationalone <joueurs> <texte>` | La même chose pour un seul joueur (ou ceux choisis). |
 | `/cassette liste` | Les fichiers MP3 disponibles sur le serveur (`config/eraphones/cassettes/`, où arrivent aussi ceux gravés depuis le jeu). |
 | `/cassette graver <fichier> <titre>` | Donne une cassette de ce fichier, avec ce titre sur l'étiquette. Elle ne peut plus être modifiée. |
 | `/radio emettre <fréquence>` · `/radio arreter` | Passer à l'antenne sur une fréquence (ta voix sort des radios réglées dessus), ou s'arrêter. |

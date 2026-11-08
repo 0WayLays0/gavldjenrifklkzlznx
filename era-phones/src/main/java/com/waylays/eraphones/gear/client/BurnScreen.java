@@ -70,7 +70,10 @@ public class BurnScreen extends Screen {
         try {
             Files.createDirectories(Tape.folder());
             try (Stream<Path> s = Files.list(Tape.folder())) {
-                s.filter(p -> p.getFileName().toString().toLowerCase().endsWith(".mp3") && Files.isRegularFile(p))
+                s.filter(p -> {
+                            String n = p.getFileName().toString().toLowerCase();
+                            return (n.endsWith(".mp3") || n.endsWith(".mp4")) && Files.isRegularFile(p);
+                        })
                         .sorted((a, b) -> a.getFileName().toString().compareToIgnoreCase(b.getFileName().toString()))
                         .forEach(files::add);
             }

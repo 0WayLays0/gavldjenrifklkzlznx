@@ -37,7 +37,7 @@ import java.util.UUID;
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class TapeNet {
     /** The largest recording that may be sent (bytes). */
-    public static final int MAX = 24 * 1024 * 1024;
+    public static final int MAX = 64 * 1024 * 1024;
     /** One piece of a file on its way (bytes): under the 32 KiB a packet to the server may carry. */
     public static final int CHUNK = 30000;
     public static final int TITLE = 40;
@@ -77,7 +77,8 @@ public final class TapeNet {
         }
         String base = name.replace('\\', '/');
         base = base.substring(base.lastIndexOf('/') + 1);
-        if (!base.toLowerCase().endsWith(".mp3")) {
+        String ext = base.toLowerCase().endsWith(".mp3") ? ".mp3" : base.toLowerCase().endsWith(".mp4") ? ".mp4" : null;
+        if (ext == null) {
             return null;
         }
         base = base.substring(0, base.length() - 4);
@@ -92,7 +93,7 @@ public final class TapeNet {
         if (s.isEmpty()) {
             return null;
         }
-        return (s.length() > 60 ? s.substring(0, 60) : s) + ".mp3";
+        return (s.length() > 60 ? s.substring(0, 60) : s) + ext;
     }
 
     private static void reply(ServerPlayer p, String state, String detail) {
@@ -117,9 +118,9 @@ public final class TapeNet {
                 burn(p, b.offhand(), file, b.title());
                 return;
             }
-            String base = file.substring(0, file.length() - 4);
+            String base = file.substring(0, file.length() - 4), ext = file.substring(file.length() - 4);
             for (int k = 2; Files.exists(dest); k++) {
-                file = base + " (" + k + ").mp3";
+                file = base + " (" + k + ")" + ext;
                 dest = Tape.folder().resolve(file);
             }
             Path part = Tape.folder().resolve(file + ".part");
@@ -189,6 +190,9 @@ public final class TapeNet {
         stack.set(GearRegistry.TAPE_LABEL.get(), label);
         stack.set(GearRegistry.TAPE_POS.get(), 0L);
         Tape.sound(file);
+        if (Video.isVideo(file)) {
+            Video.prepare(file);
+        }
         p.level().playSound(null, p.blockPosition(), SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, SoundSource.PLAYERS, .7f, 1.2f);
         reply(p, "done", label);
     }

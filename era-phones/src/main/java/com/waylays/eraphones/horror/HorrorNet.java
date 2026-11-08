@@ -12,6 +12,24 @@ public final class HorrorNet {
 
     public static void register(PayloadRegistrar r) {
         r.playToClient(Effect.TYPE, Effect.CODEC, (p, c) -> com.waylays.eraphones.horror.client.HorrorClient.effect(p));
+        r.playToClient(OpenRemote.TYPE, OpenRemote.CODEC, (p, c) -> com.waylays.eraphones.horror.client.HorrorClient.openRemote(p));
+        r.playToServer(Remote.TYPE, Remote.CODEC, (p, c) -> {
+            if (!(c.player() instanceof net.minecraft.server.level.ServerPlayer gm) || !RemoteItem.allowed(gm)) {
+                return;
+            }
+            java.util.List<net.minecraft.server.level.ServerPlayer> t = new java.util.ArrayList<>();
+            for (String id : p.targets()) {
+                try {
+                    net.minecraft.server.level.ServerPlayer sp = gm.server.getPlayerList().getPlayer(java.util.UUID.fromString(id));
+                    if (sp != null) {
+                        t.add(sp);
+                    }
+                } catch (IllegalArgumentException ignored) {
+                    // Not a player's id
+                }
+            }
+            RemoteItem.act(gm, t, p.action(), p.arg());
+        });
     }
 
     /**
@@ -37,6 +55,61 @@ public final class HorrorNet {
 
         @Override
         public Type<Effect> type() {
+            return TYPE;
+        }
+    }
+
+    /** To a game master: the players about (their ids and how they are named) for the remote's board. */
+    public record OpenRemote(java.util.List<String> ids, java.util.List<String> names) implements CustomPacketPayload {
+        public static final Type<OpenRemote> TYPE = new Type<>(EraPhones.id("horror_remote_open"));
+        public static final StreamCodec<FriendlyByteBuf, OpenRemote> CODEC = CustomPacketPayload.codec((p, b) -> {
+            b.writeVarInt(p.ids.size());
+            for (int i = 0; i < p.ids.size(); i++) {
+                b.writeUtf(p.ids.get(i), 64);
+                b.writeUtf(p.names.get(i), 64);
+            }
+        }, b -> {
+            int n = Math.min(256, b.readVarInt());
+            java.util.List<String> ids = new java.util.ArrayList<>(), names = new java.util.ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                ids.add(b.readUtf(64));
+                names.add(b.readUtf(64));
+            }
+            return new OpenRemote(ids, names);
+        });
+
+        @Override
+        public Type<OpenRemote> type() {
+            return TYPE;
+        }
+    }
+
+    /** From a game master's remote: do {@code action} (with {@code arg}, its words) to the players {@code targets}. */
+    public record Remote(java.util.List<String> targets, String action, String arg) implements CustomPacketPayload {
+        public static final Type<Remote> TYPE = new Type<>(EraPhones.id("horror_remote"));
+        public static final StreamCodec<FriendlyByteBuf, Remote> CODEC = CustomPacketPayload.codec((p, b) -> {
+            b.writeVarInt(p.targets.size());
+            for (String t : p.targets) {
+                b.writeUtf(t, 64);
+            }
+            b.writeUtf(p.action, 32);
+            b.writeUtf(p.arg, 512);
+        }, b -> {
+            int n = Math.min(256, b.readVarInt());
+            java.util.List<String> t = new java.util.ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                t.add(b.readUtf(64));
+            }
+            return new Remote(t, b.readUtf(32), b.readUtf(512));
+        });
+
+        public Remote {
+            action = action.length() > 32 ? action.substring(0, 32) : action;
+            arg = arg == null ? "" : arg.length() > 512 ? arg.substring(0, 512) : arg;
+        }
+
+        @Override
+        public Type<Remote> type() {
             return TYPE;
         }
     }

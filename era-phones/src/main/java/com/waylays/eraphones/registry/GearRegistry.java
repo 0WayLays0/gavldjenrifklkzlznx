@@ -80,6 +80,7 @@ public final class GearRegistry {
 
     public static final DeferredHolder<SoundEvent, SoundEvent> RADIO_STATIC = sound("radio_static");
     public static final DeferredHolder<SoundEvent, SoundEvent> TALKIE_SQUELCH = sound("talkie_squelch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_BOX = sound("boite_a_musique");
 
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(EraPhones.id(name)));
@@ -90,6 +91,18 @@ public final class GearRegistry {
     public static final DeferredBlock<VcrBlock> VCR = BLOCKS.register("magnetoscope",
             () -> new VcrBlock(BlockBehaviour.Properties.of().strength(1.2f).sound(SoundType.METAL).noOcclusion()));
 
+    public static final DeferredBlock<com.waylays.eraphones.gear.block.TvBlock> TV = BLOCKS.register("television",
+            () -> new com.waylays.eraphones.gear.block.TvBlock(BlockBehaviour.Properties.of().strength(1.5f).sound(SoundType.WOOD).noOcclusion()
+                    .lightLevel(s -> s.getValue(com.waylays.eraphones.gear.block.TvBlock.LIT) ? 7 : 0)));
+    public static final DeferredBlock<com.waylays.eraphones.horror.block.MusicBoxBlock> MUSIC_BOX_BLOCK = BLOCKS.register("boite_a_musique",
+            () -> new com.waylays.eraphones.horror.block.MusicBoxBlock(BlockBehaviour.Properties.of().strength(.8f).sound(SoundType.WOOD).noOcclusion()));
+    public static final DeferredBlock<com.waylays.eraphones.horror.block.DollBlock> DOLL = BLOCKS.register("poupee",
+            () -> new com.waylays.eraphones.horror.block.DollBlock(BlockBehaviour.Properties.of().strength(.6f).sound(SoundType.WOOL).noOcclusion()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.waylays.eraphones.gear.block.TvBlockEntity>> TV_BE = BLOCK_ENTITIES.register("television",
+            () -> BlockEntityType.Builder.of(com.waylays.eraphones.gear.block.TvBlockEntity::new, TV.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.waylays.eraphones.horror.block.DollBlockEntity>> DOLL_BE = BLOCK_ENTITIES.register("poupee",
+            () -> BlockEntityType.Builder.of(com.waylays.eraphones.horror.block.DollBlockEntity::new, DOLL.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RadioBlockEntity>> RADIO_BE = BLOCK_ENTITIES.register("radio",
             () -> BlockEntityType.Builder.of(RadioBlockEntity::new, RADIO.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<VcrBlockEntity>> VCR_BE = BLOCK_ENTITIES.register("magnetoscope",
@@ -102,6 +115,14 @@ public final class GearRegistry {
             () -> new WalkieItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
     public static final DeferredHolder<Item, Item> RADIO_ITEM = EraRegistry.ITEMS.register("radio", () -> new BlockItem(RADIO.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> VCR_ITEM = EraRegistry.ITEMS.register("magnetoscope", () -> new BlockItem(VCR.get(), new Item.Properties()));
+    public static final DeferredHolder<Item, Item> TV_ITEM = EraRegistry.ITEMS.register("television", () -> new BlockItem(TV.get(), new Item.Properties()));
+    public static final DeferredHolder<Item, Item> MUSIC_BOX_ITEM = EraRegistry.ITEMS.register("boite_a_musique",
+            () -> new BlockItem(MUSIC_BOX_BLOCK.get(), new Item.Properties()));
+    public static final DeferredHolder<Item, Item> DOLL_ITEM = EraRegistry.ITEMS.register("poupee", () -> new BlockItem(DOLL.get(), new Item.Properties()));
+    public static final DeferredHolder<Item, Item> BALLOON = EraRegistry.ITEMS.register("ballon_rouge",
+            () -> new com.waylays.eraphones.horror.BalloonItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> REMOTE = EraRegistry.ITEMS.register("telecommande_mj",
+            () -> new com.waylays.eraphones.horror.RemoteItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
     public static final DeferredHolder<Item, Item> CASSETTE = EraRegistry.ITEMS.register("cassette", () -> new CassetteItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<Item, Item> ID_CARD = EraRegistry.ITEMS.register("carte_identite", () -> new IdCardItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<Item, Item> NOTE = EraRegistry.ITEMS.register("feuille",
@@ -140,6 +161,7 @@ public final class GearRegistry {
             .withTabsBefore(TAB_LIGHT.getId())
             .displayItems((p, out) -> {
                 out.accept(VCR_ITEM.get());
+                out.accept(TV_ITEM.get());
                 out.accept(CASSETTE.get());
             }).build());
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB_DAILY = EraRegistry.TABS.register("vie_quotidienne", () -> CreativeModeTab.builder()
@@ -153,6 +175,17 @@ public final class GearRegistry {
                 out.accept(ID_CARD.get());
                 out.accept(NOTE.get());
                 out.accept(NEWSPAPER.get());
+            }).build());
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB_HORROR = EraRegistry.TABS.register("horreur", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.eraphones.horreur"))
+            .icon(() -> new ItemStack(BALLOON.get()))
+            .withTabsBefore(TAB_DAILY.getId())
+            .displayItems((p, out) -> {
+                out.accept(REMOTE.get());
+                out.accept(BALLOON.get());
+                out.accept(DOLL_ITEM.get());
+                out.accept(MUSIC_BOX_ITEM.get());
             }).build());
 
     private GearRegistry() {}

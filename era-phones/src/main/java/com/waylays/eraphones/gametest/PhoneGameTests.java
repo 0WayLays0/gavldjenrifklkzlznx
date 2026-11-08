@@ -165,7 +165,9 @@ public final class PhoneGameTests {
         // The names of the recordings sent from the game: kept in the folder, MP3 only
         helper.assertTrue("evil.mp3".equals(com.waylays.eraphones.gear.TapeNet.clean("../../evil.mp3")), "no way out of the folder");
         helper.assertTrue("Chanson du cirque.mp3".equals(com.waylays.eraphones.gear.TapeNet.clean("Chanson du cirque.mp3")), "a plain name kept");
-        helper.assertTrue(com.waylays.eraphones.gear.TapeNet.clean("chanson.wav") == null, "MP3 only");
+        helper.assertTrue(com.waylays.eraphones.gear.TapeNet.clean("chanson.wav") == null, "MP3 and MP4 only");
+        helper.assertTrue("film.mp4".equals(com.waylays.eraphones.gear.TapeNet.clean("film.mp4")), "a film kept");
+        helper.assertTrue(com.waylays.eraphones.gear.Video.index(48000L * 3) == 3 * com.waylays.eraphones.gear.VideoDecode.FPS, "a film's frame at three seconds");
         helper.assertTrue(com.waylays.eraphones.gear.TapeNet.clean("..mp3") == null, "a name needed");
         helper.assertTrue("a_b.mp3".equals(com.waylays.eraphones.gear.TapeNet.clean("a:b.mp3")), "odd marks replaced");
         // The torch: on, off, its batteries

@@ -25,8 +25,8 @@ import java.util.Arrays;
  */
 @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT)
 public final class TapeClient {
-    /** Pieces sent each tick: about 1.2 MB a second. */
-    private static final int PER_TICK = 2;
+    /** Pieces sent each tick: about 1.8 MB a second. */
+    private static final int PER_TICK = 3;
     private static byte[] bytes;
     private static int sent;
     private static boolean sending, waiting;

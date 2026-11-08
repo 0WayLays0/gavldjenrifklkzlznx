@@ -68,6 +68,14 @@ public final class HorrorCommands {
                     return t.size();
                 })))));
 
+        // The narrator: words over everyone's screen, or over one player's alone
+        d.register(Commands.literal("narration").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+                .then(Commands.argument("texte", StringArgumentType.greedyString())
+                        .executes(c -> narrate(c, c.getSource().getServer().getPlayerList().getPlayers()))));
+        d.register(Commands.literal("narrationalone").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+                .then(Commands.argument("joueurs", EntityArgument.players()).then(Commands.argument("texte", StringArgumentType.greedyString())
+                        .executes(c -> narrate(c, EntityArgument.getPlayers(c, "joueurs"))))));
+
         d.register(Commands.literal("voix").requires(s -> s.hasPermission(RpConfig.get(RpConfig.VOICE_PERMISSION, 2)))
                 .executes(HorrorCommands::voices)
                 .then(Commands.literal("ecoute").executes(HorrorCommands::listen))
@@ -82,6 +90,17 @@ public final class HorrorCommands {
                         })
                         .executes(c -> voice(c, List.of(c.getSource().getPlayerOrException())))
                         .then(Commands.argument("joueurs", EntityArgument.players()).executes(c -> voice(c, EntityArgument.getPlayers(c, "joueurs"))))));
+    }
+
+    private static int narrate(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> targets) {
+        String text = StringArgumentType.getString(c, "texte");
+        HorrorService.show(targets, "narration", 80 + Math.min(500, text.length() * 4), text, null);
+        Component line = Component.literal("\u2726 " + text).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+        for (ServerPlayer p : targets) {
+            p.sendSystemMessage(line);
+        }
+        c.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.narration.sent", targets.size()).withStyle(ChatFormatting.DARK_GRAY), false);
+        return targets.size();
     }
 
     private interface Timed {
