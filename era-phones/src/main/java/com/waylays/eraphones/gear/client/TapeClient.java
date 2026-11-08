@@ -25,10 +25,11 @@ import java.util.Arrays;
  */
 @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT)
 public final class TapeClient {
-    /** Pieces sent each tick: about 1.8 MB a second. */
-    private static final int PER_TICK = 3;
-    private static byte[] bytes;
-    private static int sent;
+    /** Pieces sent each tick: about 3 MB a second. */
+    private static final int PER_TICK = 5;
+    /** The file being sent, read a piece at a time (any size), how long it is, how much has gone. */
+    private static java.nio.channels.FileChannel file;
+    private static long size, sent;
     private static boolean sending, waiting;
     /** What the screen shows under the list: a key and its argument, and whether it is bad news. */
     static Component status;
@@ -58,29 +59,31 @@ public final class TapeClient {
 
     /** The share of the file sent, 0 to 1. */
     static float progress() {
-        return bytes == null || bytes.length == 0 ? 0 : sent / (float) bytes.length;
+        return size <= 0 ? 0 : (float) ((double) sent / size);
     }
 
     /** Asks the server to record {@code file} on the cassette in that hand. */
-    static void start(boolean offhand, Path file, String title) {
+    static void start(boolean offhand, Path path, String title) {
         if (busy()) {
             return;
         }
         try {
-            long size = Files.size(file);
-            if (size <= 0 || size > TapeNet.MAX) {
+            reset();
+            size = Files.size(path);
+            if (size <= 0) {
                 say(Component.translatable("gear.eraphones.burn_bad"), true);
                 return;
             }
-            bytes = Files.readAllBytes(file);
+            file = java.nio.channels.FileChannel.open(path, java.nio.file.StandardOpenOption.READ);
         } catch (IOException e) {
-            say(Component.translatable("gear.eraphones.burn_read_failed", file.getFileName().toString()), true);
+            reset();
+            say(Component.translatable("gear.eraphones.burn_read_failed", path.getFileName().toString()), true);
             return;
         }
         sent = 0;
         waiting = true;
         say(Component.translatable("gear.eraphones.burn_waiting"), false);
-        PacketDistributor.sendToServer(new TapeNet.Begin(offhand, file.getFileName().toString(), title, bytes.length));
+        PacketDistributor.sendToServer(new TapeNet.Begin(offhand, path.getFileName().toString(), title, size));
     }
 
     public static void state(TapeNet.State s) {
@@ -119,7 +122,15 @@ public final class TapeClient {
     }
 
     private static void reset() {
-        bytes = null;
+        if (file != null) {
+            try {
+                file.close();
+            } catch (IOException ignored) {
+                // Done with it anyway
+            }
+        }
+        file = null;
+        size = 0;
         sent = 0;
         sending = false;
         waiting = false;
@@ -127,19 +138,31 @@ public final class TapeClient {
 
     @SubscribeEvent
     public static void onTick(ClientTickEvent.Post event) {
-        if (!sending || bytes == null) {
+        if (!sending || file == null) {
             return;
         }
         if (Minecraft.getInstance().getConnection() == null) {
             reset();
             return;
         }
-        for (int k = 0; k < PER_TICK && sent < bytes.length; k++) {
-            int n = Math.min(TapeNet.CHUNK, bytes.length - sent);
-            PacketDistributor.sendToServer(new TapeNet.Chunk(Arrays.copyOfRange(bytes, sent, sent + n)));
-            sent += n;
+        try {
+            for (int k = 0; k < PER_TICK && sent < size; k++) {
+                java.nio.ByteBuffer buf = java.nio.ByteBuffer.allocate((int) Math.min(TapeNet.CHUNK, size - sent));
+                while (buf.hasRemaining() && file.read(buf, sent + buf.position()) > 0) {
+                    // Filled a piece
+                }
+                PacketDistributor.sendToServer(new TapeNet.Chunk(Arrays.copyOf(buf.array(), buf.position())));
+                sent += buf.position();
+                if (buf.position() == 0) {
+                    throw new IOException("the file shrank");
+                }
+            }
+        } catch (IOException e) {
+            reset();
+            say(Component.translatable("gear.eraphones.burn_failed"), true);
+            return;
         }
-        if (sent >= bytes.length) {
+        if (sent >= size) {
             PacketDistributor.sendToServer(new TapeNet.End());
             sending = false;
             waiting = true;

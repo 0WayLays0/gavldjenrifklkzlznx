@@ -16,7 +16,7 @@
   "gear.eraphones.bad_frequency": "A frequency from 88.0 to 108.0",
   "gear.eraphones.broken": "Broken",
   "gear.eraphones.broken_torch": "The flashlight won't light",
-  "gear.eraphones.burn_bad": "This file cannot be recorded (an MP3 or MP4 of 64 MB at most)",
+  "gear.eraphones.burn_bad": "This file cannot be recorded (an MP3 or an MP4, not empty)",
   "gear.eraphones.burn_cancel": "Cancel",
   "gear.eraphones.burn_done": "Cassette recorded: %s",
   "gear.eraphones.burn_empty": "No MP3 or MP4 in the folder yet: drop one in, it shows here by itself.",

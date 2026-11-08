@@ -36,8 +36,6 @@ import java.util.UUID;
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class TapeNet {
-    /** The largest recording that may be sent (bytes). */
-    public static final int MAX = 64 * 1024 * 1024;
     /** One piece of a file on its way (bytes): under the 32 KiB a packet to the server may carry. */
     public static final int CHUNK = 30000;
     public static final int TITLE = 40;
@@ -106,7 +104,7 @@ public final class TapeNet {
         }
         abort(p.getUUID());
         String file = clean(b.file());
-        if (file == null || b.size() <= 0 || b.size() > MAX) {
+        if (file == null || b.size() <= 0) {
             reply(p, "error", "gear.eraphones.burn_bad");
             return;
         }

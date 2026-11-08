@@ -161,7 +161,7 @@ public class BurnScreen extends Screen {
                 PhoneUI.round(g, x0 + 11, y + 1, W - 22, ROW - 2, 3, 0xFF22262F);
             }
             String size = Component.translatable("gear.eraphones.burn_size", String.format("%.1f", sizes.get(i) / 1048576.0)).getString();
-            PhoneUI.right(g, size, x0 + W - 16, y + 4, sizes.get(i) > TapeNet.MAX ? 0xFFFF7070 : PhoneUI.FAINT, 1);
+            PhoneUI.right(g, size, x0 + W - 16, y + 4, PhoneUI.FAINT, 1);
             String name = PhoneUI.fit(files.get(i).getFileName().toString(), W - 40 - PhoneUI.width(size, 1), 1);
             PhoneUI.text(g, name, x0 + 16, y + 4, PhoneUI.WHITE, 1);
         }

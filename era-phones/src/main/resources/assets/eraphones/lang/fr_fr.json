@@ -16,7 +16,7 @@
   "gear.eraphones.bad_frequency": "Une fr\u00e9quence de 88.0 \u00e0 108.0",
   "gear.eraphones.broken": "Cass\u00e9e",
   "gear.eraphones.broken_torch": "La lampe ne s'allume plus",
-  "gear.eraphones.burn_bad": "Ce fichier ne peut pas \u00eatre grav\u00e9 (un MP3 ou MP4 de 64 Mo au plus)",
+  "gear.eraphones.burn_bad": "Ce fichier ne peut pas \u00eatre grav\u00e9 (un MP3 ou un MP4, non vide)",
   "gear.eraphones.burn_cancel": "Annuler",
   "gear.eraphones.burn_done": "Cassette enregistr\u00e9e : %s",
   "gear.eraphones.burn_empty": "Aucun MP3 ni MP4 dans le dossier : d\u00e9pose-en un, il appara\u00eetra ici tout seul.",

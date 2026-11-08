@@ -84,7 +84,7 @@ T = {
     "gear.eraphones.burn_sending": ("Sending to the server: %s%%", "Envoi au serveur : %s %%"),
     "gear.eraphones.burn_waiting": ("Waiting for the server...", "En attente du serveur…"),
     "gear.eraphones.burn_done": ("Cassette recorded: %s", "Cassette enregistrée : %s"),
-    "gear.eraphones.burn_bad": ("This file cannot be recorded (an MP3 or MP4 of 64 MB at most)", "Ce fichier ne peut pas être gravé (un MP3 ou MP4 de 64 Mo au plus)"),
+    "gear.eraphones.burn_bad": ("This file cannot be recorded (an MP3 or an MP4, not empty)", "Ce fichier ne peut pas être gravé (un MP3 ou un MP4, non vide)"),
     "gear.eraphones.burn_failed": ("The server could not keep the file", "Le serveur n'a pas pu garder le fichier"),
     "gear.eraphones.burn_read_failed": ("Cannot read %s", "Impossible de lire %s"),
     "gear.eraphones.burn_folder_failed": ("Cannot open the folder: %s", "Impossible d'ouvrir le dossier : %s"),
