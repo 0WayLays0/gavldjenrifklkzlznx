@@ -112,10 +112,13 @@ def disc(color, rim, mark=None):
 # ------------------------------------------------------------------------------------------------ in hand
 
 TORCH = {
-    "thirdperson_righthand": {"rotation": [-10, -90, 0], "translation": [0, 3, 0.5], "scale": [0.62, 0.62, 0.62]},
-    "thirdperson_lefthand": {"rotation": [-10, 90, 0], "translation": [0, 3, 0.5], "scale": [0.62, 0.62, 0.62]},
-    "firstperson_righthand": {"rotation": [0, -100, 10], "translation": [0, 3.5, -1], "scale": [0.42, 0.42, 0.42]},
-    "firstperson_lefthand": {"rotation": [0, -80, -10], "translation": [0, 3.5, -1], "scale": [0.42, 0.42, 0.42]},
+    # Held like a torch: the lens forward, the red switch on top. In third person the item's frame has +y forward and
+    # +z up, so a quarter turn about x sends the lens (north) forward, a little short of it to level the raised arm;
+    # the grip sits in the fist. In first person the lens points ahead, turned a little toward the crosshair.
+    "thirdperson_righthand": {"rotation": [75, 0, 0], "translation": [0, 0.5, 1.5], "scale": [0.62, 0.62, 0.62]},
+    "thirdperson_lefthand": {"rotation": [75, 0, 0], "translation": [0, 0.5, 1.5], "scale": [0.62, 0.62, 0.62]},
+    "firstperson_righthand": {"rotation": [4, 6, 0], "translation": [0, 3.5, -1], "scale": [0.42, 0.42, 0.42]},
+    "firstperson_lefthand": {"rotation": [4, -6, 0], "translation": [0, 3.5, -1], "scale": [0.42, 0.42, 0.42]},
     "ground": {"rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]},
     "gui": {"rotation": [30, 225, 0], "translation": [0, 0, 0], "scale": [0.85, 0.85, 0.85]},
     "fixed": {"rotation": [0, 90, 0], "translation": [0, 0, 0], "scale": [0.9, 0.9, 0.9]},
@@ -160,8 +163,7 @@ def lens(tile):
 
 def flashlight():
     """A torch of the time: a matte black metal body with a knurled grip, a red push switch, a chrome bezel round a
-    wide lens, a rounded tail cap. It lies along z, its lens to the north: held like the phones (whose face looks back
-    at the holder), it points away from them, where they look."""
+    wide lens, a rounded tail cap. It lies along z, its lens to the north, which its hand transforms turn forward."""
     m = Model("lampe_torche")
     cx = cy = 8
     black, chrome = (46, 48, 54), (176, 180, 190)

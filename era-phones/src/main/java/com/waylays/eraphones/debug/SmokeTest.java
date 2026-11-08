@@ -328,6 +328,8 @@ public final class SmokeTest {
         STEPS.add(() -> shot(mc, "gear_torch_night"));
         STEPS.add(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT));
         STEPS.add(() -> shot(mc, "gear_torch_front"));
+        STEPS.add(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_BACK));
+        STEPS.add(() -> shot(mc, "gear_torch_back"));
         STEPS.add(() -> {
             mc.options.setCameraType(CameraType.FIRST_PERSON);
             select(mc, 6);

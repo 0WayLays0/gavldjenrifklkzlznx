@@ -67,12 +67,13 @@ public class NoteEditScreen extends Screen {
         title.setValue(keepTitle);
         addRenderableWidget(title);
         y += 24;
-        int textH = Math.max(60, Math.min(150, height - y - 120));
+        int textH = Math.max(60, Math.min(150, height - y - 128));
         text = new MultiLineEditBox(font, panelX, y, panelW, textH, tr("note.eraphones.text"), tr("note.eraphones.text"));
         text.setCharacterLimit(GearNet.NOTE_TEXT);
         text.setValue(keepText);
         addRenderableWidget(text);
-        y += textH + 6;
+        // Room under the box for its character count
+        y += textH + 14;
         addRenderableWidget(Button.builder(Component.literal("◀"), b -> style = Math.floorMod(style - 1, NotePage.STYLES.length))
                 .bounds(panelX, y, 20, 20).build());
         addRenderableWidget(Button.builder(Component.literal("▶"), b -> style = Math.floorMod(style + 1, NotePage.STYLES.length))
