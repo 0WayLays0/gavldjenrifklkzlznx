@@ -190,7 +190,7 @@ public class VcrBlockEntity extends BlockEntity {
     private void findTvs() {
         tvs.clear();
         for (BlockPos p : BlockPos.betweenClosed(worldPosition.offset(-TV_REACH, -2, -TV_REACH), worldPosition.offset(TV_REACH, 2, TV_REACH))) {
-            if (level.getBlockEntity(p) instanceof TvBlockEntity) {
+            if (level.getBlockEntity(p) instanceof TvBlockEntity tv && !tv.hasCassette()) {
                 tvs.add(p.immutable());
             }
         }

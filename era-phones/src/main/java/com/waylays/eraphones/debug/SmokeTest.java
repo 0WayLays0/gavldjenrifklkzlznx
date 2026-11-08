@@ -436,17 +436,16 @@ public final class SmokeTest {
         STEPS.add(() -> shot(mc, "tv_blue"));
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null || vcrPos == null || !(p.serverLevel().getBlockEntity(vcrPos) instanceof com.waylays.eraphones.gear.block.VcrBlockEntity vcr)) {
-                fail("no video recorder to play the film in");
+            if (p == null || vcrPos == null || !(p.serverLevel().getBlockEntity(vcrPos.above()) instanceof com.waylays.eraphones.gear.block.TvBlockEntity tv)) {
+                fail("no television to play the film in");
                 return;
             }
             ItemStack film = new ItemStack(com.waylays.eraphones.registry.GearRegistry.CASSETTE.get());
             film.set(com.waylays.eraphones.registry.GearRegistry.TAPE.get(), "Film test.mp4");
             film.set(com.waylays.eraphones.registry.GearRegistry.TAPE_LABEL.get(), "Film test");
             ItemStack keep = p.getOffhandItem().copy();
-            p.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, film);
-            vcr.press(p, "insert");
-            vcr.press(p, "play");
+            // Pushed into the television itself, as a player does
+            tv.insert(film);
             p.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, keep);
         }));
         for (int k = 0; k < 2; k++) {
