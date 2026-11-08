@@ -54,7 +54,6 @@ public class BurnScreen extends Screen {
         int y = listY + ROWS * ROW + 8;
         label = new EditBox(font, x0 + 10, y + 10, W - 20, 18, Component.translatable("gear.eraphones.burn_label"));
         label.setMaxLength(TapeNet.TITLE);
-        label.setHint(Component.translatable("gear.eraphones.burn_label"));
         label.setValue(keep);
         addRenderableWidget(label);
         record = addRenderableWidget(Button.builder(Component.translatable("gear.eraphones.burn_go"), b -> go())

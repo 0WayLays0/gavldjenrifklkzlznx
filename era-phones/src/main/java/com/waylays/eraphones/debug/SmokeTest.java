@@ -386,7 +386,30 @@ public final class SmokeTest {
                     0, 1, false, "Un ami")));
         });
         STEPS.add(() -> shot(mc, "gear_note_read"));
-        // Every thing in hand, one after the other; a few as others see them; the inventory's icons
+        // What the client has where the radio and the recorder were set down, and what it would draw there
+        STEPS.add(() -> {
+            for (net.minecraft.core.BlockPos at : new net.minecraft.core.BlockPos[] {radioPos, vcrPos}) {
+                if (at == null) {
+                    continue;
+                }
+                net.minecraft.world.level.block.state.BlockState st = mc.level.getBlockState(at);
+                net.minecraft.client.resources.model.BakedModel model = mc.getBlockRenderer().getBlockModel(st);
+                int quads = model.getQuads(st, null, net.minecraft.util.RandomSource.create()).size();
+                log("block at {}: {} (below {}), light block {} sky {}, model {} with {} quads, shape {}", at.toShortString(), st,
+                        mc.level.getBlockState(at.below()).getBlock(), mc.level.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, at),
+                        mc.level.getBrightness(net.minecraft.world.level.LightLayer.SKY, at), model.getClass().getSimpleName(), quads, st.getRenderShape());
+            }
+        });
+        // Every thing in hand, one after the other; a few as others see them; the inventory's icons (the hotbar is
+        // put back after, the phones in it are looked at again at the end)
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p != null) {
+                for (int k = 0; k < 9; k++) {
+                    HOTBAR[k] = p.getInventory().getItem(k).copy();
+                }
+            }
+        }));
         String[] held = {"piece_25c", "billet_20", "carte_identite", "journal_papier", "feuille", "cassette", "piles", "talkie_walkie", "radio",
                 "magnetoscope", "lampe_torche"};
         for (String name : held) {
@@ -441,6 +464,14 @@ public final class SmokeTest {
             mc.setScreen(new com.waylays.eraphones.gear.client.BurnScreen(false));
         });
         STEPS.add(() -> shot(mc, "gear_burn"));
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p != null) {
+                for (int k = 0; k < 9; k++) {
+                    p.getInventory().setItem(k, HOTBAR[k] == null ? ItemStack.EMPTY : HOTBAR[k]);
+                }
+            }
+        }));
         STEPS.add(() -> {
             mc.setScreen(null);
             log("gear: torch, walkie-talkie, radio, video recorder, card, newspaper, things in hand and the cassette screen shown");
@@ -448,6 +479,7 @@ public final class SmokeTest {
     }
 
     private static net.minecraft.core.BlockPos radioPos, vcrPos;
+    private static final ItemStack[] HOTBAR = new ItemStack[9];
 
     private static void open(Minecraft mc, int slot) {
         mc.setScreen(null);
