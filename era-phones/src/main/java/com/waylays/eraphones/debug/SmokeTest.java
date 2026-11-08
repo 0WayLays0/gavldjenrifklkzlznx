@@ -449,7 +449,7 @@ public final class SmokeTest {
             vcr.press(p, "play");
             p.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, keep);
         }));
-        for (int k = 0; k < 4; k++) {
+        for (int k = 0; k < 2; k++) {
             STEPS.add(() -> {
             });
         }
@@ -553,18 +553,18 @@ public final class SmokeTest {
         });
     }
 
-    /** A three-second film of colour bars with a black square crossing them, made with the same library that reads it. */
+    /** A twenty-second film of colour bars with a black square crossing them, made with the same library that reads it. */
     private static void testFilm(java.io.File out) throws java.io.IOException {
         org.jcodec.api.SequenceEncoder enc = org.jcodec.api.SequenceEncoder.createSequenceEncoder(out, 10);
         int[][] cols = {{255, 255, 255}, {255, 255, 0}, {0, 255, 255}, {0, 255, 0}, {255, 0, 255}, {255, 0, 0}, {0, 0, 255}};
-        for (int f = 0; f < 30; f++) {
+        for (int f = 0; f < 200; f++) {
             org.jcodec.common.model.Picture pic = org.jcodec.common.model.Picture.create(160, 120, org.jcodec.common.model.ColorSpace.RGB);
             byte[] d = pic.getPlaneData(0);
             for (int y = 0; y < 120; y++) {
                 for (int x = 0; x < 160; x++) {
                     int i = (y * 160 + x) * 3;
                     int[] c = cols[x * 7 / 160];
-                    boolean square = Math.abs(x - (20 + f * 4)) < 14 && Math.abs(y - 60) < 14;
+                    boolean square = Math.abs(x - (20 + f * 4 % 120)) < 14 && Math.abs(y - 60) < 14;
                     for (int k = 0; k < 3; k++) {
                         d[i + k] = (byte) ((square ? 16 : c[k]) - 128);
                     }
