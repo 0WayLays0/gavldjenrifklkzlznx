@@ -40,6 +40,8 @@ feuille de papier, journal).
 | --- | --- |
 | `/narration <texte>` | Narration sur l'écran de tous les joueurs (bandes noires de cinéma, texte qui s'écrit) et dans leur chat. |
 | `/narrationalone <joueurs> <texte>` | La même chose pour un seul joueur (ou ceux choisis). |
+| `/narrationchat <texte>` | Narration seulement dans le chat de tous (rien à l'écran). |
+| `/narrationchatalone <joueurs> <texte>` | Pareil, pour un ou quelques joueurs. |
 | `/cassette liste` | Les fichiers MP3 disponibles sur le serveur (`config/eraphones/cassettes/`, où arrivent aussi ceux gravés depuis le jeu). |
 | `/cassette graver <fichier> <titre>` | Donne une cassette de ce fichier, avec ce titre sur l'étiquette. Elle ne peut plus être modifiée. |
 | `/radio emettre <fréquence>` · `/radio arreter` | Passer à l'antenne sur une fréquence (ta voix sort des radios réglées dessus), ou s'arrêter. |

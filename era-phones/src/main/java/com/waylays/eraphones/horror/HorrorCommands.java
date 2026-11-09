@@ -76,6 +76,14 @@ public final class HorrorCommands {
                 .then(Commands.argument("joueurs", EntityArgument.players()).then(Commands.argument("texte", StringArgumentType.greedyString())
                         .executes(c -> narrate(c, EntityArgument.getPlayers(c, "joueurs"))))));
 
+        // The narrator in the chat alone: words, nothing on the screen
+        d.register(Commands.literal("narrationchat").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+                .then(Commands.argument("texte", StringArgumentType.greedyString())
+                        .executes(c -> narrateChat(c, c.getSource().getServer().getPlayerList().getPlayers()))));
+        d.register(Commands.literal("narrationchatalone").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+                .then(Commands.argument("joueurs", EntityArgument.players()).then(Commands.argument("texte", StringArgumentType.greedyString())
+                        .executes(c -> narrateChat(c, EntityArgument.getPlayers(c, "joueurs"))))));
+
         d.register(Commands.literal("voix").requires(s -> s.hasPermission(RpConfig.get(RpConfig.VOICE_PERMISSION, 2)))
                 .executes(HorrorCommands::voices)
                 .then(Commands.literal("ecoute").executes(HorrorCommands::listen))
@@ -96,6 +104,15 @@ public final class HorrorCommands {
         String text = StringArgumentType.getString(c, "texte");
         HorrorService.show(targets, "narration", 80 + Math.min(500, text.length() * 4), text, null);
         Component line = Component.literal("\u2726 " + text).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+        for (ServerPlayer p : targets) {
+            p.sendSystemMessage(line);
+        }
+        c.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.narration.sent", targets.size()).withStyle(ChatFormatting.DARK_GRAY), false);
+        return targets.size();
+    }
+
+    private static int narrateChat(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> targets) {
+        Component line = Component.literal("\u2726 " + StringArgumentType.getString(c, "texte")).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
         for (ServerPlayer p : targets) {
             p.sendSystemMessage(line);
         }
