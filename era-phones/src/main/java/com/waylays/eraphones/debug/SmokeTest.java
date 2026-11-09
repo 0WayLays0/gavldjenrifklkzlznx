@@ -474,6 +474,57 @@ public final class SmokeTest {
         });
         STEPS.add(() -> shot(mc, "narration"));
         STEPS.add(() -> com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("stop", 0, "", 0, 0, 0)));
+        // Words on a wall in the four styles, and on the floor; then fear
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            net.minecraft.core.Direction dir = p.getDirection(), side = dir.getClockWise();
+            net.minecraft.core.BlockPos base = p.blockPosition().relative(dir, 6);
+            for (int a = -4; a <= 4; a++) {
+                for (int y = 0; y < 4; y++) {
+                    p.serverLevel().setBlockAndUpdate(base.relative(side, a).above(y), net.minecraft.world.level.block.Blocks.STONE_BRICKS.defaultBlockState());
+                    p.serverLevel().setBlockAndUpdate(base.relative(side, a).above(y).relative(dir.getOpposite()), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                }
+            }
+            for (int a = -2; a <= 2; a++) {
+                for (int b = 1; b <= 4; b++) {
+                    p.serverLevel().setBlockAndUpdate(base.relative(dir.getOpposite(), b).relative(side, a).below(), net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
+                    for (int y = 0; y < 3; y++) {
+                        p.serverLevel().setBlockAndUpdate(base.relative(dir.getOpposite(), b).relative(side, a).above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    }
+                }
+            }
+            net.minecraft.world.phys.Vec3 front = net.minecraft.world.phys.Vec3.atCenterOf(base).add(net.minecraft.world.phys.Vec3.atLowerCornerOf(dir.getOpposite().getNormal()).scale(.512));
+            net.minecraft.world.phys.Vec3 sideV = net.minecraft.world.phys.Vec3.atLowerCornerOf(side.getNormal());
+            Object[][] texts = {{"sang", "IL EST REVENU", .7f, 0, 2.2}, {"noir", "Ne descends pas", .32f, -2.3, 1.1}, {"peinture", "LOSERS CLUB", .42f, 2.2, 1.0},
+                    {"craie", "1 + 1 = 3 ?|Bill a menti", .3f, 0, .55}};
+            for (Object[] t : texts) {
+                com.waylays.eraphones.horror.WallWriting w = new com.waylays.eraphones.horror.WallWriting(com.waylays.eraphones.registry.GearRegistry.WRITING.get(), p.level());
+                net.minecraft.world.phys.Vec3 at = front.add(sideV.scale(((Number) t[3]).doubleValue())).add(0, ((Number) t[4]).doubleValue() - .5, 0);
+                w.setPos(at.x, at.y, at.z);
+                w.setup((String) t[1], (String) t[0], dir.getOpposite().get3DDataValue(), ((Number) t[2]).floatValue(), 0);
+                p.level().addFreshEntity(w);
+            }
+            com.waylays.eraphones.horror.WallWriting floor = new com.waylays.eraphones.horror.WallWriting(com.waylays.eraphones.registry.GearRegistry.WRITING.get(), p.level());
+            net.minecraft.world.phys.Vec3 fl = net.minecraft.world.phys.Vec3.atBottomCenterOf(base.relative(dir.getOpposite(), 2)).add(0, .012, 0);
+            floor.setPos(fl.x, fl.y, fl.z);
+            floor.setup("Viens jouer", "sang", net.minecraft.core.Direction.UP.get3DDataValue(), .5f, p.getYRot() + 180);
+            p.level().addFreshEntity(floor);
+            p.teleportTo(p.serverLevel(), Vec3c(base.relative(dir.getOpposite(), 5)).x, base.getY(), Vec3c(base.relative(dir.getOpposite(), 5)).z, p.getYRot(), 12);
+        }));
+        STEPS.add(() -> mc.player.setXRot(12));
+        for (int k = 0; k < 3; k++) {
+            STEPS.add(() -> {
+            });
+        }
+        STEPS.add(() -> shot(mc, "writing_wall"));
+        STEPS.add(() -> com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("peur", 400, "", 0, 0, 0)));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "fear"));
+        STEPS.add(() -> com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("stop", 0, "", 0, 0, 0)));
         // Every thing in hand, one after the other; a few as others see them; the inventory's icons (the hotbar is
         // put back after, the phones in it are looked at again at the end)
         STEPS.add(() -> server.execute(() -> {
@@ -572,6 +623,10 @@ public final class SmokeTest {
             enc.encodeNativeFrame(pic);
         }
         enc.finish();
+    }
+
+    private static net.minecraft.world.phys.Vec3 Vec3c(net.minecraft.core.BlockPos p) {
+        return net.minecraft.world.phys.Vec3.atBottomCenterOf(p);
     }
 
     private static net.minecraft.core.BlockPos radioPos, vcrPos;

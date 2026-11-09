@@ -23,5 +23,19 @@
       }
     ],
     "subtitle": "subtitles.eraphones.boite_a_musique"
+  },
+  "coeur_peur": {
+    "sounds": [
+      {
+        "name": "eraphones:coeur_peur"
+      }
+    ]
+  },
+  "souffle_peur": {
+    "sounds": [
+      {
+        "name": "eraphones:souffle_peur"
+      }
+    ]
   }
 }

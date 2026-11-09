@@ -19,9 +19,9 @@ import java.util.Set;
  * fright and each sound of /horreur, and words to whisper in their heads or to narrate over their screens.
  */
 public class RemoteScreen extends Screen {
-    static final String[] EFFECTS = {"brouillard", "coupure", "sang", "tremblement", "flotter", "vertige", "ballon", "stop"};
+    static final String[] EFFECTS = {"brouillard", "coupure", "sang", "tremblement", "flotter", "vertige", "ballon", "peur", "stop"};
     static final String[] SOUNDS = {"pas", "toc", "porte", "rire", "enfants", "murmures", "souffle", "coeur", "cri", "manege", "glas", "gouttes"};
-    private static final int W = 380, H = 236, LIST = 120, ROW = 14;
+    private static final int W = 380, H = 258, LIST = 120, ROW = 14;
     private final List<String> ids, names;
     private final Set<String> picked = new HashSet<>();
     private int x0, y0, scroll;
@@ -59,17 +59,17 @@ public class RemoteScreen extends Screen {
         for (int i = 0; i < SOUNDS.length; i++) {
             String s = SOUNDS[i];
             addRenderableWidget(Button.builder(Component.translatable("remote.eraphones.son." + s), b -> send("son:" + s, ""))
-                    .bounds(bx + (i % 4) * (bw + 3), y0 + 92 + (i / 4) * 21, bw, 18).build());
+                    .bounds(bx + (i % 4) * (bw + 3), y0 + 114 + (i / 4) * 21, bw, 18).build());
         }
-        words = new EditBox(font, bx, y0 + 172, W - LIST - 20, 18, Component.translatable("remote.eraphones.words"));
+        words = new EditBox(font, bx, y0 + 194, W - LIST - 20, 18, Component.translatable("remote.eraphones.words"));
         words.setMaxLength(500);
         words.setHint(Component.translatable("remote.eraphones.words"));
         addRenderableWidget(words);
         int half = (W - LIST - 20 - 3) / 2;
         addRenderableWidget(Button.builder(Component.translatable("remote.eraphones.murmure"), b -> send("murmure", words.getValue()))
-                .bounds(bx, y0 + 194, half, 18).build());
+                .bounds(bx, y0 + 216, half, 18).build());
         addRenderableWidget(Button.builder(Component.translatable("remote.eraphones.narration"), b -> send("narration", words.getValue()))
-                .bounds(bx + half + 3, y0 + 194, half, 18).build());
+                .bounds(bx + half + 3, y0 + 216, half, 18).build());
     }
 
     private void send(String action, String arg) {
@@ -130,7 +130,7 @@ public class RemoteScreen extends Screen {
         }
         int bx = x0 + LIST + 12;
         PhoneUI.text(g, Component.translatable("remote.eraphones.frights").getString(), bx, y0 + 21, 0xFFC08080, .8f);
-        PhoneUI.text(g, Component.translatable("remote.eraphones.sounds").getString(), bx, y0 + 83, 0xFFC08080, .8f);
+        PhoneUI.text(g, Component.translatable("remote.eraphones.sounds").getString(), bx, y0 + 105, 0xFFC08080, .8f);
         PhoneUI.text(g, Component.translatable("remote.eraphones.picked", picked.size()).getString(), bx, y0 + H - 18, PhoneUI.DIM, 1);
     }
 }

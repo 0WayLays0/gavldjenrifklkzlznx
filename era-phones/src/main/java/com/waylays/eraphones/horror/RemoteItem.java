@@ -85,6 +85,7 @@ public class RemoteItem extends Item {
             case "sang" -> HorrorService.show(targets, "sang", 8 * 20, "", null);
             case "tremblement" -> HorrorService.show(targets, "tremblement", 4 * 20, "", null);
             case "ballon" -> HorrorService.show(targets, "ballon", 400, "", null);
+            case "peur" -> HorrorService.show(targets, "peur", 30 * 20, "", null);
             case "flotter" -> HorrorService.levitate(targets, 6 * 20);
             case "vertige" -> HorrorService.dizzy(targets, 15 * 20);
             case "stop" -> HorrorService.stop(targets);

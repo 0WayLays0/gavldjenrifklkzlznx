@@ -55,6 +55,7 @@ public final class HorrorCommands {
                     HorrorService.levitate(t, s * 20);
                     return done(c, "flotter", t);
                 }))
+                .then(timed("peur", 30, (c, t, s) -> show(c, t, "peur", s)))
                 .then(timed("vertige", 15, (c, t, s) -> {
                     HorrorService.dizzy(t, s * 20);
                     return done(c, "vertige", t);
@@ -75,6 +76,30 @@ public final class HorrorCommands {
         d.register(Commands.literal("narrationalone").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.argument("joueurs", EntityArgument.players()).then(Commands.argument("texte", StringArgumentType.greedyString())
                         .executes(c -> narrate(c, EntityArgument.getPlayers(c, "joueurs"))))));
+
+        // Fear: blurred sight, a pounding heart, short breaths, for as long as the game master says
+        d.register(Commands.literal("peur").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+                .then(Commands.argument("joueurs", EntityArgument.players())
+                        .executes(c -> show(c, EntityArgument.getPlayers(c, "joueurs"), "peur", 30))
+                        .then(Commands.argument("secondes", IntegerArgumentType.integer(1, 600))
+                                .executes(c -> show(c, EntityArgument.getPlayers(c, "joueurs"), "peur", IntegerArgumentType.getInteger(c, "secondes"))))));
+
+        // Words written on what the game master looks at: /ecrire <style> [petit|moyen|grand] <texte> ("|" starts a line)
+        com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> write = Commands.literal("ecrire")
+                .requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)));
+        for (String style : new String[] {"sang", "craie", "peinture", "noir"}) {
+            com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> st = Commands.literal(style)
+                    .then(Commands.argument("texte", StringArgumentType.greedyString()).executes(c -> write(c, style, .45f)));
+            for (String[] size : new String[][] {{"petit", ".25"}, {"moyen", ".45"}, {"grand", ".9"}, {"enorme", "1.6"}}) {
+                st.then(Commands.literal(size[0]).then(Commands.argument("texte", StringArgumentType.greedyString())
+                        .executes(c -> write(c, style, Float.parseFloat(size[1])))));
+            }
+            write.then(st);
+        }
+        write.then(Commands.literal("effacer").executes(c -> rubOut(c, 4)));
+        write.then(Commands.literal("effacertout").executes(c -> rubOutAll(c, 48))
+                .then(Commands.argument("rayon", IntegerArgumentType.integer(1, 256)).executes(c -> rubOutAll(c, IntegerArgumentType.getInteger(c, "rayon")))));
+        d.register(write);
 
         // The narrator in the chat alone: words, nothing on the screen
         d.register(Commands.literal("narrationchat").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
@@ -118,6 +143,58 @@ public final class HorrorCommands {
         }
         c.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.narration.sent", targets.size()).withStyle(ChatFormatting.DARK_GRAY), false);
         return targets.size();
+    }
+
+    /** What the game master looks at, within 32 blocks: the face hit, or null. */
+    private static net.minecraft.world.phys.BlockHitResult looked(ServerPlayer p) {
+        Vec3 eye = p.getEyePosition();
+        net.minecraft.world.phys.BlockHitResult hit = p.level().clip(new net.minecraft.world.level.ClipContext(eye, eye.add(p.getLookAngle().scale(32)),
+                net.minecraft.world.level.ClipContext.Block.OUTLINE, net.minecraft.world.level.ClipContext.Fluid.NONE, p));
+        return hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS ? null : hit;
+    }
+
+    private static int write(CommandContext<CommandSourceStack> c, String style, float size) throws CommandSyntaxException {
+        ServerPlayer p = c.getSource().getPlayerOrException();
+        net.minecraft.world.phys.BlockHitResult hit = looked(p);
+        if (hit == null) {
+            c.getSource().sendFailure(Component.translatable("rp.eraphones.writing.nowhere"));
+            return 0;
+        }
+        String text = StringArgumentType.getString(c, "texte").replace("\\n", "|");
+        net.minecraft.core.Direction face = hit.getDirection();
+        Vec3 at = hit.getLocation().add(Vec3.atLowerCornerOf(face.getNormal()).scale(.012));
+        WallWriting w = new WallWriting(com.waylays.eraphones.registry.GearRegistry.WRITING.get(), p.level());
+        w.setPos(at.x, at.y, at.z);
+        w.setup(text.length() > 200 ? text.substring(0, 200) : text, style, face.get3DDataValue(), size, p.getYRot() + 180);
+        p.level().addFreshEntity(w);
+        c.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.writing.written").withStyle(ChatFormatting.GRAY), false);
+        return 1;
+    }
+
+    private static int rubOut(CommandContext<CommandSourceStack> c, double reach) throws CommandSyntaxException {
+        ServerPlayer p = c.getSource().getPlayerOrException();
+        net.minecraft.world.phys.BlockHitResult hit = looked(p);
+        Vec3 at = hit == null ? p.getEyePosition().add(p.getLookAngle().scale(3)) : hit.getLocation();
+        int n = 0;
+        for (WallWriting w : p.level().getEntitiesOfClass(WallWriting.class, new net.minecraft.world.phys.AABB(at, at).inflate(reach))) {
+            w.rubOut();
+            n++;
+        }
+        int count = n;
+        c.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.writing.erased", count).withStyle(ChatFormatting.GRAY), false);
+        return n;
+    }
+
+    private static int rubOutAll(CommandContext<CommandSourceStack> c, int radius) throws CommandSyntaxException {
+        ServerPlayer p = c.getSource().getPlayerOrException();
+        int n = 0;
+        for (WallWriting w : p.level().getEntitiesOfClass(WallWriting.class, p.getBoundingBox().inflate(radius))) {
+            w.rubOut();
+            n++;
+        }
+        int count = n;
+        c.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.writing.erased", count).withStyle(ChatFormatting.GRAY), false);
+        return n;
     }
 
     private interface Timed {

@@ -85,6 +85,9 @@ public final class HorrorClient {
     }
 
     private static final List<Active> ACTIVE = new ArrayList<>();
+    private static long lastBeat = -1, lastBreath = -1;
+    private static java.lang.reflect.Field blurField;
+    private static boolean blurTried;
 
     private HorrorClient() {}
 
@@ -127,6 +130,10 @@ public final class HorrorClient {
             case "sang" -> play("entity.warden.heartbeat", 1, 1);
             case "tremblement" -> play("entity.warden.emerge", .6f, .9f);
             case "narration" -> play("block.amethyst_block.chime", .5f, .5f);
+            case "peur" -> {
+                lastBeat = -1;
+                lastBreath = -1;
+            }
             default -> {
             }
         }
@@ -155,6 +162,22 @@ public final class HorrorClient {
                 it.remove();
             }
         }
+        // Fear: the heart pounding (faster as it takes hold), a short breath now and then
+        Active fear = active("peur");
+        if (fear != null && mc.player != null) {
+            float f = fear.fade(2f, 3f);
+            double beat = heartPeriod(f);
+            long beatNo = (long) (fear.age() / beat);
+            if (beatNo != lastBeat) {
+                lastBeat = beatNo;
+                mc.getSoundManager().play(SimpleSoundInstance.forUI(com.waylays.eraphones.registry.GearRegistry.HEARTBEAT.get(), 1, .25f + .75f * f));
+            }
+            long breathNo = (long) (fear.age() / 3.1);
+            if (breathNo != lastBreath && f > .3f) {
+                lastBreath = breathNo;
+                mc.getSoundManager().play(SimpleSoundInstance.forUI(com.waylays.eraphones.registry.GearRegistry.FEAR_BREATH.get(), .95f + (float) Math.random() * .1f, .5f * f));
+            }
+        }
         // A heart beating under the blood
         Active blood = active("sang");
         if (blood != null && blood.left() > 1 && mc.player != null && mc.player.tickCount % 22 == 0) {
@@ -172,6 +195,7 @@ public final class HorrorClient {
     @SubscribeEvent
     public static void onRegisterLayers(RegisterGuiLayersEvent event) {
         event.registerAboveAll(EraPhones.id("horror"), HorrorClient::render);
+        event.registerBelowAll(EraPhones.id("horror_blur"), HorrorClient::fearBlur);
     }
 
     private static void render(GuiGraphics g, DeltaTracker delta) {
@@ -191,6 +215,66 @@ public final class HorrorClient {
         }
         if ((a = active("narration")) != null) {
             narration(g, a, w, h);
+        }
+        if ((a = active("peur")) != null) {
+            float f = a.fade(2f, 3f);
+            float b = pulse(a);
+            vignette(g, w, h, 0x240000, (.45f + .35f * b) * f);
+            vignette(g, w, h, 0x000000, .25f * f);
+        }
+    }
+
+    /** Seconds between two heartbeats: a little fast, then racing as fear {@code f} takes hold. */
+    private static double heartPeriod(float f) {
+        return 60.0 / (95 + 55 * f);
+    }
+
+    /** The heartbeat's swell, 0 to 1: a strong beat and its echo. */
+    private static float pulse(Active fear) {
+        double period = heartPeriod(fear.fade(2f, 3f));
+        double t = fear.age() % period;
+        return (float) Math.min(1, Math.exp(-Math.pow(t / .09, 2)) + .6 * Math.exp(-Math.pow((t - .24) / .08, 2)));
+    }
+
+    /**
+     * Fear's blur over the world (drawn under the rest of the screen, so the hotbar stays sharp): the game's own blur,
+     * stronger on each heartbeat.
+     */
+    private static void fearBlur(GuiGraphics g, DeltaTracker delta) {
+        Active a = active("peur");
+        if (a == null) {
+            return;
+        }
+        float f = a.fade(2f, 3f);
+        float radius = (2.5f + 5f * pulse(a)) * f;
+        if (radius < .5f) {
+            return;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        g.flush();
+        try {
+            if (!blurTried) {
+                blurTried = true;
+                blurField = net.minecraft.client.renderer.GameRenderer.class.getDeclaredField("blurEffect");
+                blurField.setAccessible(true);
+            }
+            Object chain = blurField == null ? null : blurField.get(mc.gameRenderer);
+            if (chain instanceof net.minecraft.client.renderer.PostChain post) {
+                post.setUniform("Radius", radius);
+                post.process(delta.getGameTimeDeltaPartialTick(false));
+            }
+        } catch (Exception e) {
+            blurField = null;
+            mc.gameRenderer.processBlurEffect(delta.getGameTimeDeltaPartialTick(false));
+        }
+        mc.getMainRenderTarget().bindWrite(false);
+    }
+
+    @SubscribeEvent
+    public static void onFov(ViewportEvent.ComputeFov event) {
+        Active a = active("peur");
+        if (a != null) {
+            event.setFOV(event.getFOV() * (1 - .035 * pulse(a) * a.fade(2f, 3f)));
         }
     }
 
@@ -423,6 +507,10 @@ public final class HorrorClient {
         Active a = active("tremblement");
         if (a != null) {
             strength = Math.max(strength, 1.6f * a.fade(.8f, 1.5f));
+        }
+        Active fear = active("peur");
+        if (fear != null) {
+            strength = Math.max(strength, .25f * fear.fade(2f, 3f));
         }
         if (strength <= 0) {
             return;

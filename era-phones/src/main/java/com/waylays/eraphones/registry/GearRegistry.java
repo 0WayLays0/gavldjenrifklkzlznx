@@ -42,6 +42,13 @@ public final class GearRegistry {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(EraPhones.MODID);
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, EraPhones.MODID);
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, EraPhones.MODID);
+    public static final DeferredRegister<net.minecraft.world.entity.EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, EraPhones.MODID);
+
+    /** Writing on a wall (/ecrire). */
+    public static final DeferredHolder<net.minecraft.world.entity.EntityType<?>, net.minecraft.world.entity.EntityType<com.waylays.eraphones.horror.WallWriting>> WRITING =
+            ENTITIES.register("ecriture", () -> net.minecraft.world.entity.EntityType.Builder.<com.waylays.eraphones.horror.WallWriting>of(
+                    com.waylays.eraphones.horror.WallWriting::new, net.minecraft.world.entity.MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8)
+                    .updateInterval(20).noSummon().build("ecriture"));
 
     private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> component(String name, Codec<T> codec,
             net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf, T> stream) {
@@ -81,6 +88,8 @@ public final class GearRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> RADIO_STATIC = sound("radio_static");
     public static final DeferredHolder<SoundEvent, SoundEvent> TALKIE_SQUELCH = sound("talkie_squelch");
     public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_BOX = sound("boite_a_musique");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEARTBEAT = sound("coeur_peur");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FEAR_BREATH = sound("souffle_peur");
 
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(EraPhones.id(name)));
@@ -194,5 +203,6 @@ public final class GearRegistry {
         BLOCKS.register(bus);
         BLOCK_ENTITIES.register(bus);
         SOUNDS.register(bus);
+        ENTITIES.register(bus);
     }
 }

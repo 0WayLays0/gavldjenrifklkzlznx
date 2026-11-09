@@ -47,5 +47,6 @@ public final class DollClient {
     @SubscribeEvent
     public static void onRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(GearRegistry.DOLL_BE.get(), c -> new DollRenderer());
+        event.registerEntityRenderer(GearRegistry.WRITING.get(), WritingRenderer::new);
     }
 }
