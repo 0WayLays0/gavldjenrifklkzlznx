@@ -572,13 +572,16 @@ def sounds():
     shake = 1 + .35 * np.sin(2 * np.pi * 11 * t)
     breath = air * (inhale * .55 + exhale * .8) * shake
     ogg("souffle_peur", breath / np.abs(breath).max() * .8)
+    import photo_assets
+    ogg("photo_declic", photo_assets.shutter(rate))
     kit.write_json("sounds.json", {
         "radio_static": {"sounds": [{"name": "eraphones:radio_static"}], "subtitle": "subtitles.eraphones.radio_static"},
         "talkie_squelch": {"sounds": [{"name": "eraphones:talkie_squelch"}], "subtitle": "subtitles.eraphones.talkie_squelch"},
         "boite_a_musique": {"sounds": [{"name": "eraphones:boite_a_musique", "attenuation_distance": 20}],
                             "subtitle": "subtitles.eraphones.boite_a_musique"},
         "coeur_peur": {"sounds": [{"name": "eraphones:coeur_peur"}]},
-        "souffle_peur": {"sounds": [{"name": "eraphones:souffle_peur"}]}})
+        "souffle_peur": {"sounds": [{"name": "eraphones:souffle_peur"}]},
+        "photo_declic": {"sounds": [{"name": "eraphones:photo_declic"}], "subtitle": "subtitles.eraphones.photo_declic"}})
 
 
 # ------------------------------------------------------------------------------------------------ recipes
@@ -609,6 +612,8 @@ def main():
     gear_items.main(MONEY, money_id)
     import horror_items
     horror_items.main()
+    import photo_assets
+    photo_assets.main()
     sounds()
     recipes()
 

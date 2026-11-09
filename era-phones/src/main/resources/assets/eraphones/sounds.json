@@ -37,5 +37,13 @@
         "name": "eraphones:souffle_peur"
       }
     ]
+  },
+  "photo_declic": {
+    "sounds": [
+      {
+        "name": "eraphones:photo_declic"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.photo_declic"
   }
 }

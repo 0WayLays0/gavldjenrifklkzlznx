@@ -81,6 +81,16 @@ public final class GearRegistry {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> NOTE_INK = component("note_ink", Codec.INT, ByteBufCodecs.VAR_INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> NOTE_TYPED = component("note_typed", Codec.BOOL, ByteBufCodecs.BOOL);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NOTE_AUTHOR = text("note_author");
+    /** A photograph: its picture (squeezed), when it came out of the camera (game ticks), who took it; the shots left in a camera. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<byte[]>> PHOTO = component("photo",
+            Codec.BYTE_BUFFER.xmap(b -> {
+                byte[] a = new byte[b.remaining()];
+                b.duplicate().get(a);
+                return a;
+            }, java.nio.ByteBuffer::wrap), ByteBufCodecs.BYTE_ARRAY);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> PHOTO_TIME = component("photo_time", Codec.LONG, ByteBufCodecs.VAR_LONG);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> PHOTO_BY = text("photo_by");
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> FILM = component("film", Codec.INT, ByteBufCodecs.VAR_INT);
     /** A newspaper's headline and article. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NEWS_TITLE = text("news_title");
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NEWS_TEXT = text("news_text");
@@ -89,6 +99,7 @@ public final class GearRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> TALKIE_SQUELCH = sound("talkie_squelch");
     public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_BOX = sound("boite_a_musique");
     public static final DeferredHolder<SoundEvent, SoundEvent> HEARTBEAT = sound("coeur_peur");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHUTTER = sound("photo_declic");
     public static final DeferredHolder<SoundEvent, SoundEvent> FEAR_BREATH = sound("souffle_peur");
 
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
@@ -136,6 +147,11 @@ public final class GearRegistry {
     public static final DeferredHolder<Item, Item> ID_CARD = EraRegistry.ITEMS.register("carte_identite", () -> new IdCardItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<Item, Item> NOTE = EraRegistry.ITEMS.register("feuille",
             () -> new com.waylays.eraphones.gear.NoteItem(new Item.Properties().stacksTo(16)));
+    public static final DeferredHolder<Item, Item> CAMERA = EraRegistry.ITEMS.register("appareil_photo",
+            () -> new com.waylays.eraphones.gear.CameraItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> FILM_PACK = EraRegistry.ITEMS.register("pellicule", () -> new Item(new Item.Properties().stacksTo(16)));
+    public static final DeferredHolder<Item, Item> PHOTOGRAPH = EraRegistry.ITEMS.register("photo",
+            () -> new com.waylays.eraphones.gear.PhotoItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<Item, Item> NEWSPAPER = EraRegistry.ITEMS.register("journal_papier", () -> new NewspaperItem(new Item.Properties().stacksTo(16)));
 
     /** The money: dollar bills and coins, by face value in cents. */
@@ -182,6 +198,8 @@ public final class GearRegistry {
                     out.accept(m.get());
                 }
                 out.accept(ID_CARD.get());
+                out.accept(CAMERA.get());
+                out.accept(FILM_PACK.get());
                 out.accept(NOTE.get());
                 out.accept(NEWSPAPER.get());
             }).build());

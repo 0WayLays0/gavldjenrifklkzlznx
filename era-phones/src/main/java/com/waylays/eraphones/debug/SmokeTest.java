@@ -498,8 +498,8 @@ public final class SmokeTest {
             }
             net.minecraft.world.phys.Vec3 front = net.minecraft.world.phys.Vec3.atCenterOf(base).add(net.minecraft.world.phys.Vec3.atLowerCornerOf(dir.getOpposite().getNormal()).scale(.512));
             net.minecraft.world.phys.Vec3 sideV = net.minecraft.world.phys.Vec3.atLowerCornerOf(side.getNormal());
-            Object[][] texts = {{"sang", "IL EST REVENU", .7f, 0, 2.2}, {"noir", "Ne descends pas", .32f, -2.3, 1.1}, {"peinture", "LOSERS CLUB", .42f, 2.2, 1.0},
-                    {"craie", "1 + 1 = 3 ?|Bill a menti", .3f, 0, .55}};
+            Object[][] texts = {{"sang", "IL EST REVENU", .7f, 0, 2.2}, {"noir", "Ne descends pas", .32f, -2.3, 1.1}, {"peinture", "PAS SEULS", .42f, 2.2, 1.0},
+                    {"craie", "1 + 1 = 3 ?|Il a menti", .3f, 0, .55}};
             for (Object[] t : texts) {
                 com.waylays.eraphones.horror.WallWriting w = new com.waylays.eraphones.horror.WallWriting(com.waylays.eraphones.registry.GearRegistry.WRITING.get(), p.level());
                 net.minecraft.world.phys.Vec3 at = front.add(sideV.scale(((Number) t[3]).doubleValue())).add(0, ((Number) t[4]).doubleValue() - .5, 0);
@@ -525,6 +525,47 @@ public final class SmokeTest {
         });
         STEPS.add(() -> shot(mc, "fear"));
         STEPS.add(() -> com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("stop", 0, "", 0, 0, 0)));
+        // An instant camera: a picture of the wall taken, printed, looked at once developed
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p != null) {
+                p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CAMERA.get()));
+            }
+        }));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "camera_held"));
+        STEPS.add(() -> com.waylays.eraphones.gear.client.PhotoClient.take(false));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            boolean found = false;
+            for (ItemStack st : p.getInventory().items) {
+                if (st.is(com.waylays.eraphones.registry.GearRegistry.PHOTOGRAPH.get())) {
+                    st.set(com.waylays.eraphones.registry.GearRegistry.PHOTO_TIME.get(), p.level().getGameTime() - 5000);
+                    found = true;
+                }
+            }
+            if (!found) {
+                fail("no photograph came out of the camera");
+            }
+        }));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> {
+            for (ItemStack st : mc.player.getInventory().items) {
+                if (st.is(com.waylays.eraphones.registry.GearRegistry.PHOTOGRAPH.get())) {
+                    com.waylays.eraphones.gear.client.PhotoClient.open(st);
+                    return;
+                }
+            }
+        });
+        STEPS.add(() -> shot(mc, "photo_view"));
+        STEPS.add(() -> mc.setScreen(null));
         // Every thing in hand, one after the other; a few as others see them; the inventory's icons (the hotbar is
         // put back after, the phones in it are looked at again at the end)
         STEPS.add(() -> server.execute(() -> {

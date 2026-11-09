@@ -118,6 +118,12 @@ public final class CallService {
             state(p, OVER, s.number, to, d.display(s.number, to), 0, "busy");
             return;
         }
+        if (Booths.is(to)) {
+            Call c = new Call(s.number, to, p.getUUID(), s.era, Era.GSM, List.of());
+            CALLS.add(c);
+            state(p, CALLING, s.number, to, d.display(s.number, to), 0, "");
+            return;
+        }
         ServerPlayer callee = PhoneService.holder(p.server, to);
         if (callee == null || PhoneService.bars(callee, target.era) <= 0) {
             d.logCall(s.number, new LineData.Call(to, 0, PhoneService.now(), 0));
@@ -140,6 +146,10 @@ public final class CallService {
         if (target == null || of(to) != null) {
             return false;
         }
+        if (Booths.is(to)) {
+            CALLS.add(new Call(Numbers.HIDDEN, to, null, Era.GSM, Era.GSM, new ArrayList<>(script)));
+            return true;
+        }
         ServerPlayer callee = PhoneService.holder(server, to);
         if (callee == null) {
             return false;
@@ -149,6 +159,67 @@ public final class CallService {
         CALLS.add(c);
         state(callee, RINGING, to, Numbers.HIDDEN, "", 0, "");
         return true;
+    }
+
+    /** {@code p}, at the booth of {@code booth}, dials {@code raw} (the coin already taken). */
+    public static boolean dialFromBooth(ServerPlayer p, String booth, String raw) {
+        if (of(p.getUUID()) != null || of(booth) != null) {
+            return false;
+        }
+        String to = Numbers.normalize(raw);
+        LineData d = LineData.get(p.server);
+        if (to == null) {
+            state(p, OVER, booth, raw, raw, 0, "bad_number");
+            return false;
+        }
+        LineData.Line target = d.line(to);
+        if (to.equals(booth) || target == null) {
+            state(p, OVER, booth, to, to, 0, to.equals(booth) ? "busy" : "unassigned");
+            return false;
+        }
+        if (of(to) != null) {
+            state(p, OVER, booth, to, d.display(booth, to), 0, "busy");
+            return false;
+        }
+        Call c;
+        if (Booths.is(to)) {
+            c = new Call(booth, to, p.getUUID(), Era.GSM, Era.GSM, List.of());
+        } else {
+            ServerPlayer callee = PhoneService.holder(p.server, to);
+            if (callee == null || PhoneService.bars(callee, target.era) <= 0) {
+                state(p, OVER, booth, to, d.display(booth, to), 0, "unreachable");
+                return false;
+            }
+            c = new Call(booth, to, p.getUUID(), Era.GSM, target.era, List.of());
+            c.callee = callee.getUUID();
+            state(callee, RINGING, to, booth, d.display(to, booth), 0, "");
+        }
+        CALLS.add(c);
+        state(p, CALLING, booth, to, d.display(booth, to), 0, "");
+        return true;
+    }
+
+    /** {@code p} picks up the handset of the booth {@code booth}: answers it if it rings. */
+    public static boolean answerBooth(ServerPlayer p, String booth) {
+        Call c = of(booth);
+        if (c == null || c.talking || !c.to.equals(booth) || of(p.getUUID()) != null) {
+            return false;
+        }
+        c.callee = p.getUUID();
+        c.talking = true;
+        c.since = PhoneService.now();
+        c.ticks = 0;
+        LineData d = LineData.get(p.server);
+        ServerPlayer caller = c.caller == null ? null : p.server.getPlayerList().getPlayer(c.caller);
+        state(caller, TALKING, c.from, c.to, d.display(c.from, c.to), c.since, "");
+        state(p, TALKING, c.to, c.from, d.display(c.to, c.from), c.since, "");
+        return true;
+    }
+
+    /** Whether the booth {@code booth} is ringing. */
+    public static boolean boothRinging(String booth) {
+        Call c = of(booth);
+        return c != null && !c.talking && c.to.equals(booth);
     }
 
     public static void answer(ServerPlayer p, boolean accept) {
@@ -252,6 +323,9 @@ public final class CallService {
         if (p == null) {
             return "lost";
         }
+        if (Booths.is(number)) {
+            return Booths.near(p, number) ? null : "lost";
+        }
         ItemStack st = PhoneService.find(p, number);
         if (st.isEmpty()) {
             return "lost";
@@ -278,11 +352,23 @@ public final class CallService {
             ServerPlayer callee = c.callee == null ? null : server.getPlayerList().getPlayer(c.callee);
             if (!c.talking) {
                 LineData.Line target = d.line(c.to);
-                if (callee != null && target != null && !target.silent) {
+                if (Booths.is(c.to)) {
+                    Booths.ring(server, c.to, c.ticks);
+                } else if (callee != null && target != null && !target.silent) {
                     Ringer.ring(callee, c.calleeEra, c.ticks, c.hidden());
                 }
                 if (c.ticks > RING_TICKS) {
                     end(server, c, "no_answer");
+                    continue;
+                }
+                if (Booths.is(c.from) && !Booths.near(caller, c.from)) {
+                    end(server, c, "ended");
+                    continue;
+                }
+                if (Booths.is(c.to)) {
+                    if (c.caller != null && caller == null) {
+                        end(server, c, "ended");
+                    }
                     continue;
                 }
                 if (callee == null || PhoneService.find(callee, c.to).isEmpty() || c.caller != null && caller == null) {

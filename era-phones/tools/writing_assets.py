@@ -133,6 +133,9 @@ def sheet(style):
         rgba = PAINT[style](mask, rng, ch.isalnum())
         cell = Image.fromarray(np.clip(rgba, 0, 255).astype(np.uint8), "RGBA").resize((CW, CH), Image.LANCZOS)
         img.paste(cell, ((i % COLS) * CW, (i // COLS) * CH))
+        if ch == " ":
+            # The fonts' own spaces are narrow for words written large by hand: a clear gap between them
+            advance = max(advance, size * .62)
         adv.append(round(advance + (2 if style != "craie" else 0), 1))
     kit.save(img, f"textures/writing/{style}.png")
     kit.write_json(f"writing/{style}.json", {"chars": CHARS, "cell": [CW, CH], "body": BODY, "baseline": BASE, "pad": PAD,
