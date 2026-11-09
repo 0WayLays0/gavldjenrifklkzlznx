@@ -529,15 +529,21 @@ public final class SmokeTest {
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
             if (p != null) {
-                p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CAMERA.get()));
+                ItemStack camera = new ItemStack(com.waylays.eraphones.registry.GearRegistry.CAMERA.get());
+                camera.set(com.waylays.eraphones.registry.GearRegistry.FILM.get(), com.waylays.eraphones.gear.CameraItem.SHOTS);
+                p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, camera);
+                // Room for the print (a full inventory drops it at the photographer's feet)
+                p.getInventory().setItem(35, ItemStack.EMPTY);
             }
         }));
         STEPS.add(() -> {
         });
         STEPS.add(() -> shot(mc, "camera_held"));
         STEPS.add(() -> com.waylays.eraphones.gear.client.PhotoClient.take(false));
-        STEPS.add(() -> {
-        });
+        for (int k = 0; k < 4; k++) {
+            STEPS.add(() -> {
+            });
+        }
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
             if (p == null) {
@@ -548,6 +554,14 @@ public final class SmokeTest {
                 if (st.is(com.waylays.eraphones.registry.GearRegistry.PHOTOGRAPH.get())) {
                     st.set(com.waylays.eraphones.registry.GearRegistry.PHOTO_TIME.get(), p.level().getGameTime() - 5000);
                     found = true;
+                }
+            }
+            if (!found) {
+                for (net.minecraft.world.entity.item.ItemEntity e : p.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
+                        p.getBoundingBox().inflate(4))) {
+                    if (e.getItem().is(com.waylays.eraphones.registry.GearRegistry.PHOTOGRAPH.get())) {
+                        found = true;
+                    }
                 }
             }
             if (!found) {
