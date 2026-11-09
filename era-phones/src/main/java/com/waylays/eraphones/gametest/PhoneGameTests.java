@@ -29,6 +29,29 @@ import java.util.Set;
 public final class PhoneGameTests {
     private PhoneGameTests() {}
 
+    @GameTest(template = "platform", skyAccess = true, timeoutTicks = 100)
+    public static void aBoothHasItsNumberAndRings(GameTestHelper helper) {
+        net.minecraft.world.level.block.state.BlockState lower = com.waylays.eraphones.registry.GearRegistry.BOOTH.get().defaultBlockState();
+        helper.setBlock(new BlockPos(1, 2, 1), lower);
+        helper.setBlock(new BlockPos(1, 3, 1), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.HALF,
+                net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+        helper.succeedWhen(() -> {
+            if (!(helper.getBlockEntity(new BlockPos(1, 2, 1)) instanceof com.waylays.eraphones.gear.block.BoothBlockEntity booth)) {
+                throw new net.minecraft.gametest.framework.GameTestAssertException("no booth");
+            }
+            String n = booth.number();
+            helper.assertTrue(!n.isEmpty() && n.startsWith("555-9"), "the booth has a number 555-9xxx, got '" + n + "'");
+            helper.assertTrue(com.waylays.eraphones.server.Booths.is(n), "the network knows the booth " + n);
+            helper.assertTrue(LineData.get(helper.getLevel().getServer()).line(n) != null, "the booth's line exists");
+            if (!com.waylays.eraphones.server.CallService.boothRinging(n)) {
+                helper.assertTrue(com.waylays.eraphones.server.CallService.hidden(helper.getLevel().getServer(), n, java.util.List.of("...")),
+                        "the booth can be called");
+            }
+            helper.assertTrue(com.waylays.eraphones.server.CallService.boothRinging(n), "the called booth rings");
+            helper.assertTrue(helper.getBlockState(new BlockPos(1, 3, 1)).getLightEmission() > 0, "its sign is lit");
+        });
+    }
+
     @GameTest(template = "platform", skyAccess = true)
     public static void numbersAreRead(GameTestHelper helper) {
         helper.assertTrue("555-0142".equals(Numbers.normalize("5550142")), "seven digits");

@@ -37,6 +37,7 @@ public final class GearNet {
         TapeNet.register(r);
         TvNet.register(r);
         PhotoNet.register(r);
+        BoothNet.register(r);
         r.playToClient(Card.TYPE, Card.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.card(p));
         r.playToClient(Stations.TYPE, Stations.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.stations(p));
     }

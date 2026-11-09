@@ -16,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 final class VoiceStreams {
     private static final Map<UUID, Stream> STREAMS = new ConcurrentHashMap<>();
+    /** The voices as the other end of a phone call hears them, through the line. */
+    private static final Map<UUID, Stream> LINES = new ConcurrentHashMap<>();
 
     private VoiceStreams() {}
 
@@ -76,6 +78,49 @@ final class VoiceStreams {
                 return null;
             }
             return s.encoder.encode(s.chain.process(pcm));
+        }
+    }
+
+    /**
+     * The frame {@code data} of {@code speaker} as heard through a phone of the time {@code era} (its line, its
+     * ear-piece); null when it is to go as it is.
+     */
+    @Nullable
+    static byte[] line(VoicechatApi api, UUID speaker, String era, byte[] data) {
+        String voice = "telephone_" + era;
+        Stream s = LINES.get(speaker);
+        if (s == null || !s.voice.equals(voice)) {
+            VoiceFx.Chain chain = VoiceFx.chain(voice);
+            if (chain == null) {
+                return null;
+            }
+            if (s != null) {
+                s.close();
+            }
+            s = new Stream(voice, api.createDecoder(), api.createEncoder(), chain);
+            LINES.put(speaker, s);
+        }
+        synchronized (s) {
+            if (data == null || data.length == 0) {
+                s.decoder.resetState();
+                s.encoder.resetState();
+                return null;
+            }
+            short[] pcm = s.decoder.decode(data);
+            if (pcm == null || pcm.length == 0) {
+                return null;
+            }
+            return s.encoder.encode(s.chain.process(pcm));
+        }
+    }
+
+    /** Forgets a speaker's streams (they left). */
+    static void forget(UUID speaker) {
+        for (Map<UUID, Stream> m : java.util.List.of(STREAMS, LINES)) {
+            Stream s = m.remove(speaker);
+            if (s != null) {
+                s.close();
+            }
         }
     }
 }

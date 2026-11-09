@@ -43,6 +43,7 @@ public class VoicePlugin implements VoicechatPlugin {
             if (gear != null) {
                 gear.forget(e.getPlayerUuid());
             }
+            VoiceStreams.forget(e.getPlayerUuid());
         });
     }
 
@@ -82,9 +83,40 @@ public class VoicePlugin implements VoicechatPlugin {
             if (other != null) {
                 VoicechatConnection c = api.getConnectionOf(other);
                 if (c != null) {
-                    api.sendStaticSoundPacketTo(c, event.getPacket().toStaticSoundPacket());
+                    api.sendStaticSoundPacketTo(c, throughLine(event, speaker, api));
                 }
             }
+        }
+    }
+
+    /**
+     * The voice as the other end hears it: through the line and the ear-piece of the phone it is spoken into (an
+     * old car phone hisses and crackles, today's is clear); as it is if that cannot be done.
+     */
+    private de.maxhenkel.voicechat.api.packets.StaticSoundPacket throughLine(MicrophonePacketEvent event, ServerPlayer speaker,
+                                                                              VoicechatServerApi api) {
+        de.maxhenkel.voicechat.api.packets.MicrophonePacket packet = event.getPacket();
+        com.waylays.eraphones.Era era = CallService.voiceEra(speaker.getUUID());
+        if (era == null) {
+            return packet.toStaticSoundPacket();
+        }
+        try {
+            byte[] heard = VoiceStreams.line(api, speaker.getUUID(), era.item, packet.getOpusEncodedData());
+            if (heard == null) {
+                return packet.toStaticSoundPacket();
+            }
+            // The packet made from the line's sound; the microphone's own left as it was for those nearby
+            byte[] own = packet.getOpusEncodedData();
+            packet.setOpusEncodedData(heard);
+            de.maxhenkel.voicechat.api.packets.StaticSoundPacket out = packet.toStaticSoundPacket();
+            packet.setOpusEncodedData(own);
+            return out;
+        } catch (Throwable t) {
+            if (!lineWarned) {
+                lineWarned = true;
+                EraPhones.LOGGER.warn("The phone line's sound could not be made: {}", t.toString());
+            }
+            return packet.toStaticSoundPacket();
         }
     }
 
@@ -108,7 +140,7 @@ public class VoicePlugin implements VoicechatPlugin {
         }
     }
 
-    private boolean warned, gearWarned;
+    private boolean warned, gearWarned, lineWarned;
     private volatile GearVoice gear;
 
     private static boolean phoneVoice() {

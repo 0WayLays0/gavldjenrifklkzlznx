@@ -411,6 +411,16 @@ public final class CallService {
         return player.equals(c.caller) ? c.callee : c.caller;
     }
 
+    /** The kind of phone {@code player} speaks into on the call they are talking on; null when not talking. */
+    @Nullable
+    public static Era voiceEra(UUID player) {
+        Call c = of(player);
+        if (c == null || !c.talking) {
+            return null;
+        }
+        return player.equals(c.caller) ? c.callerEra : c.calleeEra;
+    }
+
     /** Who is on a call (its phone drains faster), by number. */
     static boolean talking(String number) {
         Call c = of(number);

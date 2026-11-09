@@ -68,6 +68,17 @@ public final class VoiceFx {
             // Through an old radio: a narrow band, clipped, crackling
             case "radio" -> new Stage[] {new Biquad(Biquad.HIGH, 450, .8f, 0), new Biquad(Biquad.LOW, 2600, .9f, 0), new Biquad(Biquad.PEAK, 1400, 1.2f, 6),
                     new Drive(6), new Crackle(9, .25f)};
+            // Heard through the phone, by the phone's time: the 1985 car phone's narrow, hissing, crackling analogue line
+            case "telephone_radiotelephone" -> new Stage[] {new Biquad(Biquad.HIGH, 420, .8f, 0), new Biquad(Biquad.LOW, 2700, .9f, 0),
+                    new Biquad(Biquad.PEAK, 1200, 1.1f, 4), new Drive(3.2f), new Crackle(6, .18f)};
+            // The 1990s mobile: the old telephone band, a little squeezed, a faint digital edge
+            case "telephone_gsm" -> new Stage[] {new Biquad(Biquad.HIGH, 320, .75f, 0), new Biquad(Biquad.LOW, 3300, .8f, 0),
+                    new Biquad(Biquad.PEAK, 1700, 1.2f, 3), new Drive(1.8f)};
+            // The 2000s flip phone: the same band, cleaner
+            case "telephone_clapet" -> new Stage[] {new Biquad(Biquad.HIGH, 300, .75f, 0), new Biquad(Biquad.LOW, 3500, .8f, 0),
+                    new Biquad(Biquad.PEAK, 2000, 1.0f, 2)};
+            // Today's phone: wide and clear, only the ear-piece's small speaker
+            case "telephone_smartphone" -> new Stage[] {new Biquad(Biquad.HIGH, 160, .7f, 0), new Biquad(Biquad.LOW, 7000, .7f, 0)};
             // A voice going wrong: jumping high and low, stuttering, falling to pieces now and then
             case "glitch" -> new Stage[] {new Glitch(), new Biquad(Biquad.HIGH, 120, .7f, 0)};
             default -> null;

@@ -75,7 +75,8 @@ public final class PhoneHud {
                 shown++;
             }
             if (state == 3) {
-                PhoneUI.centered(g, Component.translatable("phone.eraphones.speak_hint", key()).getString(), w / 2f, g.guiHeight() - 72, 0x88FFFFFF, .55f);
+                PhoneUI.centered(g, Component.translatable(PhoneClient.voiceChat() ? "phone.eraphones.voice_hint" : "phone.eraphones.speak_hint", key()).getString(),
+                        w / 2f, g.guiHeight() - 72, PhoneClient.voiceChat() ? 0xCC9AE6B4 : 0x88FFFFFF, .55f);
             }
         } else if (now - PhoneClient.callEndedAt < 2500 && PhoneClient.callEndedAt > 0) {
             String r = Component.translatable("phone.eraphones.call_end." + PhoneClient.callReason).getString();

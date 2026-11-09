@@ -1,0 +1,31 @@
+{
+  "variants": {
+    "facing=south,half=lower": {
+      "model": "eraphones:block/cabine_telephonique"
+    },
+    "facing=south,half=upper": {
+      "model": "eraphones:block/cabine_telephonique_haut"
+    },
+    "facing=west,half=lower": {
+      "model": "eraphones:block/cabine_telephonique",
+      "y": 90
+    },
+    "facing=west,half=upper": {
+      "model": "eraphones:block/cabine_telephonique_haut"
+    },
+    "facing=north,half=lower": {
+      "model": "eraphones:block/cabine_telephonique",
+      "y": 180
+    },
+    "facing=north,half=upper": {
+      "model": "eraphones:block/cabine_telephonique_haut"
+    },
+    "facing=east,half=lower": {
+      "model": "eraphones:block/cabine_telephonique",
+      "y": 270
+    },
+    "facing=east,half=upper": {
+      "model": "eraphones:block/cabine_telephonique_haut"
+    }
+  }
+}

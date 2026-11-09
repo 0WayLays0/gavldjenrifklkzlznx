@@ -72,7 +72,10 @@ public class CallOverlay extends PhoneApp {
         } else if (st == 1) {
             roundButton(g, cx, SY + SH - 50, 0xFFE0453A, "✆", mx, my);
         } else if (st == 3) {
-            subtitles(g, SY + 140, SY + SH - 86);
+            if (PhoneClient.voiceChat()) {
+                PhoneUI.centered(g, Component.translatable("phone.eraphones.voice_on").getString(), cx, SY + 136, 0xFF9AE6B4, .55f);
+            }
+            subtitles(g, SY + 146, SY + SH - 86);
             drawField(g, line(), mx, my, pt);
             boolean hs = PhoneUI.in(mx, my, SX + SW - 32, SY + SH - 80, 20, 14);
             PhoneUI.round(g, SX + SW - 32, SY + SH - 80, 20, 14, 7, hs ? 0xFF5CB4FF : 0xFF2E7AD0);

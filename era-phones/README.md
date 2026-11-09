@@ -30,6 +30,8 @@ feuille de papier, journal).
 | Ballon rouge | Un ballon rouge au bout de sa ficelle, à tenir. |
 | Télécommande du MJ (staff) | Clic droit : liste des joueurs à 64 blocs (clique pour choisir), touches pour brouillard, coupure, sang, tremblement, flotter, vertige, ballon, tout arrêter, les 12 sons, et un texte à murmurer ou narrer. |
 | Cassette vierge | Clic droit (staff) : le dossier des cassettes s'ouvre sur ton ordinateur et un écran liste les MP3 qui s'y trouvent ; choisis-en un, écris l'étiquette, « Graver ». Le fichier est envoyé au serveur (aucune limite de taille, environ 3 Mo par seconde) et gravé pour toujours sur la cassette tenue. Un joueur sans droits voit seulement qu'elle est vierge. |
+| Appareil photo instantané + pellicule | Clic droit : photographie ce que tu vois (sans la main ni l'interface), une photo sort de l'appareil. Pellicule de 10 photos ; pour recharger, une pellicule dans l'autre main. La photo se regarde (clic droit) dans son cadre blanc, signée du nom du photographe ; à peine sortie, elle se révèle en une minute (d'abord gris-bleu, puis les formes, puis les couleurs). |
+| Cabine téléphonique (bloc, 2 de haut) | Cadre alu, vitres fumées, enseigne lumineuse « TELEPHONE » qui éclaire la rue, publiphone en acier avec combiné. Chaque cabine a son numéro (555-9xxx, affiché sur l'écran du publiphone). Clic droit : le publiphone s'ouvre ; compose au clavier (souris ou clavier de l'ordinateur), « Appeler » : une pièce de 25 cents par appel, rendue si l'appel ne passe pas (gratuit en créatif). Appelée (par un joueur ou par un MJ avec un numéro masqué), elle sonne fort dans la rue : celui qui décroche (clic droit) répond. S'éloigner de la cabine coupe l'appel. |
 | Carte d'identité | Vierge, elle est établie au nom de la première personne qui l'utilise (nom RP, signalement de `/desc`, numéro). Clic droit pour la regarder (avec la photo du visage du personnage), clic droit sur quelqu'un pour la lui montrer. |
 | Journal | Imprimé par les maîtres du jeu ; clic droit pour le lire. |
 | Feuille de papier | Clic droit : on écrit dessus avec la page sous les yeux qui se remplit en direct (titre, texte jusqu'à 2000 caractères avec retours à la ligne), on choisit le papier (feuille de carnet, papier à lettre, vieux parchemin, post-it, page arrachée, papier quadrillé, fiche bristol, vieux papier taché), l'encre (noire, bleue, rouge, verte, crayon) et l'écriture (à la main, penchée, ou tapée à la machine). « Garder » en fait un brouillon qu'on peut reprendre ; « Signer » la ferme avec le nom du personnage : ensuite, clic droit pour la lire, page entière à l'écran (molette pour les longs textes). Une pile de feuilles vierges en donne une écrite à la fois. |
@@ -66,8 +68,12 @@ messages). Les messages attendent sur le serveur si le téléphone est éteint, 
 - **Ouvrir** : utiliser l'objet (clic droit), ou la touche du téléphone (`N` par défaut) s'il est en main ou dans la
   barre d'action. Quand un téléphone sonne, la touche sort celui qui sonne.
 - **Appels** : composer un numéro (ou un contact). Le téléphone appelé sonne là où il est (tout le monde autour
-  l'entend, sauf en silencieux). Décroché, ce que l'on tape s'affiche chez l'autre ; avec Simple Voice Chat, les deux
-  bouts **s'entendent à la voix**.
+  l'entend, sauf en silencieux). Avec Simple Voice Chat, l'appel est **vocal** : dès que l'autre décroche, le téléphone
+  se range (on le garde à l'oreille, l'appel continue, affiché en haut de l'écran) et les deux bouts **se parlent au
+  micro**, où qu'ils soient ; chacun entend l'autre « au téléphone », selon l'appareil de celui qui parle (la brique de
+  1985 grésille et crachote, le GSM et le clapet ont la bande étroite du téléphone, le smartphone est clair). Ceux qui
+  sont autour entendent toujours ce qu'on dit. Sans Simple Voice Chat (ou pour ceux qui n'ont pas de micro), ce qu'on
+  tape s'affiche chez l'autre.
 - **Réseau** : 4 barres à l'air libre, moins sous un toit, plus rien sous terre sans lumière du jour (caves, tunnels,
   égouts). Sans réseau, pas d'appel ni de message ; un appel en cours coupe.
 - **Batterie** : se vide écran allumé et en appel (vite pour la brique de 1985), barre visible sous l'objet.

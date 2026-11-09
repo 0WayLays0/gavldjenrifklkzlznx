@@ -358,8 +358,20 @@ public final class PhoneClient {
         }
     }
 
+    /** Whether Simple Voice Chat is here: calls are then spoken, the phone put to the ear once the other end answers. */
+    public static boolean voiceChat() {
+        return net.neoforged.fml.ModList.get().isLoaded("voicechat");
+    }
+
     public static void callState(PhoneNet.CallState p) {
         int before = callState;
+        if (p.state() == 3 && before != 3 && voiceChat()) {
+            // Answered: the phone goes to the ear, the voice does the talking (the call goes on, shown at the top)
+            Screen open = Minecraft.getInstance().screen;
+            if (phoneOpen() || open instanceof com.waylays.eraphones.gear.client.BoothScreen) {
+                Minecraft.getInstance().setScreen(null);
+            }
+        }
         callState = p.state();
         callMine = p.mine();
         callNumber = p.number();

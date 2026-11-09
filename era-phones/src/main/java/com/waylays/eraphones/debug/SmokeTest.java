@@ -566,6 +566,93 @@ public final class SmokeTest {
         });
         STEPS.add(() -> shot(mc, "photo_view"));
         STEPS.add(() -> mc.setScreen(null));
+        // A phone booth: seen from the street, from inside, called (it rings, picked up it answers), its payphone
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            net.minecraft.core.Direction dir = p.getDirection();
+            net.minecraft.core.BlockPos at = p.blockPosition().relative(dir, 4);
+            for (int a = -2; a <= 2; a++) {
+                for (int y = 0; y < 3; y++) {
+                    for (int b = -1; b <= 1; b++) {
+                        p.serverLevel().setBlockAndUpdate(at.relative(dir.getClockWise(), a).relative(dir, b).above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    }
+                }
+            }
+            net.minecraft.world.level.block.state.BlockState lower = com.waylays.eraphones.registry.GearRegistry.BOOTH.get().defaultBlockState()
+                    .setValue(com.waylays.eraphones.gear.block.BoothBlock.FACING, dir.getOpposite());
+            p.serverLevel().setBlockAndUpdate(at, lower);
+            p.serverLevel().setBlockAndUpdate(at.above(), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.HALF,
+                    net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+            BOOTH = at;
+            p.teleportTo(p.serverLevel(), Vec3c(at.relative(dir.getOpposite(), 4)).x, at.getY(), Vec3c(at.relative(dir.getOpposite(), 4)).z, dir.toYRot(), 0);
+        }));
+        STEPS.add(() -> mc.player.setXRot(-8));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "booth"));
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null || !(p.level().getBlockEntity(BOOTH) instanceof com.waylays.eraphones.gear.block.BoothBlockEntity b)) {
+                fail("the phone booth was not placed");
+                return;
+            }
+            if (!com.waylays.eraphones.server.Booths.is(b.number())) {
+                fail("the phone booth %s is not on the network", b.number());
+            }
+            net.minecraft.world.phys.Vec3 in = net.minecraft.world.phys.Vec3.atBottomCenterOf(BOOTH);
+            p.teleportTo(p.serverLevel(), in.x, in.y + .07, in.z, p.getYRot(), 18);
+            if (!com.waylays.eraphones.server.CallService.hidden(server, b.number(), java.util.List.of("Tu es seul dans la cabine ?", "Retourne-toi."))) {
+                fail("the phone booth %s cannot be called", b.number());
+            }
+        }));
+        STEPS.add(() -> mc.player.setXRot(18));
+        STEPS.add(() -> shot(mc, "booth_inside"));
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p != null && p.level().getBlockEntity(BOOTH) instanceof com.waylays.eraphones.gear.block.BoothBlockEntity b) {
+                if (!com.waylays.eraphones.server.CallService.boothRinging(b.number())) {
+                    fail("the called phone booth does not ring");
+                }
+                com.waylays.eraphones.gear.BoothNet.use(p, b);
+            }
+        }));
+        for (int k = 0; k < 4; k++) {
+            STEPS.add(() -> {
+            });
+        }
+        STEPS.add(() -> {
+            if (!(mc.screen instanceof com.waylays.eraphones.gear.client.BoothScreen) && !com.waylays.eraphones.client.PhoneClient.voiceChat()) {
+                fail("picking up the booth's handset did not show its payphone");
+            }
+            if (com.waylays.eraphones.client.PhoneClient.callState != 3) {
+                fail("picking up the ringing booth did not answer it (state %s)", com.waylays.eraphones.client.PhoneClient.callState);
+            }
+        });
+        STEPS.add(() -> shot(mc, "booth_call"));
+        STEPS.add(() -> {
+            com.waylays.eraphones.client.PhoneClient.hangUp();
+            mc.setScreen(null);
+        });
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p != null && p.level().getBlockEntity(BOOTH) instanceof com.waylays.eraphones.gear.block.BoothBlockEntity b) {
+                com.waylays.eraphones.gear.BoothNet.use(p, b);
+            }
+        }));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> {
+            if (mc.screen != null) {
+                for (char c : "5550142".toCharArray()) {
+                    mc.screen.charTyped(c, 0);
+                }
+            }
+        });
+        STEPS.add(() -> shot(mc, "booth_dial"));
+        STEPS.add(() -> mc.setScreen(null));
         // Every thing in hand, one after the other; a few as others see them; the inventory's icons (the hotbar is
         // put back after, the phones in it are looked at again at the end)
         STEPS.add(() -> server.execute(() -> {
@@ -665,6 +752,8 @@ public final class SmokeTest {
         }
         enc.finish();
     }
+
+    private static net.minecraft.core.BlockPos BOOTH = net.minecraft.core.BlockPos.ZERO;
 
     private static net.minecraft.world.phys.Vec3 Vec3c(net.minecraft.core.BlockPos p) {
         return net.minecraft.world.phys.Vec3.atBottomCenterOf(p);
