@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout",
   "textures": {
     "t": "eraphones:block/boite_a_musique",
     "particle": "eraphones:block/boite_a_musique"

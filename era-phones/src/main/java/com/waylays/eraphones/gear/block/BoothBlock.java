@@ -39,6 +39,8 @@ import javax.annotation.Nullable;
 public class BoothBlock extends HorizontalDirectionalBlock implements EntityBlock {
     public static final MapCodec<BoothBlock> CODEC = simpleCodec(BoothBlock::new);
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
+    /** Whether the booth has power (a power cut leaves it dark and dead). */
+    public static final net.minecraft.world.level.block.state.properties.BooleanProperty POWERED = BlockStateProperties.POWERED;
     /** Its shapes by half (0 lower, 1 upper), then by facing; the boxes given for a booth open to the south. */
     private static final VoxelShape[][] SHAPES = new VoxelShape[2][4];
 
@@ -72,7 +74,8 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
 
     public BoothBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.SOUTH).setValue(HALF, DoubleBlockHalf.LOWER));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.SOUTH).setValue(HALF, DoubleBlockHalf.LOWER)
+                .setValue(POWERED, true));
     }
 
     @Override
@@ -82,7 +85,7 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, HALF);
+        builder.add(FACING, HALF, POWERED);
     }
 
     @Nullable
@@ -144,5 +147,15 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return state.getValue(HALF) == DoubleBlockHalf.LOWER ? new BoothBlockEntity(pos, state) : null;
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state,
+            net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        if (level.isClientSide || type != com.waylays.eraphones.registry.GearRegistry.BOOTH_BE.get()) {
+            return null;
+        }
+        return (l, p, s, be) -> ((BoothBlockEntity) be).serverTick();
     }
 }

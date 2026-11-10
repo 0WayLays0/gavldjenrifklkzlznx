@@ -52,6 +52,22 @@ public class BoothBlockEntity extends BlockEntity {
         forget();
     }
 
+    /** Every second: the booth lit and live, or dark and dead in a power cut (both of its halves). */
+    public void serverTick() {
+        if (level == null || level.getGameTime() % 20 != 0) {
+            return;
+        }
+        boolean power = !com.waylays.eraphones.gear.Power.cut(level, worldPosition);
+        BlockState low = getBlockState();
+        if (low.getValue(BoothBlock.POWERED) != power) {
+            level.setBlock(worldPosition, low.setValue(BoothBlock.POWERED, power), 3);
+            BlockState up = level.getBlockState(worldPosition.above());
+            if (up.is(low.getBlock())) {
+                level.setBlock(worldPosition.above(), up.setValue(BoothBlock.POWERED, power), 3);
+            }
+        }
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);

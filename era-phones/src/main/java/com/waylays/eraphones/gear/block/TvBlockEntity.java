@@ -88,7 +88,22 @@ public class TvBlockEntity extends BlockEntity {
         shownFrame = Integer.MIN_VALUE;
     }
 
+    /** Switched off by a power cut, to come back on with the power. */
+    private boolean cutOff;
+
     public void serverTick() {
+        if (level != null && level.getGameTime() % 10 == 0) {
+            boolean cut = com.waylays.eraphones.gear.Power.cut(level, worldPosition);
+            if (cut && on()) {
+                cutOff = true;
+                power(false);
+                level.setBlock(worldPosition, getBlockState().setValue(TvBlock.LIT, false), 3);
+            } else if (!cut && cutOff) {
+                cutOff = false;
+                level.setBlock(worldPosition, getBlockState().setValue(TvBlock.LIT, true), 3);
+                power(true);
+            }
+        }
         if (!(level instanceof ServerLevel sl) || cassette.isEmpty()) {
             return;
         }

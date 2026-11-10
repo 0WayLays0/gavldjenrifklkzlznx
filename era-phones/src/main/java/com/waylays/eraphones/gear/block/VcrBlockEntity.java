@@ -168,6 +168,12 @@ public class VcrBlockEntity extends BlockEntity {
             return;
         }
         long now = level.getGameTime();
+        // No power: the tape stops where it is
+        if (now % 10 == 0 && deck.mode != Tape.Mode.STOP && deck.mode != Tape.Mode.PAUSE && com.waylays.eraphones.gear.Power.cut(level, worldPosition)) {
+            deck.mode = Tape.Mode.PAUSE;
+            stopSound();
+            changed();
+        }
         Audio audio = Audio.get();
         if (sound == null || audio == null || !audio.playing(sound)) {
             deck.advance();

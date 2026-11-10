@@ -743,6 +743,53 @@ public final class SmokeTest {
             }
         }));
         STEPS.add(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
+        // A street lamp at night, then a power cut: it buzzes and goes out
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            net.minecraft.core.Direction dir = p.getDirection();
+            net.minecraft.core.BlockPos at = p.blockPosition().relative(dir, 4).relative(dir.getClockWise(), 1);
+            for (int y = 0; y < 4; y++) {
+                p.serverLevel().setBlockAndUpdate(at.above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+            }
+            net.minecraft.world.level.block.state.BlockState lamp = com.waylays.eraphones.registry.GearRegistry.LAMP_POST.get().defaultBlockState()
+                    .setValue(com.waylays.eraphones.gear.block.LampPostBlock.FACING, dir.getCounterClockWise());
+            p.serverLevel().setBlockAndUpdate(at, lamp);
+            p.serverLevel().setBlockAndUpdate(at.above(), lamp.setValue(com.waylays.eraphones.gear.block.LampPostBlock.PART, 1));
+            p.serverLevel().setBlockAndUpdate(at.above(2), lamp.setValue(com.waylays.eraphones.gear.block.LampPostBlock.PART, 2));
+            LAMP = at;
+            p.serverLevel().setDayTime(18000);
+        }));
+        STEPS.add(() -> mc.player.setXRot(-12));
+        for (int k = 0; k < 3; k++) {
+            STEPS.add(() -> {
+            });
+        }
+        STEPS.add(() -> server.execute(() -> {
+            net.minecraft.world.level.block.state.BlockState head = server.overworld().getBlockState(LAMP.above(2));
+            if (!head.is(com.waylays.eraphones.registry.GearRegistry.LAMP_POST.get()) || !head.getValue(com.waylays.eraphones.gear.block.LampPostBlock.LIT)) {
+                fail("the street lamp did not light up at night ({})", head);
+            }
+        }));
+        STEPS.add(() -> shot(mc, "lamp_night"));
+        STEPS.add(() -> server.execute(() -> com.waylays.eraphones.gear.Power.start(server.overworld(), LAMP, 24, 0, false)));
+        for (int k = 0; k < 2; k++) {
+            STEPS.add(() -> {
+            });
+        }
+        STEPS.add(() -> server.execute(() -> {
+            net.minecraft.world.level.block.state.BlockState head = server.overworld().getBlockState(LAMP.above(2));
+            if (head.is(com.waylays.eraphones.registry.GearRegistry.LAMP_POST.get()) && head.getValue(com.waylays.eraphones.gear.block.LampPostBlock.LIT)) {
+                fail("the street lamp stayed lit in a power cut");
+            }
+        }));
+        STEPS.add(() -> shot(mc, "power_cut"));
+        STEPS.add(() -> server.execute(() -> {
+            com.waylays.eraphones.gear.Power.end(server.overworld(), null);
+            server.overworld().setDayTime(6000);
+        }));
         // Every thing in hand, one after the other; a few as others see them; the inventory's icons (the hotbar is
         // put back after, the phones in it are looked at again at the end)
         STEPS.add(() -> server.execute(() -> {
@@ -755,7 +802,7 @@ public final class SmokeTest {
         }));
         String[] held = {"piece_25c", "billet_20", "carte_identite", "journal_papier", "feuille", "cassette", "piles", "talkie_walkie", "radio",
                 "magnetoscope", "lampe_torche", "television", "ballon_rouge", "telecommande_mj", "poupee", "boite_a_musique", "velo",
-                "appareil_photo", "cabine_telephonique"};
+                "velo_course", "velo_ville", "velo_bmx", "lampadaire", "appareil_photo", "cabine_telephonique"};
         for (String name : held) {
             STEPS.add(() -> server.execute(() -> {
                 ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -784,6 +831,53 @@ public final class SmokeTest {
             });
             STEPS.add(() -> shot(mc, "held3_" + name));
             STEPS.add(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
+        // A street lamp at night, then a power cut: it buzzes and goes out
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            net.minecraft.core.Direction dir = p.getDirection();
+            net.minecraft.core.BlockPos at = p.blockPosition().relative(dir, 4).relative(dir.getClockWise(), 1);
+            for (int y = 0; y < 4; y++) {
+                p.serverLevel().setBlockAndUpdate(at.above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+            }
+            net.minecraft.world.level.block.state.BlockState lamp = com.waylays.eraphones.registry.GearRegistry.LAMP_POST.get().defaultBlockState()
+                    .setValue(com.waylays.eraphones.gear.block.LampPostBlock.FACING, dir.getCounterClockWise());
+            p.serverLevel().setBlockAndUpdate(at, lamp);
+            p.serverLevel().setBlockAndUpdate(at.above(), lamp.setValue(com.waylays.eraphones.gear.block.LampPostBlock.PART, 1));
+            p.serverLevel().setBlockAndUpdate(at.above(2), lamp.setValue(com.waylays.eraphones.gear.block.LampPostBlock.PART, 2));
+            LAMP = at;
+            p.serverLevel().setDayTime(18000);
+        }));
+        STEPS.add(() -> mc.player.setXRot(-12));
+        for (int k = 0; k < 3; k++) {
+            STEPS.add(() -> {
+            });
+        }
+        STEPS.add(() -> server.execute(() -> {
+            net.minecraft.world.level.block.state.BlockState head = server.overworld().getBlockState(LAMP.above(2));
+            if (!head.is(com.waylays.eraphones.registry.GearRegistry.LAMP_POST.get()) || !head.getValue(com.waylays.eraphones.gear.block.LampPostBlock.LIT)) {
+                fail("the street lamp did not light up at night ({})", head);
+            }
+        }));
+        STEPS.add(() -> shot(mc, "lamp_night"));
+        STEPS.add(() -> server.execute(() -> com.waylays.eraphones.gear.Power.start(server.overworld(), LAMP, 24, 0, false)));
+        for (int k = 0; k < 2; k++) {
+            STEPS.add(() -> {
+            });
+        }
+        STEPS.add(() -> server.execute(() -> {
+            net.minecraft.world.level.block.state.BlockState head = server.overworld().getBlockState(LAMP.above(2));
+            if (head.is(com.waylays.eraphones.registry.GearRegistry.LAMP_POST.get()) && head.getValue(com.waylays.eraphones.gear.block.LampPostBlock.LIT)) {
+                fail("the street lamp stayed lit in a power cut");
+            }
+        }));
+        STEPS.add(() -> shot(mc, "power_cut"));
+        STEPS.add(() -> server.execute(() -> {
+            com.waylays.eraphones.gear.Power.end(server.overworld(), null);
+            server.overworld().setDayTime(6000);
+        }));
         }
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -846,6 +940,7 @@ public final class SmokeTest {
 
     private static net.minecraft.core.BlockPos BOOTH = net.minecraft.core.BlockPos.ZERO;
     private static java.util.UUID BIKE;
+    private static net.minecraft.core.BlockPos LAMP = net.minecraft.core.BlockPos.ZERO;
     private static net.minecraft.world.phys.Vec3 BIKE_START;
 
     private static net.minecraft.world.phys.Vec3 Vec3c(net.minecraft.core.BlockPos p) {

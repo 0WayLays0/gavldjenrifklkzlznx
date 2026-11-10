@@ -18,17 +18,18 @@ public final class BikePose {
         }
         float pt = Mth.clamp(ageInTicks - rider.tickCount, 0, 1);
         float crank = Mth.lerp(pt, bike.crankO, bike.crank);
-        model.body.xRot = .12f;
+        // Sitting on the seat, leaning a little toward the bars
+        model.body.xRot = .22f;
         // Hands forward on the grips, a little wide
-        model.rightArm.xRot = -.84f;
-        model.leftArm.xRot = -.84f;
+        model.rightArm.xRot = -1.02f;
+        model.leftArm.xRot = -1.02f;
         model.rightArm.yRot = 0;
         model.leftArm.yRot = 0;
         model.rightArm.zRot = .1f;
         model.leftArm.zRot = -.1f;
         // The right foot on the drive side's pedal (up at rest), the left on the other
-        model.rightLeg.xRot = -(.34f + .2f * Mth.sin(crank));
-        model.leftLeg.xRot = -(.34f + .2f * Mth.sin(crank + Mth.PI));
+        model.rightLeg.xRot = -(.4f + .24f * Mth.sin(crank));
+        model.leftLeg.xRot = -(.4f + .24f * Mth.sin(crank + Mth.PI));
         model.rightLeg.yRot = .04f;
         model.leftLeg.yRot = -.04f;
         model.rightLeg.zRot = .03f;

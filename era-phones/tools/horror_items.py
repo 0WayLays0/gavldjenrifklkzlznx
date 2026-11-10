@@ -74,7 +74,9 @@ def television():
     # The knobs: channels, volume
     silver = (190, 192, 198)
     ga.octo(m, "z", FRONT, FRONT + .7, 12.8, 10.6, .95, (40, 40, 44), end_b=ga.disc((60, 60, 66), (24, 24, 28), mark=(230, 230, 236)))
-    ga.octo(m, "z", FRONT, FRONT + .55, 12.8, 8.2, .7, silver, end_b=ga.disc(silver, (110, 112, 118), mark=(40, 40, 44)))
+    # The volume knob: silver, on a dark collar so it stands out of the panel
+    ga.octo(m, "z", FRONT, FRONT + .2, 12.8, 8.2, .95, (34, 34, 38), end_b=ga.disc((44, 44, 50), (20, 20, 24)))
+    ga.octo(m, "z", FRONT + .2, FRONT + .7, 12.8, 8.2, .7, silver, end_b=ga.disc(silver, (110, 112, 118), mark=(40, 40, 44)))
     # Feet
     for x, z in ((2.2, 3.2), (13.8, 3.2), (2.2, 12.2), (13.8, 12.2)):
         m.box([x - .6, 0, z - .6], [x + .6, CY0, z + .6], {"*": (24, 22, 20)})
@@ -83,7 +85,8 @@ def television():
     rod = {"*": ga.lengthwise((120, 124, 132), (240, 242, 248))}
     for angle in (22.5, -22.5):
         m.box([7.85, CY1 + .6, 6.35], [8.15, CY1 + 9.5, 6.65], rod, rotation={"origin": [8, CY1 + .6, 6.5], "axis": "z", "angle": angle})
-    ga.write_block(m, ga.BLOCK_DISPLAY)
+    # Cut out, so the round knobs' caps have no square corners
+    ga.write_block(m, ga.BLOCK_DISPLAY, render_type="minecraft:cutout")
     # Its states: facing four ways, on or off (the screen itself is drawn by the game)
     variants = {}
     for f, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270)):

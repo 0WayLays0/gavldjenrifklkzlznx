@@ -287,9 +287,11 @@ def cassette():
 
 # ------------------------------------------------------------------------------------------------ blocks
 
-def write_block(m, display):
+def write_block(m, display, render_type="minecraft:cutout"):
     kit.save(m.img, f"textures/block/{m.name}.png")
+    extra = {"render_type": render_type} if render_type else {}
     kit.write_json(f"models/block/{m.name}.json", {
+        **extra,
         "textures": {"t": f"eraphones:block/{m.name}", "particle": f"eraphones:block/{m.name}"},
         "elements": [dict(e, faces={k: dict(v, texture="#t") for k, v in e["faces"].items()}) for e in m.elements],
         "display": display})
@@ -571,6 +573,10 @@ def sounds():
     ogg("cabine_touche", booth_assets.key(rate))
     import bike_assets
     ogg("velo_sonnette", bike_assets.bell(rate))
+    import lamp_assets
+    ogg("lampadaire_bourdonnement", lamp_assets.buzz(rate))
+    ogg("lampadaire_claquement", lamp_assets.click(rate))
+    ogg("coupure_courant", lamp_assets.power_down(rate))
     kit.write_json("sounds.json", {
         "radio_static": {"sounds": [{"name": "eraphones:radio_static"}], "subtitle": "subtitles.eraphones.radio_static"},
         "talkie_squelch": {"sounds": [{"name": "eraphones:talkie_squelch"}], "subtitle": "subtitles.eraphones.talkie_squelch"},
@@ -582,7 +588,12 @@ def sounds():
                             "subtitle": "subtitles.eraphones.cabine_sonnerie"},
         "cabine_piece": {"sounds": [{"name": "eraphones:cabine_piece"}], "subtitle": "subtitles.eraphones.cabine_piece"},
         "cabine_touche": {"sounds": [{"name": "eraphones:cabine_touche"}]},
-        "velo_sonnette": {"sounds": [{"name": "eraphones:velo_sonnette", "attenuation_distance": 24}], "subtitle": "subtitles.eraphones.velo_sonnette"}})
+        "velo_sonnette": {"sounds": [{"name": "eraphones:velo_sonnette", "attenuation_distance": 24}], "subtitle": "subtitles.eraphones.velo_sonnette"},
+        "lampadaire_bourdonnement": {"sounds": [{"name": "eraphones:lampadaire_bourdonnement", "attenuation_distance": 20}],
+                                     "subtitle": "subtitles.eraphones.lampadaire_bourdonnement"},
+        "lampadaire_claquement": {"sounds": [{"name": "eraphones:lampadaire_claquement", "attenuation_distance": 20}],
+                                  "subtitle": "subtitles.eraphones.lampadaire_claquement"},
+        "coupure_courant": {"sounds": [{"name": "eraphones:coupure_courant"}], "subtitle": "subtitles.eraphones.coupure_courant"}})
 
 
 # ------------------------------------------------------------------------------------------------ recipes
@@ -619,6 +630,8 @@ def main():
     booth_assets.main()
     import bike_assets
     bike_assets.main()
+    import lamp_assets
+    lamp_assets.main()
     sounds()
     recipes()
 

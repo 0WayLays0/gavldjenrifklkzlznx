@@ -16,8 +16,11 @@ import java.util.List;
 
 /** The bicycle in hand: used on the ground, it is stood there, facing the way its owner faces. */
 public class BikeItem extends Item {
-    public BikeItem(Properties properties) {
+    private final int kind;
+
+    public BikeItem(int kind, Properties properties) {
         super(properties);
+        this.kind = kind;
     }
 
     @Override
@@ -31,6 +34,7 @@ public class BikeItem extends Item {
         if (bike == null) {
             return InteractionResult.FAIL;
         }
+        bike.setKind(kind);
         bike.moveTo(at.x, at.y, at.z, ctx.getPlayer() == null ? 0 : ctx.getPlayer().getYRot(), 0);
         if (!level.noCollision(bike, bike.getBoundingBox())) {
             return InteractionResult.FAIL;

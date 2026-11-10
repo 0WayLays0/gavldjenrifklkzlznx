@@ -314,6 +314,19 @@ def booth():
 def write(m, pm):
     kit.save(m.img, f"textures/block/{m.name}.png")
     kit.save(pm.img, f"textures/block/{pm.name}.png")
+    # The booth in a power cut: the same, its sign and lamp no longer glowing
+    def unlit(e):
+        e = dict(e)
+        e.pop("neoforge_data", None)
+        e.pop("shade", None)
+        return e
+
+    kit.write_json(f"models/block/{m.name}_eteinte.json", {
+        "render_type": "minecraft:translucent",
+        "ambientocclusion": False,
+        "textures": {"t": f"eraphones:block/{m.name}", "p": f"eraphones:block/{pm.name}", "particle": f"eraphones:block/{m.name}"},
+        "elements": [unlit(dict(e, faces={k: dict(v, texture="#t") for k, v in e["faces"].items()})) for e in m.elements]
+        + [unlit(dict(e, faces={k: dict(v, texture="#p") for k, v in e["faces"].items()})) for e in pm.elements]})
     kit.write_json(f"models/block/{m.name}.json", {
         "render_type": "minecraft:translucent",
         "ambientocclusion": False,
@@ -333,11 +346,12 @@ def write(m, pm):
     kit.write_json(f"models/item/{m.name}.json", {"parent": f"eraphones:block/{m.name}"})
     variants = {}
     for f, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270)):
-        lower = {"model": f"eraphones:block/{m.name}"}
-        if y:
-            lower["y"] = y
-        variants[f"facing={f},half=lower"] = lower
-        variants[f"facing={f},half=upper"] = {"model": f"eraphones:block/{m.name}_haut"}
+        for powered in ("true", "false"):
+            lower = {"model": f"eraphones:block/{m.name}" + ("" if powered == "true" else "_eteinte")}
+            if y:
+                lower["y"] = y
+            variants[f"facing={f},half=lower,powered={powered}"] = lower
+            variants[f"facing={f},half=upper,powered={powered}"] = {"model": f"eraphones:block/{m.name}_haut"}
     kit.write_json(f"blockstates/{m.name}.json", {"variants": variants})
     ga.write_data(f"loot_table/blocks/{m.name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [
         {"type": "minecraft:item", "name": f"eraphones:{m.name}"}], "conditions": [

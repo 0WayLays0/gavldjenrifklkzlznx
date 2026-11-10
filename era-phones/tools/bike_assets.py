@@ -155,12 +155,42 @@ def spokes(n, seed):
     return p
 
 
-def wheel():
-    m = Model("velo_roue", 512, 16)
+def gumwall(tile):
+    """A racing tyre's side: black tread edge, tan rubber wall."""
+    w, h = tile.size
+    tile.paste(Image.new("RGBA", tile.size, (150, 112, 70, 255)))
+    d = ImageDraw.Draw(tile)
+    if h <= w:
+        d.rectangle((0, 0, w, h * .3), fill=(26, 26, 28, 255))
+    else:
+        d.rectangle((0, 0, w * .3, h), fill=(26, 26, 28, 255))
+
+
+def knobs(tile):
+    """A BMX tyre's tread: square knobs standing out of the black rubber."""
+    w, h = tile.size
+    vgrad(tile, (34, 34, 38), (20, 20, 22))
+    d = ImageDraw.Draw(tile)
+    for y in range(1, h - 1, 4):
+        for x in range((y // 4) % 2 * 2 + 1, w - 1, 4):
+            d.rectangle((x, y, x + 1, y + 1), fill=(66, 66, 72, 255))
+
+
+def wheel(name="velo_roue", kind="whitewall"):
+    m = Model(name, 512, 16)
     c = 8
-    ring(m, c, c, WHEEL_R, .8, .6, tread, ga.facet((30, 30, 32), .8), whitewall)
-    ring(m, c, c, WHEEL_R - .78, .32, .42, chrome, chrome, chrome)
-    r = WHEEL_R - 1.05
+    if kind == "thin":
+        ring(m, c, c, WHEEL_R, .5, .36, tread, ga.facet((30, 30, 32), .8), gumwall)
+        ring(m, c, c, WHEEL_R - .48, .3, .3, chrome, chrome, chrome)
+        r = WHEEL_R - .75
+    elif kind == "knobby":
+        ring(m, c, c, WHEEL_R, 1.0, .78, knobs, ga.facet((30, 30, 32), .8), ga.facet((28, 28, 30), .9))
+        ring(m, c, c, WHEEL_R - .98, .36, .5, chrome, chrome, chrome)
+        r = WHEEL_R - 1.3
+    else:
+        ring(m, c, c, WHEEL_R, .8, .6, tread, ga.facet((30, 30, 32), .8), whitewall)
+        ring(m, c, c, WHEEL_R - .78, .32, .42, chrome, chrome, chrome)
+        r = WHEEL_R - 1.05
     for x, seed in ((-.18, 0), (.18, 1)):
         m.box([c + x, c - r, c - r], [c + x, c + r, c + r], {"east": spokes(18, seed), "west": spokes(18, seed)})
     ga.octo(m, "x", c - .75, c + .75, c, c, .42, (210, 214, 220), end_a=ga.disc((180, 184, 190), (110, 114, 120)),
@@ -217,10 +247,10 @@ def pedal():
     return m
 
 
-def decal(word, color=(250, 248, 240)):
+def decal(word, color=(250, 248, 240), base=None):
     """The maker's name along a tube, white with a thin black edge."""
     def p(tile):
-        red(tile)
+        (base or red)(tile)
         w, h = tile.size
         long = max(w, h)
         img = Image.new("RGBA", (long, min(w, h)), (0, 0, 0, 0))
@@ -350,6 +380,211 @@ def lamp_glass(tile):
     d.ellipse((w * .25, h * .2, w * .5, h * .45), fill=(255, 255, 250, 255))
 
 
+# ------------------------------------------------------------------------------------------------ the other three bikes
+
+def painted(dark, light):
+    def p(tile):
+        metal_edge(tile, dark, light)
+    return p
+
+
+def drivetrain(m, guard_paint=None):
+    """The bottom bracket, dropouts, rear sprocket and chain (a guard over the chain if a paint is given)."""
+    ga.octo(m, "x", 8 - 1.2, 8 + 1.2, BB[0], BB[1] + 8, .7, (60, 60, 66))
+    for x in (-1.0, 1.0):
+        ga.octo(m, "x", 8 + x - .25, 8 + x + .25, REAR[0], REAR[1] + 8, .35, (200, 204, 210))
+    ga.octo(m, "x", 8 - 1.4, 8 - 1.2, REAR[0], REAR[1] + 8, .8, (170, 174, 180))
+    m.box([8 - 1.36, 6.55, REAR[1] + 8], [8 - 1.24, 6.8, BB[1] + 8], {"*": chain})
+    m.box([8 - 1.36, 3.4, REAR[1] + 8 + .3], [8 - 1.24, 3.65, BB[1] + 8 - .2], {"*": chain})
+    if guard_paint is not None:
+        m.box([8 - 1.95, 3.1, REAR[1] + 8 + .6], [8 - 1.8, 7.5, BB[1] + 8 + 1.6], {"*": guard_paint})
+
+
+def diamond(m, paint, word_paint, top=True):
+    tube(m, BB, CLUSTER, .45, paint)
+    if top:
+        tube(m, CLUSTER, (CLUSTER[0], HEAD_TOP[1] + .3), .42, paint)
+    tube(m, BB, (11.21, 4.91), .5, word_paint)
+    tube(m, HEAD_LOW, HEAD_TOP, .62, paint)
+    for x in (-.95, .95):
+        tube(m, (5.05, BB[1] - .3), (5.05, REAR[1]), .28, paint, x=x)
+        tube(m, REAR, CLUSTER, .28, paint, x=x)
+
+
+def leather(color):
+    def p(tile):
+        w, h = tile.size
+        vgrad(tile, ga.shade(color, 1.15), ga.shade(color, .8))
+        d = ImageDraw.Draw(tile)
+        d.rectangle((1, 1, w - 2, h - 2), outline=ga.shade(color, .55), width=1)
+    return p
+
+
+BLUE = ((14, 34, 110), (110, 160, 250))
+GREEN = ((12, 70, 52), (140, 220, 180))
+CREAM = ((170, 160, 130), (250, 244, 224))
+
+
+def frame_course():
+    m = Model("velo_cadre_course", 1024, 16)
+    blue = painted(*BLUE)
+    diamond(m, blue, decal("VOXA", base=blue))
+    drivetrain(m)
+    # The rear derailleur hanging under the sprocket
+    m.box([8 - 1.6, 3.4, REAR[1] + 8 - .3], [8 - 1.2, 4.6, REAR[1] + 8 + .5], {"*": chrome})
+    # A white bottle on the down tube
+    tube(m, (7.38, -.48), (10.18, 2.32), .55, painted((190, 190, 196), (252, 252, 255)))
+    tube(m, CLUSTER, (15.6, -6.05), .28, chrome)
+    m.box([8 - .9, 15.3, -7.4 + 8], [8 + .9, 15.85, -4.0 + 8], {"up": leather((24, 24, 26)), "*": ga.facet((18, 18, 20), .9)})
+    m.box([8 - .45, 15.35, -4.2 + 8], [8 + .45, 15.75, -2.9 + 8], {"up": leather((24, 24, 26)), "*": ga.facet((18, 18, 20), .9)})
+    return m
+
+
+def tape(tile):
+    w, h = tile.size
+    vgrad(tile, (30, 30, 34), (14, 14, 16))
+    d = ImageDraw.Draw(tile)
+    for k in range(0, max(w, h), 3):
+        if w >= h:
+            d.line((k, 0, k - 2, h), fill=(56, 56, 62, 255), width=1)
+        else:
+            d.line((0, k, w, k - 2), fill=(56, 56, 62, 255), width=1)
+
+
+def fork(m, paint):
+    for x in (-.95, .95):
+        tube(m, FRONT, HEAD_LOW, .3, paint, x=x)
+    m.box([8 - 1.25, 10.6, HEAD_LOW[1] + 8 - .55], [8 + 1.25, 11.25, HEAD_LOW[1] + 8 + .55], {"*": paint})
+
+
+def steering_course():
+    m = Model("velo_guidon_course", 512, 16)
+    fork(m, painted(*BLUE))
+    tube(m, HEAD_TOP, (14.55, 3.53), .3, chrome)
+    # The stem forward, the drop bars: across, forward, down and back
+    m.box([8 - .25, 14.3, 3.5 + 8], [8 + .25, 14.75, 6.1 + 8], {"*": chrome})
+    m.box([8 - 2.1, 14.3, 5.85 + 8], [8 + 2.1, 14.75, 6.3 + 8], {"*": tape})
+    for x in (-2.1, 2.1):
+        m.box([8 + x - .24, 14.3, 6.1 + 8], [8 + x + .24, 14.75, 7.7 + 8], {"*": tape})
+        m.box([8 + x - .24, 12.5, 7.3 + 8], [8 + x + .24, 14.5, 7.75 + 8], {"*": tape})
+        m.box([8 + x - .24, 12.3, 6.3 + 8], [8 + x + .24, 12.75, 7.75 + 8], {"*": tape})
+        m.box([8 + x - .15, 13.2, 7.75 + 8], [8 + x + .15, 14.4, 8.1 + 8], {"*": chrome})
+    m.box([8 - .4, 9.4, FRONT[1] + 8 - 2.6], [8 + .4, 10.0, FRONT[1] + 8 - 2.45], {"south": (240, 240, 246), "*": (160, 160, 166)})
+    return m
+
+
+def wicker(tile):
+    w, h = tile.size
+    vgrad(tile, (176, 132, 76), (130, 92, 48))
+    d = ImageDraw.Draw(tile)
+    for y in range(0, h, 3):
+        d.line((0, y, w, y), fill=(110, 76, 36, 255), width=1)
+    for x in range(0, w, 4):
+        d.line((x, 0, x, h), fill=(196, 152, 92, 255), width=1)
+
+
+def basket_top(tile):
+    wicker(tile)
+    w, h = tile.size
+    d = ImageDraw.Draw(tile)
+    d.rectangle((w * .1, h * .12, w * .9, h * .88), fill=(60, 40, 20, 255))
+    d.ellipse((w * .2, h * .2, w * .55, h * .6), fill=(220, 40, 40, 255))
+    d.rectangle((w * .5, h * .3, w * .85, h * .8), fill=(230, 220, 180, 255))
+
+
+def frame_ville():
+    m = Model("velo_cadre_ville", 1024, 16)
+    green, cream = painted(*GREEN), painted(*CREAM)
+    # A step-through frame: no top tube, a low tube from the head down to the seat tube
+    diamond(m, green, decal("VOXA", base=green), top=False)
+    tube(m, (7.5, -3.45), HEAD_LOW, .45, green)
+    drivetrain(m, guard_paint=green)
+    tube(m, CLUSTER, (15.2, -5.9), .3, chrome)
+    # The sprung leather saddle
+    m.box([8 - 1.4, 15.4, -6.8 + 8], [8 + 1.4, 16.2, -3.8 + 8], {"up": leather((120, 70, 36)), "*": ga.facet((90, 52, 26), .9)})
+    for x in (-.9, .9):
+        ga.octo(m, "y", 14.6, 15.4, 8 + x, -6.2 + 8, .3, (210, 214, 220))
+    # The rear rack
+    for x in (-1.5, 1.5):
+        m.box([8 + x - .15, 11.45, -12.6 + 8], [8 + x + .15, 11.75, -6.2 + 8], {"*": chrome})
+        m.box([8 + x * .74 - .15, 5.3, -12.4 + 8], [8 + x * .74 + .15, 11.6, -12.1 + 8], {"*": chrome})
+    for z in (-12.4, -10.0, -7.6):
+        m.box([8 - 1.6, 11.45, z + 8], [8 + 1.6, 11.75, z + .3 + 8], {"*": chrome})
+    ring(m, REAR[0], REAR[1] + 8, WHEEL_R + .7, .25, .78, cream, cream, cream, keep=lambda a: a >= 250 or a <= 30)
+    m.box([8 - .45, 9.0, REAR[1] + 8 - 6.2], [8 + .45, 9.8, REAR[1] + 8 - 5.95], {"north": (210, 20, 20), "*": (120, 10, 10)})
+    m.box([8 + 1.3, 4.2, -5.6 + 8], [8 + 1.55, 4.5, -1.8 + 8], {"*": chrome})
+    return m
+
+
+def steering_ville():
+    m = Model("velo_guidon_ville", 512, 16)
+    cream = painted(*CREAM)
+    fork(m, painted(*GREEN))
+    tube(m, HEAD_TOP, (15.8, 3.0), .3, chrome)
+    # Upright bars swept back to the rider, brown grips
+    m.box([8 - 2.4, 15.75, 3.0 + 8], [8 + 2.4, 16.15, 3.4 + 8], {"*": chrome})
+    for x in (-2.6, 2.6):
+        m.box([8 + x - .3, 15.7, 1.2 + 8], [8 + x + .3, 16.25, 3.4 + 8], {"*": leather((110, 64, 30))})
+    # The wicker basket before the bars, on the fork crown
+    m.box([8 - 2.4, 10.8, 5.6 + 8], [8 + 2.4, 13.9, 9.4 + 8], {"*": wicker, "up": basket_top})
+    ga.octo(m, "y", 16.15, 16.55, 8 + 1.9, 3.2 + 8, .45, (220, 222, 228), end_b=ga.disc((236, 238, 244), (150, 152, 160)))
+    ga.octo(m, "z", 9.4 + 8, 10.2 + 8, 8, 12.2, .75, (210, 214, 220), end_b=lamp_glass)
+    ring(m, FRONT[0], FRONT[1] + 8, WHEEL_R + .7, .25, .78, cream, cream, cream, keep=lambda a: a <= 60 or a >= 330)
+    return m
+
+
+def yellow_pad(word=""):
+    def p(tile):
+        w, h = tile.size
+        vgrad(tile, (252, 214, 40), (220, 170, 10))
+        if word:
+            d = ImageDraw.Draw(tile)
+            font = ImageFont.truetype(kit_font(), max(8, int(min(w, h) * .7)))
+            d.text((w / 2, h / 2), word, font=font, fill=(20, 20, 20, 255), anchor="mm")
+    return p
+
+
+def number_plate(tile):
+    w, h = tile.size
+    vgrad(tile, (252, 214, 40), (226, 178, 12))
+    d = ImageDraw.Draw(tile)
+    d.rounded_rectangle((0, 0, w - 1, h - 1), radius=max(2, w // 8), outline=(30, 30, 30, 255), width=max(1, w // 24))
+    font = ImageFont.truetype(kit_font(), max(8, int(h * .62)))
+    d.text((w / 2, h / 2), "80", font=font, fill=(20, 20, 20, 255), anchor="mm")
+
+
+def frame_bmx():
+    m = Model("velo_cadre_bmx", 1024, 16)
+    diamond(m, chrome, decal("VOXA", base=chrome, color=(20, 20, 24)))
+    drivetrain(m)
+    # The foam pad round the top tube
+    m.box([8 - .75, CLUSTER[0] - .75, -2.2 + 8], [8 + .75, CLUSTER[0] + .75, 3.2 + 8],
+          {"*": yellow_pad(), "east": yellow_pad("VOXA"), "west": yellow_pad("VOXA")})
+    tube(m, CLUSTER, (14.9, -5.77), .3, chrome)
+    m.box([8 - .85, 14.9, -7.0 + 8], [8 + .85, 15.5, -3.8 + 8], {"up": leather((20, 20, 22)), "*": ga.facet((14, 14, 16), .9)})
+    return m
+
+
+def steering_bmx():
+    m = Model("velo_guidon_bmx", 512, 16)
+    fork(m, chrome)
+    tube(m, HEAD_TOP, (15.4, 3.18), .32, chrome)
+    by, bz = 15.4, 3.18 + 8
+    m.box([8 - 3.4, by - .22, bz - .22], [8 + 3.4, by + .22, bz + .22], {"*": chrome})
+    for x in (-3.2, 3.2):
+        m.box([8 + x - .22, by, bz - .22], [8 + x + .22, by + 1.6, bz + .22], {"*": chrome})
+        m.box([8 + x - .34, by + 1.4, bz - 1.4], [8 + x + .34, by + 2.0, bz + .2], {"*": foam})
+    m.box([8 - 3.0, by + .6, bz - .3], [8 + 3.0, by + 1.1, bz + .3], {"*": yellow_pad()})
+    # The number plate before the bars
+    m.box([8 - 2.0, by + .2, bz + .5], [8 + 2.0, by + 2.6, bz + .65], {"south": number_plate, "north": number_plate, "*": (230, 190, 30)})
+    return m
+
+
+# The four bikes: their name, frame, steering, wheel
+BIKES = (("velo", "velo_roue"), ("velo_course", "velo_roue_course"), ("velo_ville", "velo_roue"), ("velo_bmx", "velo_roue_bmx"))
+
+
+
 # ------------------------------------------------------------------------------------------------ writing them
 
 def write_part(m):
@@ -376,7 +611,7 @@ def moved(elements, key, dx, dy, dz):
     return out
 
 
-def whole(parts):
+def whole(parts, name="velo"):
     """The bike in one model, for the item: every part in its place, the cranks level."""
     frame_m, wheel_m, crank_m, pedal_m, steer_m = parts
     els = moved(frame_m.elements, "#f", 0, 0, 0) + moved(steer_m.elements, "#s", 0, 0, 0)
@@ -385,10 +620,10 @@ def whole(parts):
     els += moved(crank_m.elements, "#c", 0, BB[0] - 8, BB[1])
     for side in (-1, 1):
         els += moved(pedal_m.elements, "#p", side * 2.45, BB[0] - 8 - side * CRANK_R, BB[1])
-    tex = {k: f"eraphones:block/{n}" for k, n in (("f", "velo_cadre"), ("s", "velo_guidon"), ("w", "velo_roue"), ("c", "velo_pedalier"),
+    tex = {k: f"eraphones:block/{n}" for k, n in (("f", frame_m.name), ("s", steer_m.name), ("w", wheel_m.name), ("c", "velo_pedalier"),
                                                    ("p", "velo_pedale"))}
-    tex["particle"] = "eraphones:block/velo_cadre"
-    kit.write_json("models/item/velo.json", {
+    tex["particle"] = f"eraphones:block/{frame_m.name}"
+    kit.write_json(f"models/item/{name}.json", {
         "textures": tex, "elements": els,
         "display": {
             "gui": {"rotation": [8, 90, 0], "translation": [0, -2.2, 0], "scale": [.52, .52, .52]},
@@ -415,15 +650,25 @@ def bell(rate=48000):
 
 
 def recipes():
-    ga.shaped("velo", ["R S", "IRI", "W W"], {"R": "minecraft:red_dye", "S": "minecraft:leather", "I": "minecraft:iron_ingot",
-                                             "W": "minecraft:iron_bars"})
+    for name, dye in (("velo", "red_dye"), ("velo_course", "blue_dye"), ("velo_ville", "green_dye"), ("velo_bmx", "yellow_dye")):
+        ga.shaped(name, ["R S", "IRI", "W W"], {"R": f"minecraft:{dye}", "S": "minecraft:leather", "I": "minecraft:iron_ingot",
+                                                 "W": "minecraft:iron_bars"})
 
 
 def main():
-    parts = (frame(), wheel(), crank(), pedal(), steering())
-    for m in parts:
-        write_part(m)
-    whole(parts)
+    cr, pe = crank(), pedal()
+    write_part(cr)
+    write_part(pe)
+    wheels = {"velo_roue": wheel(), "velo_roue_course": wheel("velo_roue_course", "thin"), "velo_roue_bmx": wheel("velo_roue_bmx", "knobby")}
+    for w in wheels.values():
+        write_part(w)
+    makers = {"velo": (frame, steering), "velo_course": (frame_course, steering_course), "velo_ville": (frame_ville, steering_ville),
+              "velo_bmx": (frame_bmx, steering_bmx)}
+    for name, wheel_name in BIKES:
+        fr, st = (f() for f in makers[name])
+        write_part(fr)
+        write_part(st)
+        whole((fr, wheels[wheel_name], cr, pe, st), name)
     recipes()
 
 

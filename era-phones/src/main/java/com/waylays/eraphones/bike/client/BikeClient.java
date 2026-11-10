@@ -15,9 +15,12 @@ public final class BikeClient {
 
     @SubscribeEvent
     public static void onModels(ModelEvent.RegisterAdditional event) {
-        for (var id : new net.minecraft.client.resources.model.ModelResourceLocation[] {BikeRenderer.FRAME, BikeRenderer.WHEEL, BikeRenderer.CRANK,
-                BikeRenderer.PEDAL, BikeRenderer.STEER}) {
-            event.register(id);
+        event.register(BikeRenderer.CRANK);
+        event.register(BikeRenderer.PEDAL);
+        for (var group : java.util.List.of(BikeRenderer.FRAMES, BikeRenderer.STEERS, BikeRenderer.WHEELS)) {
+            for (var id : group) {
+                event.register(id);
+            }
         }
     }
 

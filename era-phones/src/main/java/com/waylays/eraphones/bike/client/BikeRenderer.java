@@ -23,8 +23,11 @@ import net.minecraft.util.Mth;
  * the whole leaning into the turns.
  */
 public class BikeRenderer extends EntityRenderer<BikeEntity> {
-    public static final ModelResourceLocation FRAME = part("velo_cadre"), WHEEL = part("velo_roue"), CRANK = part("velo_pedalier"),
-            PEDAL = part("velo_pedale"), STEER = part("velo_guidon");
+    public static final ModelResourceLocation CRANK = part("velo_pedalier"), PEDAL = part("velo_pedale");
+    /** Each bicycle's frame, steering and wheel, by its kind. */
+    public static final ModelResourceLocation[] FRAMES = {part("velo_cadre"), part("velo_cadre_course"), part("velo_cadre_ville"), part("velo_cadre_bmx")},
+            STEERS = {part("velo_guidon"), part("velo_guidon_course"), part("velo_guidon_ville"), part("velo_guidon_bmx")},
+            WHEELS = {part("velo_roue"), part("velo_roue_course"), part("velo_roue"), part("velo_roue_bmx")};
     /** Where the parts turn (model sixteenths: bike units moved by 8 across and 8 forward). */
     private static final float REAR_Y = 5.3f, REAR_Z = -.5f, FRONT_Y = 5.3f, FRONT_Z = 15.36f, BB_Y = 4.8f, BB_Z = 6.5f, HEAD_Y = 11f,
             HEAD_Z = 13f, HEAD_TILT = 22.5f, CRANK_R = 2.6f, PEDAL_X = 2.45f;
@@ -46,6 +49,8 @@ public class BikeRenderer extends EntityRenderer<BikeEntity> {
     @Override
     public void render(BikeEntity bike, float yaw, float pt, PoseStack pose, MultiBufferSource buffers, int light) {
         VertexConsumer vc = buffers.getBuffer(RenderType.entityCutout(TextureAtlas.LOCATION_BLOCKS));
+        int k = bike.kind();
+        ModelResourceLocation FRAME = FRAMES[k], STEER = STEERS[k], WHEEL = WHEELS[k];
         float spin = Mth.lerp(pt, bike.spinO, bike.spin), crank = Mth.lerp(pt, bike.crankO, bike.crank);
         float steer = Mth.lerp(pt, bike.steerO, bike.steer), lean = Mth.lerp(pt, bike.leanO, bike.lean);
         pose.pushPose();

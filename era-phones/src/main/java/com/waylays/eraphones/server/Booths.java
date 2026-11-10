@@ -75,7 +75,7 @@ public final class Booths {
             return;
         }
         ServerLevel level = server.getLevel(g.dimension());
-        if (level != null && ticks % 60 == 1) {
+        if (level != null && ticks % 60 == 1 && !com.waylays.eraphones.gear.Power.cut(level, g.pos())) {
             level.playSound(null, g.pos().above(), GearRegistry.BOOTH_RING.get(), SoundSource.BLOCKS, 1.6f, 1f);
         }
     }

@@ -71,5 +71,31 @@
       }
     ],
     "subtitle": "subtitles.eraphones.velo_sonnette"
+  },
+  "lampadaire_bourdonnement": {
+    "sounds": [
+      {
+        "name": "eraphones:lampadaire_bourdonnement",
+        "attenuation_distance": 20
+      }
+    ],
+    "subtitle": "subtitles.eraphones.lampadaire_bourdonnement"
+  },
+  "lampadaire_claquement": {
+    "sounds": [
+      {
+        "name": "eraphones:lampadaire_claquement",
+        "attenuation_distance": 20
+      }
+    ],
+    "subtitle": "subtitles.eraphones.lampadaire_claquement"
+  },
+  "coupure_courant": {
+    "sounds": [
+      {
+        "name": "eraphones:coupure_courant"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.coupure_courant"
   }
 }

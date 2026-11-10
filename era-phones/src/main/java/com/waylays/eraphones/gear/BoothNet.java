@@ -60,6 +60,10 @@ public final class BoothNet {
                 || !(p.level().getBlockEntity(d.pos()) instanceof BoothBlockEntity booth) || booth.number().isEmpty()) {
             return;
         }
+        if (Power.cut(p.level(), d.pos())) {
+            p.displayClientMessage(net.minecraft.network.chat.Component.translatable("booth.eraphones.dead"), true);
+            return;
+        }
         boolean free = p.getAbilities().instabuild;
         Item coin = coin();
         if (!free) {

@@ -26,6 +26,10 @@ import javax.annotation.Nullable;
  * not pedalled, slows in water. Hit, it is picked up. Driven on the rider's own side, as boats are.
  */
 public class BikeEntity extends Entity {
+    /** The four bicycles: the red chopper, the blue racer, the green town bike, the chrome BMX (their item names). */
+    public static final String[] KINDS = {"velo", "velo_course", "velo_ville", "velo_bmx"};
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> KIND =
+            SynchedEntityData.defineId(BikeEntity.class, net.minecraft.network.syncher.EntityDataSerializers.INT);
     /** Top speed (blocks a tick: about 30 km/h) and how fast it gets there, how hard it brakes. */
     public static final float MAX = .42f, PEDAL = .011f, BRAKE = .03f;
     /** The wheel's radius and the gearing from cranks to wheel (blocks; turns). */
@@ -45,14 +49,29 @@ public class BikeEntity extends Entity {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(KIND, 0);
+    }
+
+    public int kind() {
+        return Mth.clamp(entityData.get(KIND), 0, KINDS.length - 1);
+    }
+
+    public void setKind(int kind) {
+        entityData.set(KIND, Mth.clamp(kind, 0, KINDS.length - 1));
     }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
+        setKind(tag.getInt("Kind"));
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
+        tag.putInt("Kind", kind());
+    }
+
+    private ItemStack item() {
+        return new ItemStack(GearRegistry.BIKE_ITEMS.get(kind()).get());
     }
 
     @Override
@@ -93,8 +112,9 @@ public class BikeEntity extends Entity {
 
     @Override
     protected Vec3 getPassengerAttachmentPoint(Entity passenger, EntityDimensions dimensions, float partialTick) {
-        // The rider's hips over the long seat, the feet on the pedals
-        return new Vec3(0, .29, -.35).yRot(-getYRot() * Mth.DEG_TO_RAD);
+        // The rider's hips on the long seat, the feet on the pedals: a player's own attachment puts them 0.6 lower,
+        // so that much is added back (their feet .29 above the ground, their hips on the seat at about 1)
+        return new Vec3(0, .29 + .6, -.36).yRot(-getYRot() * Mth.DEG_TO_RAD);
     }
 
     @Override
@@ -123,7 +143,7 @@ public class BikeEntity extends Entity {
         }
         if (source.getEntity() instanceof Player p) {
             if (!p.getAbilities().instabuild) {
-                spawnAtLocation(new ItemStack(GearRegistry.BIKE_ITEM.get()));
+                spawnAtLocation(item());
             }
             discard();
             return true;
@@ -133,7 +153,7 @@ public class BikeEntity extends Entity {
 
     @Override
     public ItemStack getPickResult() {
-        return new ItemStack(GearRegistry.BIKE_ITEM.get());
+        return item();
     }
 
     @Override
