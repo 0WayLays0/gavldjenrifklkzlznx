@@ -123,10 +123,14 @@ public class VoicePlugin implements VoicechatPlugin {
 
     private final java.util.Map<UUID, de.maxhenkel.voicechat.api.opus.OpusDecoder> machineDecoders = new java.util.concurrent.ConcurrentHashMap<>();
 
-    /** A caller leaving a message on an answering machine: their voice, decoded, taken down by it. */
+    /**
+     * The voice taken down by things that record it: an answering machine the speaker is leaving a message on, the
+     * camcorders filming near them.
+     */
     private void recordForMachine(ServerPlayer speaker, byte[] data, VoicechatServerApi api) {
         UUID id = speaker.getUUID();
-        if (!com.waylays.eraphones.server.AnswerMachines.recording(id)) {
+        boolean machine = com.waylays.eraphones.server.AnswerMachines.recording(id);
+        if (!machine && !com.waylays.eraphones.gear.CamNet.anyRecording()) {
             de.maxhenkel.voicechat.api.opus.OpusDecoder old = machineDecoders.remove(id);
             if (old != null) {
                 old.close();
@@ -139,7 +143,11 @@ public class VoicePlugin implements VoicechatPlugin {
                 dec.resetState();
                 return;
             }
-            com.waylays.eraphones.server.AnswerMachines.voice(id, dec.decode(data));
+            short[] pcm = dec.decode(data);
+            if (machine) {
+                com.waylays.eraphones.server.AnswerMachines.voice(id, pcm);
+            }
+            com.waylays.eraphones.gear.CamNet.voice(speaker, pcm);
         } catch (Throwable t) {
             if (!machineWarned) {
                 machineWarned = true;

@@ -29,7 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The camcorder's films: the server starts and stops a recording (on a blank cassette the filmer carries) and writes
- * the pictures their screen sends, ten a second, straight into a film the televisions can play.
+ * the pictures their screen sends, ten a second, straight into a film the televisions can play, with the voices
+ * spoken near the camcorder (with Simple Voice Chat).
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class CamNet {
@@ -39,10 +40,16 @@ public final class CamNet {
 
     private CamNet() {}
 
+    /** How far round a filmer voices are heard on the film (blocks). */
+    public static final double HEARS = 8;
+
     static final class Recording {
         final String file;
         final VideoDecode.Writer writer;
         final long start = System.currentTimeMillis();
+        /** The sound filmed (48 kHz): the voices of those speaking near the camcorder, each at the time it was said. */
+        short[] sound = new short[Audio.RATE * 10];
+        int soundLength;
 
         Recording(String file, VideoDecode.Writer writer) {
             this.file = file;
@@ -57,6 +64,65 @@ public final class CamNet {
 
     public static boolean recording(ServerPlayer p) {
         return RECORDING.containsKey(p.getUUID());
+    }
+
+    /** Whether any camcorder is filming (voices are then worth decoding). */
+    public static boolean anyRecording() {
+        return !RECORDING.isEmpty();
+    }
+
+    /**
+     * {@code speaker} said this (48 kHz, from their microphone): it goes on the films of the camcorders within
+     * {@link #HEARS} blocks, louder the nearer, at the moment it was said.
+     */
+    public static void voice(ServerPlayer speaker, short[] pcm) {
+        if (pcm == null || pcm.length == 0) {
+            return;
+        }
+        for (Map.Entry<UUID, Recording> e : RECORDING.entrySet()) {
+            ServerPlayer filmer = speaker.server.getPlayerList().getPlayer(e.getKey());
+            if (filmer == null || filmer.level() != speaker.level()) {
+                continue;
+            }
+            double d = filmer.distanceTo(speaker);
+            if (d > HEARS) {
+                continue;
+            }
+            float gain = (float) (d < 1 ? 1 : Math.max(.15, 1 - d / HEARS));
+            Recording r = e.getValue();
+            synchronized (r) {
+                int at = (int) Math.max(0, (System.currentTimeMillis() - r.start) * Audio.RATE / 1000 - pcm.length);
+                int end = Math.min(at + pcm.length, LONGEST * Audio.RATE);
+                if (end <= at) {
+                    continue;
+                }
+                if (end > r.sound.length) {
+                    r.sound = java.util.Arrays.copyOf(r.sound, Math.min(LONGEST * Audio.RATE, Math.max(end, r.sound.length * 2)));
+                }
+                for (int i = at; i < end; i++) {
+                    r.sound[i] = (short) Math.max(-32768, Math.min(32767, r.sound[i] + pcm[i - at] * gain));
+                }
+                r.soundLength = Math.max(r.soundLength, end);
+            }
+        }
+    }
+
+    /** Writes a film's sound next to its pictures (raw 16-bit, little end first). */
+    private static void saveSound(Recording r) {
+        short[] pcm;
+        synchronized (r) {
+            pcm = java.util.Arrays.copyOf(r.sound, r.soundLength);
+        }
+        if (pcm.length == 0) {
+            return;
+        }
+        try {
+            java.nio.ByteBuffer b = java.nio.ByteBuffer.allocate(pcm.length * 2).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+            b.asShortBuffer().put(pcm);
+            Files.write(Video.soundOf(r.file), b.array());
+        } catch (IOException e) {
+            EraPhones.LOGGER.warn("A film's sound could not be kept: {}", e.toString());
+        }
     }
 
     /** Starts filming on the first blank cassette {@code p} carries; false (and why, told) if there is none. */
@@ -100,6 +166,7 @@ public final class CamNet {
         } catch (IOException e) {
             EraPhones.LOGGER.warn("A film could not be finished: {}", e.toString());
         }
+        saveSound(r);
         Video.forget(r.file);
         PacketDistributor.sendToPlayer(p, new Rec(false));
         int s = frames / VideoDecode.FPS;
@@ -148,6 +215,7 @@ public final class CamNet {
                     } catch (IOException ignored) {
                         // Lost anyway
                     }
+                    saveSound(gone);
                     Video.forget(gone.file);
                 }
             } else if (!holding || full) {

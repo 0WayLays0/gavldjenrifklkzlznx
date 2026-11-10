@@ -55,6 +55,11 @@ public final class Video {
         COUNT.remove(file);
     }
 
+    /** Where a filmed tape's sound is kept (next to its pictures). */
+    public static Path soundOf(String file) {
+        return cache(file).resolveSibling(file + ".pcm");
+    }
+
     public static Path cache(String file) {
         return Tape.folder().resolve(".tv").resolve(file + ".tvx");
     }
@@ -88,7 +93,16 @@ public final class Video {
             // Filmed with a camcorder: already in the prepared form; silent, as long as its pictures
             try (RandomAccessFile f = new RandomAccessFile(cache(file).toFile(), "r")) {
                 int n = VideoDecode.count(f);
-                SOUND.put(file, new short[Math.max(1, n) * Audio.RATE / VideoDecode.FPS]);
+                short[] pcm = new short[Math.max(1, n) * Audio.RATE / VideoDecode.FPS];
+                // The voices spoken while filming, if any were taken down
+                Path snd = soundOf(file);
+                if (Files.isRegularFile(snd)) {
+                    byte[] raw = Files.readAllBytes(snd);
+                    short[] voices = new short[raw.length / 2];
+                    java.nio.ByteBuffer.wrap(raw).order(java.nio.ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(voices);
+                    System.arraycopy(voices, 0, pcm, 0, Math.min(voices.length, pcm.length));
+                }
+                SOUND.put(file, pcm);
                 PROGRESS.put(file, 100);
                 STATE.put(file, State.READY);
                 return State.READY;
