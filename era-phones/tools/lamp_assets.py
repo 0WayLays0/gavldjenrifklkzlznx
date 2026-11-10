@@ -1,7 +1,7 @@
 """The street lamp (original design, drawn here): a galvanised grey pole on a round concrete foot, an access door and
 the lamp's number on it; at the top an arm reaching over the street and the long "cobra" head at its end, its sodium
-glass glowing orange at night (a lit and an unlit model). Three blocks tall: the foot's model holds the pole for two
-blocks, the top block's the rest. Its sounds: the buzz of a lamp warming up, the click of one going out, and a whole
+glass glowing orange at night (a lit and an unlit model). Four blocks tall (its head at about 3.7): the foot's model
+holds the pole for two blocks, the third block's the next, the top block's the arm and the head. Its sounds: the buzz of a lamp warming up, the click of one going out, and a whole
 street losing its power."""
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -67,9 +67,17 @@ def lower():
     m = Model(NAME, 1024, 12)
     ga.octo(m, "y", 0, 2.4, 8, 8, 3.2, (150, 148, 142), end_b=ga.disc((160, 158, 152), (120, 118, 112)))
     ga.octo(m, "y", 2.4, 3.2, 8, 8, 1.9, POLE_DARK)
-    ga.octo(m, "y", 3.2, 32, 8, 8, 1.25, galvanised)
+    # (Each end of a rod has a thin cap past it: the rod stops short of 32, the most a block model may reach)
+    ga.octo(m, "y", 3.2, 31.97, 8, 8, 1.25, galvanised)
     m.box([8 - .9, 5.5, 8 + 1.2], [8 + .9, 9.5, 8 + 1.32], {"south": door})
     m.box([8 - 1.0, 18, 8 + 1.2], [8 + 1.0, 19.5, 8 + 1.32], {"south": number})
+    return m
+
+
+def pole():
+    m = Model(NAME + "_poteau", 1024, 12)
+    ga.octo(m, "y", .03, 15.97, 8, 8, 1.2, galvanised)
+    m.box([8 - 1.4, 8, 8 - 1.4], [8 + 1.4, 8.6, 8 + 1.4], {"*": ga.facet(POLE_DARK, 1.0)})
     return m
 
 
@@ -91,6 +99,8 @@ def upper(on):
 
 
 def write(m, render_type="minecraft:cutout"):
+    for e in m.elements:
+        assert all(-16 <= v <= 32 for v in e["from"] + e["to"]), f"{m.name}: an element out of the model's bounds"
     kit.save(m.img, f"textures/block/{m.name}.png")
     tex = f"eraphones:block/{m.name}"
     kit.write_json(f"models/block/{m.name}.json", {
@@ -100,14 +110,14 @@ def write(m, render_type="minecraft:cutout"):
 
 
 def lamp():
-    low, up_off, up_on = lower(), upper(False), upper(True)
-    for m in (low, up_off, up_on):
+    low, mid, up_off, up_on = lower(), pole(), upper(False), upper(True)
+    for m in (low, mid, up_off, up_on):
         write(m)
     kit.write_json(f"models/block/{NAME}_milieu.json", {"textures": {"particle": f"eraphones:block/{NAME}"}, "elements": []})
     variants = {}
     for f, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270)):
         for lit in ("false", "true"):
-            for part, model in ((0, NAME), (1, NAME + "_milieu"), (2, NAME + "_haut" + ("_allume" if lit == "true" else ""))):
+            for part, model in ((0, NAME), (1, NAME + "_milieu"), (2, NAME + "_poteau"), (3, NAME + "_haut" + ("_allume" if lit == "true" else ""))):
                 v = {"model": f"eraphones:block/{model}"}
                 if y:
                     v["y"] = y
@@ -115,11 +125,13 @@ def lamp():
     kit.write_json(f"blockstates/{NAME}.json", {"variants": variants})
     # The item: the whole lamp, small
     els = [dict(e, faces={k: dict(v, texture="#a") for k, v in e["faces"].items()}) for e in low.elements]
-    els += ba.moved(up_on.elements, "#b", 0, 32, 0)
-    scale = 16 / 48
+    els += ba.moved(mid.elements, "#c", 0, 32, 0)
+    els += ba.moved(up_on.elements, "#b", 0, 48, 0)
+    scale = 32 / 64
     els = scaled(els, scale)
     kit.write_json(f"models/item/{NAME}.json", {
-        "textures": {"a": f"eraphones:block/{NAME}", "b": f"eraphones:block/{NAME}_haut_allume", "particle": f"eraphones:block/{NAME}"},
+        "textures": {"a": f"eraphones:block/{NAME}", "b": f"eraphones:block/{NAME}_haut_allume", "c": f"eraphones:block/{NAME}_poteau",
+                     "particle": f"eraphones:block/{NAME}"},
         "elements": els, "display": {"gui": {"rotation": [20, 225, 0], "translation": [0, 0, 0], "scale": [.9, .9, .9]},
                                      "ground": {"rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [.5, .5, .5]},
                                      "thirdperson_righthand": {"rotation": [0, 45, 0], "translation": [0, 1, 0], "scale": [.5, .5, .5]},

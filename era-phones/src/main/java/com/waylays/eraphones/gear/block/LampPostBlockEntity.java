@@ -38,9 +38,9 @@ public class LampPostBlockEntity extends BlockEntity {
         if (level == null || level.getGameTime() % 2 != Math.floorMod(worldPosition.hashCode(), 2)) {
             return;
         }
-        BlockPos top = worldPosition.above(2);
+        BlockPos top = worldPosition.above(LampPostBlock.TOP);
         BlockState head = level.getBlockState(top);
-        if (!head.is(GearRegistry.LAMP_POST.get()) || head.getValue(LampPostBlock.PART) != 2) {
+        if (!head.is(GearRegistry.LAMP_POST.get()) || head.getValue(LampPostBlock.PART) != LampPostBlock.TOP) {
             return;
         }
         boolean lit = head.getValue(LampPostBlock.LIT);

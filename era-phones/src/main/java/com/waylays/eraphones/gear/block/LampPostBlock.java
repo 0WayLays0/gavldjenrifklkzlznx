@@ -29,14 +29,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 
 /**
- * A street lamp of the time, three blocks tall: a grey pole on its concrete foot, an arm reaching over the street
+ * A street lamp of the time, four blocks tall: a grey pole on its concrete foot, an arm reaching over the street
  * and the long lamp head at its end, its sodium glass glowing orange at night. The lamps come on one after another
  * as night falls, buzzing and flickering while they warm up, and go out at dawn; a power cut puts them out.
  */
 public class LampPostBlock extends HorizontalDirectionalBlock implements EntityBlock {
     public static final MapCodec<LampPostBlock> CODEC = simpleCodec(LampPostBlock::new);
-    /** Which block of the three: 0 the foot, 1 the middle, 2 the top with the arm and the lamp. */
-    public static final IntegerProperty PART = IntegerProperty.create("part", 0, 2);
+    /** Which block of the four: 0 the foot, 1 and 2 the pole, 3 the top with the arm and the lamp. */
+    public static final int TOP = 3;
+    public static final IntegerProperty PART = IntegerProperty.create("part", 0, TOP);
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     private static final VoxelShape POLE = Block.box(6, 0, 6, 10, 16, 10), FOOT = Block.box(4.5, 0, 4.5, 11.5, 3, 11.5);
 
@@ -60,10 +61,10 @@ public class LampPostBlock extends HorizontalDirectionalBlock implements EntityB
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         BlockPos pos = ctx.getClickedPos();
         Level level = ctx.getLevel();
-        if (pos.getY() >= level.getMaxBuildHeight() - 2) {
+        if (pos.getY() >= level.getMaxBuildHeight() - TOP) {
             return null;
         }
-        for (int k = 1; k <= 2; k++) {
+        for (int k = 1; k <= TOP; k++) {
             if (!level.getBlockState(pos.above(k)).canBeReplaced(ctx)) {
                 return null;
             }
@@ -74,14 +75,15 @@ public class LampPostBlock extends HorizontalDirectionalBlock implements EntityB
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        level.setBlock(pos.above(), state.setValue(PART, 1), 3);
-        level.setBlock(pos.above(2), state.setValue(PART, 2), 3);
+        for (int k = 1; k <= TOP; k++) {
+            level.setBlock(pos.above(k), state.setValue(PART, k), 3);
+        }
     }
 
     @Override
     protected BlockState updateShape(BlockState state, Direction dir, BlockState neighbour, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
         int part = state.getValue(PART);
-        boolean needUp = part < 2 && dir == Direction.UP, needDown = part > 0 && dir == Direction.DOWN;
+        boolean needUp = part < TOP && dir == Direction.UP, needDown = part > 0 && dir == Direction.DOWN;
         if (needUp || needDown) {
             int want = needUp ? part + 1 : part - 1;
             if (!neighbour.is(this) || neighbour.getValue(PART) != want) {
