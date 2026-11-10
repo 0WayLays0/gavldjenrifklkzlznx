@@ -29,6 +29,8 @@ import java.util.zip.Inflater;
 @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT)
 public final class PhotoClient {
     private static boolean pending, hidGui, offhand;
+    /** What became of the last picture on this side (for the tests). */
+    public static volatile String last = "none";
     private static int frames;
     private static long flashAt;
 
@@ -40,6 +42,7 @@ public final class PhotoClient {
         }
         Minecraft mc = Minecraft.getInstance();
         pending = true;
+        last = "waiting for a frame";
         offhand = offhandCamera;
         frames = 0;
         hidGui = mc.options.hideGui;
@@ -65,8 +68,10 @@ public final class PhotoClient {
                 data = pack(shot, 96);
             }
             PacketDistributor.sendToServer(new PhotoNet.Taken(offhand, data));
-        } catch (Exception e) {
-            EraPhones.LOGGER.warn("The photograph could not be taken: {}", e.toString());
+            last = "sent " + data.length + " bytes (" + shot.getWidth() + "x" + shot.getHeight() + ")";
+        } catch (Throwable e) {
+            last = "failed: " + e;
+            EraPhones.LOGGER.warn("The photograph could not be taken", e);
         }
     }
 

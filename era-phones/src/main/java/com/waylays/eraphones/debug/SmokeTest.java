@@ -565,7 +565,8 @@ public final class SmokeTest {
                 }
             }
             if (!found) {
-                fail("no photograph came out of the camera");
+                fail("no photograph came out of the camera (client: {}; server: {})", com.waylays.eraphones.gear.client.PhotoClient.last,
+                        com.waylays.eraphones.gear.PhotoNet.last);
             }
         }));
         STEPS.add(() -> {

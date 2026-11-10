@@ -23,15 +23,21 @@ public final class PhotoNet {
         r.playToServer(Taken.TYPE, Taken.CODEC, PhotoNet::taken);
     }
 
+    /** What became of the last picture the server was sent (for the tests). */
+    public static volatile String last = "none";
+
     private static void taken(Taken t, IPayloadContext c) {
         if (!(c.player() instanceof ServerPlayer p) || t.data().length == 0 || t.data().length > MAX) {
+            last = "refused: " + t.data().length + " bytes";
             return;
         }
         InteractionHand hand = t.offhand() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack camera = p.getItemInHand(hand);
         if (!(camera.getItem() instanceof CameraItem) || CameraItem.film(camera) <= 0) {
+            last = "refused: " + camera + " in hand, film " + (camera.getItem() instanceof CameraItem ? CameraItem.film(camera) : -1);
             return;
         }
+        last = "printed";
         if (!p.getAbilities().instabuild) {
             camera.set(GearRegistry.FILM.get(), CameraItem.film(camera) - 1);
         }
