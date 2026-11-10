@@ -97,5 +97,13 @@
       }
     ],
     "subtitle": "subtitles.eraphones.coupure_courant"
+  },
+  "repondeur_bip": {
+    "sounds": [
+      {
+        "name": "eraphones:repondeur_bip"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.repondeur_bip"
   }
 }

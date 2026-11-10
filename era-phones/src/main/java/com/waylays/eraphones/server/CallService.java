@@ -24,6 +24,8 @@ public final class CallService {
     public static final int OVER = 0, CALLING = 1, RINGING = 2, TALKING = 3;
     /** How long a phone rings before the call is missed (ticks). */
     static final int RING_TICKS = 20 * 25;
+    /** How long a phone rings before its answering machine picks up (ticks); sooner if no one carries it. */
+    static final int MACHINE_AFTER = 20 * 9, MACHINE_SOON = 20 * 3;
     /** Between two lines of a hidden caller's script (ticks). */
     static final int SCRIPT_GAP = 20 * 3;
 
@@ -38,6 +40,8 @@ public final class CallService {
         int ticks;
         final List<String> script;
         int scriptAt;
+        /** The answering machine that picked up, if one did. */
+        @Nullable net.minecraft.core.GlobalPos machine;
 
         Call(String from, String to, @Nullable UUID caller, Era callerEra, Era calleeEra, List<String> script) {
             this.from = from;
@@ -125,6 +129,12 @@ public final class CallService {
             return;
         }
         ServerPlayer callee = PhoneService.holder(p.server, to);
+        if ((callee == null || PhoneService.bars(callee, target.era) <= 0) && AnswerMachines.at(p.server, to) != null) {
+            // No one to answer, but a machine will
+            CALLS.add(new Call(s.number, to, p.getUUID(), s.era, target.era, List.of()));
+            state(p, CALLING, s.number, to, d.display(s.number, to), 0, "");
+            return;
+        }
         if (callee == null || PhoneService.bars(callee, target.era) <= 0) {
             d.logCall(s.number, new LineData.Call(to, 0, PhoneService.now(), 0));
             d.logCall(to, new LineData.Call(s.number, 2, PhoneService.now(), 0));
@@ -265,6 +275,9 @@ public final class CallService {
         }
         UUID other = p.getUUID().equals(c.caller) ? c.callee : c.caller;
         PacketDistributor.sendToPlayer(p, new PhoneNet.CallLine(true, text));
+        if (c.machine != null && p.getUUID().equals(c.caller)) {
+            AnswerMachines.text(p.getUUID(), text);
+        }
         if (other != null) {
             ServerPlayer o = p.server.getPlayerList().getPlayer(other);
             if (o != null) {
@@ -289,9 +302,31 @@ public final class CallService {
 
     // ---------------------------------------------------------------- ending, ticking
 
+    /** No one picked up: the answering machine does, its beep, and the caller's message is taken down. */
+    private static void machineAnswers(MinecraftServer server, Call c, com.waylays.eraphones.gear.block.AnswerMachineBlockEntity m,
+                                       ServerPlayer caller, @Nullable ServerPlayer callee) {
+        LineData d = LineData.get(server);
+        c.machine = net.minecraft.core.GlobalPos.of(m.getLevel().dimension(), m.getBlockPos());
+        c.talking = true;
+        c.since = PhoneService.now();
+        c.ticks = 0;
+        if (callee != null) {
+            state(callee, OVER, c.to, c.from, d.display(c.to, c.from), 0, "machine");
+            c.callee = null;
+        }
+        state(caller, TALKING, c.from, c.to, d.display(c.from, c.to), c.since, "");
+        caller.displayClientMessage(net.minecraft.network.chat.Component.translatable("machine.eraphones.greeting"), true);
+        caller.playNotifySound(com.waylays.eraphones.registry.GearRegistry.MACHINE_BEEP.get(), net.minecraft.sounds.SoundSource.PLAYERS, .8f, 1f);
+        m.answering(true);
+        AnswerMachines.begin(caller.getUUID(), c.machine, c.from);
+    }
+
     static void end(MinecraftServer server, Call c, String reason) {
         if (!CALLS.remove(c)) {
             return;
+        }
+        if (c.machine != null && c.caller != null) {
+            AnswerMachines.finish(server, c.caller);
         }
         LineData d = LineData.get(server);
         long now = PhoneService.now();
@@ -350,6 +385,14 @@ public final class CallService {
             c.ticks++;
             ServerPlayer caller = c.caller == null ? null : server.getPlayerList().getPlayer(c.caller);
             ServerPlayer callee = c.callee == null ? null : server.getPlayerList().getPlayer(c.callee);
+            if (!c.talking && c.caller != null && !c.hidden() && !Booths.is(c.to)
+                    && (c.ticks >= MACHINE_AFTER || callee == null && c.ticks >= MACHINE_SOON)) {
+                com.waylays.eraphones.gear.block.AnswerMachineBlockEntity m = AnswerMachines.at(server, c.to);
+                if (m != null && caller != null) {
+                    machineAnswers(server, c, m, caller, callee);
+                    continue;
+                }
+            }
             if (!c.talking) {
                 LineData.Line target = d.line(c.to);
                 if (Booths.is(c.to)) {
@@ -371,6 +414,9 @@ public final class CallService {
                     }
                     continue;
                 }
+                if (callee == null && c.caller != null && caller != null && AnswerMachines.at(server, c.to) != null) {
+                    continue; // Ringing on, until the machine picks up
+                }
                 if (callee == null || PhoneService.find(callee, c.to).isEmpty() || c.caller != null && caller == null) {
                     end(server, c, c.caller != null && caller == null ? "ended" : "no_answer");
                     continue;
@@ -388,6 +434,18 @@ public final class CallService {
                     end(server, c, "ended");
                     continue;
                 }
+            }
+            if (c.machine != null) {
+                // Leaving a message: until the caller hangs up, loses the line, or the tape's minute is up
+                if (c.ticks > AnswerMachines.LONGEST * 20) {
+                    end(server, c, "ended");
+                } else if (c.ticks % 20 == 0) {
+                    String t = trouble(caller, c.from, c.callerEra);
+                    if (t != null) {
+                        end(server, c, t);
+                    }
+                }
+                continue;
             }
             if (c.ticks % 20 == 0) {
                 String t = c.caller == null ? null : trouble(caller, c.from, c.callerEra);

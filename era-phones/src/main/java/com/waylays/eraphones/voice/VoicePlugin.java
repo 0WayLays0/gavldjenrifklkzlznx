@@ -78,6 +78,7 @@ public class VoicePlugin implements VoicechatPlugin {
                 }
             }
         }
+        recordForMachine(speaker, event.getPacket().getOpusEncodedData(), api);
         if (phoneVoice()) {
             UUID other = CallService.otherEnd(speaker.getUUID());
             if (other != null) {
@@ -119,6 +120,35 @@ public class VoicePlugin implements VoicechatPlugin {
             return packet.toStaticSoundPacket();
         }
     }
+
+    private final java.util.Map<UUID, de.maxhenkel.voicechat.api.opus.OpusDecoder> machineDecoders = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** A caller leaving a message on an answering machine: their voice, decoded, taken down by it. */
+    private void recordForMachine(ServerPlayer speaker, byte[] data, VoicechatServerApi api) {
+        UUID id = speaker.getUUID();
+        if (!com.waylays.eraphones.server.AnswerMachines.recording(id)) {
+            de.maxhenkel.voicechat.api.opus.OpusDecoder old = machineDecoders.remove(id);
+            if (old != null) {
+                old.close();
+            }
+            return;
+        }
+        try {
+            de.maxhenkel.voicechat.api.opus.OpusDecoder dec = machineDecoders.computeIfAbsent(id, k -> api.createDecoder());
+            if (data == null || data.length == 0) {
+                dec.resetState();
+                return;
+            }
+            com.waylays.eraphones.server.AnswerMachines.voice(id, dec.decode(data));
+        } catch (Throwable t) {
+            if (!machineWarned) {
+                machineWarned = true;
+                EraPhones.LOGGER.warn("A message could not be recorded: {}", t.toString());
+            }
+        }
+    }
+
+    private boolean machineWarned;
 
     /** The speaker's voice put on before anyone hears it (so also through /voir and the phone). */
     private void changeVoice(MicrophonePacketEvent event, VoicechatConnection sender, ServerPlayer speaker, VoicechatServerApi api) {

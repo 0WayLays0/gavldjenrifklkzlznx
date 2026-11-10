@@ -21,8 +21,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -32,27 +30,29 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 
 /**
- * A phone booth, two blocks tall and open at the front: a payphone inside on its back wall, a lit sign on its roof. It
+ * A phone booth, three blocks tall (two and three quarters to its roof) and open at the front: a payphone inside on its back wall, a lit sign on its roof. It
  * has a number of its own (555-9xxx) on the phone network: a coin of 25 cents calls any phone from it, and when it is
  * called it rings out loud in the street until someone picks up its handset (uses it).
  */
 public class BoothBlock extends HorizontalDirectionalBlock implements EntityBlock {
     public static final MapCodec<BoothBlock> CODEC = simpleCodec(BoothBlock::new);
-    public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
+    /** Which block of the three: 0 the foot (the booth's model, its block entity), 1 the middle, 2 the top (the sign). */
+    public static final net.minecraft.world.level.block.state.properties.IntegerProperty PART =
+            net.minecraft.world.level.block.state.properties.IntegerProperty.create("part", 0, 2);
     /** Whether the booth has power (a power cut leaves it dark and dead). */
     public static final net.minecraft.world.level.block.state.properties.BooleanProperty POWERED = BlockStateProperties.POWERED;
-    /** Its shapes by half (0 lower, 1 upper), then by facing; the boxes given for a booth open to the south. */
-    private static final VoxelShape[][] SHAPES = new VoxelShape[2][4];
+    /** Its shapes by part, then by facing; the boxes given for a booth open to the south. */
+    private static final VoxelShape[][] SHAPES = new VoxelShape[3][4];
 
     static {
-        double[][] lower = {{0, 0, 0, 16, 1, 16}, {0, 1, 0, 16, 16, 1.2}, {0, 1, 0, 1.2, 16, 16}, {14.8, 1, 0, 16, 16, 16},
+        double[][] foot = {{0, 0, 0, 16, 1, 16}, {0, 1, 0, 16, 16, 1.2}, {0, 1, 0, 1.2, 16, 16}, {14.8, 1, 0, 16, 16, 16},
                 {2.5, 9.6, 1, 13.5, 10.1, 5.6}, {3.2, 12.4, 1, 11.4, 16, 3.8}};
-        // The roof a little above the lamp, so that a player fits inside under it
-        double[][] upper = {{0, 0, 0, 16, 14, 1.2}, {0, 0, 0, 1.2, 14, 16}, {14.8, 0, 0, 16, 14, 16}, {0, 14, 0, 16, 16, 16},
-                {3.2, 0, 1, 11.4, 6.6, 3.8}};
+        double[][] middle = {{0, 0, 0, 16, 16, 1.2}, {0, 0, 0, 1.2, 16, 16}, {14.8, 0, 0, 16, 16, 16}, {3.2, 0, 1, 11.4, 6.6, 3.8}};
+        double[][] top = {{0, 0, 0, 16, 8, 1.2}, {0, 0, 0, 1.2, 8, 16}, {14.8, 0, 0, 16, 8, 16}, {0, 8, 0, 16, 12, 16}};
         for (Direction d : Direction.Plane.HORIZONTAL) {
-            SHAPES[0][d.get2DDataValue()] = shape(lower, d);
-            SHAPES[1][d.get2DDataValue()] = shape(upper, d);
+            SHAPES[0][d.get2DDataValue()] = shape(foot, d);
+            SHAPES[1][d.get2DDataValue()] = shape(middle, d);
+            SHAPES[2][d.get2DDataValue()] = shape(top, d);
         }
     }
 
@@ -74,7 +74,7 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
 
     public BoothBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.SOUTH).setValue(HALF, DoubleBlockHalf.LOWER)
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.SOUTH).setValue(PART, 0)
                 .setValue(POWERED, true));
     }
 
@@ -85,7 +85,7 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, HALF, POWERED);
+        builder.add(FACING, PART, POWERED);
     }
 
     @Nullable
@@ -93,35 +93,45 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos pos = context.getClickedPos();
         Level level = context.getLevel();
-        if (pos.getY() >= level.getMaxBuildHeight() - 1 || !level.getBlockState(pos.above()).canBeReplaced(context)) {
+        if (pos.getY() >= level.getMaxBuildHeight() - 2) {
             return null;
         }
-        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(HALF, DoubleBlockHalf.LOWER);
+        for (int k = 1; k <= 2; k++) {
+            if (!level.getBlockState(pos.above(k)).canBeReplaced(context)) {
+                return null;
+            }
+        }
+        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(PART, 0);
     }
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        level.setBlock(pos.above(), state.setValue(HALF, DoubleBlockHalf.UPPER), 3);
+        level.setBlock(pos.above(), state.setValue(PART, 1), 3);
+        level.setBlock(pos.above(2), state.setValue(PART, 2), 3);
     }
 
     @Override
     protected BlockState updateShape(BlockState state, Direction dir, BlockState neighbour, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
-        DoubleBlockHalf half = state.getValue(HALF);
-        if (dir.getAxis() == Direction.Axis.Y && (half == DoubleBlockHalf.LOWER) == (dir == Direction.UP)) {
-            return neighbour.is(this) && neighbour.getValue(HALF) != half ? state : Blocks.AIR.defaultBlockState();
+        int part = state.getValue(PART);
+        boolean needUp = part < 2 && dir == Direction.UP, needDown = part > 0 && dir == Direction.DOWN;
+        if (needUp || needDown) {
+            int want = needUp ? part + 1 : part - 1;
+            if (!neighbour.is(this) || neighbour.getValue(PART) != want) {
+                return Blocks.AIR.defaultBlockState();
+            }
         }
         return super.updateShape(state, dir, neighbour, level, pos, neighbourPos);
     }
 
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        // Broken from above by a creative player: the lower half goes without dropping the booth
-        if (!level.isClientSide && player.isCreative() && state.getValue(HALF) == DoubleBlockHalf.UPPER) {
-            BlockPos below = pos.below();
-            BlockState b = level.getBlockState(below);
-            if (b.is(this) && b.getValue(HALF) == DoubleBlockHalf.LOWER) {
-                level.setBlock(below, Blocks.AIR.defaultBlockState(), 35);
-                level.levelEvent(player, 2001, below, Block.getId(b));
+        // Broken from above by a creative player: the foot goes without dropping the booth
+        if (!level.isClientSide && player.isCreative() && state.getValue(PART) > 0) {
+            BlockPos foot = pos.below(state.getValue(PART));
+            BlockState f = level.getBlockState(foot);
+            if (f.is(this) && f.getValue(PART) == 0) {
+                level.setBlock(foot, Blocks.AIR.defaultBlockState(), 35);
+                level.levelEvent(player, 2001, foot, Block.getId(f));
             }
         }
         return super.playerWillDestroy(level, pos, state, player);
@@ -129,13 +139,13 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return SHAPES[state.getValue(HALF) == DoubleBlockHalf.LOWER ? 0 : 1][state.getValue(FACING).get2DDataValue()];
+        return SHAPES[state.getValue(PART)][state.getValue(FACING).get2DDataValue()];
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && player instanceof ServerPlayer sp) {
-            BlockPos base = state.getValue(HALF) == DoubleBlockHalf.UPPER ? pos.below() : pos;
+            BlockPos base = pos.below(state.getValue(PART));
             if (level.getBlockEntity(base) instanceof BoothBlockEntity booth) {
                 BoothNet.use(sp, booth);
             }
@@ -146,7 +156,7 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return state.getValue(HALF) == DoubleBlockHalf.LOWER ? new BoothBlockEntity(pos, state) : null;
+        return state.getValue(PART) == 0 ? new BoothBlockEntity(pos, state) : null;
     }
 
     @Nullable

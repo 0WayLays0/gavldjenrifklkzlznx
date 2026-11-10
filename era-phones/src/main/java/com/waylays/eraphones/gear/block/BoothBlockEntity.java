@@ -61,9 +61,11 @@ public class BoothBlockEntity extends BlockEntity {
         BlockState low = getBlockState();
         if (low.getValue(BoothBlock.POWERED) != power) {
             level.setBlock(worldPosition, low.setValue(BoothBlock.POWERED, power), 3);
-            BlockState up = level.getBlockState(worldPosition.above());
-            if (up.is(low.getBlock())) {
-                level.setBlock(worldPosition.above(), up.setValue(BoothBlock.POWERED, power), 3);
+            for (int k = 1; k <= 2; k++) {
+                BlockState up = level.getBlockState(worldPosition.above(k));
+                if (up.is(low.getBlock())) {
+                    level.setBlock(worldPosition.above(k), up.setValue(BoothBlock.POWERED, power), 3);
+                }
             }
         }
     }

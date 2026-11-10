@@ -102,6 +102,7 @@ public final class GearRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> SHUTTER = sound("photo_declic");
     public static final DeferredHolder<SoundEvent, SoundEvent> BIKE_BELL = sound("velo_sonnette");
     public static final DeferredHolder<SoundEvent, SoundEvent> LAMP_BUZZ = sound("lampadaire_bourdonnement");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MACHINE_BEEP = sound("repondeur_bip");
     public static final DeferredHolder<SoundEvent, SoundEvent> LAMP_CLICK = sound("lampadaire_claquement");
     public static final DeferredHolder<SoundEvent, SoundEvent> POWER_DOWN = sound("coupure_courant");
     public static final DeferredHolder<SoundEvent, SoundEvent> BOOTH_RING = sound("cabine_sonnerie");
@@ -127,8 +128,13 @@ public final class GearRegistry {
 
     public static final DeferredBlock<com.waylays.eraphones.gear.block.BoothBlock> BOOTH = BLOCKS.register("cabine_telephonique",
             () -> new com.waylays.eraphones.gear.block.BoothBlock(BlockBehaviour.Properties.of().strength(2.5f, 6f).sound(SoundType.METAL).noOcclusion()
-                    .lightLevel(s -> s.getValue(com.waylays.eraphones.gear.block.BoothBlock.HALF)
-                            == net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER && s.getValue(com.waylays.eraphones.gear.block.BoothBlock.POWERED) ? 13 : 0)));
+                    .lightLevel(s -> s.getValue(com.waylays.eraphones.gear.block.BoothBlock.PART) == 2
+                            && s.getValue(com.waylays.eraphones.gear.block.BoothBlock.POWERED) ? 13 : 0)));
+    public static final DeferredBlock<com.waylays.eraphones.gear.block.AnswerMachineBlock> MACHINE = BLOCKS.register("repondeur",
+            () -> new com.waylays.eraphones.gear.block.AnswerMachineBlock(BlockBehaviour.Properties.of().strength(1f).sound(SoundType.STONE).noOcclusion()
+                    .lightLevel(s -> s.getValue(com.waylays.eraphones.gear.block.AnswerMachineBlock.NEW) ? 3 : 0)));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.waylays.eraphones.gear.block.AnswerMachineBlockEntity>> MACHINE_BE = BLOCK_ENTITIES.register(
+            "repondeur", () -> BlockEntityType.Builder.of(com.waylays.eraphones.gear.block.AnswerMachineBlockEntity::new, MACHINE.get()).build(null));
     public static final DeferredBlock<com.waylays.eraphones.gear.block.LampPostBlock> LAMP_POST = BLOCKS.register("lampadaire",
             () -> new com.waylays.eraphones.gear.block.LampPostBlock(BlockBehaviour.Properties.of().strength(3f, 6f).sound(SoundType.METAL).noOcclusion()
                     .lightLevel(s -> s.getValue(com.waylays.eraphones.gear.block.LampPostBlock.LIT) ? 15 : 0)));
@@ -152,6 +158,9 @@ public final class GearRegistry {
             () -> new WalkieItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
     public static final DeferredHolder<Item, Item> RADIO_ITEM = EraRegistry.ITEMS.register("radio", () -> new BlockItem(RADIO.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> VCR_ITEM = EraRegistry.ITEMS.register("magnetoscope", () -> new BlockItem(VCR.get(), new Item.Properties()));
+    public static final DeferredHolder<Item, Item> CAMCORDER = EraRegistry.ITEMS.register("camescope",
+            () -> new com.waylays.eraphones.gear.CamcorderItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> MACHINE_ITEM = EraRegistry.ITEMS.register("repondeur", () -> new BlockItem(MACHINE.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> LAMP_POST_ITEM = EraRegistry.ITEMS.register("lampadaire",
             () -> new BlockItem(LAMP_POST.get(), new Item.Properties()));
     /** The four bicycles, in the order of {@link com.waylays.eraphones.bike.BikeEntity#KINDS}. */
@@ -167,7 +176,7 @@ public final class GearRegistry {
 
     public static final DeferredHolder<Item, Item> BIKE_ITEM = BIKE_ITEMS.get(0);
     public static final DeferredHolder<Item, Item> BOOTH_ITEM = EraRegistry.ITEMS.register("cabine_telephonique",
-            () -> new net.minecraft.world.item.DoubleHighBlockItem(BOOTH.get(), new Item.Properties()));
+            () -> new BlockItem(BOOTH.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> TV_ITEM = EraRegistry.ITEMS.register("television", () -> new BlockItem(TV.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> MUSIC_BOX_ITEM = EraRegistry.ITEMS.register("boite_a_musique",
             () -> new BlockItem(MUSIC_BOX_BLOCK.get(), new Item.Properties()));
@@ -221,6 +230,7 @@ public final class GearRegistry {
                 out.accept(VCR_ITEM.get());
                 out.accept(TV_ITEM.get());
                 out.accept(CASSETTE.get());
+                out.accept(CAMCORDER.get());
             }).build());
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB_DAILY = EraRegistry.TABS.register("vie_quotidienne", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.eraphones.vie_quotidienne"))
@@ -238,6 +248,7 @@ public final class GearRegistry {
                     out.accept(b.get());
                 }
                 out.accept(LAMP_POST_ITEM.get());
+                out.accept(MACHINE_ITEM.get());
                 out.accept(NOTE.get());
                 out.accept(NEWSPAPER.get());
             }).build());

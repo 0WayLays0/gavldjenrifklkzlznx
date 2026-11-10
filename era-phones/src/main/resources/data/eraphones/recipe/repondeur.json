@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PRP",
+    "ICI"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:white_dye"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "eraphones:cassette"
+    }
+  },
+  "result": {
+    "id": "eraphones:repondeur",
+    "count": 1
+  }
+}

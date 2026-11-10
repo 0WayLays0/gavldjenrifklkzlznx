@@ -1,58 +1,88 @@
 {
   "variants": {
-    "facing=south,half=lower,powered=true": {
+    "facing=south,part=0,powered=true": {
       "model": "eraphones:block/cabine_telephonique"
     },
-    "facing=south,half=upper,powered=true": {
+    "facing=south,part=1,powered=true": {
       "model": "eraphones:block/cabine_telephonique_haut"
     },
-    "facing=south,half=lower,powered=false": {
+    "facing=south,part=2,powered=true": {
+      "model": "eraphones:block/cabine_telephonique_toit"
+    },
+    "facing=south,part=0,powered=false": {
       "model": "eraphones:block/cabine_telephonique_eteinte"
     },
-    "facing=south,half=upper,powered=false": {
+    "facing=south,part=1,powered=false": {
       "model": "eraphones:block/cabine_telephonique_haut"
     },
-    "facing=west,half=lower,powered=true": {
+    "facing=south,part=2,powered=false": {
+      "model": "eraphones:block/cabine_telephonique_toit_eteinte"
+    },
+    "facing=west,part=0,powered=true": {
       "model": "eraphones:block/cabine_telephonique",
       "y": 90
     },
-    "facing=west,half=upper,powered=true": {
+    "facing=west,part=1,powered=true": {
       "model": "eraphones:block/cabine_telephonique_haut"
     },
-    "facing=west,half=lower,powered=false": {
+    "facing=west,part=2,powered=true": {
+      "model": "eraphones:block/cabine_telephonique_toit",
+      "y": 90
+    },
+    "facing=west,part=0,powered=false": {
       "model": "eraphones:block/cabine_telephonique_eteinte",
       "y": 90
     },
-    "facing=west,half=upper,powered=false": {
+    "facing=west,part=1,powered=false": {
       "model": "eraphones:block/cabine_telephonique_haut"
     },
-    "facing=north,half=lower,powered=true": {
+    "facing=west,part=2,powered=false": {
+      "model": "eraphones:block/cabine_telephonique_toit_eteinte",
+      "y": 90
+    },
+    "facing=north,part=0,powered=true": {
       "model": "eraphones:block/cabine_telephonique",
       "y": 180
     },
-    "facing=north,half=upper,powered=true": {
+    "facing=north,part=1,powered=true": {
       "model": "eraphones:block/cabine_telephonique_haut"
     },
-    "facing=north,half=lower,powered=false": {
+    "facing=north,part=2,powered=true": {
+      "model": "eraphones:block/cabine_telephonique_toit",
+      "y": 180
+    },
+    "facing=north,part=0,powered=false": {
       "model": "eraphones:block/cabine_telephonique_eteinte",
       "y": 180
     },
-    "facing=north,half=upper,powered=false": {
+    "facing=north,part=1,powered=false": {
       "model": "eraphones:block/cabine_telephonique_haut"
     },
-    "facing=east,half=lower,powered=true": {
+    "facing=north,part=2,powered=false": {
+      "model": "eraphones:block/cabine_telephonique_toit_eteinte",
+      "y": 180
+    },
+    "facing=east,part=0,powered=true": {
       "model": "eraphones:block/cabine_telephonique",
       "y": 270
     },
-    "facing=east,half=upper,powered=true": {
+    "facing=east,part=1,powered=true": {
       "model": "eraphones:block/cabine_telephonique_haut"
     },
-    "facing=east,half=lower,powered=false": {
+    "facing=east,part=2,powered=true": {
+      "model": "eraphones:block/cabine_telephonique_toit",
+      "y": 270
+    },
+    "facing=east,part=0,powered=false": {
       "model": "eraphones:block/cabine_telephonique_eteinte",
       "y": 270
     },
-    "facing=east,half=upper,powered=false": {
+    "facing=east,part=1,powered=false": {
       "model": "eraphones:block/cabine_telephonique_haut"
+    },
+    "facing=east,part=2,powered=false": {
+      "model": "eraphones:block/cabine_telephonique_toit_eteinte",
+      "y": 270
     }
   }
 }

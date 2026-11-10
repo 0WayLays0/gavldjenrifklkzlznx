@@ -109,6 +109,52 @@ public final class VideoDecode {
         }
     }
 
+    /**
+     * A film written as it is filmed (by a camcorder): the same file as a prepared film, frames added one by one as
+     * they come, the table of their places written when it is closed.
+     */
+    public static final class Writer implements java.io.Closeable {
+        private final RandomAccessFile f;
+        private long[] at = new long[1024];
+        private int n;
+
+        public Writer(File out) throws IOException {
+            f = new RandomAccessFile(out, "rw");
+            f.setLength(0);
+            f.writeInt(MAGIC);
+            f.writeInt(W);
+            f.writeInt(H);
+            f.writeInt(FPS);
+            f.writeInt(0);
+        }
+
+        /** Adds a frame, squeezed as a camcorder sends it ({@link #W} x {@link #H}, 0xRGB a pixel, deflated). */
+        public synchronized void add(byte[] squeezed) throws IOException {
+            if (n == at.length) {
+                at = java.util.Arrays.copyOf(at, n * 2);
+            }
+            at[n++] = f.getFilePointer();
+            f.writeInt(squeezed.length);
+            f.write(squeezed);
+        }
+
+        public synchronized int frames() {
+            return n;
+        }
+
+        @Override
+        public synchronized void close() throws IOException {
+            long table = f.getFilePointer();
+            for (int i = 0; i < n; i++) {
+                f.writeLong(at[i]);
+            }
+            f.writeLong(table);
+            f.seek(16);
+            f.writeInt(n);
+            f.close();
+        }
+    }
+
     /** Frame {@code index} of a prepared film, as kept (squeezed); null past its end. */
     public static byte[] frame(RandomAccessFile f, int index) throws IOException {
         f.seek(16);

@@ -573,6 +573,8 @@ def sounds():
     ogg("cabine_touche", booth_assets.key(rate))
     import bike_assets
     ogg("velo_sonnette", bike_assets.bell(rate))
+    import machine_assets
+    ogg("repondeur_bip", machine_assets.beep(rate))
     import lamp_assets
     ogg("lampadaire_bourdonnement", lamp_assets.buzz(rate))
     ogg("lampadaire_claquement", lamp_assets.click(rate))
@@ -593,7 +595,8 @@ def sounds():
                                      "subtitle": "subtitles.eraphones.lampadaire_bourdonnement"},
         "lampadaire_claquement": {"sounds": [{"name": "eraphones:lampadaire_claquement", "attenuation_distance": 20}],
                                   "subtitle": "subtitles.eraphones.lampadaire_claquement"},
-        "coupure_courant": {"sounds": [{"name": "eraphones:coupure_courant"}], "subtitle": "subtitles.eraphones.coupure_courant"}})
+        "coupure_courant": {"sounds": [{"name": "eraphones:coupure_courant"}], "subtitle": "subtitles.eraphones.coupure_courant"},
+        "repondeur_bip": {"sounds": [{"name": "eraphones:repondeur_bip"}], "subtitle": "subtitles.eraphones.repondeur_bip"}})
 
 
 # ------------------------------------------------------------------------------------------------ recipes
@@ -632,6 +635,10 @@ def main():
     bike_assets.main()
     import lamp_assets
     lamp_assets.main()
+    import machine_assets
+    machine_assets.main()
+    import camcorder_assets
+    camcorder_assets.main()
     sounds()
     recipes()
 

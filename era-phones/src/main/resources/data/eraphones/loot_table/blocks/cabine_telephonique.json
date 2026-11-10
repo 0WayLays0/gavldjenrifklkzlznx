@@ -17,7 +17,7 @@
           "condition": "minecraft:block_state_property",
           "block": "eraphones:cabine_telephonique",
           "properties": {
-            "half": "lower"
+            "part": "0"
           }
         }
       ]

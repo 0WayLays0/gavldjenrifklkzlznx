@@ -229,14 +229,45 @@ def cord(tile):
 
 # ------------------------------------------------------------------------------------------------ the model
 
+TOP = 32  # Where the top block begins (model units): what is above goes in the top block's model
+
+
 def booth():
-    m = Model(NAME, size=1024, density=8)
-    lit = []
+    """The booth, two and three quarter blocks tall: the foot block's model holds it up to two blocks, the top block's
+    model the rest (its walls' last part, the lit sign, the roof)."""
+    m = Model(NAME, size=1024, density=7)
+    pm = Model(NAME + "_publiphone", size=1024, density=24)
+    low, high = [], []
+
+    def place(model, frm, to, paint, rotation=None, glow=False):
+        pieces = []
+        if to[1] <= TOP:
+            pieces.append((frm, to, False))
+        elif frm[1] >= TOP:
+            pieces.append((frm, to, True))
+        else:
+            pieces.append((frm, [to[0], TOP, to[2]], False))
+            pieces.append(([frm[0], TOP, frm[2]], to, True))
+        for a, b, up in pieces:
+            model.box(a, b, paint, rotation)
+            e = model.elements.pop()
+            e["_tex"] = "#t" if model is m else "#p"
+            if glow:
+                e["neoforge_data"] = LIT
+                e["shade"] = False
+            if up:
+                e = dict(e)
+                e["from"] = [e["from"][0], round(e["from"][1] - TOP, 4), e["from"][2]]
+                e["to"] = [e["to"][0], round(e["to"][1] - TOP, 4), e["to"][2]]
+                high.append(e)
+            else:
+                low.append(e)
 
     def box(frm, to, paint, rotation=None, glow=False):
-        m.box(frm, to, paint, rotation)
-        if glow:
-            lit.append(len(m.elements) - 1)
+        place(m, frm, to, paint, rotation, glow)
+
+    def pbox(frm, to, paint, glow=False):
+        place(pm, frm, to, paint, None, glow)
 
     post = {"*": alu(True), "up": alu_edge, "down": alu_edge}
     rail = {"*": alu(False), "east": alu_edge, "west": alu_edge}
@@ -244,119 +275,110 @@ def booth():
     box([0, 0, 0], [16, 1, 16], {"*": concrete})
     # The four posts
     for x0, z0 in ((0, 0), (14.8, 0), (0, 14.8), (14.8, 14.8)):
-        box([x0, 1, z0], [x0 + 1.2, 29, z0 + 1.2], post)
+        box([x0, 1, z0], [x0 + 1.2, 40, z0 + 1.2], post)
     # The back wall: ribbed aluminium outside, blue enamel inside
-    box([1.2, 1, .3], [14.8, 29, 1.0], {"north": ribbed, "south": enamel})
-    # The sides: a kick plate, two panes of smoked glass, rails between them
+    box([1.2, 1, .3], [14.8, 40, 1.0], {"north": ribbed, "south": enamel})
+    # The sides: a kick plate, two tall panes of smoked glass, rails between them
     for x0, x1 in ((.3, .9), (15.1, 15.7)):
         box([x0, 1, 1.2], [x1, 8, 14.8], {"east": alu(False), "west": alu(False), "up": alu_edge})
         box([x0, 8, 1.2], [x1, 8.6, 14.8], rail)
-        box([x0, 17.6, 1.2], [x1, 18.2, 14.8], rail)
-        box([x0, 27.4, 1.2], [x1, 28, 14.8], rail)
+        box([x0, 22, 1.2], [x1, 22.6, 14.8], rail)
+        box([x0, 37.4, 1.2], [x1, 38, 14.8], rail)
         gx0, gx1 = (x0 + x1) / 2 - .06, (x0 + x1) / 2 + .06
         outer, inner = ("west", "east") if x0 < 8 else ("east", "west")
         panes = {outer: glass, inner: lambda tile: glass(tile, False)}
-        box([gx0, 8.6, 1.2], [gx1, 17.6, 14.8], panes)
-        box([gx0, 18.2, 1.2], [gx1, 27.4, 14.8], panes)
-    # The front: a header bar across the opening
-    box([1.2, 27.4, 15.0], [14.8, 29, 15.8], {"south": alu(False), "north": alu(False), "down": alu_edge})
-    # The light box: its four lit faces, the lamp under it, an aluminium cap on top
-    box([1.2, 28.98, 1.2], [14.8, 29, 14.8], {"down": ceiling_lamp}, glow=True)
-    box([0, 31.4, 0], [16, 32, 16], {"up": alu(False), "north": alu_edge, "south": alu_edge, "east": alu_edge, "west": alu_edge,
+        box([gx0, 8.6, 1.2], [gx1, 22, 14.8], panes)
+        box([gx0, 22.6, 1.2], [gx1, 37.4, 14.8], panes)
+    # The front: a header bar across the opening, high above the head
+    box([1.2, 37.4, 15.0], [14.8, 40, 15.8], {"south": alu(False), "north": alu(False), "down": alu_edge})
+    # The lamp under the roof, the lit sign round the roof, the cap
+    box([1.2, 39.98, 1.2], [14.8, 40, 14.8], {"down": ceiling_lamp}, glow=True)
+    pbox([.2, 40, .2], [15.8, 43.4, 15.8], {"north": sign, "south": sign, "east": sign, "west": sign}, glow=True)
+    box([0, 43.4, 0], [16, 44, 16], {"up": alu(False), "north": alu_edge, "south": alu_edge, "east": alu_edge, "west": alu_edge,
                                      "down": alu_edge})
 
     # The payphone on the back wall, drawn finer on its own texture
-    pm = Model(NAME + "_publiphone", size=1024, density=24)
-
-    plit = []
-
-    def pbox(frm, to, paint, glow=False):
-        pm.box(frm, to, paint)
-        if glow:
-            plit.append(len(pm.elements) - 1)
-
-    # The light box's four lit faces, on the fine texture so that the letters are sharp
-    pbox([.2, 29, .2], [15.8, 31.4, 15.8], {"north": sign, "south": sign, "east": sign, "west": sign}, glow=True)
-
     pm.body(4.6, 12.4, 11.4, 22.6, 1.0, 3.4, .6, payphone_face, steel, (110, 114, 120), (220, 224, 230))
-    # Its keypad: four rows of three chrome keys
+    for e in pm.elements:
+        e["_tex"] = "#p"
+    low.extend(pm.elements)
+    pm.elements.clear()
     labels = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"]
     kw, kh = 1.0, .95
     for i, lab in enumerate(labels):
         c, r = i % 3, i // 3
         pm.key(6.2 + c * 1.3, 18.85 - r * 1.25, kw, kh, 3.4, .35, (206, 210, 216), lab, (30, 30, 34, 255))
-    # The hook the handset hangs on, on the left side
+    for e in pm.elements:
+        e["_tex"] = "#p"
+    low.extend(pm.elements)
+    pm.elements.clear()
     pbox([3.6, 21.6, 1.7], [4.6, 22.1, 2.9], {"*": ga.facet((200, 204, 210), 1.0)})
-    # The handset, hanging down the left side: grip, earpiece above, mouthpiece below
     pbox([3.55, 14.6, 1.7], [4.55, 21.0, 2.9], {"*": handset_black})
     pbox([3.25, 19.4, 1.5], [4.55, 21.6, 3.1], {"*": handset_black, "west": ga.disc((34, 34, 38), (20, 20, 22), None)})
     pbox([3.25, 14.0, 1.5], [4.55, 16.2, 3.1], {"*": handset_black, "west": ga.disc((34, 34, 38), (20, 20, 22), None)})
-    # The armoured cord: down from the handset, along the bottom, up into the payphone
     c = {"*": cord}
     pbox([3.8, 11.3, 2.0], [4.3, 14.0, 2.5], c)
     pbox([3.8, 10.9, 2.0], [5.6, 11.4, 2.5], c)
     pbox([5.2, 11.3, 2.0], [5.7, 12.4, 2.5], c)
-    # The card of instructions above it
     pbox([4.8, 23.2, 1.0], [11.2, 27.0, 1.12], {"south": instructions})
-    # The shelf under it and the phone book lying on it
     box([2.5, 9.6, 1.0], [13.5, 10.1, 5.6], {"up": alu(False), "down": alu(False), "south": alu_edge, "east": alu_edge, "west": alu_edge})
     box([8.2, 10.1, 1.6], [12.4, 10.9, 4.8], {"up": phone_book, "south": pages, "east": pages, "west": pages, "north": pages})
-    # The bracket under the shelf
     box([7.6, 7.6, 1.0], [8.4, 9.6, 3.0], {"*": alu(True)})
-
-    for model, which in ((m, lit), (pm, plit)):
-        for i in which:
-            model.elements[i]["neoforge_data"] = LIT
-            model.elements[i]["shade"] = False
-    write(m, pm)
+    write(m, pm, low, high)
 
 
-def write(m, pm):
+def write(m, pm, low, high):
     kit.save(m.img, f"textures/block/{m.name}.png")
     kit.save(pm.img, f"textures/block/{pm.name}.png")
-    # The booth in a power cut: the same, its sign and lamp no longer glowing
-    def unlit(e):
-        e = dict(e)
-        e.pop("neoforge_data", None)
-        e.pop("shade", None)
-        return e
+    tex = {"t": f"eraphones:block/{m.name}", "p": f"eraphones:block/{pm.name}", "particle": f"eraphones:block/{m.name}"}
 
-    kit.write_json(f"models/block/{m.name}_eteinte.json", {
-        "render_type": "minecraft:translucent",
-        "ambientocclusion": False,
-        "textures": {"t": f"eraphones:block/{m.name}", "p": f"eraphones:block/{pm.name}", "particle": f"eraphones:block/{m.name}"},
-        "elements": [unlit(dict(e, faces={k: dict(v, texture="#t") for k, v in e["faces"].items()})) for e in m.elements]
-        + [unlit(dict(e, faces={k: dict(v, texture="#p") for k, v in e["faces"].items()})) for e in pm.elements]})
-    kit.write_json(f"models/block/{m.name}.json", {
-        "render_type": "minecraft:translucent",
-        "ambientocclusion": False,
-        "textures": {"t": f"eraphones:block/{m.name}", "p": f"eraphones:block/{pm.name}", "particle": f"eraphones:block/{m.name}"},
-        "elements": [dict(e, faces={k: dict(v, texture="#t") for k, v in e["faces"].items()}) for e in m.elements]
-        + [dict(e, faces={k: dict(v, texture="#p") for k, v in e["faces"].items()}) for e in pm.elements],
-        "display": {
-            "gui": {"rotation": [20, 205, 0], "translation": [0, -3.2, 0], "scale": [.38, .38, .38]},
-            "ground": {"rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [.18, .18, .18]},
-            "fixed": {"rotation": [0, 180, 0], "translation": [0, -4, 0], "scale": [.38, .38, .38]},
-            "thirdperson_righthand": {"rotation": [0, 135, 0], "translation": [0, 0, 0], "scale": [.2, .2, .2]},
-            "thirdperson_lefthand": {"rotation": [0, 135, 0], "translation": [0, 0, 0], "scale": [.2, .2, .2]},
-            "firstperson_righthand": {"rotation": [0, 160, 0], "translation": [0, -1, 0], "scale": [.22, .22, .22]},
-            "firstperson_lefthand": {"rotation": [0, 160, 0], "translation": [0, -1, 0], "scale": [.22, .22, .22]}}})
-    # The upper half shows nothing of its own: the lower half's model is two blocks tall
+    def textured(els, lit=True):
+        out = []
+        for e in els:
+            e = dict(e)
+            key = e.pop("_tex")
+            e["faces"] = {k: dict(v, texture=key) for k, v in e["faces"].items()}
+            if not lit:
+                e.pop("neoforge_data", None)
+                e.pop("shade", None)
+            out.append(e)
+        return out
+
+    for suffix, lit in (("", True), ("_eteinte", False)):
+        kit.write_json(f"models/block/{m.name}{suffix}.json", {"render_type": "minecraft:translucent", "ambientocclusion": False,
+                                                               "textures": tex, "elements": textured(low, lit)})
+        kit.write_json(f"models/block/{m.name}_toit{suffix}.json", {"render_type": "minecraft:translucent", "ambientocclusion": False,
+                                                                    "textures": tex, "elements": textured(high, lit)})
+    # The middle block shows nothing of its own: the foot block's model is two blocks tall
     kit.write_json(f"models/block/{m.name}_haut.json", {"textures": {"particle": f"eraphones:block/{m.name}"}, "elements": []})
-    kit.write_json(f"models/item/{m.name}.json", {"parent": f"eraphones:block/{m.name}"})
+    # The item: the whole booth brought down to fit
+    import lamp_assets
+    whole = textured(low) + [dict(e, **{"from": [e["from"][0], e["from"][1] + TOP, e["from"][2]],
+                                        "to": [e["to"][0], e["to"][1] + TOP, e["to"][2]]}) for e in textured(high)]
+    kit.write_json(f"models/item/{m.name}.json", {
+        "render_type": "minecraft:translucent", "textures": tex, "elements": lamp_assets.scaled(whole, 32 / 44),
+        "display": {
+            "gui": {"rotation": [20, 205, 0], "translation": [0, -3.2, 0], "scale": [.5, .5, .5]},
+            "ground": {"rotation": [0, 0, 0], "translation": [0, 2, 0], "scale": [.22, .22, .22]},
+            "fixed": {"rotation": [0, 180, 0], "translation": [0, -4, 0], "scale": [.5, .5, .5]},
+            "thirdperson_righthand": {"rotation": [0, 135, 0], "translation": [0, 0, 0], "scale": [.25, .25, .25]},
+            "thirdperson_lefthand": {"rotation": [0, 135, 0], "translation": [0, 0, 0], "scale": [.25, .25, .25]},
+            "firstperson_righthand": {"rotation": [0, 160, 0], "translation": [0, -1, 0], "scale": [.28, .28, .28]},
+            "firstperson_lefthand": {"rotation": [0, 160, 0], "translation": [0, -1, 0], "scale": [.28, .28, .28]}}})
     variants = {}
     for f, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270)):
         for powered in ("true", "false"):
-            lower = {"model": f"eraphones:block/{m.name}" + ("" if powered == "true" else "_eteinte")}
-            if y:
-                lower["y"] = y
-            variants[f"facing={f},half=lower,powered={powered}"] = lower
-            variants[f"facing={f},half=upper,powered={powered}"] = {"model": f"eraphones:block/{m.name}_haut"}
+            off = "" if powered == "true" else "_eteinte"
+            for part, model in ((0, m.name + off), (1, m.name + "_haut"), (2, m.name + "_toit" + off)):
+                v = {"model": f"eraphones:block/{model}"}
+                if y and part != 1:
+                    v["y"] = y
+                variants[f"facing={f},part={part},powered={powered}"] = v
     kit.write_json(f"blockstates/{m.name}.json", {"variants": variants})
     ga.write_data(f"loot_table/blocks/{m.name}.json", {"type": "minecraft:block", "pools": [{"rolls": 1, "entries": [
         {"type": "minecraft:item", "name": f"eraphones:{m.name}"}], "conditions": [
         {"condition": "minecraft:survives_explosion"},
-        {"condition": "minecraft:block_state_property", "block": f"eraphones:{m.name}", "properties": {"half": "lower"}}]}]})
+        {"condition": "minecraft:block_state_property", "block": f"eraphones:{m.name}", "properties": {"part": "0"}}]}]})
 
 
 # ------------------------------------------------------------------------------------------------ the payphone's screen

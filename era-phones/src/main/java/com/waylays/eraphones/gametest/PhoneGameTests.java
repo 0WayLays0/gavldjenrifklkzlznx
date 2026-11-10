@@ -33,8 +33,8 @@ public final class PhoneGameTests {
     public static void aBoothHasItsNumberAndRings(GameTestHelper helper) {
         net.minecraft.world.level.block.state.BlockState lower = com.waylays.eraphones.registry.GearRegistry.BOOTH.get().defaultBlockState();
         helper.setBlock(new BlockPos(1, 2, 1), lower);
-        helper.setBlock(new BlockPos(1, 3, 1), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.HALF,
-                net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+        helper.setBlock(new BlockPos(1, 3, 1), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.PART, 1));
+        helper.setBlock(new BlockPos(1, 4, 1), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.PART, 2));
         helper.succeedWhen(() -> {
             if (!(helper.getBlockEntity(new BlockPos(1, 2, 1)) instanceof com.waylays.eraphones.gear.block.BoothBlockEntity booth)) {
                 throw new net.minecraft.gametest.framework.GameTestAssertException("no booth");
@@ -48,7 +48,7 @@ public final class PhoneGameTests {
                         "the booth can be called");
             }
             helper.assertTrue(com.waylays.eraphones.server.CallService.boothRinging(n), "the called booth rings");
-            helper.assertTrue(helper.getBlockState(new BlockPos(1, 3, 1)).getLightEmission() > 0, "its sign is lit");
+            helper.assertTrue(helper.getBlockState(new BlockPos(1, 4, 1)).getLightEmission() > 0, "its sign is lit");
         });
     }
 

@@ -590,7 +590,7 @@ public final class SmokeTest {
             net.minecraft.core.Direction dir = p.getDirection();
             net.minecraft.core.BlockPos at = p.blockPosition().relative(dir, 4);
             for (int a = -2; a <= 2; a++) {
-                for (int y = 0; y < 3; y++) {
+                for (int y = 0; y < 4; y++) {
                     for (int b = -1; b <= 1; b++) {
                         p.serverLevel().setBlockAndUpdate(at.relative(dir.getClockWise(), a).relative(dir, b).above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
                     }
@@ -599,8 +599,8 @@ public final class SmokeTest {
             net.minecraft.world.level.block.state.BlockState lower = com.waylays.eraphones.registry.GearRegistry.BOOTH.get().defaultBlockState()
                     .setValue(com.waylays.eraphones.gear.block.BoothBlock.FACING, dir.getOpposite());
             p.serverLevel().setBlockAndUpdate(at, lower);
-            p.serverLevel().setBlockAndUpdate(at.above(), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.HALF,
-                    net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+            p.serverLevel().setBlockAndUpdate(at.above(), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.PART, 1));
+            p.serverLevel().setBlockAndUpdate(at.above(2), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.PART, 2));
             BOOTH = at;
             p.teleportTo(p.serverLevel(), Vec3c(at.relative(dir.getOpposite(), 4)).x, at.getY(), Vec3c(at.relative(dir.getOpposite(), 4)).z, dir.toYRot(), 0);
         }));
@@ -743,6 +743,35 @@ public final class SmokeTest {
             }
         }));
         STEPS.add(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
+        // The camcorder: a few seconds filmed on a blank cassette, which then holds a film the televisions can play
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CAMCORDER.get()));
+            p.getInventory().setItem(34, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CASSETTE.get()));
+            if (!com.waylays.eraphones.gear.CamNet.start(p)) {
+                fail("the camcorder did not start filming");
+            }
+        }));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "camcorder"));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            com.waylays.eraphones.gear.CamNet.stop(p);
+            String film = p.getInventory().getItem(34).get(com.waylays.eraphones.registry.GearRegistry.TAPE.get());
+            if (film == null || com.waylays.eraphones.gear.Video.prepare(film) != com.waylays.eraphones.gear.Video.State.READY
+                    || com.waylays.eraphones.gear.Video.frame(film, 5) == null) {
+                fail("the camcorder's film cannot be played ({})", film);
+            }
+        }));
         // A street lamp at night, then a power cut: it buzzes and goes out
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -802,7 +831,7 @@ public final class SmokeTest {
         }));
         String[] held = {"piece_25c", "billet_20", "carte_identite", "journal_papier", "feuille", "cassette", "piles", "talkie_walkie", "radio",
                 "magnetoscope", "lampe_torche", "television", "ballon_rouge", "telecommande_mj", "poupee", "boite_a_musique", "velo",
-                "velo_course", "velo_ville", "velo_bmx", "lampadaire", "appareil_photo", "cabine_telephonique"};
+                "velo_course", "velo_ville", "velo_bmx", "lampadaire", "repondeur", "camescope", "appareil_photo", "cabine_telephonique"};
         for (String name : held) {
             STEPS.add(() -> server.execute(() -> {
                 ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -831,6 +860,35 @@ public final class SmokeTest {
             });
             STEPS.add(() -> shot(mc, "held3_" + name));
             STEPS.add(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
+        // The camcorder: a few seconds filmed on a blank cassette, which then holds a film the televisions can play
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CAMCORDER.get()));
+            p.getInventory().setItem(34, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CASSETTE.get()));
+            if (!com.waylays.eraphones.gear.CamNet.start(p)) {
+                fail("the camcorder did not start filming");
+            }
+        }));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "camcorder"));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            com.waylays.eraphones.gear.CamNet.stop(p);
+            String film = p.getInventory().getItem(34).get(com.waylays.eraphones.registry.GearRegistry.TAPE.get());
+            if (film == null || com.waylays.eraphones.gear.Video.prepare(film) != com.waylays.eraphones.gear.Video.State.READY
+                    || com.waylays.eraphones.gear.Video.frame(film, 5) == null) {
+                fail("the camcorder's film cannot be played ({})", film);
+            }
+        }));
         // A street lamp at night, then a power cut: it buzzes and goes out
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);

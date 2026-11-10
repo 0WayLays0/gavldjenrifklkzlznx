@@ -32,10 +32,30 @@ public final class Video {
     private Video() {}
 
     public static boolean isVideo(@Nullable String file) {
-        return file != null && file.toLowerCase().endsWith(".mp4");
+        return file != null && (file.toLowerCase().endsWith(".mp4") || isFilmed(file));
     }
 
-    private static Path cache(String file) {
+    /** A film made with a camcorder (written straight in the prepared form, silent). */
+    public static boolean isFilmed(@Nullable String file) {
+        return file != null && file.toLowerCase().endsWith(".vhs");
+    }
+
+    /** Forgets what was known of {@code file} (a camcorder has just written it). */
+    public static synchronized void forget(String file) {
+        STATE.remove(file);
+        SOUND.remove(file);
+        RandomAccessFile f = OPEN.remove(file);
+        if (f != null) {
+            try {
+                f.close();
+            } catch (IOException ignored) {
+                // Closed anyway
+            }
+        }
+        COUNT.remove(file);
+    }
+
+    public static Path cache(String file) {
         return Tape.folder().resolve(".tv").resolve(file + ".tvx");
     }
 
@@ -63,6 +83,20 @@ public final class Video {
         }
         if (STATE.putIfAbsent(file, State.LOADING) != null) {
             return STATE.get(file);
+        }
+        if (isFilmed(file)) {
+            // Filmed with a camcorder: already in the prepared form; silent, as long as its pictures
+            try (RandomAccessFile f = new RandomAccessFile(cache(file).toFile(), "r")) {
+                int n = VideoDecode.count(f);
+                SOUND.put(file, new short[Math.max(1, n) * Audio.RATE / VideoDecode.FPS]);
+                PROGRESS.put(file, 100);
+                STATE.put(file, State.READY);
+                return State.READY;
+            } catch (IOException e) {
+                WHY.put(file, "VHS");
+                STATE.put(file, State.FAILED);
+                return State.FAILED;
+            }
         }
         Thread t = new Thread(() -> {
             Path src = Tape.folder().resolve(file).normalize();

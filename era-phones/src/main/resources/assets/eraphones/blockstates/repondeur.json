@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=south,nouveau=false": {
+      "model": "eraphones:block/repondeur"
+    },
+    "facing=south,nouveau=true": {
+      "model": "eraphones:block/repondeur_message"
+    },
+    "facing=west,nouveau=false": {
+      "model": "eraphones:block/repondeur",
+      "y": 90
+    },
+    "facing=west,nouveau=true": {
+      "model": "eraphones:block/repondeur_message",
+      "y": 90
+    },
+    "facing=north,nouveau=false": {
+      "model": "eraphones:block/repondeur",
+      "y": 180
+    },
+    "facing=north,nouveau=true": {
+      "model": "eraphones:block/repondeur_message",
+      "y": 180
+    },
+    "facing=east,nouveau=false": {
+      "model": "eraphones:block/repondeur",
+      "y": 270
+    },
+    "facing=east,nouveau=true": {
+      "model": "eraphones:block/repondeur_message",
+      "y": 270
+    }
+  }
+}
