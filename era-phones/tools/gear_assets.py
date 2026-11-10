@@ -553,7 +553,7 @@ def sounds():
     ogg("talkie_squelch", (burst * .6 * env + beep) * .9)
     import horror_items
     ogg("boite_a_musique", horror_items.music_box_tune(rate))
-    # Fear: one heartbeat as heard from inside (a deep thud, its echo), and one short, shaking breath in and out
+    # Fear: one heartbeat as heard from inside (a deep thud, its echo)
     n = int(rate * .62)
     t = np.arange(n) / rate
 
@@ -563,15 +563,6 @@ def sounds():
 
     beat = thud(0, 52, 1) + thud(.21, 44, .7) + band(rng.normal(0, 1, n), 30, 160) * np.exp(-t * 18) * .25
     ogg("coeur_peur", beat / np.abs(beat).max() * .95)
-    n = int(rate * 2.6)
-    t = np.arange(n) / rate
-    air = band(rng.normal(0, 1, n), 400, 3800)
-    air /= np.abs(air).max()
-    inhale = np.clip(t / .9, 0, 1) * np.clip((1.05 - t) / .15, 0, 1)
-    exhale = np.clip((t - 1.2) / .1, 0, 1) * np.clip((2.6 - t) / 1.3, 0, 1)
-    shake = 1 + .35 * np.sin(2 * np.pi * 11 * t)
-    breath = air * (inhale * .55 + exhale * .8) * shake
-    ogg("souffle_peur", breath / np.abs(breath).max() * .8)
     import photo_assets
     ogg("photo_declic", photo_assets.shutter(rate))
     import booth_assets
@@ -584,7 +575,6 @@ def sounds():
         "boite_a_musique": {"sounds": [{"name": "eraphones:boite_a_musique", "attenuation_distance": 20}],
                             "subtitle": "subtitles.eraphones.boite_a_musique"},
         "coeur_peur": {"sounds": [{"name": "eraphones:coeur_peur"}]},
-        "souffle_peur": {"sounds": [{"name": "eraphones:souffle_peur"}]},
         "photo_declic": {"sounds": [{"name": "eraphones:photo_declic"}], "subtitle": "subtitles.eraphones.photo_declic"},
         "cabine_sonnerie": {"sounds": [{"name": "eraphones:cabine_sonnerie", "attenuation_distance": 32}],
                             "subtitle": "subtitles.eraphones.cabine_sonnerie"},

@@ -77,7 +77,7 @@ public final class HorrorCommands {
                 .then(Commands.argument("joueurs", EntityArgument.players()).then(Commands.argument("texte", StringArgumentType.greedyString())
                         .executes(c -> narrate(c, EntityArgument.getPlayers(c, "joueurs"))))));
 
-        // Fear: blurred sight, a pounding heart, short breaths, for as long as the game master says
+        // Fear: blurred sight, a pounding heart, for as long as the game master says
         d.register(Commands.literal("peur").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.argument("joueurs", EntityArgument.players())
                         .executes(c -> show(c, EntityArgument.getPlayers(c, "joueurs"), "peur", 30))

@@ -85,7 +85,7 @@ public final class HorrorClient {
     }
 
     private static final List<Active> ACTIVE = new ArrayList<>();
-    private static long lastBeat = -1, lastBreath = -1;
+    private static long lastBeat = -1;
     private static java.lang.reflect.Field blurField;
     private static boolean blurTried;
 
@@ -130,10 +130,7 @@ public final class HorrorClient {
             case "sang" -> play("entity.warden.heartbeat", 1, 1);
             case "tremblement" -> play("entity.warden.emerge", .6f, .9f);
             case "narration" -> play("block.amethyst_block.chime", .5f, .5f);
-            case "peur" -> {
-                lastBeat = -1;
-                lastBreath = -1;
-            }
+            case "peur" -> lastBeat = -1;
             default -> {
             }
         }
@@ -162,7 +159,7 @@ public final class HorrorClient {
                 it.remove();
             }
         }
-        // Fear: the heart pounding (faster as it takes hold), a short breath now and then
+        // Fear: the heart pounding, faster as it takes hold
         Active fear = active("peur");
         if (fear != null && mc.player != null) {
             float f = fear.fade(2f, 3f);
@@ -171,11 +168,6 @@ public final class HorrorClient {
             if (beatNo != lastBeat) {
                 lastBeat = beatNo;
                 mc.getSoundManager().play(SimpleSoundInstance.forUI(com.waylays.eraphones.registry.GearRegistry.HEARTBEAT.get(), 1, .25f + .75f * f));
-            }
-            long breathNo = (long) (fear.age() / 3.1);
-            if (breathNo != lastBreath && f > .3f) {
-                lastBreath = breathNo;
-                mc.getSoundManager().play(SimpleSoundInstance.forUI(com.waylays.eraphones.registry.GearRegistry.FEAR_BREATH.get(), .95f + (float) Math.random() * .1f, .5f * f));
             }
         }
         // A heart beating under the blood
