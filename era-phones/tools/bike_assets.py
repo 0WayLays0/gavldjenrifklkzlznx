@@ -396,8 +396,8 @@ def whole(parts):
             "fixed": {"rotation": [0, 90, 0], "translation": [0, -2, 0], "scale": [.5, .5, .5]},
             "thirdperson_righthand": {"rotation": [0, 0, 0], "translation": [0, -1, 2], "scale": [.32, .32, .32]},
             "thirdperson_lefthand": {"rotation": [0, 0, 0], "translation": [0, -1, 2], "scale": [.32, .32, .32]},
-            "firstperson_righthand": {"rotation": [0, 70, 0], "translation": [2, -2, 0], "scale": [.3, .3, .3]},
-            "firstperson_lefthand": {"rotation": [0, 110, 0], "translation": [2, -2, 0], "scale": [.3, .3, .3]}}})
+            "firstperson_righthand": {"rotation": [0, 100, 0], "translation": [1, 3, -2], "scale": [.22, .22, .22]},
+            "firstperson_lefthand": {"rotation": [0, 80, 0], "translation": [1, 3, -2], "scale": [.22, .22, .22]}}})
 
 
 def bell(rate=48000):

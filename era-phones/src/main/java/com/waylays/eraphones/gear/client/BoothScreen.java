@@ -260,8 +260,8 @@ public class BoothScreen extends Screen {
             g.drawString(font, s, kx + (KW - font.width(s)) / 2, ky + (KH - 8) / 2 + (down ? 2 : 1), 0xFF26282E, false);
         }
         // The green and red buttons
-        button(g, CALL_X, 96, "booth.eraphones.call", in(x, y, CALL_X, BY, BW, BH), !inCall() && !dialed.isEmpty());
-        button(g, HANG_X, 136, "booth.eraphones.hang_up", in(x, y, HANG_X, BY, BW, BH), true);
+        button(g, CALL_X, 192, "booth.eraphones.call", in(x, y, CALL_X, BY, BW, BH), !inCall() && !dialed.isEmpty());
+        button(g, HANG_X, 272, "booth.eraphones.hang_up", in(x, y, HANG_X, BY, BW, BH), true);
         // The handset: on its cradle, or lifted off it while a call goes on
         if (inCall()) {
             g.pose().pushPose();
