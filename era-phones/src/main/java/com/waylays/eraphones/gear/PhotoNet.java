@@ -42,7 +42,7 @@ public final class PhotoNet {
             camera.set(GearRegistry.FILM.get(), CameraItem.film(camera) - 1);
         }
         ItemStack photo = new ItemStack(GearRegistry.PHOTOGRAPH.get());
-        photo.set(GearRegistry.PHOTO.get(), t.data());
+        photo.set(GearRegistry.PHOTO.get(), new Picture(t.data()));
         photo.set(GearRegistry.PHOTO_TIME.get(), p.level().getGameTime());
         photo.set(GearRegistry.PHOTO_BY.get(), com.waylays.eraphones.rp.RpService.name(p));
         if (p.getInventory().add(photo)) {

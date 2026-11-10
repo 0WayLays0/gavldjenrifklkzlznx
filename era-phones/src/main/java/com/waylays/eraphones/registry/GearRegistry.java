@@ -45,6 +45,10 @@ public final class GearRegistry {
     public static final DeferredRegister<net.minecraft.world.entity.EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, EraPhones.MODID);
 
     /** Writing on a wall (/ecrire). */
+    public static final DeferredHolder<net.minecraft.world.entity.EntityType<?>, net.minecraft.world.entity.EntityType<com.waylays.eraphones.bike.BikeEntity>> BIKE =
+            ENTITIES.register("velo", () -> net.minecraft.world.entity.EntityType.Builder.<com.waylays.eraphones.bike.BikeEntity>of(
+                    com.waylays.eraphones.bike.BikeEntity::new, net.minecraft.world.entity.MobCategory.MISC).sized(.8f, 1.1f).clientTrackingRange(10)
+                    .build("velo"));
     public static final DeferredHolder<net.minecraft.world.entity.EntityType<?>, net.minecraft.world.entity.EntityType<com.waylays.eraphones.horror.WallWriting>> WRITING =
             ENTITIES.register("ecriture", () -> net.minecraft.world.entity.EntityType.Builder.<com.waylays.eraphones.horror.WallWriting>of(
                     com.waylays.eraphones.horror.WallWriting::new, net.minecraft.world.entity.MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8)
@@ -82,12 +86,8 @@ public final class GearRegistry {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> NOTE_TYPED = component("note_typed", Codec.BOOL, ByteBufCodecs.BOOL);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NOTE_AUTHOR = text("note_author");
     /** A photograph: its picture (squeezed), when it came out of the camera (game ticks), who took it; the shots left in a camera. */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<byte[]>> PHOTO = component("photo",
-            Codec.BYTE_BUFFER.xmap(b -> {
-                byte[] a = new byte[b.remaining()];
-                b.duplicate().get(a);
-                return a;
-            }, java.nio.ByteBuffer::wrap), ByteBufCodecs.BYTE_ARRAY);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<com.waylays.eraphones.gear.Picture>> PHOTO = component("photo",
+            com.waylays.eraphones.gear.Picture.CODEC, com.waylays.eraphones.gear.Picture.STREAM_CODEC);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> PHOTO_TIME = component("photo_time", Codec.LONG, ByteBufCodecs.VAR_LONG);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> PHOTO_BY = text("photo_by");
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> FILM = component("film", Codec.INT, ByteBufCodecs.VAR_INT);
@@ -100,6 +100,7 @@ public final class GearRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_BOX = sound("boite_a_musique");
     public static final DeferredHolder<SoundEvent, SoundEvent> HEARTBEAT = sound("coeur_peur");
     public static final DeferredHolder<SoundEvent, SoundEvent> SHUTTER = sound("photo_declic");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BIKE_BELL = sound("velo_sonnette");
     public static final DeferredHolder<SoundEvent, SoundEvent> BOOTH_RING = sound("cabine_sonnerie");
     public static final DeferredHolder<SoundEvent, SoundEvent> BOOTH_COIN = sound("cabine_piece");
     public static final DeferredHolder<SoundEvent, SoundEvent> BOOTH_KEY = sound("cabine_touche");
@@ -143,6 +144,8 @@ public final class GearRegistry {
             () -> new WalkieItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
     public static final DeferredHolder<Item, Item> RADIO_ITEM = EraRegistry.ITEMS.register("radio", () -> new BlockItem(RADIO.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> VCR_ITEM = EraRegistry.ITEMS.register("magnetoscope", () -> new BlockItem(VCR.get(), new Item.Properties()));
+    public static final DeferredHolder<Item, Item> BIKE_ITEM = EraRegistry.ITEMS.register("velo",
+            () -> new com.waylays.eraphones.bike.BikeItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<Item, Item> BOOTH_ITEM = EraRegistry.ITEMS.register("cabine_telephonique",
             () -> new net.minecraft.world.item.DoubleHighBlockItem(BOOTH.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> TV_ITEM = EraRegistry.ITEMS.register("television", () -> new BlockItem(TV.get(), new Item.Properties()));
@@ -211,6 +214,7 @@ public final class GearRegistry {
                 out.accept(CAMERA.get());
                 out.accept(FILM_PACK.get());
                 out.accept(BOOTH_ITEM.get());
+                out.accept(BIKE_ITEM.get());
                 out.accept(NOTE.get());
                 out.accept(NEWSPAPER.get());
             }).build());

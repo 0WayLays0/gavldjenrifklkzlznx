@@ -62,5 +62,14 @@
         "name": "eraphones:cabine_touche"
       }
     ]
+  },
+  "velo_sonnette": {
+    "sounds": [
+      {
+        "name": "eraphones:velo_sonnette",
+        "attenuation_distance": 24
+      }
+    ],
+    "subtitle": "subtitles.eraphones.velo_sonnette"
   }
 }

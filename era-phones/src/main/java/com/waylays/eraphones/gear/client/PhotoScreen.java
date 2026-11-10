@@ -32,7 +32,8 @@ public class PhotoScreen extends Screen {
     public PhotoScreen(ItemStack photo) {
         super(Component.translatable("item.eraphones.photo"));
         this.photo = photo;
-        int[] p = PhotoClient.unpack(photo.get(GearRegistry.PHOTO.get()));
+        com.waylays.eraphones.gear.Picture pic = photo.get(GearRegistry.PHOTO.get());
+        int[] p = PhotoClient.unpack(pic == null ? null : pic.data());
         this.side = p == null ? 1 : p[0];
         this.px = p;
     }

@@ -1,0 +1,77 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "t": "eraphones:block/velo_pedale",
+    "particle": "eraphones:block/velo_pedale"
+  },
+  "elements": [
+    {
+      "from": [
+        7.1,
+        7.8,
+        7.4
+      ],
+      "to": [
+        8.9,
+        8.2,
+        8.6
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.0,
+            0.0,
+            5.375,
+            1.25
+          ],
+          "texture": "#t"
+        },
+        "south": {
+          "uv": [
+            5.375,
+            0.0,
+            10.75,
+            1.25
+          ],
+          "texture": "#t"
+        },
+        "east": {
+          "uv": [
+            10.75,
+            0.0,
+            14.375,
+            1.25
+          ],
+          "texture": "#t"
+        },
+        "west": {
+          "uv": [
+            0.0,
+            1.25,
+            3.625,
+            2.5
+          ],
+          "texture": "#t"
+        },
+        "up": {
+          "uv": [
+            3.625,
+            1.25,
+            9.0,
+            4.875
+          ],
+          "texture": "#t"
+        },
+        "down": {
+          "uv": [
+            9.0,
+            1.25,
+            14.375,
+            4.875
+          ],
+          "texture": "#t"
+        }
+      }
+    }
+  ]
+}

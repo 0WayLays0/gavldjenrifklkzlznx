@@ -668,6 +668,81 @@ public final class SmokeTest {
         });
         STEPS.add(() -> shot(mc, "booth_dial"));
         STEPS.add(() -> mc.setScreen(null));
+        // The bicycle: stood on the ground, seen from the side; ridden, pedalled forward (it must go), got off
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            net.minecraft.core.Direction dir = p.getDirection();
+            net.minecraft.core.BlockPos start = p.blockPosition().relative(dir.getOpposite(), 4);
+            net.minecraft.core.BlockPos at = start.relative(dir.getOpposite(), 4);
+            for (int a = -3; a <= 3; a++) {
+                for (int b = -14; b <= 4; b++) {
+                    net.minecraft.core.BlockPos q = at.relative(dir.getClockWise(), a).relative(dir, b);
+                    p.serverLevel().setBlockAndUpdate(q.below(), net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
+                    for (int y = 0; y < 4; y++) {
+                        p.serverLevel().setBlockAndUpdate(q.above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    }
+                }
+            }
+            com.waylays.eraphones.bike.BikeEntity bike = com.waylays.eraphones.registry.GearRegistry.BIKE.get().create(p.level());
+            if (bike == null) {
+                fail("no bicycle could be made");
+                return;
+            }
+            net.minecraft.world.phys.Vec3 c = net.minecraft.world.phys.Vec3.atBottomCenterOf(at);
+            bike.moveTo(c.x, c.y, c.z, dir.getClockWise().toYRot(), 0);
+            p.level().addFreshEntity(bike);
+            BIKE = bike.getUUID();
+            net.minecraft.world.phys.Vec3 eye = c.add(net.minecraft.world.phys.Vec3.atLowerCornerOf(dir.getNormal()).scale(3.2));
+            p.teleportTo(p.serverLevel(), eye.x, c.y, eye.z, dir.getOpposite().toYRot(), 18);
+        }));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "bike"));
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            net.minecraft.world.entity.Entity bike = p == null ? null : p.serverLevel().getEntity(BIKE);
+            if (bike == null) {
+                fail("the bicycle is gone");
+                return;
+            }
+            // Facing the way the player looks, down the cleared strip
+            bike.setYRot(p.getYRot());
+            if (!p.startRiding(bike, true)) {
+                fail("could not get on the bicycle");
+            }
+        }));
+        STEPS.add(() -> {
+            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+            mc.player.setXRot(15);
+        });
+        STEPS.add(() -> shot(mc, "bike_ride"));
+        STEPS.add(() -> {
+            if (mc.player.getVehicle() != null) {
+                BIKE_START = mc.player.getVehicle().position();
+            }
+            net.minecraft.client.KeyMapping.set(mc.options.keyUp.getKey(), true);
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "bike_moving"));
+        STEPS.add(() -> {
+            net.minecraft.client.KeyMapping.set(mc.options.keyUp.getKey(), false);
+            if (mc.player.getVehicle() == null || BIKE_START == null) {
+                fail("the rider is not on the bicycle");
+            } else if (mc.player.getVehicle().position().distanceTo(BIKE_START) < 3) {
+                fail("the bicycle did not go forward when pedalled ({} blocks)", mc.player.getVehicle().position().distanceTo(BIKE_START));
+            }
+        });
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p != null) {
+                p.stopRiding();
+            }
+        }));
+        STEPS.add(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
         // Every thing in hand, one after the other; a few as others see them; the inventory's icons (the hotbar is
         // put back after, the phones in it are looked at again at the end)
         STEPS.add(() -> server.execute(() -> {
@@ -679,7 +754,8 @@ public final class SmokeTest {
             }
         }));
         String[] held = {"piece_25c", "billet_20", "carte_identite", "journal_papier", "feuille", "cassette", "piles", "talkie_walkie", "radio",
-                "magnetoscope", "lampe_torche", "television", "ballon_rouge", "telecommande_mj", "poupee", "boite_a_musique"};
+                "magnetoscope", "lampe_torche", "television", "ballon_rouge", "telecommande_mj", "poupee", "boite_a_musique", "velo",
+                "appareil_photo", "cabine_telephonique"};
         for (String name : held) {
             STEPS.add(() -> server.execute(() -> {
                 ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -769,6 +845,8 @@ public final class SmokeTest {
     }
 
     private static net.minecraft.core.BlockPos BOOTH = net.minecraft.core.BlockPos.ZERO;
+    private static java.util.UUID BIKE;
+    private static net.minecraft.world.phys.Vec3 BIKE_START;
 
     private static net.minecraft.world.phys.Vec3 Vec3c(net.minecraft.core.BlockPos p) {
         return net.minecraft.world.phys.Vec3.atBottomCenterOf(p);
