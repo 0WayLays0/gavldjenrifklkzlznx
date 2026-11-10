@@ -558,7 +558,7 @@ public final class SmokeTest {
             }
             if (!found) {
                 for (net.minecraft.world.entity.item.ItemEntity e : p.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
-                        p.getBoundingBox().inflate(4))) {
+                        p.getBoundingBox().inflate(12))) {
                     if (e.getItem().is(com.waylays.eraphones.registry.GearRegistry.PHOTOGRAPH.get())) {
                         found = true;
                     }

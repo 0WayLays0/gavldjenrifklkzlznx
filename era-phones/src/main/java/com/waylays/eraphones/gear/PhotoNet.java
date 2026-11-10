@@ -45,8 +45,16 @@ public final class PhotoNet {
         photo.set(GearRegistry.PHOTO.get(), t.data());
         photo.set(GearRegistry.PHOTO_TIME.get(), p.level().getGameTime());
         photo.set(GearRegistry.PHOTO_BY.get(), com.waylays.eraphones.rp.RpService.name(p));
-        if (!p.getInventory().add(photo)) {
-            p.drop(photo, false);
+        if (p.getInventory().add(photo)) {
+            last = "printed into the inventory";
+        } else {
+            // No room: it falls at the photographer's feet
+            net.minecraft.world.entity.item.ItemEntity dropped = p.drop(photo, false);
+            if (dropped != null) {
+                dropped.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                dropped.setPos(p.getX(), p.getY() + .3, p.getZ());
+            }
+            last = "printed, dropped (inventory full)";
         }
         p.level().playSound(null, p.blockPosition(), GearRegistry.SHUTTER.get(), SoundSource.PLAYERS, .8f, 1f);
     }
