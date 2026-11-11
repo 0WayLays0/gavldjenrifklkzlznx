@@ -73,7 +73,7 @@ public class ChargerItem extends Item {
         }
         int b = PhoneItem.battery(phone) + PER_TICK;
         PhoneItem.setBattery(phone, b);
-        int used = getUseDuration(stack, entity) - remaining;
+        int used = getUseDuration(stack) - remaining;
         if (used % 20 == 0) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.NOTE_BLOCK_BIT.value(), SoundSource.PLAYERS, .25f, 1.6f + Math.min(1, b / 1000f) * .4f);
             player.displayClientMessage(Component.translatable("message.eraphones.charging", Math.min(100, b / 10)), true);
