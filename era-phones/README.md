@@ -157,17 +157,17 @@ L'**appareil photo instantané** (onglet Objets) prend ce que tu vois ; la photo
 Dans `emotes/` (et dans le zip du build) : onze emotes **dans le style d'un clown inquiétant**, faites ici de zéro, pose par pose (pas copiées d'un film). Chaque partie du corps bouge : coudes et genoux qui plient, torse qui se courbe, épaules qui tournent contre les hanches, tête qui compense.
 | Fichier | Emote |
 |---|---|
-| `clown_sautille` | Pas sautillé moqueur : genoux très hauts, bras qui balancent en grand, coudes pliés, le corps rebondit, la tête reste droite et fixée sur sa proie. Fait pour marcher avec. |
-| `clown_danse` | La danse : une mesure de gigue (rebonds sur les genoux, hanches qui balancent, bras pliés qui battent comme des ailes cassées), puis une mesure folle (bras lancés au ciel l'un après l'autre, coups de pied, tête renversée). |
+| `clown_sautille` | Pas sautillé léger (pas une course) : droit, un pas puis un rebond sur le même pied, l'autre genou très haut, long temps en l'air ; bras qui montent en grand sur les côtés ; la tête reste droite et fixe. Fait pour marcher avec. |
+| `clown_danse` | Sa gigue : sautille d'un pied sur l'autre, mains agitées au-dessus de la tête d'un côté puis de l'autre ; accroupi, il bat des coudes et secoue les épaules ; bras au ciel, coup de pied, « ta-da » et petit salut. |
 | `clown_tete_penchee` | Immobile, la tête se penche lentement sur l'épaule ; il respire, se balance, observe, puis sursaute (tête qui claque, bras qui part), et tourne la tête d'un coup. |
-| `clown_assis` | Assis par terre, il serre ses genoux et se balance d'avant en arrière, tête penchée, yeux levés. |
+| `clown_assis` | Assis par terre, penché sur ses genoux, les bras autour des tibias (mains jointes devant), il se balance d'avant en arrière, tête penchée, yeux levés. |
 | `clown_assis_rebord` | Assis au bord d'un bloc (mets-toi au bord, face au vide) : jambes qui se balancent comme un enfant, tête qui roule d'une épaule à l'autre. |
-| `clown_tend_objet` | Il tend l'objet qu'il a en main droite (le ballon…), bras pas tout à fait tendu, l'autre main dans le dos, penché, tête sur le côté. |
-| `clown_viens` | Signe de venir : l'avant-bras se replie vers lui, lentement, deux fois. |
-| `clown_rire` | Recroquevillé, mains devant la bouche, épaules qui tressautent, puis tête renversée et bras ouverts. |
-| `clown_coucou` | Mains devant le visage… puis il les ouvre d'un coup en se penchant : coucou ! |
-| `clown_reverence` | Grande révérence de théâtre, sans jamais te quitter des yeux. |
-| `clown_marionnette` | Pendu à des fils invisibles : un bras, un genou, la tête tirés puis lâchés. |
+| `clown_tend_objet` | Il tend l'objet qu'il a en main droite (le ballon…) à hauteur de poitrine, l'autre main dans le dos, tête sur le côté ; la main bouge doucement, puis s'approche. |
+| `clown_viens` | Signe de venir : la main tendue vers toi puis ramenée contre lui, deux fois, l'autre main sur la hanche. |
+| `clown_rire` | Il se tient le ventre et éclate de rire : penché en arrière tête renversée, puis plié en deux, le corps qui tressaute (ha-ha-ha). |
+| `clown_coucou` | Il se cache le visage dans les mains en se balançant, puis les ouvre d'un coup de chaque côté du visage en se jetant vers toi : COUCOU ! puis se cache à nouveau. |
+| `clown_reverence` | Une vraie révérence : un pied glisse en arrière, une main sur le ventre, l'autre bras ouvert sur le côté, il se plie aux hanches, tête baissée, puis se redresse. |
+| `clown_marionnette` | Une marionnette : un peu soulevé, poignets tenus par les fils, tête qui pend ; il « marche » dans le vide, un genou et la main opposée tirés vers le haut, puis l'autre. |
 
 Chacune a son **icône** (`.png` du même nom : le clown dans sa pose, sur un rond rouge et or). Installation : avec **Emotecraft**, copier les `.json` **et les `.png`** dans `.minecraft/emotes/`, relancer le jeu, les mettre sur la roue des emotes. Avec Emotecraft aussi sur le serveur, les autres joueurs qui l'ont voient l'emote. `tools/emote_preview.py` les dessine sur un joueur en blocs pour les vérifier.
 

@@ -173,128 +173,168 @@ def wave(t, period, phase=0.0):
     return math.sin(2 * math.pi * (t / period + phase))
 
 
+# ------------------------------------------------------------------------------------------------ helpers
+
+import functools  # noqa: E402
+
+import emote_kin  # noqa: E402
+
+
+@functools.lru_cache(maxsize=None)
+def _reach(side, target, prefer):
+    return emote_kin.reach(side, target, dict(prefer) if prefer else None)[0]
+
+
+def hand(side, target, **prefer):
+    """The arm's angles that put its hand on `target` (model space: pixels, y down from the neck, -z in front, the right
+    side toward -x)."""
+    return dict(_reach(side, tuple(round(v, 1) for v in target), tuple(sorted(prefer.items()))))
+
+
+def hands(target_right, **prefer):
+    """Both hands, the left one the mirror of the right."""
+    l = (-target_right[0], target_right[1], target_right[2])
+    pl = {k: (-v if k in ("yaw", "roll") else v) for k, v in prefer.items()}
+    return {"rightArm": hand("right", target_right, **prefer), "leftArm": hand("left", l, **pl)}
+
+
+def bow(a, right_leg=0.0, left_leg=0.0, knees=0.0):
+    """Bent forward at the hips by `a` degrees, the feet staying where they are (each leg turned back by its own angle
+    too, if asked: a foot slid back); `knees`: both knees bent that much, the thighs forward and the body lowered so
+    the feet stay under it."""
+    drop = .75 * .9375 * (1 - math.cos(math.radians(knees / 2)))
+    out = {"body": {"pitch": -a}, "rightLeg": {"pitch": -a + right_leg - knees / 2, "bend": knees},
+           "leftLeg": {"pitch": -a + left_leg - knees / 2, "bend": knees}}
+    if knees:
+        out["body"]["y"] = -drop
+    return out
+
+
+def hang(a):
+    """The arms hanging straight down while bent forward by `a`."""
+    return {"rightArm": {"pitch": -a, "roll": 4, "yaw": 0, "bend": -6}, "leftArm": {"pitch": -a, "roll": -4, "yaw": 0, "bend": -6}}
+
+
+def leg_points(side, pitch, bend):
+    """A leg's knee and foot (model space) for these angles."""
+    sx = -1 if side == "right" else 1
+    hip = np.array([1.9 * sx, 12, .1])
+    a, b = math.radians(pitch), math.radians(pitch + bend)
+    knee = hip + np.array([0, 6 * math.cos(a), 6 * math.sin(a)])
+    foot = knee + np.array([0, 6 * math.cos(b), 6 * math.sin(b)])
+    return knee, foot
+
+
+import numpy as np  # noqa: E402
+
+
 # ------------------------------------------------------------------------------------------------ the skip
 
 def skip():
-    """The mocking skip: step, hop on the same foot as the other knee drives up high, land, the other side. The arms
-    swing wide against the legs (elbows a little bent, out like a puppet's), the shoulders twist against the hips,
-    the body bounces and leans in, and the head stays dead level, locked on its prey, a little tilted."""
+    """The mocking skip, light and bouncing, not a run: upright, a step then a hop on the same foot while the other knee
+    springs up high, a long float, a soft landing; the arms swing up wide and out to the sides like a puppet's, the
+    hands loose; the body sways; the head stays dead level, locked on its prey, a little tilted."""
     e = Emote("clown_sautille", "Clown : pas sautillé",
-              "Il sautille d'un pied sur l'autre, genoux très hauts, bras qui balancent comme une marionnette ; "
-              "le corps rebondit, la tête reste droite et fixe. Marche avec.", 20)
-    land = {  # landing on the right foot: knees giving, the left leg trailing behind, the arms crossing the middle
-        "body": {"y": -.07, "pitch": -13, "roll": -2, "yaw": 2},
-        "torso": {"bend": 14, "yaw": 0},
-        "rightLeg": {"pitch": -14, "bend": 32, "roll": 2},
-        "leftLeg": {"pitch": 28, "bend": 46, "roll": -2},
-        "rightArm": {"pitch": -10, "roll": 16, "bend": -28, "yaw": 0},
-        "leftArm": {"pitch": -12, "roll": -16, "bend": -28, "yaw": 0},
-        "head": {"pitch": -9, "roll": 9, "yaw": 0},
-    }
-    push = {  # off the right foot: the left knee coming through, the body rising
-        "body": {"y": .07, "pitch": -12, "roll": -4, "yaw": 5},
-        "torso": {"bend": 10, "yaw": -8},
-        "rightLeg": {"pitch": 6, "bend": 10, "roll": 2},
-        "leftLeg": {"pitch": -50, "bend": 70, "roll": -3},
-        "rightArm": {"pitch": -62, "roll": 20, "bend": -48, "yaw": -6},
-        "leftArm": {"pitch": 34, "roll": -22, "bend": -18, "yaw": 4},
-        "head": {"pitch": -9, "roll": 12, "yaw": 3},
-    }
-    peak = {  # in the air: the left knee high, the right leg long beneath, the right arm up and out, the left back
-        "body": {"y": .19, "pitch": -11, "roll": -5, "yaw": 7},
-        "torso": {"bend": 8, "yaw": -13},
-        "rightLeg": {"pitch": 20, "bend": 14, "roll": 3},
-        "leftLeg": {"pitch": -86, "bend": 98, "roll": -5},
-        "rightArm": {"pitch": -98, "roll": 28, "bend": -58, "yaw": -12},
-        "leftArm": {"pitch": 52, "roll": -28, "bend": -24, "yaw": 6},
-        "head": {"pitch": -8, "roll": 13, "yaw": 6},
-    }
-    fall = {  # coming down: the left leg reaching for the ground
-        "body": {"y": .07, "pitch": -12, "roll": -3, "yaw": 4},
-        "torso": {"bend": 11, "yaw": -7},
-        "rightLeg": {"pitch": 24, "bend": 26, "roll": 2},
-        "leftLeg": {"pitch": -34, "bend": 22, "roll": -3},
-        "rightArm": {"pitch": -58, "roll": 22, "bend": -40, "yaw": -6},
-        "leftArm": {"pitch": 26, "roll": -20, "bend": -20, "yaw": 3},
-        "head": {"pitch": -9, "roll": 11, "yaw": 3},
-    }
-    e.key(0, land).key(3, push).key(5, peak).key(8, fall)
-    e.key(10, merge(mirror(land), {"head": {"roll": 9}}))
-    e.key(13, merge(mirror(push), {"head": {"roll": 7}}))
-    e.key(15, merge(mirror(peak), {"head": {"roll": 6}}))
-    e.key(18, merge(mirror(fall), {"head": {"roll": 8}}))
-    # The wrists of the forward arm flick on each hop (the forearm a little further)
-    e.layer(lambda t: {"rightArm": {"bend": -8 * max(0, wave(t, 20, .05))}, "leftArm": {"bend": -8 * max(0, -wave(t, 20, .05))}})
+              "Il sautille d'un pied sur l'autre, léger, genoux très hauts, bras qui montent en grand sur les côtés "
+              "comme une marionnette ; la tête reste droite et fixe. Marche avec.", 24)
+
+    def side(t0, mirror_it):
+        land = {  # down on the right foot, the knee giving a little, the left foot behind
+            "body": {"y": -.05, "pitch": -4, "roll": -3, "yaw": 3},
+            "rightLeg": {"pitch": -8, "bend": 26, "roll": 2}, "leftLeg": {"pitch": 18, "bend": 30, "roll": -2},
+            "rightArm": {"pitch": -20, "roll": 24, "yaw": 0, "bend": -14}, "leftArm": {"pitch": -24, "roll": -24, "yaw": 0, "bend": -14},
+            "head": {"pitch": -2, "roll": 8, "yaw": -3}}
+        spring = {  # off the right foot, the left knee coming up
+            "body": {"y": .12, "pitch": -3, "roll": -4, "yaw": 5},
+            "rightLeg": {"pitch": 6, "bend": 4, "roll": 2}, "leftLeg": {"pitch": -62, "bend": 80, "roll": -3},
+            "rightArm": {"pitch": -92, "roll": 34, "yaw": -6, "bend": -26}, "leftArm": {"pitch": 14, "roll": -30, "yaw": 0, "bend": -12},
+            "head": {"pitch": -1, "roll": 9, "yaw": -5}}
+        float_ = {  # the top of the hop: the left knee at the hip, the right toe pointed down, the right arm high
+            "body": {"y": .28, "pitch": -2, "roll": -4, "yaw": 6},
+            "rightLeg": {"pitch": 10, "bend": 6, "roll": 2}, "leftLeg": {"pitch": -92, "bend": 96, "roll": -4},
+            "rightArm": {"pitch": -128, "roll": 40, "yaw": -8, "bend": -30}, "leftArm": {"pitch": 24, "roll": -38, "yaw": 2, "bend": -14},
+            "head": {"pitch": 0, "roll": 9, "yaw": -6}}
+        drop = {
+            "body": {"y": .12, "pitch": -3, "roll": -3, "yaw": 4},
+            "rightLeg": {"pitch": 4, "bend": 10, "roll": 2}, "leftLeg": {"pitch": -40, "bend": 34, "roll": -3},
+            "rightArm": {"pitch": -76, "roll": 32, "yaw": -4, "bend": -22}, "leftArm": {"pitch": 6, "roll": -30, "yaw": 0, "bend": -12},
+            "head": {"pitch": -1, "roll": 8, "yaw": -4}}
+        poses = [(0, land), (3, spring), (6, float_), (9, drop)]
+        for dt, p in poses:
+            if mirror_it:
+                p = mirror(p)
+                p["head"]["roll"] = -p["head"]["roll"] * .4 + 8
+            e.key(t0 + dt, p)
+
+    side(0, False)
+    side(12, True)
     return e
 
 
 # ------------------------------------------------------------------------------------------------ the dance
 
 def dance():
-    """The clown's dance, 64 ticks (two bars of four beats): first a bouncing jig, knees giving on every beat, hips
-    swaying from side to side, the elbows bent and the arms flapping like broken wings, the head swinging against the
-    hips; then the wild bar: arms flung up overhead one after the other, legs kicked out in turn, the body twisting,
-    the head thrown back and dropped."""
+    """The clown's dance, 96 ticks, three parts of four beats: the jig (hopping from foot to foot, the free leg flicked
+    out, both hands up by the head flapping from one side to the other together, the head bobbing against them); the
+    shimmy (crouched low, the elbows out like wings flapping, the shoulders shaking, the head swinging); and the
+    flourish (arms flung up in turn, a kick, then a full spin on the spot and a bow of the head)."""
     e = Emote("clown_danse", "Clown : la danse",
-              "Une gigue folle : il rebondit sur ses genoux, balance les hanches, bat des bras comme des ailes "
-              "cassées, puis lance les bras au ciel et les jambes en l'air, la tête renversée.", 64)
-    B = 8  # a beat
-    # Bar one: the jig
+              "Sa gigue de clown : sautille d'un pied sur l'autre les mains agitées au-dessus de la tête, puis "
+              "accroupi il bat des coudes et secoue les épaules, puis bras au ciel, coup de pied et pirouette.", 96)
+    B = 8
+    up_r = hand("right", (-9, -11, -3), roll=60)
+    up_l = hand("left", (9, -11, -3), roll=-60)
+    over_r = hand("right", (-2, -13, -4), roll=30)
+    over_l = hand("left", (2, -13, -4), roll=-30)
     for i in range(4):
         t = i * B
-        side = 1 if i % 2 == 0 else -1
-        down = {
-            "body": {"y": -.13, "x": .09 * side, "roll": 8 * side, "yaw": 12 * side, "pitch": -6},
-            "torso": {"bend": 16, "yaw": -14 * side, "roll": 0},
-            "rightLeg": {"pitch": -24, "bend": 52, "roll": 8},
-            "leftLeg": {"pitch": -24, "bend": 52, "roll": -8},
-            "rightArm": {"pitch": -30, "roll": 62, "bend": -100, "yaw": 0},
-            "leftArm": {"pitch": -30, "roll": -62, "bend": -100, "yaw": 0},
-            "head": {"roll": -20 * side, "yaw": -22 * side, "pitch": 6},
-        }
-        up = {
-            "body": {"y": .05, "x": .03 * side, "roll": 2 * side, "yaw": 4 * side, "pitch": -2},
-            "torso": {"bend": 6, "yaw": -4 * side, "roll": 0},
-            "rightLeg": {"pitch": -4, "bend": 6, "roll": 4},
-            "leftLeg": {"pitch": -4, "bend": 6, "roll": -4},
-            "rightArm": {"pitch": -62, "roll": 78, "bend": -64, "yaw": 0},
-            "leftArm": {"pitch": -62, "roll": -78, "bend": -64, "yaw": 0},
-            "head": {"roll": -6 * side, "yaw": -6 * side, "pitch": -4},
-        }
-        # one leg lifts a little on the up (a jig): the side's
-        lift = "rightLeg" if side > 0 else "leftLeg"
-        up[lift] = {"pitch": -38, "bend": 58, "roll": 6 * side}
-        e.key(t, down).key(t + 4, up)
-    # Bar two: the wild one
+        s = 1 if i % 2 == 0 else -1
+        hop_leg, free_leg = ("rightLeg", "leftLeg") if s > 0 else ("leftLeg", "rightLeg")
+        # both hands up, swung over to one side (s): the near one out, the far one over the head
+        arms = {"rightArm": up_r, "leftArm": over_l} if s > 0 else {"rightArm": over_r, "leftArm": up_l}
+        land = merge({"body": {"y": -.08, "x": .06 * s, "roll": 10 * s, "yaw": -8 * s, "pitch": -4},
+                      hop_leg: {"pitch": -6, "bend": 30, "roll": 3 * s}, free_leg: {"pitch": 10, "bend": 70, "roll": 18 * s},
+                      "head": {"roll": -22 * s, "pitch": 6, "yaw": 10 * s}}, arms)
+        hop = merge({"body": {"y": .12, "x": .03 * s, "roll": 4 * s, "yaw": -3 * s, "pitch": -2},
+                     hop_leg: {"pitch": 4, "bend": 6, "roll": 2 * s}, free_leg: {"pitch": -30, "bend": 60, "roll": 24 * s},
+                     "head": {"roll": -8 * s, "pitch": -6, "yaw": 4 * s}}, arms)
+        e.key(t, land).key(t + 4, hop)
+    wing_r = hand("right", (-12, 1, -4), roll=80)
+    wing_l = hand("left", (12, 1, -4), roll=-80)
+    flap_r = hand("right", (-11, -6, -3), roll=90)
+    flap_l = hand("left", (11, -6, -3), roll=-90)
     for i in range(4):
         t = 32 + i * B
-        side = 1 if i % 2 == 0 else -1
-        hi, lo = ("rightArm", "leftArm") if side > 0 else ("leftArm", "rightArm")
-        kick = "leftLeg" if side > 0 else "rightLeg"
-        stand = "rightLeg" if side > 0 else "leftLeg"
-        fling = {
-            "body": {"y": .1, "x": -.04 * side, "roll": -6 * side, "yaw": 22 * side, "pitch": 4},
-            "torso": {"bend": -12, "yaw": 10 * side, "roll": -4 * side},
-            hi: {"pitch": -168, "roll": 22 * side, "bend": -18, "yaw": 0},
-            lo: {"pitch": -36, "roll": -70 * side, "bend": -96, "yaw": 0},
-            kick: {"pitch": -64, "bend": 8, "roll": -10 * side},
-            stand: {"pitch": 6, "bend": 18, "roll": 4 * side},
-            "head": {"pitch": -34, "roll": 18 * side, "yaw": -10 * side},
-        }
-        drop = {
-            "body": {"y": -.08, "x": .02 * side, "roll": 3 * side, "yaw": 8 * side, "pitch": -10},
-            "torso": {"bend": 22, "yaw": 0, "roll": 0},
-            hi: {"pitch": -70, "roll": 40 * side, "bend": -70, "yaw": 0},
-            lo: {"pitch": -20, "roll": -40 * side, "bend": -60, "yaw": 0},
-            kick: {"pitch": -10, "bend": 34, "roll": -4 * side},
-            stand: {"pitch": -14, "bend": 40, "roll": 4 * side},
-            "head": {"pitch": 22, "roll": -12 * side, "yaw": 8 * side},
-        }
-        e.key(t + 2, fling).key(t + 6, drop)
-    # The forearms flap twice a beat in the jig; the head nods with the beat, a shade late
-    e.layer(lambda t: {"rightArm": {"pitch": 14 * wave(t, 4) if t < 32 else 0},
-                       "leftArm": {"pitch": -14 * wave(t, 4) if t < 32 else 0},
-                       "head": {"pitch": 4 * wave(t - 1, 8)}})
+        s = 1 if i % 2 == 0 else -1
+        low = merge(bow(14), {"body": {"y": -.2, "x": .05 * s, "roll": 6 * s, "yaw": 14 * s, "pitch": -14},
+                              "rightLeg": {"bend": 62, "roll": 10}, "leftLeg": {"bend": 62, "roll": -10},
+                              "head": {"roll": 18 * s, "pitch": -10, "yaw": -18 * s}, "rightArm": wing_r, "leftArm": wing_l})
+        low["rightLeg"]["pitch"] = -14 - 20
+        low["leftLeg"]["pitch"] = -14 - 20
+        high = merge(low, {"body": {"y": -.12, "x": -.02 * s, "roll": -4 * s, "yaw": -6 * s, "pitch": -12},
+                           "rightArm": flap_r, "leftArm": flap_l, "head": {"roll": -10 * s, "pitch": -4, "yaw": 10 * s}})
+        e.key(t, low).key(t + 4, high)
+    sky_r = hand("right", (-5, -18, -2), roll=10)
+    sky_l = hand("left", (5, -18, -2), roll=-10)
+    rest = {"body": {"y": 0, "x": 0, "roll": 0, "yaw": 0, "pitch": 0}, "rightLeg": {"pitch": 0, "bend": 4, "roll": 2},
+            "leftLeg": {"pitch": 0, "bend": 4, "roll": -2}, "rightArm": {"pitch": -10, "roll": 20, "yaw": 0, "bend": -20},
+            "leftArm": {"pitch": -10, "roll": -20, "yaw": 0, "bend": -20}, "head": {"roll": 0, "pitch": 0, "yaw": 0}}
+    e.key(64, merge(rest, {"rightArm": sky_r, "body": {"roll": -6, "y": .06}, "head": {"pitch": -20, "roll": 10}}))
+    e.key(68, merge(rest, {"leftArm": sky_l, "rightArm": {"pitch": -20, "roll": 50, "yaw": 0, "bend": -40}, "body": {"roll": 6, "y": .06},
+                           "head": {"pitch": -20, "roll": -10}}))
+    e.key(72, merge(rest, {"rightArm": sky_r, "leftArm": sky_l, "rightLeg": {"pitch": -70, "bend": 10}, "body": {"y": .1, "pitch": 6},
+                           "head": {"pitch": -30}}))
+    e.key(76, merge(rest, {"rightArm": {"pitch": -30, "roll": 70, "yaw": 0, "bend": -30}, "leftArm": {"pitch": -30, "roll": -70, "yaw": 0, "bend": -30},
+                           "body": {"y": .04, "yaw": 0}}))
+    # ta-da: a hop to one side, to the other, then arms flung wide and up, a little bow of the head
+    e.key(82, merge(rest, {"rightArm": {"pitch": -30, "roll": 80, "yaw": 0, "bend": -20}, "leftArm": {"pitch": -30, "roll": -80, "yaw": 0, "bend": -20},
+                           "body": {"y": .12, "x": .1, "roll": -8}, "leftLeg": {"pitch": -10, "bend": 40, "roll": -16}}))
+    e.key(86, merge(rest, {"rightArm": {"pitch": -150, "roll": 40, "yaw": 0, "bend": -10}, "leftArm": {"pitch": -150, "roll": -40, "yaw": 0, "bend": -10},
+                           "body": {"y": .02, "x": 0}, "head": {"pitch": -14}}))
+    e.key(91, merge(rest, bow(14), {"head": {"pitch": 16, "roll": 14}, "rightArm": {"pitch": -60, "roll": 50, "yaw": 0, "bend": -40},
+                                    "leftArm": {"pitch": -40, "roll": -60, "yaw": 0, "bend": -20}}))
+    # The hands flutter all the while (the forearms quiver)
+    e.layer(lambda t: {"rightArm": {"bend": 10 * wave(t, 3)}, "leftArm": {"bend": 10 * wave(t, 3, .5)}} if t < 64 else {})
     return e
 
 
@@ -306,30 +346,25 @@ def tilt():
     of the head the other way, held, then slowly back."""
     e = Emote("clown_tete_penchee", "Clown : tête penchée",
               "Immobile, la tête se penche lentement sur l'épaule ; il respire, se balance, observe… et sursaute.", 130, 30)
-    rest = {"body": {"pitch": 0, "x": 0}, "torso": {"bend": 0, "roll": 0},
-            "head": {"roll": 0, "pitch": 0, "yaw": 0},
+    rest = {"body": {"pitch": 0, "x": 0}, "head": {"roll": 0, "pitch": 0, "yaw": 0},
             "rightArm": {"pitch": 0, "roll": 4, "bend": -4}, "leftArm": {"pitch": 0, "roll": -4, "bend": -4},
-            "leftLeg": {"bend": 0}, "rightLeg": {"bend": 0}}
-    tilted = {"body": {"pitch": -5, "x": 0}, "torso": {"bend": 9, "roll": -3},
-              "head": {"roll": 60, "pitch": 6, "yaw": -4},
-              "rightArm": {"pitch": -6, "roll": 2, "bend": -14}, "leftArm": {"pitch": -10, "roll": -9, "bend": -12},
-              "leftLeg": {"bend": 8}, "rightLeg": {"bend": 2}}
+            "rightLeg": {"pitch": 0, "bend": 0}, "leftLeg": {"pitch": 0, "bend": 0}}
+    tilted = merge(bow(6), {"body": {"x": 0}, "head": {"roll": 60, "pitch": -2, "yaw": -4},
+                            "rightArm": {"pitch": -10, "roll": 2, "bend": -16}, "leftArm": {"pitch": -12, "roll": -10, "bend": -14},
+                            "leftLeg": {"bend": 8}, "rightLeg": {"bend": 2}})
     e.key(0, rest).key(4, rest)
-    e.key(24, merge(tilted, {"head": {"roll": 67, "pitch": 9}}))
+    e.key(24, merge(tilted, {"head": {"roll": 67, "pitch": 1}}))
     e.key(30, tilted)
     e.key(54, tilted)
-    # twitch one: a snap of the head, the right arm jerked up, the body jolted
-    e.key(56, merge(tilted, {"head": {"roll": 80, "pitch": -12, "yaw": 6}, "rightArm": {"pitch": -34, "bend": -50, "roll": 10},
-                             "body": {"x": .03}, "torso": {"bend": 4}}))
-    e.key(59, merge(tilted, {"head": {"roll": 54, "pitch": 4}, "rightArm": {"pitch": -12, "bend": -20}}))
+    e.key(56, merge(tilted, {"head": {"roll": 80, "pitch": -16, "yaw": 6}, "rightArm": {"pitch": -38, "bend": -54, "roll": 12},
+                             "body": {"x": .03}}))
+    e.key(59, merge(tilted, {"head": {"roll": 54, "pitch": -4}, "rightArm": {"pitch": -16, "bend": -22}}))
     e.key(66, tilted)
     e.key(90, tilted)
-    # twitch two: the head turned sharp to its left, held, then slowly back
-    e.key(92, merge(tilted, {"head": {"yaw": -42, "roll": 48, "pitch": -6}, "torso": {"roll": 4}}))
-    e.key(102, merge(tilted, {"head": {"yaw": -40, "roll": 50, "pitch": -4}, "torso": {"roll": 4}}))
+    e.key(92, merge(tilted, {"head": {"yaw": -42, "roll": 48, "pitch": -8}}))
+    e.key(102, merge(tilted, {"head": {"yaw": -40, "roll": 50, "pitch": -6}}))
     e.key(122, tilted)
-    # breath (the chest rising), a slow sway, the head drifting as it watches
-    e.layer(lambda t: {} if t < 26 else {"torso": {"bend": 2.2 * wave(t, 50)}, "body": {"roll": 1.8 * wave(t, 100, .25)},
+    e.layer(lambda t: {} if t < 26 else {"body": {"roll": 1.8 * wave(t, 100, .25), "pitch": -1 * wave(t, 50)},
                                           "head": {"roll": 2.5 * wave(t, 100, .6), "yaw": 5 * wave(t, 100, .1)},
                                           "rightArm": {"pitch": 2 * wave(t, 100, .3)}, "leftArm": {"pitch": -2 * wave(t, 100, .3)}})
     return e
@@ -338,193 +373,158 @@ def tilt():
 # ------------------------------------------------------------------------------------------------ sitting
 
 def sit():
-    """Sitting on the ground, knees drawn up and hugged, rocking slowly back and forth, the head on one side, looking
-    up from under the brow; now and then the head rolls over to the other side."""
+    """Sitting on the ground, knees drawn up, the arms wrapped round the shins (the hands clasped in front of them),
+    leaning over the knees and rocking slowly on the hips, the head on one side looking up from under the brow; now and
+    then the head rolls over to the other side."""
     e = Emote("clown_assis", "Clown : assis, se balance",
-              "Assis par terre, il serre ses genoux et se balance doucement d'avant en arrière, la tête penchée, "
-              "les yeux levés vers toi.", 120, 0)
-    base = {"body": {"y": -.66, "pitch": 0},
-            "torso": {"bend": 26},
-            "rightLeg": {"pitch": -118, "bend": 120, "roll": 6}, "leftLeg": {"pitch": -118, "bend": 120, "roll": -6},
-            "rightArm": {"pitch": -58, "roll": -16, "bend": -64, "yaw": 10}, "leftArm": {"pitch": -58, "roll": 16, "bend": -64, "yaw": -10},
-            "head": {"pitch": -26, "roll": 24, "yaw": 0}}
-    e.key(0, base)
-    e.key(54, base)
-    e.key(66, merge(base, {"head": {"pitch": -24, "roll": -24, "yaw": 4}}))
-    e.key(108, merge(base, {"head": {"pitch": -24, "roll": -24, "yaw": 4}}))
-    e.key(118, base)
-    # rocking: back and forth about the hips, the head lagging behind it
-    e.layer(lambda t: {"body": {"pitch": 9 * wave(t, 40)}, "torso": {"bend": 4 * wave(t, 40, .1)},
-                       "head": {"pitch": -5 * wave(t, 40, .2)}})
+              "Assis par terre, il serre ses jambes dans ses bras et se balance doucement d'avant en arrière, "
+              "la tête penchée, les yeux levés vers toi.", 120, 0)
+    lean = 22
+    thigh = -120 - lean
+    legs = {"rightLeg": {"pitch": thigh, "bend": 124, "roll": 5}, "leftLeg": {"pitch": thigh, "bend": 124, "roll": -5}}
+    knee, foot = leg_points("right", thigh, 124)
+    shin_mid = (knee + foot) / 2
+    # the hands clasped in front of the shins, a little below the knees
+    grip = (-1.0, float(shin_mid[1] - 1.0), float(shin_mid[2] - 3.2))
+    arms = hands(grip, roll=20, pitch=-70)
+    base = merge({"body": {"y": -.64, "pitch": -lean}, "head": {"pitch": -30 + 0, "roll": 22, "yaw": 0}}, legs, arms)
+    e.key(0, base).key(54, base)
+    other = merge(base, {"head": {"pitch": -28, "roll": -22, "yaw": 4}})
+    e.key(66, other).key(108, other).key(118, base)
+    # rocking: the whole body back and forth on the hips (the arms hold the legs), the head lagging a little
+    e.layer(lambda t: {"body": {"pitch": 8 * wave(t, 40)}, "head": {"pitch": -4 * wave(t, 40, .15)}})
     return e
 
 
 def ledge():
     """Sitting on a ledge (stand at the edge of a block, facing out): legs dangling and swinging like a child's, the
-    hands holding the edge, the head lolling slowly from one shoulder to the other."""
+    hands holding the edge, the head rolling slowly from one shoulder to the other."""
     e = Emote("clown_assis_rebord", "Clown : assis au bord",
               "Assis au bord d'un bloc (mets-toi au bord, face au vide), les jambes qui se balancent comme un enfant, "
-              "la tête qui roule d'une épaule à l'autre.", 96, 0)
+              "la tête qui roule lentement d'une épaule à l'autre.", 168, 0)
     base = {"body": {"y": -.7, "z": -.12, "pitch": 0},
-            "torso": {"bend": 12},
             "rightLeg": {"pitch": -88, "bend": 90, "roll": 3}, "leftLeg": {"pitch": -88, "bend": 90, "roll": -3},
             "rightArm": {"pitch": 18, "roll": 18, "bend": -8}, "leftArm": {"pitch": 18, "roll": -18, "bend": -8},
             "head": {"pitch": -4}}
     e.key(0, base)
-    # legs swinging in turn; the head rolling slowly from side to side, a little late on the legs
-    e.layer(lambda t: {"rightLeg": {"bend": 30 * wave(t, 24)}, "leftLeg": {"bend": -30 * wave(t, 24)},
-                       "head": {"roll": 26 * wave(t, 96), "yaw": 8 * wave(t, 96, .25)},
-                       "torso": {"roll": 3 * wave(t, 96, .5)},
-                       "rightArm": {"pitch": 2 * wave(t, 24)}, "leftArm": {"pitch": -2 * wave(t, 24)}})
+    e.layer(lambda t: {"rightLeg": {"bend": 30 * wave(t, 28)}, "leftLeg": {"bend": -30 * wave(t, 28)},
+                       "head": {"roll": 26 * wave(t, 168), "yaw": 8 * wave(t, 168, .25)},
+                       "body": {"roll": 2 * wave(t, 168, .5)},
+                       "rightArm": {"pitch": 2 * wave(t, 28)}, "leftArm": {"pitch": -2 * wave(t, 28)}})
     return e
 
 
 # ------------------------------------------------------------------------------------------------ with something in hand
 
 def offer():
-    """Holding something out (whatever is in the right hand: a balloon...), the arm not quite stretched, the other
-    hand behind the back, leaning in, the head on one side; the hand bobbing the thing gently, come and take it."""
+    """Holding something out (whatever is in the right hand: a balloon...) at chest height, the arm almost straight, the
+    left hand tucked behind the back; leaning in a little, the head on one side; the hand bobbing the thing gently up
+    and down, come and take it, now and then pushed a little closer."""
     e = Emote("clown_tend_objet", "Clown : tend l'objet",
-              "Il te tend ce qu'il a en main droite (un ballon…), le bras pas tout à fait tendu, l'autre main dans le "
-              "dos, penché vers toi, la tête sur le côté. Viens le prendre…", 60, 0)
-    base = {"body": {"pitch": -6},
-            "torso": {"bend": 9, "yaw": -6},
-            "rightArm": {"pitch": -50, "roll": 6, "yaw": -12, "bend": -20},
-            "leftArm": {"pitch": 32, "roll": 18, "bend": -78, "yaw": 0},
-            "rightLeg": {"pitch": -6, "bend": 4}, "leftLeg": {"pitch": 6, "bend": 10},
-            "head": {"roll": -20, "pitch": -2, "yaw": 6}}
-    e.key(0, base)
-    e.key(30, merge(base, {"head": {"roll": -26, "pitch": 2, "yaw": 2}}))
-    e.layer(lambda t: {"rightArm": {"pitch": 4 * wave(t, 20), "bend": -4 * wave(t, 20, .2)},
-                       "body": {"roll": 1.5 * wave(t, 60)}, "torso": {"bend": 1.5 * wave(t, 60, .25)}})
+              "Il te tend ce qu'il a en main droite (un ballon…), à hauteur de poitrine, l'autre main dans le dos, "
+              "penché vers toi, la tête sur le côté. Viens le prendre…", 80, 0)
+    behind = hand("left", (2.5, 9, 3.4), roll=10, pitch=30)
+    base = merge(bow(6), {"rightArm": {"pitch": -72, "roll": -4, "yaw": -6, "bend": -14}, "leftArm": behind,
+                          "head": {"roll": -18, "pitch": -4, "yaw": 4}})
+    closer = merge(bow(12), {"rightArm": {"pitch": -80, "roll": -4, "yaw": -6, "bend": -4}, "leftArm": behind,
+                             "head": {"roll": -24, "pitch": -8, "yaw": 2}, "body": {"z": -.06}})
+    e.key(0, base).key(40, base).key(50, closer).key(62, closer).key(74, base)
+    e.layer(lambda t: {"rightArm": {"pitch": 5 * wave(t, 20)}, "head": {"roll": 2 * wave(t, 80)}})
     return e
 
 
 def beckon():
-    """Come here: the right forearm curling in toward him, twice, slow out, quick in; leaning a little more each time;
-    the head on one side, chin down, eyes up."""
+    """Come here: the right hand held out, palm up, then the forearm drawn slowly in toward the chest, twice, the body
+    leaning back with it; the left hand on the hip; the head on one side, chin down, eyes up."""
     e = Emote("clown_viens", "Clown : viens…",
-              "Il te fait signe de venir, l'avant-bras qui se replie lentement vers lui, la tête penchée, le menton "
-              "baissé, les yeux levés.", 40, 0)
-    out = {"body": {"pitch": -6}, "torso": {"bend": 10},
-           "rightArm": {"pitch": -66, "roll": 10, "yaw": -14, "bend": -22},
-           "leftArm": {"pitch": 0, "roll": -6, "bend": -10},
-           "head": {"roll": 22, "pitch": 10, "yaw": 0}}
-    curl = merge(out, {"rightArm": {"pitch": -74, "roll": 10, "yaw": -14, "bend": -118}, "body": {"pitch": -9}, "torso": {"bend": 13},
-                       "head": {"roll": 26, "pitch": 12}})
-    e.key(0, out).key(8, out).key(14, curl).key(20, out).key(28, out).key(34, curl)
+              "Il te fait signe de venir : la main tendue vers toi puis ramenée lentement contre lui, deux fois, "
+              "l'autre main sur la hanche, la tête penchée, le menton baissé.", 60, 0)
+    hip = hand("left", (5.5, 10.5, -1.0), roll=-40, pitch=10)
+    out = merge(bow(10), {"rightArm": {"pitch": -78, "roll": 6, "yaw": -8, "bend": -10}, "leftArm": hip,
+                          "head": {"roll": 20, "pitch": 4, "yaw": 0}})
+    curl = merge(bow(2), {"rightArm": hand("right", (-2.5, 2, -6), pitch=-60), "leftArm": hip,
+                          "head": {"roll": 24, "pitch": 8, "yaw": 0}})
+    e.key(0, out).key(8, out).key(20, curl).key(26, out).key(34, out).key(46, curl).key(54, out)
     return e
 
 
 def giggle():
-    """The giggle: hunched, the hands to the mouth, the shoulders shaking; then the head thrown back in a wide laugh,
-    arms flung open, and back into the hunch."""
+    """The laugh: both hands clutching the belly; first leaning back, the head thrown back (ha, ha, ha: the shoulders
+    jolting), then folded forward over the belly, the head bobbing down, then up again."""
     e = Emote("clown_rire", "Clown : rire",
-              "Recroquevillé, les mains devant la bouche, les épaules qui tressautent… puis il renverse la tête et "
-              "éclate de rire, les bras ouverts.", 70, 0)
-    hunch = {"body": {"pitch": -6, "y": -.03}, "torso": {"bend": 24, "roll": 0},
-             "rightArm": {"pitch": -46, "roll": -18, "bend": -128, "yaw": 14},
-             "leftArm": {"pitch": -46, "roll": 18, "bend": -128, "yaw": -14},
-             "rightLeg": {"bend": 12}, "leftLeg": {"bend": 12},
-             "head": {"pitch": 8, "roll": 10}}
-    laugh = {"body": {"pitch": 6, "y": .02}, "torso": {"bend": -14, "roll": 0},
-             "rightArm": {"pitch": -40, "roll": 52, "bend": -46, "yaw": 0},
-             "leftArm": {"pitch": -40, "roll": -52, "bend": -46, "yaw": 0},
-             "rightLeg": {"bend": 4}, "leftLeg": {"bend": 4},
-             "head": {"pitch": -42, "roll": -6}}
-    e.key(0, hunch).key(34, hunch).key(40, laugh).key(54, laugh).key(62, hunch)
-    # the shaking: quick, small, the head with it; stronger in the laugh
-    e.layer(lambda t: {"torso": {"bend": (2.5 if t < 36 or t > 60 else 4) * wave(t, 3)},
-                       "body": {"y": .012 * wave(t, 3, .25)},
-                       "head": {"pitch": 3 * wave(t, 3, .5)}})
+              "Il se tient le ventre et éclate de rire : la tête renversée en arrière, les épaules qui tressautent, "
+              "puis plié en deux, puis il se redresse.", 80, 0)
+    belly = hands((-1.6, 8.6, -3.2), roll=30, yaw=-40)
+    back = merge(bow(-10), {"head": {"pitch": -38, "roll": 6}}, belly)
+    fold = merge(bow(34, knees=16), {"head": {"pitch": 10, "roll": -8}}, belly)
+    e.key(0, back).key(22, back).key(32, fold).key(56, fold).key(68, back)
+    # ha-ha-ha: quick jolts of the body and the head, stronger at the peak of each phase
+    e.layer(lambda t: {"body": {"y": .018 * wave(t, 4), "pitch": 2.5 * wave(t, 4, .25)}, "head": {"pitch": 4 * wave(t, 4, .5)}})
     return e
 
 
 def peekaboo():
-    """Peek-a-boo: the hands over the face, swaying a little; then flung open, leaning in all at once."""
+    """Peek-a-boo, plainly: the hands over the face, swaying, the head shaking a little (where is he?); then the hands
+    flung open beside the face, fingers out (BOO), the body lunging forward on bent knees; held, trembling; then the
+    hands slowly back over the face."""
     e = Emote("clown_coucou", "Clown : coucou !",
-              "Les mains devant le visage, il se balance… puis les ouvre d'un coup en se penchant vers toi : coucou !", 70, 0)
-    hide = {"body": {"pitch": -2, "y": 0}, "torso": {"bend": 8},
-            "rightArm": {"pitch": -78, "roll": -26, "bend": -112, "yaw": 18},
-            "leftArm": {"pitch": -78, "roll": 26, "bend": -112, "yaw": -18},
-            "rightLeg": {"bend": 4}, "leftLeg": {"bend": 4},
-            "head": {"pitch": 14, "roll": 4, "yaw": 0}}
-    boo = {"body": {"pitch": -16, "y": .04}, "torso": {"bend": 20},
-           "rightArm": {"pitch": -64, "roll": 74, "bend": -26, "yaw": 0},
-           "leftArm": {"pitch": -64, "roll": -74, "bend": -26, "yaw": 0},
-           "rightLeg": {"bend": 14}, "leftLeg": {"bend": 14},
-           "head": {"pitch": -18, "roll": 14, "yaw": 0}}
-    e.key(0, hide).key(22, merge(hide, {"head": {"pitch": 18}, "torso": {"bend": 10}}))
-    e.key(25, merge(boo, {"body": {"pitch": -20, "y": .06}, "rightArm": {"roll": 82}, "leftArm": {"roll": -82}}))
-    e.key(28, boo).key(46, boo).key(64, hide)
-    e.layer(lambda t: {"body": {"roll": (3 if t < 22 else .5) * wave(t, 22)}, "head": {"roll": (4 if t < 22 else 1) * wave(t, 22, .15)}})
+              "Il se cache le visage dans les mains en se balançant… puis les ouvre d'un coup de chaque côté du visage "
+              "en se jetant vers toi : COUCOU ! Puis il se cache à nouveau.", 90, 0)
+    face = hands((-1.6, -4.0, -5.4), roll=35, pitch=-120)
+    opened = hands((-9.0, -5.0, -6.5), roll=80, pitch=-110)
+    hide = merge(bow(4, knees=6), {"head": {"pitch": 10, "roll": 0, "yaw": 0}}, face)
+    boo = merge(bow(18, knees=34), {"head": {"pitch": -16, "roll": 16, "yaw": 0}, "body": {"z": -.12}}, opened)
+    e.key(0, hide).key(28, hide)
+    e.key(31, merge(boo, {"body": {"z": -.2}}))
+    e.key(34, boo).key(56, boo).key(72, hide)
+    e.layer(lambda t: {"body": {"roll": 4 * wave(t, 28)}, "head": {"yaw": 6 * wave(t, 14)}} if t < 28 or t > 70 else
+            {"rightArm": {"roll": 2 * wave(t, 2)}, "leftArm": {"roll": -2 * wave(t, 2)}})
     return e
 
 
-def bow():
-    """A theatrical bow: the right foot slides back, the right arm sweeps across the belly, the left flung out, a deep
-    bend; the head stays up, looking at you the whole way down; held, then slowly up."""
+def reverence():
+    """A real bow: the right foot slides back, the right hand comes to the belly, the left arm sweeps out wide to the
+    side, and the whole body bends forward from the hips, the head going down with it; held, then slowly back up."""
     e = Emote("clown_reverence", "Clown : révérence",
-              "Une grande révérence de théâtre : un pied glisse en arrière, un bras sur le ventre, l'autre ouvert, "
-              "il se plie… sans jamais te quitter des yeux.", 90, 0)
-    stand = {"body": {"pitch": 0, "y": 0}, "torso": {"bend": 0},
-             "rightLeg": {"pitch": 0, "bend": 0}, "leftLeg": {"pitch": 0, "bend": 0},
-             "rightArm": {"pitch": 0, "roll": 4, "bend": -4, "yaw": 0}, "leftArm": {"pitch": 0, "roll": -4, "bend": -4, "yaw": 0},
-             "head": {"pitch": 0, "roll": 0}}
-    low = {"body": {"pitch": -14, "y": -.06}, "torso": {"bend": 48},
-           "rightLeg": {"pitch": 26, "bend": 22}, "leftLeg": {"pitch": -10, "bend": 22},
-           "rightArm": {"pitch": -58, "roll": -42, "bend": -84, "yaw": 20},
-           "leftArm": {"pitch": -24, "roll": -78, "bend": -10, "yaw": 0},
-           "head": {"pitch": -54, "roll": 10}}
-    e.key(0, stand).key(6, stand)
-    e.key(14, merge(stand, {"rightLeg": {"pitch": 18, "bend": 8}, "leftArm": {"pitch": -40, "roll": -60, "bend": -20},
-                            "rightArm": {"pitch": -30, "roll": -20, "bend": -60, "yaw": 10}}))
-    e.key(28, low).key(60, merge(low, {"head": {"roll": 18}})).key(80, stand)
+              "Une vraie révérence : un pied glisse en arrière, une main sur le ventre, l'autre bras qui s'ouvre sur "
+              "le côté, et il se plie en avant, la tête baissée ; puis il se redresse lentement.", 90, 0)
+    stand = merge(bow(0), {"rightArm": {"pitch": 0, "roll": 4, "yaw": 0, "bend": -4}, "leftArm": {"pitch": 0, "roll": -4, "yaw": 0, "bend": -4},
+                           "head": {"pitch": 0, "roll": 0}, "rightLeg": {"bend": 0}, "leftLeg": {"bend": 0}})
+    tummy = hand("right", (-.5, 7.5, -3.0), roll=30, yaw=-50)
+    step = merge(bow(0, right_leg=22), {"rightArm": tummy, "leftArm": {"pitch": -30, "roll": -70, "yaw": 0, "bend": -14},
+                                         "head": {"pitch": 0}, "rightLeg": {"bend": 6}, "leftLeg": {"bend": 8}})
+    down = merge(bow(52, right_leg=24), {"rightArm": tummy, "leftArm": {"pitch": -40, "roll": -62, "yaw": 0, "bend": -10},
+                                         "head": {"pitch": 18, "roll": 0}, "rightLeg": {"bend": 8}, "leftLeg": {"bend": 12}})
+    e.key(0, stand).key(6, stand).key(16, step).key(32, down).key(58, down).key(76, step).key(86, stand)
     return e
 
 
 def puppet():
-    """A puppet on strings: hanging, limp, feet barely on the ground; one string at a time pulled (an arm yanked up, a
-    knee, the head) and let go to drop and bounce; the body swaying like something hung."""
+    """A marionette: lifted a little off the ground, hanging from its strings, the wrists held up by them (the hands
+    higher than the elbows, the forearms dangling up), the head lolling; it 'walks' in the air: a knee and the
+    opposite hand pulled up together, dropped, the other pair; the body bobbing on the strings."""
     e = Emote("clown_marionnette", "Clown : marionnette",
-              "Pendu à des fils invisibles, mou, à peine posé sur la pointe des pieds ; un fil tire un bras, un genou, "
-              "la tête… qui retombent.", 96, 0)
-    limp = {"body": {"y": .04, "pitch": -3}, "torso": {"bend": 14},
-            "rightArm": {"pitch": 4, "roll": 8, "bend": -8, "yaw": 0}, "leftArm": {"pitch": 4, "roll": -8, "bend": -8, "yaw": 0},
-            "rightLeg": {"pitch": 4, "bend": 10, "roll": 2}, "leftLeg": {"pitch": 6, "bend": 12, "roll": -2},
-            "head": {"pitch": 34, "roll": 22, "yaw": 0}}
-    e.key(0, limp).key(6, limp)
-    # the right arm yanked up, dropped, a bounce
-    e.key(9, merge(limp, {"rightArm": {"pitch": -128, "roll": 30, "bend": -64}, "torso": {"bend": 6}}))
-    e.key(14, merge(limp, {"rightArm": {"pitch": 10, "roll": 6, "bend": -4}}))
-    e.key(17, merge(limp, {"rightArm": {"pitch": -14, "roll": 10, "bend": -16}}))
-    e.key(22, limp)
-    # the left knee pulled up, dropped
-    e.key(28, merge(limp, {"leftLeg": {"pitch": -70, "bend": 84}, "body": {"y": .08, "roll": -4}}))
-    e.key(33, merge(limp, {"leftLeg": {"pitch": 8, "bend": 6}}))
-    e.key(36, merge(limp, {"leftLeg": {"pitch": -12, "bend": 22}}))
-    e.key(42, limp)
-    # the head yanked up, held, let go: it lolls to the other side
-    e.key(48, merge(limp, {"head": {"pitch": -24, "roll": 0}, "torso": {"bend": 2}, "body": {"pitch": 2}}))
-    e.key(54, merge(limp, {"head": {"pitch": -22, "roll": -4}, "torso": {"bend": 2}}))
-    e.key(60, merge(limp, {"head": {"pitch": 36, "roll": -26}}))
-    e.key(64, merge(limp, {"head": {"pitch": 28, "roll": -20}}))
-    # both arms pulled out like a scarecrow's, dropped
-    e.key(72, merge(limp, {"rightArm": {"pitch": -10, "roll": 88, "bend": -30}, "leftArm": {"pitch": -10, "roll": -88, "bend": -30},
-                           "head": {"pitch": 20, "roll": -18}, "body": {"y": .1}}))
-    e.key(78, merge(limp, {"rightArm": {"pitch": 6, "roll": 4}, "leftArm": {"pitch": 6, "roll": -4}, "head": {"pitch": 30, "roll": 4}}))
-    e.key(82, merge(limp, {"rightArm": {"roll": 18, "bend": -14}, "leftArm": {"roll": -18, "bend": -14}, "head": {"pitch": 32, "roll": 14}}))
-    e.key(90, limp)
-    e.layer(lambda t: {"body": {"roll": 3 * wave(t, 48), "yaw": 6 * wave(t, 96)},
-                       "rightLeg": {"roll": -1.5 * wave(t, 48)}, "leftLeg": {"roll": -1.5 * wave(t, 48)}})
+              "Une marionnette pendue à ses fils : un peu soulevé, poignets tenus en l'air, tête qui pend ; il « marche » "
+              "dans le vide, un genou et la main opposée tirés vers le haut, puis l'autre.", 48, 0)
+    wrist_r = hand("right", (-10.5, 3, -4), roll=70, pitch=-40)
+    wrist_l = hand("left", (10.5, 3, -4), roll=-70, pitch=-40)
+    pulled_r = hand("right", (-9.5, -6, -4), roll=60, pitch=-90)
+    pulled_l = hand("left", (9.5, -6, -4), roll=-60, pitch=-90)
+    hang_ = {"body": {"y": .1}, "rightLeg": {"pitch": 8, "bend": 10, "roll": 3}, "leftLeg": {"pitch": 8, "bend": 10, "roll": -3},
+             "rightArm": wrist_r, "leftArm": wrist_l, "head": {"pitch": 30, "roll": 0}}
+    a = merge(hang_, {"body": {"y": .16, "roll": -4}, "leftLeg": {"pitch": -55, "bend": 70}, "rightArm": pulled_r,
+                      "head": {"pitch": 26, "roll": -24}})
+    b = merge(hang_, {"body": {"y": .16, "roll": 4}, "rightLeg": {"pitch": -55, "bend": 70}, "leftArm": pulled_l,
+                      "head": {"pitch": 26, "roll": 24}})
+    e.key(0, hang_).key(8, a).key(16, merge(hang_, {"head": {"roll": -12}})).key(24, hang_).key(32, b).key(40, merge(hang_, {"head": {"roll": 12}}))
     return e
 
 
-ALL = (skip, dance, tilt, sit, ledge, offer, beckon, giggle, peekaboo, bow, puppet)
+ALL = (skip, dance, tilt, sit, ledge, offer, beckon, giggle, peekaboo, reverence, puppet)
 # The tick of each emote's icon: its most telling pose
-ICON_TICK = {"clown_sautille": 5, "clown_danse": 34, "clown_tete_penchee": 44, "clown_assis": 20, "clown_assis_rebord": 6,
-             "clown_tend_objet": 10, "clown_viens": 14, "clown_rire": 46, "clown_coucou": 30, "clown_reverence": 40,
-             "clown_marionnette": 9}
+ICON_TICK = {"clown_sautille": 6, "clown_danse": 4, "clown_tete_penchee": 44, "clown_assis": 10, "clown_assis_rebord": 7,
+             "clown_tend_objet": 20, "clown_viens": 8, "clown_rire": 10, "clown_coucou": 40, "clown_reverence": 40,
+             "clown_marionnette": 8}
 
 
 def main():
