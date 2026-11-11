@@ -255,5 +255,18 @@ TEXTS.update({
     "arms.eraphones.proc.invisibilite": ("invisibility", "invisibilité"),
 })
 
+TEXTS.update({
+    # The fear gauge
+    "rp.eraphones.fear.on": ("Fear gauge on: players (not staff) now feel fear", "Jauge de peur activée : les joueurs (hors staff) ressentent la peur"),
+    "rp.eraphones.fear.off": ("Fear gauge off: nobody feels it any more", "Jauge de peur désactivée : plus personne ne la ressent"),
+    "rp.eraphones.fear.state_on": ("Fear gauge: ON (/peur jauge off to turn it off)", "Jauge de peur : ACTIVÉE (/peur jauge off pour la couper)"),
+    "rp.eraphones.fear.state_off": ("Fear gauge: OFF (/peur jauge on to turn it on)", "Jauge de peur : DÉSACTIVÉE (/peur jauge on pour l'activer)"),
+    "rp.eraphones.fear.staff": ("staff, feels nothing", "staff, ne ressent rien"),
+    "rp.eraphones.fear.set": ("Fear set for %s player(s): %s %%", "Peur réglée pour %s joueur(s) : %s %%"),
+    # Photographs pinned up
+    "block.eraphones.photo_epinglee": ("Pinned photograph", "Photo épinglée"),
+    "item.eraphones.photo.help": ("Use it to look at it; sneak and use it on a wall or a table to pin it there", "Utilise-la pour la regarder ; accroupi, utilise-la sur un mur ou une table pour l'y épingler"),
+})
+
 for _k, _v in POSTER_NAMES.items():
     TEXTS["block.eraphones." + _k] = _v

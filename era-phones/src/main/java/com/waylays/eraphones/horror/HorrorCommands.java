@@ -79,6 +79,27 @@ public final class HorrorCommands {
 
         // Fear: blurred sight, a pounding heart, for as long as the game master says
         d.register(Commands.literal("peur").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+                // The fear gauge: on or off for the whole server, how afraid each one is, set by hand
+                .then(Commands.literal("jauge")
+                        .executes(HorrorCommands::gaugeInfo)
+                        .then(Commands.literal("on").executes(c -> gaugeSwitch(c, true)))
+                        .then(Commands.literal("off").executes(c -> gaugeSwitch(c, false)))
+                        .then(Commands.literal("info").executes(HorrorCommands::gaugeInfo))
+                        .then(Commands.argument("joueurs", EntityArgument.players())
+                                .then(Commands.argument("valeur", IntegerArgumentType.integer(0, 100)).executes(c -> {
+                                    Collection<ServerPlayer> t = EntityArgument.getPlayers(c, "joueurs");
+                                    int v = IntegerArgumentType.getInteger(c, "valeur");
+                                    int n = 0;
+                                    for (ServerPlayer p : t) {
+                                        if (!Fear.exempt(p)) {
+                                            Fear.set(p, v);
+                                            n++;
+                                        }
+                                    }
+                                    int done = n;
+                                    c.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.fear.set", done, v).withStyle(ChatFormatting.DARK_RED), true);
+                                    return done;
+                                }))))
                 .then(Commands.argument("joueurs", EntityArgument.players())
                         .executes(c -> show(c, EntityArgument.getPlayers(c, "joueurs"), "peur", 30))
                         .then(Commands.argument("secondes", IntegerArgumentType.integer(1, 600))
@@ -302,6 +323,27 @@ public final class HorrorCommands {
         ServerPlayer p = c.getSource().getPlayerOrException();
         boolean on = Voices.toggleListening(p.getUUID());
         c.getSource().sendSuccess(() -> Component.translatable(on ? "rp.eraphones.voice.listen_on" : "rp.eraphones.voice.listen_off").withStyle(ChatFormatting.GRAY), false);
+        return 1;
+    }
+
+    private static int gaugeSwitch(CommandContext<CommandSourceStack> c, boolean on) {
+        Fear.setEnabled(c.getSource().getServer(), on);
+        c.getSource().sendSuccess(() -> Component.translatable(on ? "rp.eraphones.fear.on" : "rp.eraphones.fear.off")
+                .withStyle(ChatFormatting.DARK_RED), true);
+        return 1;
+    }
+
+    private static int gaugeInfo(CommandContext<CommandSourceStack> c) {
+        net.minecraft.server.MinecraftServer server = c.getSource().getServer();
+        boolean on = Fear.enabled(server);
+        c.getSource().sendSuccess(() -> Component.translatable(on ? "rp.eraphones.fear.state_on" : "rp.eraphones.fear.state_off")
+                .withStyle(ChatFormatting.DARK_RED), false);
+        for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+            Component who = Component.literal("  " + com.waylays.eraphones.rp.RpService.name(p) + " (" + p.getGameProfile().getName() + ") : ");
+            Component what = Fear.exempt(p) ? Component.translatable("rp.eraphones.fear.staff").withStyle(ChatFormatting.DARK_GRAY)
+                    : Component.literal(Math.round(Fear.get(p)) + " %").withStyle(Fear.get(p) > 66 ? ChatFormatting.RED : Fear.get(p) > 33 ? ChatFormatting.GOLD : ChatFormatting.GRAY);
+            c.getSource().sendSuccess(() -> who.copy().withStyle(ChatFormatting.GRAY).append(what), false);
+        }
         return 1;
     }
 }

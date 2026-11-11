@@ -76,7 +76,7 @@ public final class PhotoClient {
     }
 
     /** The middle square of {@code shot} brought down to {@code side} pixels (each the mean of its patch), 4 bits a colour, squeezed. */
-    static byte[] pack(NativeImage shot, int side) {
+    public static byte[] pack(NativeImage shot, int side) {
         int w = shot.getWidth(), h = shot.getHeight(), sq = Math.min(w, h);
         int x0 = (w - sq) / 2, y0 = (h - sq) / 2;
         byte[] raw = new byte[side * side * 2];

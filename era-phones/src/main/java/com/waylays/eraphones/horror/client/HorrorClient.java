@@ -86,7 +86,10 @@ public final class HorrorClient {
     }
 
     private static final List<Active> ACTIVE = new ArrayList<>();
-    private static long lastBeat = -1;
+    /** The heartbeat: when the next one is due, when the last one was (ms). */
+    private static long nextBeat, lastBeatAt, nextBreath;
+    /** The fear gauge from the server (0 to 100) and as it is shown, eased. */
+    private static float gaugeLevel, gaugeShown;
     private static java.lang.reflect.Field blurField;
     private static boolean blurTried;
 
@@ -131,7 +134,7 @@ public final class HorrorClient {
             case "sang" -> play("entity.warden.heartbeat", 1, 1);
             case "tremblement" -> play("entity.warden.emerge", .6f, .9f);
             case "narration" -> play("block.amethyst_block.chime", .5f, .5f);
-            case "peur" -> lastBeat = -1;
+            case "peur" -> nextBeat = 0;
             case "yeux" -> play("item.armor.equip_leather", .6f, .25f);
             default -> {
             }
@@ -161,15 +164,23 @@ public final class HorrorClient {
                 it.remove();
             }
         }
-        // Fear: the heart pounding, faster as it takes hold
-        Active fear = active("peur");
-        if (fear != null && mc.player != null) {
-            float f = fear.fade(2f, 3f);
-            double beat = heartPeriod(f);
-            long beatNo = (long) (fear.age() / beat);
-            if (beatNo != lastBeat) {
-                lastBeat = beatNo;
+        // Fear (a game master's, or the gauge's): the heart pounding, faster as it takes hold; past two thirds, the breath short
+        gaugeShown += (gaugeLevel - gaugeShown) * .08f;
+        if (Math.abs(gaugeLevel - gaugeShown) < .05f) {
+            gaugeShown = gaugeLevel;
+        }
+        float f = fearNow();
+        if (f > 0 && mc.player != null) {
+            if (now >= nextBeat) {
+                lastBeatAt = now;
+                nextBeat = now + (long) (heartPeriod(f) * 1000);
                 mc.getSoundManager().play(SimpleSoundInstance.forUI(com.waylays.eraphones.registry.GearRegistry.HEARTBEAT.get(), 1, .25f + .75f * f));
+            }
+            float breath = clamp((f - .6f) / .4f);
+            if (breath > 0 && now >= nextBreath) {
+                nextBreath = now + (long) (2600 - 900 * breath);
+                mc.getSoundManager().play(SimpleSoundInstance.forUI(com.waylays.eraphones.registry.GearRegistry.FEAR_BREATH.get(),
+                        .95f + mc.player.getRandom().nextFloat() * .1f, .25f + .55f * breath));
             }
         }
         // A heart beating under the blood
@@ -182,6 +193,7 @@ public final class HorrorClient {
     @SubscribeEvent
     public static void onLeave(ClientPlayerNetworkEvent.LoggingOut event) {
         ACTIVE.clear();
+        gaugeLevel = gaugeShown = 0;
     }
 
     // ---------------------------------------------------------------- over the screen
@@ -193,7 +205,10 @@ public final class HorrorClient {
     }
 
     private static void render(GuiGraphics g, DeltaTracker delta) {
-        if (ACTIVE.isEmpty()) {
+        if (gaugeShown >= .5f) {
+            gaugeHud(g);
+        }
+        if (ACTIVE.isEmpty() && fearNow() <= 0) {
             return;
         }
         int w = g.guiWidth(), h = g.guiHeight();
@@ -213,12 +228,74 @@ public final class HorrorClient {
         if ((a = active("narration")) != null) {
             narration(g, a, w, h);
         }
-        if ((a = active("peur")) != null) {
-            float f = a.fade(2f, 3f);
-            float b = pulse(a);
+        float f = fearNow();
+        if (f > 0) {
+            float b = pulse();
             vignette(g, w, h, 0x240000, (.45f + .35f * b) * f);
             vignette(g, w, h, 0x000000, .25f * f);
         }
+    }
+
+    /** The fear gauge's level, from the server. */
+    public static void gauge(int level) {
+        gaugeLevel = level;
+    }
+
+    /** The gauge's level as shown (for the tests). */
+    public static float gaugeShown() {
+        return gaugeShown;
+    }
+
+    /** How strongly fear is felt now, 0 to 1: a game master's, or the gauge's from a third of the way up. */
+    private static float fearNow() {
+        Active a = active("peur");
+        float f = a == null ? 0 : a.fade(2f, 3f);
+        return Math.max(f, clamp((gaugeShown - 33) / 67f));
+    }
+
+    /**
+     * The gauge on the screen, low on the left: a heart beating with the heart, a line traced like a monitor's,
+     * pale and slow when calm, red and racing when afraid.
+     */
+    private static void gaugeHud(GuiGraphics g) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.hideGui || mc.player == null) {
+            return;
+        }
+        float v = gaugeShown / 100f;
+        int h = g.guiHeight(), x = 8, y = h - 26, w = 54;
+        int rgb = mix(0xB8C4C8, 0xE8B040, clamp(v * 2)) ;
+        rgb = mix(rgb, 0xE02828, clamp(v * 2 - 1));
+        // The panel
+        g.fill(x - 3, y - 3, x + 18 + w + 3, y + 15, 0x70000000);
+        // The heart, swelling on each beat
+        float beat = fearNow() > 0 ? pulse() : (float) Math.max(0, Math.sin(System.currentTimeMillis() / 1000.0 * Math.PI * 1.2) - .6) * 2;
+        g.pose().pushPose();
+        g.pose().translate(x + 6, y + 6, 0);
+        float sc = 1.1f + .35f * beat;
+        g.pose().scale(sc, sc, 1);
+        g.drawString(mc.font, "\u2764", -4, -4, 0xFF000000 | rgb, false);
+        g.pose().popPose();
+        // The trace: a flat line with a spike for each beat, running right to left
+        double period = heartPeriod(clamp((v * 100 - 33) / 67f)) * (fearNow() > 0 ? 1 : 1.4);
+        double t = System.currentTimeMillis() / 1000.0;
+        int prev = 0;
+        for (int i = 0; i < w; i++) {
+            double ph = ((t - (w - i) * .025) % period) / period;
+            double spike = ph < .06 ? Math.sin(ph / .06 * Math.PI) * (1 + 3 * v) : ph < .1 ? -Math.sin((ph - .06) / .04 * Math.PI) * (1 + 2 * v) : 0;
+            int py = (int) Math.round(-spike * 1.6);
+            int a = (int) (60 + 195 * (i / (float) w));
+            int top = Math.min(prev, py), bottom = Math.max(prev, py);
+            g.fill(x + 18 + i, y + 6 + top, x + 19 + i, y + 7 + bottom, a << 24 | rgb);
+            prev = py;
+        }
+    }
+
+    private static int mix(int a, int b, float t) {
+        int r = (int) ((a >> 16 & 255) + ((b >> 16 & 255) - (a >> 16 & 255)) * t);
+        int gr = (int) ((a >> 8 & 255) + ((b >> 8 & 255) - (a >> 8 & 255)) * t);
+        int bl = (int) ((a & 255) + ((b & 255) - (a & 255)) * t);
+        return r << 16 | gr << 8 | bl;
     }
 
     /** Seconds between two heartbeats: a little fast, then racing as fear {@code f} takes hold. */
@@ -227,9 +304,8 @@ public final class HorrorClient {
     }
 
     /** The heartbeat's swell, 0 to 1: a strong beat and its echo. */
-    private static float pulse(Active fear) {
-        double period = heartPeriod(fear.fade(2f, 3f));
-        double t = fear.age() % period;
+    private static float pulse() {
+        double t = (System.currentTimeMillis() - lastBeatAt) / 1000.0;
         return (float) Math.min(1, Math.exp(-Math.pow(t / .09, 2)) + .6 * Math.exp(-Math.pow((t - .24) / .08, 2)));
     }
 
@@ -238,12 +314,11 @@ public final class HorrorClient {
      * stronger on each heartbeat.
      */
     private static void fearBlur(GuiGraphics g, DeltaTracker delta) {
-        Active a = active("peur");
-        if (a == null) {
+        float f = fearNow();
+        if (f <= 0) {
             return;
         }
-        float f = a.fade(2f, 3f);
-        float radius = (2.5f + 5f * pulse(a)) * f;
+        float radius = (2.5f + 5f * pulse()) * f;
         if (radius < .5f) {
             return;
         }
@@ -269,9 +344,9 @@ public final class HorrorClient {
 
     @SubscribeEvent
     public static void onFov(ViewportEvent.ComputeFov event) {
-        Active a = active("peur");
-        if (a != null) {
-            event.setFOV(event.getFOV() * (1 - .035 * pulse(a) * a.fade(2f, 3f)));
+        float f = fearNow();
+        if (f > 0) {
+            event.setFOV(event.getFOV() * (1 - .035 * pulse() * f));
         }
     }
 
@@ -558,9 +633,9 @@ public final class HorrorClient {
         if (a != null) {
             strength = Math.max(strength, 1.6f * a.fade(.8f, 1.5f));
         }
-        Active fear = active("peur");
-        if (fear != null) {
-            strength = Math.max(strength, .25f * fear.fade(2f, 3f));
+        float fear = fearNow();
+        if (fear > 0) {
+            strength = Math.max(strength, .25f * fear);
         }
         if (strength <= 0) {
             return;

@@ -883,6 +883,82 @@ public final class SmokeTest {
         STEPS.add(() -> {
         });
         STEPS.add(() -> shot(mc, "event_eyes_open"));
+        // Photographs pinned up: what the screen shows, printed, pinned on a brick pillar and laid on the floor
+        STEPS.add(() -> {
+            byte[] data;
+            try (com.mojang.blaze3d.platform.NativeImage shot = net.minecraft.client.Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
+                data = com.waylays.eraphones.gear.client.PhotoClient.pack(shot, 112);
+            }
+            byte[] pic = data;
+            server.execute(() -> {
+                ServerPlayer p = server.getPlayerList().getPlayer(id);
+                if (p == null) {
+                    return;
+                }
+                net.minecraft.server.level.ServerLevel lv = p.serverLevel();
+                net.minecraft.core.Direction dir = p.getDirection();
+                net.minecraft.core.BlockPos at = p.blockPosition();
+                net.minecraft.world.item.ItemStack photo = new net.minecraft.world.item.ItemStack(com.waylays.eraphones.registry.GearRegistry.PHOTOGRAPH.get());
+                photo.set(com.waylays.eraphones.registry.GearRegistry.PHOTO.get(), new com.waylays.eraphones.gear.Picture(pic));
+                photo.set(com.waylays.eraphones.registry.GearRegistry.PHOTO_TIME.get(), lv.getGameTime() - 5000);
+                photo.set(com.waylays.eraphones.registry.GearRegistry.PHOTO_BY.get(), "Thomas Hale");
+                net.minecraft.world.level.block.state.BlockState pinned = com.waylays.eraphones.event.EventRegistry.PINNED_PHOTO.get().defaultBlockState();
+                for (int i = 0; i < 3; i++) {
+                    // Two bricks high, a photograph on the face turned to the player
+                    net.minecraft.core.BlockPos pillar = at.relative(dir, 3).relative(dir.getClockWise(), i - 1);
+                    lv.setBlockAndUpdate(pillar, net.minecraft.world.level.block.Blocks.BRICKS.defaultBlockState());
+                    lv.setBlockAndUpdate(pillar.above(), net.minecraft.world.level.block.Blocks.BRICKS.defaultBlockState());
+                    for (int y = 0; y < 2; y++) {
+                        net.minecraft.core.BlockPos q = pillar.relative(dir.getOpposite()).above(y);
+                        lv.setBlockAndUpdate(q, pinned.setValue(com.waylays.eraphones.gear.PinnedPhotoBlock.FACING, dir.getOpposite()));
+                        if (lv.getBlockEntity(q) instanceof com.waylays.eraphones.gear.PinnedPhotoBlockEntity be) {
+                            be.set(photo, (i * 2 + y - 2.5f) * 3, i + y);
+                        } else {
+                            fail("a pinned photograph has no block entity");
+                        }
+                    }
+                }
+                net.minecraft.core.BlockPos floor = at.relative(dir, 1).relative(dir.getClockWise(), 1);
+                lv.setBlockAndUpdate(floor, pinned.setValue(com.waylays.eraphones.gear.PinnedPhotoBlock.FACING, net.minecraft.core.Direction.UP));
+                if (lv.getBlockEntity(floor) instanceof com.waylays.eraphones.gear.PinnedPhotoBlockEntity be) {
+                    be.set(photo, 180 - p.getYRot() + 12, 0);
+                }
+                p.teleportTo(lv, p.getX(), p.getY(), p.getZ(), p.getYRot(), 22);
+            });
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "photos_pinned"));
+        // The fear gauge: the staff feel nothing; a player at 85 %: the heart, the dark edges, the trace low on the left
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            if (!com.waylays.eraphones.horror.Fear.exempt(p)) {
+                fail("the game master is not exempt from the fear gauge");
+            }
+            com.waylays.eraphones.horror.Fear.scare(p, 50);
+            if (com.waylays.eraphones.horror.Fear.get(p) != 0) {
+                fail("a game master was frightened ({})", com.waylays.eraphones.horror.Fear.get(p));
+            }
+        }));
+        STEPS.add(() -> com.waylays.eraphones.horror.client.HorrorClient.gauge(85));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "fear_gauge"));
+        STEPS.add(() -> {
+            if (com.waylays.eraphones.horror.client.HorrorClient.gaugeShown() < 40) {
+                fail("the fear gauge is not shown ({})", com.waylays.eraphones.horror.client.HorrorClient.gaugeShown());
+            }
+            com.waylays.eraphones.horror.client.HorrorClient.gauge(0);
+        });
         STEPS.add(() -> {
             if (!com.waylays.eraphones.rp.RpService.closesEyes("/me ferme lentement... non: Il ferme les yeux") || com.waylays.eraphones.rp.RpService.closesEyes("ferme la porte")) {
                 fail("closed eyes are not told apart in /me");

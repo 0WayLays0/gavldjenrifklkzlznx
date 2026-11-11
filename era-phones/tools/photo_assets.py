@@ -160,7 +160,14 @@ def recipes():
     ga.shaped("pellicule", ["PPP", "BIB"], {"P": "minecraft:paper", "B": "minecraft:black_dye", "I": "minecraft:ink_sac"})
 
 
+def pinned():
+    """A photograph pinned or laid somewhere: drawn by its block entity (its picture), the block only gives its crumbs."""
+    kit.write_json("models/block/photo_epinglee.json", {"textures": {"particle": "eraphones:item/photo"}})
+    kit.write_json("blockstates/photo_epinglee.json", {"variants": {"": {"model": "eraphones:block/photo_epinglee"}}})
+
+
 def main():
+    pinned()
     recipes()
     camera()
     film_pack()

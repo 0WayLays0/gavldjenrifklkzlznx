@@ -62,6 +62,12 @@ public class PhotoScreen extends Screen {
         if (img == null || px == null) {
             return;
         }
+        paint(img, px, side, dev);
+        texture.upload();
+    }
+
+    /** Paints {@code px} (a photograph's pixels, its side first) into {@code img} as instant film gives it, {@code dev} developed (0 to 1). */
+    static void paint(NativeImage img, int[] px, int side, float dev) {
         float shapes = Mth.clamp(dev * 2.2f, 0, 1), colours = smooth(Mth.clamp((dev - .25f) / .75f, 0, 1));
         for (int y = 0; y < side; y++) {
             for (int x = 0; x < side; x++) {
@@ -82,7 +88,6 @@ public class PhotoScreen extends Screen {
                 img.setPixelRGBA(x, y, 0xFF000000 | B << 16 | G << 8 | R);
             }
         }
-        texture.upload();
     }
 
     private static float smooth(float t) {

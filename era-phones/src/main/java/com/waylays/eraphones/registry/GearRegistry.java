@@ -99,6 +99,7 @@ public final class GearRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> TALKIE_SQUELCH = sound("talkie_squelch");
     public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_BOX = sound("boite_a_musique");
     public static final DeferredHolder<SoundEvent, SoundEvent> HEARTBEAT = sound("coeur_peur");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FEAR_BREATH = sound("souffle_peur");
     public static final DeferredHolder<SoundEvent, SoundEvent> SHUTTER = sound("photo_declic");
     public static final DeferredHolder<SoundEvent, SoundEvent> BIKE_BELL = sound("velo_sonnette");
     public static final DeferredHolder<SoundEvent, SoundEvent> LAMP_BUZZ = sound("lampadaire_bourdonnement");

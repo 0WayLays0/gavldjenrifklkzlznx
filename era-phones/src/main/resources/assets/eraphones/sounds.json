@@ -31,6 +31,13 @@
       }
     ]
   },
+  "souffle_peur": {
+    "sounds": [
+      {
+        "name": "eraphones:souffle_peur"
+      }
+    ]
+  },
   "photo_declic": {
     "sounds": [
       {

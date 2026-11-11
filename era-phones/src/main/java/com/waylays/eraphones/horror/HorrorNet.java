@@ -12,6 +12,7 @@ public final class HorrorNet {
 
     public static void register(PayloadRegistrar r) {
         r.playToClient(Effect.TYPE, Effect.CODEC, (p, c) -> com.waylays.eraphones.horror.client.HorrorClient.effect(p));
+        r.playToClient(Gauge.TYPE, Gauge.CODEC, (p, c) -> com.waylays.eraphones.horror.client.HorrorClient.gauge(p.level()));
         r.playToClient(OpenRemote.TYPE, OpenRemote.CODEC, (p, c) -> com.waylays.eraphones.horror.client.HorrorClient.openRemote(p));
         r.playToServer(Remote.TYPE, Remote.CODEC, (p, c) -> {
             if (!(c.player() instanceof net.minecraft.server.level.ServerPlayer gm) || !RemoteItem.allowed(gm)) {
@@ -110,6 +111,18 @@ public final class HorrorNet {
 
         @Override
         public Type<Remote> type() {
+            return TYPE;
+        }
+    }
+
+    /** The fear gauge's level for its player (0 to 100). */
+    public record Gauge(int level) implements CustomPacketPayload {
+        public static final Type<Gauge> TYPE = new Type<>(EraPhones.id("fear_gauge"));
+        public static final StreamCodec<FriendlyByteBuf, Gauge> CODEC = CustomPacketPayload.codec((p, b) -> b.writeVarInt(p.level),
+                b -> new Gauge(Math.max(0, Math.min(100, b.readVarInt()))));
+
+        @Override
+        public Type<Gauge> type() {
             return TYPE;
         }
     }

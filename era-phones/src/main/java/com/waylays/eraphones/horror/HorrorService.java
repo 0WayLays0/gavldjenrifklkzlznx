@@ -135,6 +135,7 @@ public final class HorrorService {
             return false;
         }
         for (ServerPlayer p : targets) {
+            Fear.scare(p, 10);
             for (Step s : steps) {
                 PENDING.add(new Pending(p.getUUID(), now + s.at, s, fixed));
             }
@@ -170,6 +171,7 @@ public final class HorrorService {
                 where = p.getEyePosition().add(flat.scale(6)).add(0, .2, 0);
             }
             PacketDistributor.sendToPlayer(p, new HorrorNet.Effect(kind, ticks, text, where.x, where.y, where.z));
+            Fear.scare(p, Fear.fright(kind));
         }
     }
 

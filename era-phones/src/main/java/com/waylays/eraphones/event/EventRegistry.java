@@ -54,6 +54,14 @@ public final class EventRegistry {
         }
     }
 
+    /** A photograph pinned to a wall or laid on a table (put there from the photograph itself, so it has no item). */
+    public static final DeferredBlock<com.waylays.eraphones.gear.PinnedPhotoBlock> PINNED_PHOTO = BLOCKS.register("photo_epinglee",
+            () -> new com.waylays.eraphones.gear.PinnedPhotoBlock(BlockBehaviour.Properties.of().instabreak().sound(SoundType.WOOL).noOcclusion()
+                    .noCollission().pushReaction(PushReaction.DESTROY)));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.waylays.eraphones.gear.PinnedPhotoBlockEntity>> PINNED_PHOTO_BE =
+            BLOCK_ENTITIES.register("photo_epinglee", () -> BlockEntityType.Builder.of(com.waylays.eraphones.gear.PinnedPhotoBlockEntity::new,
+                    PINNED_PHOTO.get()).build(null));
+
     public static final DeferredBlock<CodeBoxBlock> CODE_BOX = BLOCKS.register("boite_code",
             () -> new CodeBoxBlock(BlockBehaviour.Properties.of().strength(-1f, 3600000f).sound(SoundType.METAL).noOcclusion()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CodeBoxBlockEntity>> CODE_BOX_BE = BLOCK_ENTITIES.register("boite_code",

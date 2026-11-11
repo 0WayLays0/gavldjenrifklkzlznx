@@ -53,6 +53,7 @@ public final class EventClient {
         @SubscribeEvent
         public static void onRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(EventRegistry.FRAGMENT.get(), FragmentRenderer::new);
+            event.registerBlockEntityRenderer(EventRegistry.PINNED_PHOTO_BE.get(), com.waylays.eraphones.gear.client.PinnedPhotoRenderer::new);
         }
     }
 }
