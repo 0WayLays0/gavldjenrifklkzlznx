@@ -10,6 +10,8 @@ import event_assets  # noqa: E402
 import gear_assets  # noqa: E402
 import pack_assets  # noqa: E402
 import walkman_assets  # noqa: E402
+import lock_assets  # noqa: E402
+import held_fix  # noqa: E402
 import horror_assets  # noqa: E402
 import lang  # noqa: E402
 import models  # noqa: E402
@@ -25,6 +27,8 @@ if __name__ == "__main__":
     event_assets.main()
     pack_assets.main()
     walkman_assets.main()
+    lock_assets.main()
+    held_fix.main()
     writing_assets.main()
     models.main()
     lang.main()

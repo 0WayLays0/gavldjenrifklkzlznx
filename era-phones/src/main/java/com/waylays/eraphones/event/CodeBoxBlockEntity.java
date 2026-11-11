@@ -1,6 +1,5 @@
 package com.waylays.eraphones.event;
 
-import com.waylays.eraphones.horror.HorrorService;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -19,17 +18,13 @@ import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.ArrayList;
-import java.util.List;
 
-/** The strongbox's code, whether a balloon rises when it opens, and the nine things it can hold. */
+/** The strongbox's code and the nine things it can hold. */
 public class CodeBoxBlockEntity extends BlockEntity {
     public static final int MIN_DIGITS = 3, MAX_DIGITS = 6;
     private String code = "0000";
-    private boolean balloon = true;
     private final SimpleContainer items = new SimpleContainer(9) {
         @Override
         public void setChanged() {
@@ -50,10 +45,6 @@ public class CodeBoxBlockEntity extends BlockEntity {
         return code;
     }
 
-    public boolean balloon() {
-        return balloon;
-    }
-
     public boolean open() {
         return getBlockState().getValue(CodeBoxBlock.OPEN);
     }
@@ -67,11 +58,6 @@ public class CodeBoxBlockEntity extends BlockEntity {
             code = c;
             setChanged();
         }
-    }
-
-    public void setBalloon(boolean b) {
-        balloon = b;
-        setChanged();
     }
 
     public void setOpen(boolean open) {
@@ -115,16 +101,6 @@ public class CodeBoxBlockEntity extends BlockEntity {
         if (level instanceof ServerLevel sl) {
             sl.sendParticles(ParticleTypes.SMOKE, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, 8, .2, .1, .2, .01);
         }
-        if (balloon) {
-            // A red balloon rising out of the box, seen by all who are near
-            List<ServerPlayer> near = new ArrayList<>();
-            for (ServerPlayer o : ((ServerLevel) level).players()) {
-                if (o.distanceToSqr(Vec3.atCenterOf(worldPosition)) < 48 * 48) {
-                    near.add(o);
-                }
-            }
-            HorrorService.show(near, "ballon", 360, "", Vec3.atCenterOf(worldPosition).add(0, .9, 0));
-        }
         p.displayClientMessage(Component.translatable("event.eraphones.codebox.opened").withStyle(ChatFormatting.GOLD), true);
     }
 
@@ -132,7 +108,6 @@ public class CodeBoxBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putString("Code", code);
-        tag.putBoolean("Balloon", balloon);
         NonNullList<ItemStack> list = NonNullList.withSize(items.getContainerSize(), ItemStack.EMPTY);
         for (int i = 0; i < list.size(); i++) {
             list.set(i, items.getItem(i));
@@ -146,7 +121,6 @@ public class CodeBoxBlockEntity extends BlockEntity {
         if (validCode(tag.getString("Code"))) {
             code = tag.getString("Code");
         }
-        balloon = !tag.contains("Balloon") || tag.getBoolean("Balloon");
         NonNullList<ItemStack> list = NonNullList.withSize(items.getContainerSize(), ItemStack.EMPTY);
         ContainerHelper.loadAllItems(tag, list, registries);
         for (int i = 0; i < list.size(); i++) {

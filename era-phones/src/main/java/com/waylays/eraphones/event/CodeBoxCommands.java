@@ -1,6 +1,5 @@
 package com.waylays.eraphones.event;
 
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -21,7 +20,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * /boitecode, for the game master looking at a code box: code &lt;digits&gt; (3 to 6), fermer (locked again, its lid
- * shut), ouvrir, ballon oui|non (whether a red balloon rises out of it when it is opened), info.
+ * shut), ouvrir, info.
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class CodeBoxCommands {
@@ -52,18 +51,12 @@ public final class CodeBoxCommands {
                 .then(Commands.literal("ouvrir").executes(c -> on(c, (cc, box) -> {
                     box.setOpen(true);
                     return say(cc, "event.eraphones.codebox.unlocked");
-                })))
-                .then(Commands.literal("ballon").then(Commands.argument("oui", BoolArgumentType.bool()).executes(c -> on(c, (cc, box) -> {
-                    boolean b = BoolArgumentType.getBool(cc, "oui");
-                    box.setBalloon(b);
-                    return say(cc, b ? "event.eraphones.codebox.balloon_on" : "event.eraphones.codebox.balloon_off");
-                })))));
+                }))));
     }
 
     private static int info(CommandContext<CommandSourceStack> c, CodeBoxBlockEntity box) {
         return say(c, "event.eraphones.codebox.info", box.code(), Component.translatable(box.open() ? "event.eraphones.codebox.is_open"
-                : "event.eraphones.codebox.is_locked"), Component.translatable(box.balloon() ? "event.eraphones.codebox.with_balloon"
-                : "event.eraphones.codebox.no_balloon"));
+                : "event.eraphones.codebox.is_locked"));
     }
 
     private static int say(CommandContext<CommandSourceStack> c, String key, Object... args) {

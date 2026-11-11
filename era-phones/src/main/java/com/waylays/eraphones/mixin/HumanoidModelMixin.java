@@ -16,5 +16,6 @@ public abstract class HumanoidModelMixin {
                                 CallbackInfo ci) {
         BikePose.apply((HumanoidModel<?>) (Object) this, entity, ageInTicks);
         com.waylays.eraphones.event.client.FragmentPose.apply((HumanoidModel<?>) (Object) this, entity, ageInTicks);
+        com.waylays.eraphones.carry.client.CarryPose.apply((HumanoidModel<?>) (Object) this, entity);
     }
 }

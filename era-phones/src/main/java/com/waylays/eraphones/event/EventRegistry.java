@@ -74,6 +74,10 @@ public final class EventRegistry {
             .displayItems((p, out) -> {
                 out.accept(FRAGMENT_ITEM.get());
                 out.accept(CODE_BOX_ITEM.get());
+                out.accept(com.waylays.eraphones.lock.LockRegistry.PADLOCK.get());
+                out.accept(com.waylays.eraphones.lock.LockRegistry.KEY_ITEM.get());
+                out.accept(com.waylays.eraphones.lock.LockRegistry.READER_ITEM.get());
+                out.accept(com.waylays.eraphones.lock.LockRegistry.BADGE_ITEM.get());
                 for (DeferredHolder<Item, Item> i : POSTER_ITEMS) {
                     out.accept(i.get());
                 }

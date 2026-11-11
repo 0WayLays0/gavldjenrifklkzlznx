@@ -1003,6 +1003,97 @@ public final class SmokeTest {
             command(mc, "taille @s normale");
             mc.options.setCameraType(CameraType.FIRST_PERSON);
         });
+        // The weapons' workshop on a sword; a card reader opening its door for a badge it knows; a padlock; /hp, /vitesse
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p != null) {
+                ItemStack sword = new ItemStack(net.minecraft.world.item.Items.IRON_SWORD);
+                sword.set(com.waylays.eraphones.arms.Arms.PROCS.get(), java.util.List.of(new com.waylays.eraphones.arms.Proc("feu", 5, 1, 4),
+                        new com.waylays.eraphones.arms.Proc("epines", 10, 2, 0)));
+                p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sword);
+            }
+        }));
+        STEPS.add(() -> mc.setScreen(new com.waylays.eraphones.arms.client.WorkshopScreen(mc.player.getMainHandItem())));
+        STEPS.add(() -> shot(mc, "arms_general"));
+        STEPS.add(() -> {
+            if (mc.screen != null) {
+                for (net.minecraft.client.gui.components.events.GuiEventListener w : mc.screen.children()) {
+                    if (w instanceof net.minecraft.client.gui.components.Button b && b.getMessage().getString().contains("%")) {
+                        b.onPress();
+                        break;
+                    }
+                }
+            }
+        });
+        STEPS.add(() -> shot(mc, "arms_effects"));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            server.execute(() -> {
+                ServerPlayer p = server.getPlayerList().getPlayer(id);
+                if (p == null) {
+                    return;
+                }
+                net.minecraft.server.level.ServerLevel lv = p.serverLevel();
+                net.minecraft.core.Direction dir = p.getDirection();
+                net.minecraft.core.BlockPos door = p.blockPosition().relative(dir, 3);
+                lv.setBlockAndUpdate(door, net.minecraft.world.level.block.Blocks.IRON_DOOR.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.DoorBlock.FACING, dir.getOpposite()));
+                lv.setBlockAndUpdate(door.above(), net.minecraft.world.level.block.Blocks.IRON_DOOR.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.DoorBlock.FACING, dir.getOpposite())
+                        .setValue(net.minecraft.world.level.block.DoorBlock.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+                net.minecraft.core.BlockPos wall = door.relative(dir.getClockWise());
+                lv.setBlockAndUpdate(wall, net.minecraft.world.level.block.Blocks.STONE_BRICKS.defaultBlockState());
+                net.minecraft.core.BlockPos reader = wall.relative(dir.getOpposite());
+                lv.setBlockAndUpdate(reader, com.waylays.eraphones.lock.LockRegistry.READER.get().defaultBlockState()
+                        .setValue(com.waylays.eraphones.lock.CardReaderBlock.FACING, dir.getOpposite()));
+                READER = reader;
+                DOOR = door;
+                ItemStack badge = new ItemStack(com.waylays.eraphones.lock.LockRegistry.BADGE_ITEM.get());
+                badge.set(com.waylays.eraphones.lock.LockRegistry.BADGE.get(), "TEST01");
+                if (lv.getBlockEntity(reader) instanceof com.waylays.eraphones.lock.CardReaderBlockEntity r) {
+                    try {
+                        java.lang.reflect.Method swipe = r.getClass().getDeclaredMethod("swipe", ServerPlayer.class, ItemStack.class);
+                        swipe.setAccessible(true);
+                        swipe.invoke(r, p, badge);
+                        p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+                        swipe.invoke(r, p, badge);
+                        p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+                    } catch (ReflectiveOperationException e) {
+                        fail("swiping the badge: {}", e.toString());
+                    }
+                } else {
+                    fail("the card reader has no block entity");
+                }
+                if (!lv.getBlockState(door).getValue(net.minecraft.world.level.block.DoorBlock.OPEN)) {
+                    fail("the card reader did not open the door for a badge it knows");
+                }
+                // A padlock on a chest beside
+                net.minecraft.core.BlockPos chest = door.relative(dir.getCounterClockWise(), 2);
+                lv.setBlockAndUpdate(chest, net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.ChestBlock.FACING, dir.getOpposite()));
+                com.waylays.eraphones.lock.Locks.lock(p, chest, null, new ItemStack(com.waylays.eraphones.lock.LockRegistry.PADLOCK.get()));
+                if (com.waylays.eraphones.lock.Locks.keyAt(lv, chest) == null) {
+                    fail("the padlock did not lock the chest");
+                }
+                com.waylays.eraphones.size.Body.setHealth(p, 40);
+                com.waylays.eraphones.size.Body.setSpeed(p, 1.5f);
+                if (Math.abs(p.getMaxHealth() - 40) > .01f) {
+                    fail("/hp 40 gave {} health", p.getMaxHealth());
+                }
+            });
+        });
+        STEPS.add(() -> {
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            mc.player.setXRot(15);
+        });
+        STEPS.add(() -> shot(mc, "lock_reader_door"));
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p != null) {
+                com.waylays.eraphones.size.Body.setHealth(p, 20);
+                com.waylays.eraphones.size.Body.setSpeed(p, 1);
+            }
+        }));
         // The camcorder: a few seconds filmed on a blank cassette, which then holds a film the televisions can play
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -1184,6 +1275,7 @@ public final class SmokeTest {
     private static net.minecraft.core.BlockPos BOOTH = net.minecraft.core.BlockPos.ZERO;
     private static java.util.UUID BIKE;
     private static java.util.UUID FRAGMENT;
+    private static net.minecraft.core.BlockPos READER = net.minecraft.core.BlockPos.ZERO, DOOR = net.minecraft.core.BlockPos.ZERO;
     private static final java.util.List<ItemStack> SAVED = new java.util.ArrayList<>();
     private static net.minecraft.core.BlockPos EVENT_AT = net.minecraft.core.BlockPos.ZERO;
     private static net.minecraft.world.phys.Vec3 FRAGMENT_START;

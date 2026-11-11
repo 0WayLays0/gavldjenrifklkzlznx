@@ -73,7 +73,7 @@ Des outils faits pour un grand événement d'horreur en ville, pensés pour un m
 | Chose | Comment ça marche |
 |---|---|
 | Affiches « Disparu(e) » (15 blocs) | À coller sur n'importe quel mur (clic sur la face du mur ; on passe à travers). Un enfant seul sur six papiers différents : neuf, jauni, coin arraché, lavé par la pluie, vieux de trente ans (le cycle d'avant), à moitié arraché. Deux enfants (deux dispositions), trois, quatre. Deux tas d'affiches collées les unes sur les autres. Trois « murs d'affiches » qui se raccordent bloc après bloc pour couvrir tout un mur. Les photos d'enfants, les noms et les numéros sont inventés. Les bandelettes du bas sont en partie arrachées. |
-| Boîte à code | Vieux coffret d'acier avec quatre molettes en laiton. Clic droit : on voit les molettes de près. On les tourne (clic en haut ou en bas, molette de la souris, ou en tapant les chiffres), puis on appuie sur « Ouvrir ». Avec le bon code, la boîte s'ouvre, un ballon rouge en sort (visible par tous ceux qui sont autour) et on prend ce qu'elle contient (9 cases). Les joueurs ne peuvent pas la casser. **Le maître du jeu en créatif** voit le code, peut faire du nombre des molettes le nouveau code (« En faire le code »), et la remplit accroupi + clic droit. `/boitecode` (en la regardant) : `code <3 à 6 chiffres>`, `fermer`, `ouvrir`, `ballon true\|false`, `info`. |
+| Boîte à code | Vieux coffret d'acier avec quatre molettes en laiton. Clic droit : on voit les molettes de près. On les tourne (clic en haut ou en bas, molette de la souris, ou en tapant les chiffres), puis on appuie sur « Ouvrir ». Avec le bon code, la boîte s'ouvre et on prend ce qu'elle contient (9 cases). Les joueurs ne peuvent pas la casser. **Le maître du jeu en créatif** voit le code, peut faire du nombre des molettes le nouveau code (« En faire le code »), et la remplit accroupi + clic droit. `/boitecode` (en la regardant) : `code <3 à 6 chiffres>`, `fermer`, `ouvrir`, `info`. |
 | Fragment d'étoile | Le maître du jeu le pose (objet, en créatif). Il flotte, brille (il éclaire vraiment autour de lui), scintille. Le premier joueur qui fait clic droit lit « Tu ne sembles pas assez fort pour porter seul ce fragment… » et attend un deuxième porteur (30 s, à 5 blocs). Le deuxième fait clic droit : ils le soulèvent à deux. Un troisième et un quatrième peuvent venir aider. Les porteurs se placent autour (face à face à deux, en triangle à trois, en carré à quatre), les deux mains dessus, et marchent à petits pas lourds. Chacun pousse où il veut aller : si tout le monde va du même côté, le fragment avance. S'ils tirent chacun de leur côté, il bouge à peine et on leur demande « un peu de coordination ». Celui qui ne pousse pas est entraîné. Vitesse : lent à deux, un peu moins à trois, encore un peu moins à quatre. Accroupi pour lâcher ; seul, c'est trop lourd et il est reposé. Un maître du jeu en créatif le porte seul, sans ralentir. **Le joueur qui a le tag `clown`** (`/tag <joueur> add clown`) est repoussé à 7 blocs du fragment. |
 | `/me ferme les yeux` | Dans un `/me`, « ferme les yeux » (ou « ferme ses yeux », « closes his eyes »…) ferme les yeux du joueur sur son écran : les paupières descendent, tout est noir pendant 6 s, puis elles se rouvrent avec un clignement. Les maîtres du jeu reçoivent « X ferme les yeux » dans le chat. |
 
@@ -113,6 +113,29 @@ Un **baladeur** à cassette (onglet Son & image) : une cassette dedans à la foi
 ## Taille des joueurs : `/taille`
 
 `/taille <joueurs> <cm>` (de 50 à 400 cm, 180 = normal), `/taille <joueurs> normale`, `/taille` (sa propre taille, pour tout le monde). Tout suit la taille : le corps dessiné, la hitbox, la hauteur des yeux (donc ce qu'on voit), la caméra à la 3e personne, la portée des mains, la marche qu'on peut monter, un peu la vitesse et le saut, la chute sans se blesser. Gardé même après la mort et la déconnexion. Permission : comme `/horreur`.
+
+## Outils du staff (lot 2)
+
+### Atelier d'armes : `/arme`
+Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme` : l'atelier s'ouvre sur lui, en trois onglets.
+- **Général** : son nom, 4 lignes de lore (couleurs : `&c` rouge, `&6` or, `&e` jaune, `&a` vert, `&b` turquoise, `&9` bleu, `&d` rose, `&l` gras), incassable, brillance.
+- **Stats** : dégâts, vitesse d'attaque (comme affichés sous l'objet : une main nue = 1 et 4), armure, robustesse, résistance au recul, vitesse (%), PV max (+), portée (+). Une case vide = rien. Pour une armure, les stats comptent quand elle est portée ; pour le reste, en main.
+- **Effets %** : jusqu'à 6 effets à pourcentage. Clic sur le nom pour changer l'effet ; puis la chance en %, la force, les secondes.
+  - **En frappant** (orange, l'arme en main) : enflamme, poison, flétrissure, lenteur, faiblesse, cécité, nausée, gel, foudre, recul, vol de vie %, dégâts bonus, lévitation.
+  - **En étant frappé** (bleu, sur ce qu'on porte ou tient) : épines, brûle l'attaquant, repousse l'attaquant, ralentit l'attaquant, soin, résistance, vitesse, absorption, régénération, invisibilité.
+  - Les effets s'affichent sous l'objet (« ✦ 5 % en frappant : enflamme (4 s) »).
+
+### Porter quelqu'un
+Accroupi + clic droit main vide sur un joueur : il reçoit une demande dans le chat ([Accepter] ou `/porter accepter`). Il est alors porté dans les bras, allongé, devant le porteur, qui marche plus lentement. Accroupi + clic droit main vide (ou `/porter lacher`) : on le pose. Le porté descend en s'accroupissant. Staff : `/porter <porteur> <porté>` sans demander.
+
+### Cadenas et clés
+Un **cadenas** (clic droit sur une porte, trappe, portillon, coffre ou tonneau) le ferme à clé et donne sa **clé**. Avec une clé dans l'autre main, le cadenas prend le secret de cette clé (une seule clé pour plusieurs portes). Sans la bonne clé en main : « C'est fermé à clé ». Accroupi + clic droit avec la clé : on enlève le cadenas. Impossible à casser ou à faire exploser (sauf en créatif). On voit le cadenas accroché. Staff : `/cle nouvelle`, `/cle copier` (copie la clé en main).
+
+### Lecteur de carte et badges
+Un **lecteur de carte** se pose sur un mur à côté d'une porte (on ne peut pas le casser en survie). `/badge creer <nom>` donne un **badge**. En créatif, passe le badge sur le lecteur pour qu'il le connaisse (encore une fois : il l'oublie ; accroupi main vide : il oublie tout). Un joueur qui passe un badge connu : bip vert, les portes (même en fer), portillons et trappes à 2 blocs s'ouvrent 5 secondes. Badge inconnu : bip rouge, « Accès refusé ». `/badge copier` copie le badge en main.
+
+### `/vitesse` et `/hp`
+`/vitesse <joueurs> <fois>` (1 = normal, 0.5 = moitié, 2 = double) ou `normale`. `/hp <joueurs> <points>` (20 = normal = 10 cœurs) ou `normal`. Gardés après la mort et la déconnexion. Les **effets** qu'un joueur a quand il meurt (donnés par `/effect` ou autrement) lui sont rendus quand il réapparaît, avec le temps qui leur restait.
 
 ## Les téléphones
 
