@@ -148,10 +148,9 @@ public final class Arms {
             stack.set(DataComponents.CUSTOM_NAME, Component.literal(colours(e.name())).withStyle(s -> s.withItalic(false)));
         }
         List<Component> lore = new ArrayList<>();
+        // Blank lines are kept: they space the lore out
         for (String l : e.lore()) {
-            if (!l.isBlank()) {
-                lore.add(Component.literal(colours(l)).withStyle(s -> s.withItalic(false).withColor(ChatFormatting.GRAY)));
-            }
+            lore.add(Component.literal(colours(l)).withStyle(s -> s.withItalic(false).withColor(ChatFormatting.GRAY)));
         }
         if (lore.isEmpty()) {
             stack.remove(DataComponents.LORE);

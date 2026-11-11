@@ -34,7 +34,7 @@ import java.util.Locale;
  * </ul>
  */
 public class WorkshopScreen extends Screen {
-    private static final int W = 448, H = 276, CW = 286, MAX_LORE = 16, MAX_PROCS = 8;
+    private static final int W = 448, H = 256, CW = 286, MAX_LORE = 16, MAX_PROCS = 8;
     private static final int BG = 0xF2101418, HEAD = 0xFF1A2129, PANEL = 0xFF161C23, LINE = 0xFF2C3846, GOLD = 0xFFE8C677, GOLD_DIM = 0xFF8C7442;
     private static final int TEXT = 0xFFE6ECF2, DIM = 0xFF8592A0, FIELD = 0xFF0B0E12;
     private static final String[] TABS = {"general", "lore", "stats", "effects"};
@@ -187,8 +187,10 @@ public class WorkshopScreen extends Screen {
             case 2 -> statsTab();
             default -> effectsTab();
         }
-        flat(x0 + W - 186, y0 + H - 24, 86, 18, Component.translatable("arms.eraphones.save"), b -> save(), GOLD);
-        flat(x0 + W - 94, y0 + H - 24, 86, 18, Component.translatable("gui.cancel"), b -> onClose(), LINE);
+        // Saving and leaving, in the header: always on the screen, whatever the interface's scale
+        Flat ok = flat(x0 + W - 186, y0 + 8, 86, 18, Component.translatable("arms.eraphones.save"), b -> save(), GOLD);
+        ok.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable("arms.eraphones.save_hint")));
+        flat(x0 + W - 94, y0 + 8, 86, 18, Component.translatable("gui.cancel"), b -> onClose(), LINE);
     }
 
     private void general() {
@@ -372,6 +374,11 @@ public class WorkshopScreen extends Screen {
 
     @Override
     public boolean keyPressed(int key, int scan, int mods) {
+        // Ctrl+S saves, from any tab
+        if (picking < 0 && key == GLFW.GLFW_KEY_S && (mods & GLFW.GLFW_MOD_CONTROL) != 0) {
+            save();
+            return true;
+        }
         if (picking >= 0 && key == GLFW.GLFW_KEY_ESCAPE) {
             closePicker();
             return true;
@@ -440,8 +447,8 @@ public class WorkshopScreen extends Screen {
         g.fillGradient(x0, y0, x0 + W, y0 + 34, 0xFF243140, HEAD);
         g.fill(x0, y0 + 34, x0 + W, y0 + 35, GOLD_DIM);
         // The content well, the preview's
-        g.fill(x0 + 6, y0 + 60, x0 + 10 + CW + 4, y0 + H - 30, PANEL);
-        g.fill(x0 + CW + 20, y0 + 40, x0 + W - 6, y0 + H - 30, 0xFF0D1116);
+        g.fill(x0 + 6, y0 + 60, x0 + 10 + CW + 4, y0 + H - 8, PANEL);
+        g.fill(x0 + CW + 20, y0 + 40, x0 + W - 6, y0 + H - 8, 0xFF0D1116);
         g.fill(x0 + CW + 20, y0 + 40, x0 + W - 6, y0 + 41, GOLD_DIM);
         for (int[] f : fields) {
             g.fill(f[0] - 1, f[1] - 1, f[0] + f[2] + 1, f[1] + f[3] + 1, LINE);
@@ -458,8 +465,9 @@ public class WorkshopScreen extends Screen {
         g.pose().scale(1.6f, 1.6f, 1);
         g.renderItem(stack, 0, 0);
         g.pose().popPose();
-        g.drawString(font, title, x0 + 40, y0 + 7, GOLD, true);
-        g.drawString(font, Component.translatable("arms.eraphones.subtitle"), x0 + 40, y0 + 19, DIM, false);
+        int room = W - 186 - 46;
+        g.drawString(font, font.plainSubstrByWidth(title.getString(), room), x0 + 40, y0 + 7, GOLD, true);
+        g.drawString(font, font.plainSubstrByWidth(Component.translatable("arms.eraphones.subtitle").getString(), room), x0 + 40, y0 + 19, DIM, false);
         int x = x0 + 10, y = y0 + 64;
         switch (tab) {
             case 0 -> {
@@ -523,7 +531,7 @@ public class WorkshopScreen extends Screen {
         for (Proc p : procs()) {
             lines.add(ArmsClient.line(p));
         }
-        int bottom = y0 + H - 36;
+        int bottom = y0 + H - 12;
         for (Component c : lines) {
             for (FormattedCharSequence s : font.split(c, w)) {
                 if (y > bottom - 9) {
