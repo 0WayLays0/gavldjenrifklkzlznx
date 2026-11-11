@@ -95,7 +95,7 @@ public class CodeBoxBlockEntity extends BlockEntity {
     }
 
     private void showInside(ServerPlayer p) {
-        p.openMenu(new SimpleMenuProvider((id, inv, pl) -> ChestMenu.oneRow(id, inv, items),
+        p.openMenu(new SimpleMenuProvider((id, inv, pl) -> new ChestMenu(net.minecraft.world.inventory.MenuType.GENERIC_9x1, id, inv, items, 1),
                 Component.translatable("block.eraphones.boite_code")));
     }
 
