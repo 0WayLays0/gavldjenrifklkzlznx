@@ -34,7 +34,9 @@ import java.util.Locale;
  * </ul>
  */
 public class WorkshopScreen extends Screen {
-    private static final int W = 448, H = 256, CW = 286, MAX_LORE = 16, MAX_PROCS = 8;
+    private static final int CW = 286, MAX_LORE = 16, MAX_PROCS = 8;
+    /** The window's size: as wide and tall as it may be (448 x 256), less on a small screen so all of it shows. */
+    private int W = 448, H = 256;
     private static final int BG = 0xF2101418, HEAD = 0xFF1A2129, PANEL = 0xFF161C23, LINE = 0xFF2C3846, GOLD = 0xFFE8C677, GOLD_DIM = 0xFF8C7442;
     private static final int TEXT = 0xFFE6ECF2, DIM = 0xFF8592A0, FIELD = 0xFF0B0E12;
     private static final String[] TABS = {"general", "lore", "stats", "effects"};
@@ -163,7 +165,9 @@ public class WorkshopScreen extends Screen {
 
     @Override
     protected void init() {
-        x0 = (width - W) / 2;
+        W = Math.max(CW + 100, Math.min(448, width - 8));
+        H = Math.max(220, Math.min(256, height - 8));
+        x0 = Math.max(4, (width - W) / 2);
         y0 = Math.max(4, (height - H) / 2);
         clearWidgets();
         fields.clear();
@@ -303,11 +307,11 @@ public class WorkshopScreen extends Screen {
     // ---------------------------------------------------------------- the effect list
 
     private int px() {
-        return x0 + 70;
+        return x0 + Math.max(4, Math.min(70, W - PICK_W - 4));
     }
 
     private int py() {
-        return y0 + 30;
+        return y0 + Math.max(4, Math.min(30, H - PICK_H - 4));
     }
 
     private void initPicker() {
