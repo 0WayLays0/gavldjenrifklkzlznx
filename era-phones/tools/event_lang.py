@@ -262,6 +262,10 @@ TEXTS.update({
     "rp.eraphones.fear.state_on": ("Fear gauge: ON (/peur jauge off to turn it off)", "Jauge de peur : ACTIVÉE (/peur jauge off pour la couper)"),
     "rp.eraphones.fear.state_off": ("Fear gauge: OFF (/peur jauge on to turn it on)", "Jauge de peur : DÉSACTIVÉE (/peur jauge on pour l'activer)"),
     "rp.eraphones.fear.staff": ("staff, feels nothing", "staff, ne ressent rien"),
+    "rp.eraphones.fear.test_on": ("Test mode: you feel the fear gauge like a player (/peur jauge test again to stop; /peur jauge test <0-100> to set yours)", "Mode test : tu ressens la jauge de peur comme un joueur (/peur jauge test à nouveau pour arrêter ; /peur jauge test <0-100> pour régler la tienne)"),
+    "rp.eraphones.fear.test_off": ("Test mode off: you feel nothing any more", "Mode test coupé : tu ne ressens plus rien"),
+    "rp.eraphones.fear.test_set": ("Test mode: your fear set to %s %%", "Mode test : ta peur réglée à %s %%"),
+    "rp.eraphones.fear.test_disabled": ("The gauge is off for the server: it does not move by itself (set yours by hand, or /peur jauge on)", "La jauge est coupée sur le serveur : elle ne bouge pas toute seule (règle la tienne à la main, ou /peur jauge on)"),
     "rp.eraphones.fear.set": ("Fear set for %s player(s): %s %%", "Peur réglée pour %s joueur(s) : %s %%"),
     # Photographs pinned up
     "block.eraphones.photo_epinglee": ("Pinned photograph", "Photo épinglée"),

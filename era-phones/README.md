@@ -148,17 +148,28 @@ Chaque joueur a une peur de 0 à 100 %. Elle **monte** dans le noir (une lampe t
 - `/peur jauge on` / `/peur jauge off` : l'active ou la coupe pour tout le serveur (gardé avec le monde) ;
 - `/peur jauge` ou `/peur jauge info` : l'état, et la peur de chaque joueur ;
 - `/peur jauge <joueurs> <0-100>` : la régler à la main.
+- `/peur jauge test` : **toi (staff), tu la ressens comme un joueur** pour l'essayer (à nouveau : arrêter) ; `/peur jauge test <0-100>` règle la tienne directement (même si la jauge est coupée).
 
 ### Photos épinglées (Polaroid)
 L'**appareil photo instantané** (onglet Objets) prend ce que tu vois ; la photo sort et se révèle en une minute. **Accroupi + clic droit** avec une photo sur un **mur** : elle y est épinglée (une punaise de couleur, un peu de travers) ; sur une **table ou le sol** : elle y est posée. On y voit l'image, et le nom de qui l'a prise. Clic droit dessus : on la regarde en grand. Un coup : on la reprend. Plusieurs côte à côte font un **tableau d'enquête**.
 
 ### Emotes (mod Emotecraft)
-Dans `emotes/` : trois emotes **dans le style d'un clown inquiétant** (faites ici de zéro, image par image, pas copiées d'un film) :
-- `clown_sautille.json` : il sautille d'un pied sur l'autre, genoux hauts, bras ballants comme une marionnette, penché en avant, la tête droite et fixe pendant que le corps rebondit ;
-- `clown_danse.json` : danse molle et saccadée, d'une hanche sur l'autre, les bras qui battent l'air, les genoux qui lâchent, la tête qui penche à contretemps ;
-- `clown_tete_penchee.json` : immobile, la tête se penche lentement sur l'épaule, les bras pendants, puis un sursaut de temps en temps.
+Dans `emotes/` (et dans le zip du build) : onze emotes **dans le style d'un clown inquiétant**, faites ici de zéro, pose par pose (pas copiées d'un film). Chaque partie du corps bouge : coudes et genoux qui plient, torse qui se courbe, épaules qui tournent contre les hanches, tête qui compense.
+| Fichier | Emote |
+|---|---|
+| `clown_sautille` | Pas sautillé moqueur : genoux très hauts, bras qui balancent en grand, coudes pliés, le corps rebondit, la tête reste droite et fixée sur sa proie. Fait pour marcher avec. |
+| `clown_danse` | La danse : une mesure de gigue (rebonds sur les genoux, hanches qui balancent, bras pliés qui battent comme des ailes cassées), puis une mesure folle (bras lancés au ciel l'un après l'autre, coups de pied, tête renversée). |
+| `clown_tete_penchee` | Immobile, la tête se penche lentement sur l'épaule ; il respire, se balance, observe, puis sursaute (tête qui claque, bras qui part), et tourne la tête d'un coup. |
+| `clown_assis` | Assis par terre, il serre ses genoux et se balance d'avant en arrière, tête penchée, yeux levés. |
+| `clown_assis_rebord` | Assis au bord d'un bloc (mets-toi au bord, face au vide) : jambes qui se balancent comme un enfant, tête qui roule d'une épaule à l'autre. |
+| `clown_tend_objet` | Il tend l'objet qu'il a en main droite (le ballon…), bras pas tout à fait tendu, l'autre main dans le dos, penché, tête sur le côté. |
+| `clown_viens` | Signe de venir : l'avant-bras se replie vers lui, lentement, deux fois. |
+| `clown_rire` | Recroquevillé, mains devant la bouche, épaules qui tressautent, puis tête renversée et bras ouverts. |
+| `clown_coucou` | Mains devant le visage… puis il les ouvre d'un coup en se penchant : coucou ! |
+| `clown_reverence` | Grande révérence de théâtre, sans jamais te quitter des yeux. |
+| `clown_marionnette` | Pendu à des fils invisibles : un bras, un genou, la tête tirés puis lâchés. |
 
-Installation : avec **Emotecraft** installé, copier les fichiers `.json` dans le dossier `.minecraft/emotes/` (le créer s'il n'existe pas), relancer le jeu, puis les mettre sur la roue des emotes (touche B par défaut, *Config* des emotes). Avec Emotecraft aussi sur le serveur, les autres joueurs qui ont Emotecraft voient l'emote.
+Installation : avec **Emotecraft**, copier les `.json` dans `.minecraft/emotes/`, relancer le jeu, les mettre sur la roue des emotes. Avec Emotecraft aussi sur le serveur, les autres joueurs qui l'ont voient l'emote. `tools/emote_preview.py` les dessine sur un joueur en blocs pour les vérifier.
 
 ## Les téléphones
 

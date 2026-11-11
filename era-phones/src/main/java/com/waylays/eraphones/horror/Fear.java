@@ -72,9 +72,29 @@ public final class Fear extends SavedData {
         }
     }
 
-    /** Staff, creative and spectators never feel it. */
+    /** The staff who asked to feel it, to try it (/peur jauge test). */
+    private static final java.util.Set<UUID> TESTING = new java.util.HashSet<>();
+
+    /** Staff, creative and spectators never feel it, unless they are trying it. */
     public static boolean exempt(Player p) {
+        if (TESTING.contains(p.getUUID())) {
+            return p.isSpectator();
+        }
         return p.isCreative() || p.isSpectator() || p.hasPermissions(RpConfig.get(RpConfig.HORROR_PERMISSION, 2));
+    }
+
+    /** A staff member starts or stops feeling it, to try it; true if they now feel it. */
+    public static boolean toggleTest(ServerPlayer p) {
+        boolean on = TESTING.add(p.getUUID());
+        if (!on) {
+            TESTING.remove(p.getUUID());
+            set(p, 0);
+        }
+        return on;
+    }
+
+    public static boolean testing(Player p) {
+        return TESTING.contains(p.getUUID());
     }
 
     public static float get(Player p) {
@@ -122,13 +142,15 @@ public final class Fear extends SavedData {
         }
         boolean on = enabled(server);
         for (ServerPlayer p : server.getPlayerList().getPlayers()) {
-            if (!on || exempt(p) || !p.isAlive()) {
+            if ((!on && !testing(p)) || exempt(p) || !p.isAlive()) {
                 if (get(p) > 0 || !SENT.containsKey(p.getUUID())) {
                     set(p, 0);
                 }
                 continue;
             }
-            set(p, get(p) + rate(p) * .5f);
+            if (on) {
+                set(p, get(p) + rate(p) * .5f);
+            }
         }
     }
 
@@ -189,6 +211,7 @@ public final class Fear extends SavedData {
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         LEVEL.remove(event.getEntity().getUUID());
         SENT.remove(event.getEntity().getUUID());
+        TESTING.remove(event.getEntity().getUUID());
     }
 
     @SubscribeEvent

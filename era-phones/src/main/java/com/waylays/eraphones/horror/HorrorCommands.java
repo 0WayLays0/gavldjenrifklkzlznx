@@ -85,6 +85,26 @@ public final class HorrorCommands {
                         .then(Commands.literal("on").executes(c -> gaugeSwitch(c, true)))
                         .then(Commands.literal("off").executes(c -> gaugeSwitch(c, false)))
                         .then(Commands.literal("info").executes(HorrorCommands::gaugeInfo))
+                        // A staff member feels it themselves, to try it (again: stops), and may set their own level
+                        .then(Commands.literal("test").executes(c -> {
+                            ServerPlayer p = c.getSource().getPlayerOrException();
+                            boolean on = Fear.toggleTest(p);
+                            if (on && !Fear.enabled(c.getSource().getServer())) {
+                                c.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.fear.test_disabled").withStyle(ChatFormatting.GOLD), false);
+                            }
+                            c.getSource().sendSuccess(() -> Component.translatable(on ? "rp.eraphones.fear.test_on" : "rp.eraphones.fear.test_off")
+                                    .withStyle(ChatFormatting.DARK_RED), false);
+                            return 1;
+                        }).then(Commands.argument("valeur", IntegerArgumentType.integer(0, 100)).executes(c -> {
+                            ServerPlayer p = c.getSource().getPlayerOrException();
+                            if (!Fear.testing(p)) {
+                                Fear.toggleTest(p);
+                            }
+                            int v = IntegerArgumentType.getInteger(c, "valeur");
+                            Fear.set(p, v);
+                            c.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.fear.test_set", v).withStyle(ChatFormatting.DARK_RED), false);
+                            return 1;
+                        })))
                         .then(Commands.argument("joueurs", EntityArgument.players())
                                 .then(Commands.argument("valeur", IntegerArgumentType.integer(0, 100)).executes(c -> {
                                     Collection<ServerPlayer> t = EntityArgument.getPlayers(c, "joueurs");
@@ -340,7 +360,7 @@ public final class HorrorCommands {
                 .withStyle(ChatFormatting.DARK_RED), false);
         for (ServerPlayer p : server.getPlayerList().getPlayers()) {
             Component who = Component.literal("  " + com.waylays.eraphones.rp.RpService.name(p) + " (" + p.getGameProfile().getName() + ") : ");
-            Component what = Fear.exempt(p) ? Component.translatable("rp.eraphones.fear.staff").withStyle(ChatFormatting.DARK_GRAY)
+            Component what = Fear.exempt(p) && !Fear.testing(p) ? Component.translatable("rp.eraphones.fear.staff").withStyle(ChatFormatting.DARK_GRAY)
                     : Component.literal(Math.round(Fear.get(p)) + " %").withStyle(Fear.get(p) > 66 ? ChatFormatting.RED : Fear.get(p) > 33 ? ChatFormatting.GOLD : ChatFormatting.GRAY);
             c.getSource().sendSuccess(() -> who.copy().withStyle(ChatFormatting.GRAY).append(what), false);
         }
