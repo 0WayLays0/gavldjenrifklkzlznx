@@ -54,7 +54,7 @@ public final class Packs {
 
     public static NonNullList<ItemStack> contents(ItemStack bag) {
         NonNullList<ItemStack> list = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        List<ItemStack> c = com.waylays.eraphones.compat.ItemData.items(bag);
+        java.util.List<ItemStack> c = com.waylays.eraphones.compat.ItemData.items(bag);
         for (int i = 0; i < c.size() && i < SIZE; i++) {
             list.set(i, c.get(i));
         }
@@ -190,8 +190,8 @@ public final class Packs {
             return;
         }
         int hands = limited(p) ? slots() : 9;
-        p.level().playSound(null, p.blockPosition(), SoundEvents.ARMOR_EQUIP_LEATHER.value(), SoundSource.PLAYERS, .6f, 1.3f);
-        p.openMenu(new SimpleMenuProvider((id, inv, pl) -> new BackpackMenu(id, inv, bag, b.style(), hands), bag.getHoverName()), buf -> {
+        p.level().playSound(null, p.blockPosition(), SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.PLAYERS, .6f, 1.3f);
+        net.minecraftforge.network.NetworkHooks.openScreen(p, new SimpleMenuProvider((id, inv, pl) -> new BackpackMenu(id, inv, bag, b.style(), hands), bag.getHoverName()), buf -> {
             buf.writeVarInt(b.style());
             buf.writeVarInt(hands);
         });

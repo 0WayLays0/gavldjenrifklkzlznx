@@ -40,7 +40,7 @@ public class BackpackItem extends Item implements Equipable {
     }
 
     @Override
-    public Holder<SoundEvent> getEquipSound() {
+    public SoundEvent getEquipSound() {
         return SoundEvents.ARMOR_EQUIP_LEATHER;
     }
 

@@ -111,15 +111,10 @@ public class BikeEntity extends Entity {
     }
 
     @Override
-    protected Vec3 getPassengerAttachmentPoint(Entity passenger, EntityDimensions dimensions, float partialTick) {
-        // The rider's hips on the long seat, the feet on the pedals: a player's own attachment puts them 0.6 lower,
-        // so that much is added back (their feet .29 above the ground, their hips on the seat at about 1)
-        return new Vec3(0, .29 + .6, -.36).yRot(-getYRot() * Mth.DEG_TO_RAD);
-    }
-
-    @Override
     protected void positionRider(Entity passenger, MoveFunction move) {
-        super.positionRider(passenger, move);
+        // The rider's hips on the long seat, the feet on the pedals: their feet .29 above the ground
+        Vec3 a = new Vec3(0, .29, -.36).yRot(-getYRot() * Mth.DEG_TO_RAD);
+        move.accept(passenger, getX() + a.x, getY() + a.y, getZ() + a.z);
         if (passenger instanceof LivingEntity l) {
             l.setYBodyRot(getYRot());
         }
@@ -157,12 +152,18 @@ public class BikeEntity extends Entity {
     }
 
     @Override
-    public void lerpTo(double x, double y, double z, float yRot, float xRot, int steps) {
+    public void lerpTo(double x, double y, double z, float yRot, float xRot, int steps, boolean teleport) {
         lerpX = x;
         lerpY = y;
         lerpZ = z;
         lerpYRot = yRot;
         lerpSteps = 6;
+    }
+
+    private void lerpStep() {
+        double k = 1.0 / lerpSteps;
+        setPos(getX() + (lerpX - getX()) * k, getY() + (lerpY - getY()) * k, getZ() + (lerpZ - getZ()) * k);
+        setYRot(getYRot() + net.minecraft.util.Mth.wrapDegrees((float) lerpYRot - getYRot()) * (float) k);
     }
 
     private void tickLerp() {
@@ -171,7 +172,7 @@ public class BikeEntity extends Entity {
             syncPacketPositionCodec(getX(), getY(), getZ());
         }
         if (lerpSteps > 0) {
-            lerpPositionAndRotationStep(lerpSteps, lerpX, lerpY, lerpZ, lerpYRot, getXRot());
+            lerpStep();
             lerpSteps--;
         }
     }

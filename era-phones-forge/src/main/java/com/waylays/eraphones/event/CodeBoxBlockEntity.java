@@ -112,7 +112,7 @@ public class CodeBoxBlockEntity extends BlockEntity {
         for (int i = 0; i < list.size(); i++) {
             list.set(i, items.getItem(i));
         }
-        ContainerHelper.saveAllItems(tag, list, registries);
+        ContainerHelper.saveAllItems(tag, list);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class CodeBoxBlockEntity extends BlockEntity {
             code = tag.getString("Code");
         }
         NonNullList<ItemStack> list = NonNullList.withSize(items.getContainerSize(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, list, registries);
+        ContainerHelper.loadAllItems(tag, list);
         for (int i = 0; i < list.size(); i++) {
             items.setItem(i, list.get(i));
         }

@@ -22,7 +22,7 @@ public class BackpackMenu extends AbstractContainerMenu {
     private boolean loading;
 
     /** On the player's side: what the server opened. */
-    public BackpackMenu(int id, Inventory inv, RegistryFriendlyByteBuf buf) {
+    public BackpackMenu(int id, Inventory inv, net.minecraft.network.FriendlyByteBuf buf) {
         this(id, inv, ItemStack.EMPTY, buf.readVarInt(), buf.readVarInt());
     }
 

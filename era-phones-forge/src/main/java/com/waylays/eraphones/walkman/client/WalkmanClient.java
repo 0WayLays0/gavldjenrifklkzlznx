@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -36,7 +35,7 @@ import java.util.UUID;
  */
 @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT)
 public final class WalkmanClient {
-    public static final ModelResourceLocation HEADPHONES = ModelResourceLocation.standalone(EraPhones.id("item/casque_3d"));
+    public static final net.minecraft.resources.ResourceLocation HEADPHONES = EraPhones.id("item/casque_3d");
     private static final Set<UUID> LISTENING = new HashSet<>();
 
     private WalkmanClient() {}
@@ -93,7 +92,7 @@ public final class WalkmanClient {
 
         @SubscribeEvent
         public static void onLayers(EntityRenderersEvent.AddLayers event) {
-            for (net.minecraft.client.resources.PlayerSkin.Model skin : event.getSkins()) {
+            for (String skin : event.getSkins()) {
                 if (event.getSkin(skin) instanceof PlayerRenderer r) {
                     r.addLayer(new HeadphonesLayer(r));
                 }

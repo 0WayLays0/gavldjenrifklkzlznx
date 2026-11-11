@@ -100,7 +100,7 @@ public abstract class PhoneApp {
         box.setBordered(false);
         box.setMaxLength(max);
         box.setTextColor(PhoneUI.WHITE);
-        box.setHint(Component.translatable(hint).withColor(0xFF8A86A0));
+        box.setHint(Component.translatable(hint).withStyle(st -> st.withColor((0xFF8A86A0) & 0xFFFFFF)));
         return box;
     }
 

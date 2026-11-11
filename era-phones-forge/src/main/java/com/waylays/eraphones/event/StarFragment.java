@@ -460,7 +460,7 @@ public class StarFragment extends Entity {
     // ---------------------------------------------------------------- on the players' side
 
     @Override
-    public void lerpTo(double x, double y, double z, float yRot, float xRot, int steps) {
+    public void lerpTo(double x, double y, double z, float yRot, float xRot, int steps, boolean teleport) {
         lerpX = x;
         lerpY = y;
         lerpZ = z;
@@ -468,9 +468,15 @@ public class StarFragment extends Entity {
         lerpSteps = 4;
     }
 
+    private void lerpStep() {
+        double k = 1.0 / lerpSteps;
+        setPos(getX() + (lerpX - getX()) * k, getY() + (lerpY - getY()) * k, getZ() + (lerpZ - getZ()) * k);
+        setYRot(getYRot() + net.minecraft.util.Mth.wrapDegrees((float) lerpYRot - getYRot()) * (float) k);
+    }
+
     private void tickLerp() {
         if (lerpSteps > 0) {
-            lerpPositionAndRotationStep(lerpSteps, lerpX, lerpY, lerpZ, lerpYRot, getXRot());
+            lerpStep();
             lerpSteps--;
         }
     }

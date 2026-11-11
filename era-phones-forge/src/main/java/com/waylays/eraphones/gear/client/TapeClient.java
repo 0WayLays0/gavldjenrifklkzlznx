@@ -47,7 +47,7 @@ public final class TapeClient {
         Path dir = Tape.folder();
         try {
             Files.createDirectories(dir);
-            Util.getPlatform().openPath(dir);
+            Util.getPlatform().openFile(dir.toFile());
         } catch (Exception e) {
             say(Component.translatable("gear.eraphones.burn_folder_failed", dir.toString()), true);
         }

@@ -37,9 +37,7 @@ import org.lwjgl.glfw.GLFW;
 public final class PackClient {
     public static final KeyMapping OPEN = new KeyMapping("key.eraphones.backpack", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B,
             "key.categories.eraphones");
-    private static final ResourceLocation HOTBAR = new ResourceLocation("hud/hotbar");
-    private static final ResourceLocation SELECTION = new ResourceLocation("hud/hotbar_selection");
-    private static final ResourceLocation OFFHAND = new ResourceLocation("hud/hotbar_offhand_left");
+    private static final ResourceLocation WIDGETS = new ResourceLocation("textures/gui/widgets.png");
     private static int last;
 
     private PackClient() {}
@@ -81,7 +79,7 @@ public final class PackClient {
     /** The hotbar drawn with only its usable slots, centred, and the off hand's slot beside it. */
     @SubscribeEvent
     public static void onHotbar(RenderGuiOverlayEvent.Pre event) {
-        if (!event.getName().equals(VanillaGuiLayers.HOTBAR) || !limited()) {
+        if (!event.getOverlay().id().equals(VanillaGuiOverlay.HOTBAR.id()) || !limited()) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
@@ -97,12 +95,12 @@ public final class PackClient {
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         g.pose().pushPose();
         g.pose().translate(0, 0, -90);
-        g.blitSprite(HOTBAR, 182, 22, 0, 0, left, top, n * 20 + 1, 22);
-        g.blitSprite(HOTBAR, 182, 22, 181, 0, left + n * 20 + 1, top, 1, 22);
-        g.blitSprite(SELECTION, left - 1 + p.getInventory().selected * 20, top - 1, 24, 23);
+        g.blit(WIDGETS, left, top, 0, 0, n * 20 + 1, 22);
+        g.blit(WIDGETS, left + n * 20 + 1, top, 181, 0, 1, 22);
+        g.blit(WIDGETS, left - 1 + p.getInventory().selected * 20, top - 1, 0, 22, 24, 22);
         ItemStack off = p.getOffhandItem();
         if (!off.isEmpty()) {
-            g.blitSprite(OFFHAND, left - 29, top - 1, 29, 24);
+            g.blit(WIDGETS, left - 29, top - 1, 24, 22, 29, 24);
         }
         g.pose().popPose();
         for (int i = 0; i < n; i++) {
@@ -173,7 +171,7 @@ public final class PackClient {
 
         @SubscribeEvent
         public static void onLayers(EntityRenderersEvent.AddLayers event) {
-            for (net.minecraft.client.resources.PlayerSkin.Model skin : event.getSkins()) {
+            for (String skin : event.getSkins()) {
                 if (event.getSkin(skin) instanceof PlayerRenderer r) {
                     r.addLayer(new BackpackLayer(r));
                 }

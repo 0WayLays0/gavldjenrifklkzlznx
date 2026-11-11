@@ -169,7 +169,7 @@ public class TvBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (!cassette.isEmpty()) {
-            tag.put("Cassette", cassette.save(registries));
+            tag.put("Cassette", cassette.save(new net.minecraft.nbt.CompoundTag()));
         }
         tag.putLong("Pos", deck.pos);
     }

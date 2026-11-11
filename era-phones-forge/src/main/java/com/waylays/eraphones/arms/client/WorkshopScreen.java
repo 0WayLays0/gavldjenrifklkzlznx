@@ -213,7 +213,7 @@ public class WorkshopScreen extends Screen {
 
     private static Component toggle(String key, boolean on) {
         return Component.translatable("arms.eraphones." + key).append(" : ")
-                .append(Component.translatable(on ? "options.on" : "options.off").withColor(on ? 0xFF8CE38C : 0xFFFF8A80));
+                .append(Component.translatable(on ? "options.on" : "options.off").withStyle(st -> st.withColor((on ? 0xFF8CE38C : 0xFFFF8A80) & 0xFFFFFF)));
     }
 
     /** The colour chips: each puts its code where one writes. */
@@ -268,7 +268,7 @@ public class WorkshopScreen extends Screen {
             Row r = rows.get(i);
             int k = i, ry = y + i * 21, x = x0 + 10;
             flat(x, ry, 46, 17, Component.translatable(r.guard ? "arms.eraphones.when_struck" : "arms.eraphones.when_strike")
-                    .withColor(r.guard ? 0xFF7FD4FF : 0xFFFFB45A), b -> {
+                    .withStyle(st -> st.withColor((r.guard ? 0xFF7FD4FF : 0xFFFFB45A) & 0xFFFFFF)), b -> {
                 r.guard = !r.guard;
                 init();
             }, LINE);
@@ -278,7 +278,7 @@ public class WorkshopScreen extends Screen {
                 init();
             }, LINE);
             pick.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Effects.name(r.type).copy().append("\n").append(Component.literal(r.type)
-                    .withColor(DIM))));
+                    .withStyle(st -> st.withColor((DIM) & 0xFFFFFF)))));
             flat(x + 148, ry, 34, 17, Component.translatable(r.self ? "arms.eraphones.self" : "arms.eraphones.other"), b -> {
                 r.self = !r.self;
                 init();
@@ -318,7 +318,7 @@ public class WorkshopScreen extends Screen {
         search = new EditBox(font, px() + 26, py() + 30, 260, 12, Component.empty());
         search.setBordered(false);
         search.setTextColor(TEXT);
-        search.setHint(Component.translatable("arms.eraphones.search").withColor(DIM));
+        search.setHint(Component.translatable("arms.eraphones.search").withStyle(st -> st.withColor((DIM) & 0xFFFFFF)));
         search.setResponder(s -> {
             filter(s);
             pickScroll = 0;
@@ -524,11 +524,11 @@ public class WorkshopScreen extends Screen {
         for (int i = 0; i < stats.length; i++) {
             if (!stats[i].isBlank()) {
                 lines.add(Component.literal("§2" + stats[i] + (i == 5 ? "% " : " ")).append(Component.translatable("arms.eraphones.stat." + STAT_KEYS[i])
-                        .withColor(0xFF55AA55)));
+                        .withStyle(st -> st.withColor((0xFF55AA55) & 0xFFFFFF))));
             }
         }
         if (unbreakable) {
-            lines.add(Component.translatable("item.unbreakable").withColor(0xFF5555FF));
+            lines.add(Component.translatable("item.unbreakable").withStyle(st -> st.withColor((0xFF5555FF) & 0xFFFFFF)));
         }
         for (Proc p : procs()) {
             lines.add(ArmsClient.line(p));

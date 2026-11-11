@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
@@ -23,9 +22,9 @@ import net.minecraft.util.Mth;
  * the whole leaning into the turns.
  */
 public class BikeRenderer extends EntityRenderer<BikeEntity> {
-    public static final ModelResourceLocation CRANK = part("velo_pedalier"), PEDAL = part("velo_pedale");
+    public static final net.minecraft.resources.ResourceLocation CRANK = part("velo_pedalier"), PEDAL = part("velo_pedale");
     /** Each bicycle's frame, steering and wheel, by its kind. */
-    public static final ModelResourceLocation[] FRAMES = {part("velo_cadre"), part("velo_cadre_course"), part("velo_cadre_ville"), part("velo_cadre_bmx")},
+    public static final net.minecraft.resources.ResourceLocation[] FRAMES = {part("velo_cadre"), part("velo_cadre_course"), part("velo_cadre_ville"), part("velo_cadre_bmx")},
             STEERS = {part("velo_guidon"), part("velo_guidon_course"), part("velo_guidon_ville"), part("velo_guidon_bmx")},
             WHEELS = {part("velo_roue"), part("velo_roue_course"), part("velo_roue"), part("velo_roue_bmx")};
     /** Where the parts turn (model sixteenths: bike units moved by 8 across and 8 forward). */
@@ -37,8 +36,8 @@ public class BikeRenderer extends EntityRenderer<BikeEntity> {
         this.shadowRadius = .55f;
     }
 
-    static ModelResourceLocation part(String name) {
-        return ModelResourceLocation.standalone(EraPhones.id("block/" + name));
+    static net.minecraft.resources.ResourceLocation part(String name) {
+        return EraPhones.id("block/" + name);
     }
 
     @Override
@@ -50,7 +49,7 @@ public class BikeRenderer extends EntityRenderer<BikeEntity> {
     public void render(BikeEntity bike, float yaw, float pt, PoseStack pose, MultiBufferSource buffers, int light) {
         VertexConsumer vc = buffers.getBuffer(RenderType.entityCutout(TextureAtlas.LOCATION_BLOCKS));
         int k = bike.kind();
-        ModelResourceLocation FRAME = FRAMES[k], STEER = STEERS[k], WHEEL = WHEELS[k];
+        net.minecraft.resources.ResourceLocation FRAME = FRAMES[k], STEER = STEERS[k], WHEEL = WHEELS[k];
         float spin = Mth.lerp(pt, bike.spinO, bike.spin), crank = Mth.lerp(pt, bike.crankO, bike.crank);
         float steer = Mth.lerp(pt, bike.steerO, bike.steer), lean = Mth.lerp(pt, bike.leanO, bike.lean);
         pose.pushPose();
@@ -99,7 +98,7 @@ public class BikeRenderer extends EntityRenderer<BikeEntity> {
         pose.translate(-.5, -.5, -.5);
     }
 
-    private static void draw(ModelResourceLocation id, PoseStack pose, VertexConsumer vc, int light) {
+    private static void draw(net.minecraft.resources.ResourceLocation id, PoseStack pose, VertexConsumer vc, int light) {
         BakedModel model = Minecraft.getInstance().getModelManager().getModel(id);
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(pose.last(), vc, null, model, 1, 1, 1, light,
                 OverlayTexture.NO_OVERLAY);

@@ -325,24 +325,7 @@ public final class HorrorClient {
         if (radius < .5f) {
             return;
         }
-        Minecraft mc = Minecraft.getInstance();
-        g.flush();
-        try {
-            if (!blurTried) {
-                blurTried = true;
-                blurField = net.minecraft.client.renderer.GameRenderer.class.getDeclaredField("blurEffect");
-                blurField.setAccessible(true);
-            }
-            Object chain = blurField == null ? null : blurField.get(mc.gameRenderer);
-            if (chain instanceof net.minecraft.client.renderer.PostChain post) {
-                post.setUniform("Radius", radius);
-                post.process(delta.getGameTimeDeltaPartialTick(false));
-            }
-        } catch (Exception e) {
-            blurField = null;
-            mc.gameRenderer.processBlurEffect(delta.getGameTimeDeltaPartialTick(false));
-        }
-        mc.getMainRenderTarget().bindWrite(false);
+        // 1.20.1 has no blur pass for the screen's layers: the vignette and the heartbeat carry the fear
     }
 
     @SubscribeEvent

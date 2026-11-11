@@ -94,7 +94,7 @@ public final class SmokeTest {
                 LevelSettings settings = new LevelSettings("eraphones_smoketest", GameType.CREATIVE, false, Difficulty.PEACEFUL, true, rules,
                         WorldDataConfiguration.DEFAULT);
                 mc.createWorldOpenFlows().createFreshLevel("eraphones_smoketest_" + System.currentTimeMillis(), settings,
-                        new WorldOptions(20261107L, false, false), WorldPresets::createNormalWorldDimensions, mc.screen);
+                        new WorldOptions(20261107L, false, false), WorldPresets::createNormalWorldDimensions);
             } catch (Throwable t) {
                 fail("creating the world: {}", t.toString(), t);
                 finish(mc);

@@ -104,7 +104,7 @@ public class PinnedPhotoBlock extends BaseEntityBlock {
     }
 
     @Override
-    public net.minecraft.world.item.ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public net.minecraft.world.item.ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter level, BlockPos pos, BlockState state) {
         return level.getBlockEntity(pos) instanceof PinnedPhotoBlockEntity be ? be.photo().copy() : net.minecraft.world.item.ItemStack.EMPTY;
     }
 

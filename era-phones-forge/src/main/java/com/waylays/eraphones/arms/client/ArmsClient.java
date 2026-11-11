@@ -32,7 +32,7 @@ public final class ArmsClient {
         }
         return Component.translatable(p.guard() ? "arms.eraphones.line_guard" : "arms.eraphones.line_strike", chance,
                         Component.translatable(p.self() ? "arms.eraphones.on_self" : "arms.eraphones.on_other"), what)
-                .withColor(p.guard() ? 0xFF7FD4FF : 0xFFFFB45A);
+                .withStyle(st -> st.withColor((p.guard() ? 0xFF7FD4FF : 0xFFFFB45A) & 0xFFFFFF));
     }
 
     static String roman(int n) {

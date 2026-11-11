@@ -80,7 +80,7 @@ public class RadioBlockEntity extends BlockEntity {
 
     @Override
     public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata(registries);
+        return saveWithoutMetadata();
     }
 
     @Override

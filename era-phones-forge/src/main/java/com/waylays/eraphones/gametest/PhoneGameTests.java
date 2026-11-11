@@ -147,7 +147,7 @@ public final class PhoneGameTests {
         ids.addAll(java.util.List.of("entity.vex.ambient", "ambient.cave", "block.beacon.deactivate", "block.lever.click", "entity.warden.heartbeat",
                 "entity.elder_guardian.curse", "entity.ghast.scream", "entity.warden.emerge", "entity.firework_rocket.blast"));
         for (String id : ids) {
-            helper.assertTrue(net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.containsKey(net.minecraft.resources.new ResourceLocation(id)),
+            helper.assertTrue(net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.containsKey(new net.minecraft.resources.ResourceLocation(id)),
                     "no sound " + id);
         }
         helper.assertTrue(com.waylays.eraphones.horror.HorrorService.sounds().size() >= 12, "the sounds of fear");

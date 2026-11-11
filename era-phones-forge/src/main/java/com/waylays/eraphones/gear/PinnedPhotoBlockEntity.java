@@ -49,7 +49,7 @@ public class PinnedPhotoBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (!photo.isEmpty()) {
-            tag.put("Photo", photo.save(registries));
+            tag.put("Photo", photo.save(new net.minecraft.nbt.CompoundTag()));
         }
         tag.putFloat("Angle", angle);
         tag.putInt("Pin", pin);

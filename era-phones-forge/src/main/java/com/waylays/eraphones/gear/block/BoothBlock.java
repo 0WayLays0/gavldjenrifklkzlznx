@@ -117,7 +117,7 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
     }
 
     @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         // Broken from above by a creative player: the foot goes without dropping the booth
         if (!level.isClientSide && player.isCreative() && state.getValue(PART) > 0) {
             BlockPos foot = pos.below(state.getValue(PART));
@@ -127,7 +127,7 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
                 level.levelEvent(player, 2001, foot, Block.getId(f));
             }
         }
-        return super.playerWillDestroy(level, pos, state, player);
+        super.playerWillDestroy(level, pos, state, player);
     }
 
     @Override

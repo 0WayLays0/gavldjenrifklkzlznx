@@ -34,13 +34,13 @@ public class WallWriting extends Entity {
 
     @Override
     protected void defineSynchedData() {
-        b.define(TEXT, "");
-        b.define(STYLE, "sang");
-        b.define(FACE, 2);
-        b.define(SIZE, .45f);
-        b.define(TURN, 0f);
-        b.define(BORN, 0L);
-        b.define(GONE, -1L);
+        this.entityData.define(TEXT, "");
+        this.entityData.define(STYLE, "sang");
+        this.entityData.define(FACE, 2);
+        this.entityData.define(SIZE, .45f);
+        this.entityData.define(TURN, 0f);
+        this.entityData.define(BORN, 0L);
+        this.entityData.define(GONE, -1L);
     }
 
     public void setup(String text, String style, int face, float size, float turn) {

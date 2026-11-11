@@ -262,7 +262,7 @@ public class VcrBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (!cassette.isEmpty()) {
-            tag.put("Cassette", cassette.save(registries));
+            tag.put("Cassette", cassette.save(new net.minecraft.nbt.CompoundTag()));
         }
         tag.putLong("Pos", deck.pos);
         tag.putString("Mode", deck.mode.name());
@@ -282,7 +282,7 @@ public class VcrBlockEntity extends BlockEntity {
 
     @Override
     public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata(registries);
+        return saveWithoutMetadata();
     }
 
     @Override

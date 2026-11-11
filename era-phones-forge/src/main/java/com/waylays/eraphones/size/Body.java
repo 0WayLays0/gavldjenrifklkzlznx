@@ -94,7 +94,7 @@ public final class Body {
         }
         ListTag list = new ListTag();
         for (MobEffectInstance e : p.getActiveEffects()) {
-            list.add(e.save());
+            list.add(e.save(new CompoundTag()));
         }
         if (list.isEmpty()) {
             p.getPersistentData().remove(EFFECTS_KEY);

@@ -130,9 +130,9 @@ public final class Carry {
             return;
         }
         boolean carrying = p.getFirstPassenger() instanceof Player;
-        if (carrying && !a.hasModifier(SLOW)) {
+        if (carrying && a.getModifier(SLOW) == null) {
             a.addTransientModifier(new AttributeModifier(SLOW, "eraphones", -.3, AttributeModifier.Operation.MULTIPLY_TOTAL));
-        } else if (!carrying && a.hasModifier(SLOW)) {
+        } else if (!carrying && a.getModifier(SLOW) != null) {
             a.removeModifier(SLOW);
         }
     }
