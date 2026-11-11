@@ -247,11 +247,6 @@ public final class TvClient {
         SCREENS.clear();
     }
 
-    @SubscribeEvent
-    public static void onRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(GearRegistry.TV_BE.get(), c -> new TvRenderer());
-    }
-
     /** The hiss of an empty channel, from a set that is on and gets nothing. */
     static final class TvHiss extends AbstractTickableSoundInstance {
         private final TvBlockEntity tv;
@@ -280,6 +275,18 @@ public final class TvClient {
             if (tv.isRemoved() || !tv.on() || !snow || System.currentTimeMillis() - screen.seen > 1500) {
                 stop();
             }
+        }
+    }
+
+    /** The handlers that listen on the mod bus (registration events). */
+    @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    public static final class ModBus {
+        private ModBus() {
+        }
+
+        @SubscribeEvent
+        public static void onRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(GearRegistry.TV_BE.get(), c -> new TvRenderer());
         }
     }
 }

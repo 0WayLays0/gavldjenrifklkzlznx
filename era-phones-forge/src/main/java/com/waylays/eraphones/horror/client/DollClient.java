@@ -44,9 +44,16 @@ public final class DollClient {
         doll.pitch += (targetPitch - doll.pitch) * .35f;
     }
 
-    @SubscribeEvent
-    public static void onRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(GearRegistry.DOLL_BE.get(), c -> new DollRenderer());
-        event.registerEntityRenderer(GearRegistry.WRITING.get(), WritingRenderer::new);
+    /** The handlers that listen on the mod bus (registration events). */
+    @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    public static final class ModBus {
+        private ModBus() {
+        }
+
+        @SubscribeEvent
+        public static void onRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(GearRegistry.DOLL_BE.get(), c -> new DollRenderer());
+            event.registerEntityRenderer(GearRegistry.WRITING.get(), WritingRenderer::new);
+        }
     }
 }

@@ -201,12 +201,6 @@ public final class HorrorClient {
 
     // ---------------------------------------------------------------- over the screen
 
-    @SubscribeEvent
-    public static void onRegisterLayers(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("horror", (gui, g, pt, w, h) -> HorrorClient.render(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
-        event.registerBelowAll("horror_blur", (gui, g, pt, w, h) -> HorrorClient.fearBlur(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
-    }
-
     private static void render(GuiGraphics g, DeltaTracker delta) {
         if (gaugeShown >= .5f) {
             gaugeHud(g);
@@ -710,6 +704,19 @@ public final class HorrorClient {
         Random r = new Random(a.seed);
         for (int i = 0; i < 18; i++) {
             mc.level.addParticle(red, at.x, at.y + .2, at.z, (r.nextFloat() - .5f) * .3f, r.nextFloat() * .15f, (r.nextFloat() - .5f) * .3f);
+        }
+    }
+
+    /** The handlers that listen on the mod bus (registration events). */
+    @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    public static final class ModBus {
+        private ModBus() {
+        }
+
+        @SubscribeEvent
+        public static void onRegisterLayers(RegisterGuiOverlaysEvent event) {
+            event.registerAboveAll("horror", (gui, g, pt, w, h) -> HorrorClient.render(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
+            event.registerBelowAll("horror_blur", (gui, g, pt, w, h) -> HorrorClient.fearBlur(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
         }
     }
 }

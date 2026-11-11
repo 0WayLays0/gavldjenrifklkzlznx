@@ -101,11 +101,6 @@ public final class CamClient {
         return out.toByteArray();
     }
 
-    @SubscribeEvent
-    public static void onLayers(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("camcorder", (gui, g, pt, w, h) -> CamClient.viewfinder(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
-    }
-
     /** The viewfinder: what a camcorder of the time showed over its picture. */
     private static void viewfinder(GuiGraphics g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
@@ -135,5 +130,17 @@ public final class CamClient {
         g.fill(m + 9, h - m - 17, m + 25, h - m - 11, 0xFF101010);
         g.fill(m + 10, h - m - 16, m + 24, h - m - 12, 0xFF60E060);
         g.fill(m + 26, h - m - 16, m + 28, h - m - 12, 0xFFFFFFFF);
+    }
+
+    /** The handlers that listen on the mod bus (registration events). */
+    @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    public static final class ModBus {
+        private ModBus() {
+        }
+
+        @SubscribeEvent
+        public static void onLayers(RegisterGuiOverlaysEvent event) {
+            event.registerAboveAll("camcorder", (gui, g, pt, w, h) -> CamClient.viewfinder(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
+        }
     }
 }

@@ -692,16 +692,6 @@ public final class PhoneClient {
     // ---------------------------------------------------------------- events
 
     @SubscribeEvent
-    public static void onRegisterKeys(RegisterKeyMappingsEvent event) {
-        event.register(OPEN);
-    }
-
-    @SubscribeEvent
-    public static void onRegisterLayers(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("phone_hud", (gui, g, pt, w, h) -> PhoneHud.render(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
-    }
-
-    @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) {
             return;
@@ -768,5 +758,22 @@ public final class PhoneClient {
 
     public static void toastNow(GuiGraphics g, DeltaTracker delta) {
         PhoneHud.render(g, delta);
+    }
+
+    /** The handlers that listen on the mod bus (registration events). */
+    @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    public static final class ModBus {
+        private ModBus() {
+        }
+
+        @SubscribeEvent
+        public static void onRegisterKeys(RegisterKeyMappingsEvent event) {
+            event.register(OPEN);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterLayers(RegisterGuiOverlaysEvent event) {
+            event.registerAboveAll("phone_hud", (gui, g, pt, w, h) -> PhoneHud.render(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
+        }
     }
 }

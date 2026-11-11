@@ -147,11 +147,6 @@ public final class PhotoClient {
         return px;
     }
 
-    @SubscribeEvent
-    public static void onLayers(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("camera_flash", (gui, g, pt, w, h) -> PhotoClient.flash(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
-    }
-
     /** The flash, white and gone in a moment. */
     private static void flash(GuiGraphics g, DeltaTracker delta) {
         float t = (System.currentTimeMillis() - flashAt) / 450f;
@@ -169,5 +164,17 @@ public final class PhotoClient {
 
     static long taken(ItemStack photo) {
         return GearRegistry.PHOTO_TIME.get().getOrDefault(photo, 0L);
+    }
+
+    /** The handlers that listen on the mod bus (registration events). */
+    @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    public static final class ModBus {
+        private ModBus() {
+        }
+
+        @SubscribeEvent
+        public static void onLayers(RegisterGuiOverlaysEvent event) {
+            event.registerAboveAll("camera_flash", (gui, g, pt, w, h) -> PhotoClient.flash(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
+        }
     }
 }
