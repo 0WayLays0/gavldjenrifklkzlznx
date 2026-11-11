@@ -92,6 +92,12 @@ TEXTS = {
     E + "trigger.help.mode": ("/declencheur mode <name> une_fois | chaque_joueur | toujours [seconds between]",
                               "/declencheur mode <nom> une_fois | chaque_joueur | toujours [secondes entre deux]"),
     E + "trigger.help.tester": ("/declencheur tester <name> [player]: set it off now", "/declencheur tester <nom> [joueur] : le lancer tout de suite"),
+    E + "trigger.help.moi": ("/declencheur moi: you set the zones off yourself, even in creative (again: stop)", "/declencheur moi : toi aussi tu déclenches les zones, même en créatif (encore une fois : arrêter)"),
+    E + "trigger.me_on": ("You set the zones off now, even in creative (/declencheur moi again to stop)", "Tu déclenches maintenant les zones, même en créatif (/declencheur moi à nouveau pour arrêter)"),
+    E + "trigger.me_off": ("You no longer set the zones off in creative", "Tu ne déclenches plus les zones en créatif"),
+    E + "trigger.creative_hint": ("You are in creative: players in creative set nothing off. To try it: /declencheur moi, or /declencheur tester <name>, or survival", "Tu es en créatif : les joueurs en créatif ne déclenchent rien. Pour essayer : /declencheur moi, ou /declencheur tester <nom>, ou passe en survie"),
+    E + "trigger.fired": ("Trigger %s set off by %s", "Déclencheur %s lancé par %s"),
+    E + "trigger.spent": ("Trigger %s already went off once: /declencheur reset %1$s to set it again (or mode chaque_joueur / toujours)", "Le déclencheur %s s'est déjà lancé une fois : /declencheur reset %1$s pour le réarmer (ou mode chaque_joueur / toujours)"),
     E + "trigger.help.gerer": ("/declencheur liste | info | montrer [s] | actif <name> true|false | reset | vider | supprimer (creative players set nothing off)",
                                "/declencheur liste | info | montrer [s] | actif <nom> true|false | reset | vider | supprimer (les joueurs en créatif ne déclenchent rien)"),
 }

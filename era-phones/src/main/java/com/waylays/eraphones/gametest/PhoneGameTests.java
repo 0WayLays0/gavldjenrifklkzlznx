@@ -52,6 +52,24 @@ public final class PhoneGameTests {
         });
     }
 
+    /** A zone trigger goes off when a player in survival walks into it (its action: a gold block placed). */
+    @GameTest(template = "platform", skyAccess = true, timeoutTicks = 80)
+    public static void aZoneTriggerGoesOff(GameTestHelper helper) {
+        net.minecraft.server.level.ServerPlayer p = helper.makeMockServerPlayerInLevel();
+        p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
+        p.teleportTo(at.getX() + .5, at.getY(), at.getZ() + .5);
+        BlockPos mark = helper.absolutePos(new BlockPos(3, 2, 3));
+        String name = "test_zone_" + at.asLong();
+        com.waylays.eraphones.event.Triggers.putForTest(helper.getLevel(), name, at.offset(-1, 0, -1), at.offset(1, 2, 1),
+                "commande setblock " + mark.getX() + " " + mark.getY() + " " + mark.getZ() + " minecraft:gold_block");
+        helper.succeedWhen(() -> {
+            helper.assertBlockPresent(Blocks.GOLD_BLOCK, new BlockPos(3, 2, 3));
+            com.waylays.eraphones.event.Triggers.removeForTest(helper.getLevel().getServer(), name);
+            helper.getLevel().getServer().getPlayerList().remove(p);
+        });
+    }
+
     @GameTest(template = "platform", skyAccess = true)
     public static void numbersAreRead(GameTestHelper helper) {
         helper.assertTrue("555-0142".equals(Numbers.normalize("5550142")), "seven digits");

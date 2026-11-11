@@ -104,6 +104,8 @@ public final class Triggers extends SavedData {
     private static final Map<String, Set<UUID>> INSIDE = new HashMap<>();
     private static final List<Pending> PENDING = new ArrayList<>();
     private static final Map<UUID, Long> SHOWING = new HashMap<>();
+    /** The game masters who set the zones off themselves (even in creative), to try them: /declencheur moi. */
+    private static final Set<UUID> TESTERS = new HashSet<>();
 
     private record Pending(String zone, UUID player, int from, long at) {}
 
@@ -208,7 +210,7 @@ public final class Triggers extends SavedData {
             AABB box = z.box();
             Set<UUID> now_in = new HashSet<>();
             for (ServerPlayer p : level.players()) {
-                if (p.isCreative() || p.isSpectator() || !box.contains(p.position())) {
+                if ((p.isCreative() && !TESTERS.contains(p.getUUID())) || p.isSpectator() || !box.contains(p.position())) {
                     continue;
                 }
                 now_in.add(p.getUUID());
@@ -250,6 +252,13 @@ public final class Triggers extends SavedData {
             setDirty();
         }
         run(z, p, 0, now);
+        // The game masters see it go off, above their hotbar
+        Component note = Component.translatable("event.eraphones.trigger.fired", z.name, p.getGameProfile().getName()).withStyle(ChatFormatting.GOLD);
+        for (ServerPlayer gm : p.server.getPlayerList().getPlayers()) {
+            if (gm.hasPermissions(RpConfig.get(RpConfig.HORROR_PERMISSION, 2))) {
+                gm.displayClientMessage(note, true);
+            }
+        }
     }
 
     /** Does the zone's actions from {@code from} on, until a pause (the rest waits for it). */
@@ -401,9 +410,28 @@ public final class Triggers extends SavedData {
     public static void onStopped(ServerStoppedEvent event) {
         POS1.clear();
         POS2.clear();
+        TESTERS.clear();
         INSIDE.clear();
         PENDING.clear();
         SHOWING.clear();
+    }
+
+    /** For the tests: a zone from {@code min} to {@code max} doing {@code action} each time anyone walks in. */
+    public static void putForTest(ServerLevel level, String name, BlockPos min, BlockPos max, String action) {
+        Triggers t = get(level.getServer());
+        Zone z = new Zone();
+        z.name = name;
+        z.dim = level.dimension();
+        z.min = min;
+        z.max = max;
+        z.mode = "toujours";
+        z.actions.add(action);
+        t.zones.put(name, z);
+    }
+
+    public static void removeForTest(MinecraftServer server, String name) {
+        get(server).zones.remove(name);
+        INSIDE.remove(name);
     }
 
     // ---------------------------------------------------------------- /declencheur
@@ -460,6 +488,17 @@ public final class Triggers extends SavedData {
                 .then(Commands.argument("joueur", EntityArgument.players()).executes(c -> test(c, EntityArgument.getPlayers(c, "joueur"))))));
         root.then(Commands.literal("info").then(named().executes(Triggers::info)));
         root.then(Commands.literal("liste").executes(Triggers::list));
+        root.then(Commands.literal("moi").executes(c -> {
+            ServerPlayer gm = c.getSource().getPlayerOrException();
+            boolean on = TESTERS.add(gm.getUUID());
+            if (!on) {
+                TESTERS.remove(gm.getUUID());
+            }
+            INSIDE.values().forEach(set -> set.remove(gm.getUUID()));
+            c.getSource().sendSuccess(() -> Component.translatable(on ? "event.eraphones.trigger.me_on" : "event.eraphones.trigger.me_off")
+                    .withStyle(ChatFormatting.GOLD), false);
+            return 1;
+        }));
         root.then(Commands.literal("montrer").executes(c -> showZones(c, 60))
                 .then(Commands.argument("secondes", IntegerArgumentType.integer(0, 3600)).executes(c -> showZones(c, IntegerArgumentType.getInteger(c, "secondes")))));
         d.register(root);
@@ -496,6 +535,9 @@ public final class Triggers extends SavedData {
         c.getSource().sendSuccess(() -> Component.translatable("event.eraphones.trigger.created", name,
                 z.max.getX() - z.min.getX() + 1, z.max.getY() - z.min.getY() + 1, z.max.getZ() - z.min.getZ() + 1).withStyle(ChatFormatting.GOLD), true);
         SHOWING.put(gm.getUUID(), gm.level().getGameTime() + 200);
+        if (gm.isCreative() && !TESTERS.contains(gm.getUUID())) {
+            c.getSource().sendSuccess(() -> Component.translatable("event.eraphones.trigger.creative_hint").withStyle(ChatFormatting.YELLOW), false);
+        }
         return 1;
     }
 
@@ -607,6 +649,9 @@ public final class Triggers extends SavedData {
         if (z.actions.isEmpty()) {
             c.getSource().sendSuccess(() -> Component.translatable("event.eraphones.trigger.no_actions").withStyle(ChatFormatting.DARK_GRAY), false);
         }
+        if (z.mode.equals("une_fois") && z.fired) {
+            c.getSource().sendSuccess(() -> Component.translatable("event.eraphones.trigger.spent", z.name).withStyle(ChatFormatting.YELLOW), false);
+        }
         return z.actions.size();
     }
 
@@ -637,7 +682,7 @@ public final class Triggers extends SavedData {
     }
 
     private static int help(CommandContext<CommandSourceStack> c) {
-        for (String line : new String[] {"pos", "creer", "action", "attendre", "mode", "tester", "gerer"}) {
+        for (String line : new String[] {"pos", "creer", "action", "attendre", "mode", "tester", "moi", "gerer"}) {
             c.getSource().sendSuccess(() -> Component.translatable("event.eraphones.trigger.help." + line).withStyle(ChatFormatting.GRAY), false);
         }
         return 1;

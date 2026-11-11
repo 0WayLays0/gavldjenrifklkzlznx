@@ -96,6 +96,8 @@ Une zone invisible ; quand un joueur y entre, ce qui a été prévu lui arrive t
 
 Exemple : `/declencheur action ruelle son rire`, `/declencheur action ruelle attendre 3`, `/declencheur action ruelle ballon`.
 
+**Important :** les joueurs en **créatif** ou spectateur ne déclenchent rien (pour que le staff puisse circuler). Pour essayer une zone toi-même : `/declencheur moi` (tu la déclenches même en créatif ; à nouveau pour arrêter), ou `/declencheur tester <nom>`, ou passe en survie. En mode `une_fois`, la zone ne part qu'une fois : `reset <nom>` pour la réarmer. Quand une zone part, le staff le voit au-dessus de sa barre (« Déclencheur X lancé par Y »).
+
 ## Inventaire limité et sacs à dos
 
 Les joueurs (sauf en créatif ou en spectateur) n'ont **pas d'inventaire** : seulement les **5 premières cases** de leur barre, dessinée plus courte, centrée, plus la main secondaire. La molette fait le tour de ces 5 cases. Les autres cases sont grisées et fermées dans tous les écrans (inventaire, coffres…). Ce qui arrive dans une case fermée va dans le sac à dos, sinon dans une case libre de la main, sinon par terre. On ne ramasse rien s'il n'y a pas de place.

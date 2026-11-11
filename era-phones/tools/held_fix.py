@@ -112,7 +112,8 @@ def stance(kind):
     """Where the model's x, y, z go in the world (player facing +z, up +y): its top up; its front (z) forward, or
     toward the holder for "back"."""
     up = np.array([0, 1.0, 0])
-    fwd = np.array([0, 0, -1.0]) if kind == "back" else np.array([0, 0, 1.0])
+    # "back": its front toward the holder; "point": lying forward, its front (north, -z: a lamp's lens) ahead of the holder
+    fwd = np.array([0, 0, -1.0]) if kind in ("back", "point") else np.array([0, 0, 1.0])
     return np.column_stack([np.cross(up, fwd), up, fwd])
 
 
