@@ -218,7 +218,7 @@ public class WorkshopScreen extends Screen {
         for (int i = 0; i < CODES.length(); i++) {
             String code = "&" + CODES.charAt(i);
             int c = CODE_COLOURS[i];
-            Button b = new Button(x + i * 17, y, 15, 12, Component.empty(), btn -> put.accept(code), Button.DEFAULT_NARRATION) {
+            Button b = new Button(x + i * 17, y, 15, 12, Component.empty(), btn -> put.accept(code), narration -> narration.get()) {
                 @Override
                 protected void renderWidget(GuiGraphics g, int mx, int my, float pt) {
                     g.fill(getX(), getY(), getX() + width, getY() + height, isHovered() ? 0xFFFFFFFF : LINE);
