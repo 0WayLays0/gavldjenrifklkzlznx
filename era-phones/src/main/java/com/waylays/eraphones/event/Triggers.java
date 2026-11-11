@@ -429,6 +429,21 @@ public final class Triggers extends SavedData {
         t.zones.put(name, z);
     }
 
+    /** For the tests: what the server's watch does for one player now (walking into a zone sets it off). */
+    public static void watchForTest(ServerPlayer p) {
+        Triggers t = get(p.server);
+        long now = p.server.overworld().getGameTime();
+        for (Zone z : new ArrayList<>(t.zones.values())) {
+            if (!z.enabled || !z.dim.equals(p.level().dimension()) || (p.isCreative() && !TESTERS.contains(p.getUUID())) || p.isSpectator()) {
+                continue;
+            }
+            Set<UUID> inside = INSIDE.computeIfAbsent(z.name, k -> new HashSet<>());
+            if (z.box().contains(p.position()) && inside.add(p.getUUID())) {
+                t.fire(z, p, now, false);
+            }
+        }
+    }
+
     public static void removeForTest(MinecraftServer server, String name) {
         get(server).zones.remove(name);
         INSIDE.remove(name);

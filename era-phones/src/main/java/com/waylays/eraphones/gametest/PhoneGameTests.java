@@ -52,21 +52,27 @@ public final class PhoneGameTests {
         });
     }
 
-    /** A zone trigger goes off when a player in survival walks into it (its action: a gold block placed). */
-    @GameTest(template = "platform", skyAccess = true, timeoutTicks = 80)
+    /** A zone trigger goes off when a player in survival walks into it (its action: a gold block placed); not in creative. */
+    @GameTest(template = "platform", skyAccess = true, timeoutTicks = 40)
     public static void aZoneTriggerGoesOff(GameTestHelper helper) {
-        net.minecraft.server.level.ServerPlayer p = helper.makeMockServerPlayerInLevel();
-        p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        net.minecraft.server.level.ServerPlayer p = net.neoforged.neoforge.common.util.FakePlayerFactory.get(helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "zone_tester"));
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
-        p.teleportTo(at.getX() + .5, at.getY(), at.getZ() + .5);
+        p.setPos(at.getX() + .5, at.getY(), at.getZ() + .5);
         BlockPos mark = helper.absolutePos(new BlockPos(3, 2, 3));
         String name = "test_zone_" + at.asLong();
         com.waylays.eraphones.event.Triggers.putForTest(helper.getLevel(), name, at.offset(-1, 0, -1), at.offset(1, 2, 1),
                 "commande setblock " + mark.getX() + " " + mark.getY() + " " + mark.getZ() + " minecraft:gold_block");
+        // In creative: nothing
+        p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+        com.waylays.eraphones.event.Triggers.watchForTest(p);
+        helper.assertBlockNotPresent(Blocks.GOLD_BLOCK, new BlockPos(3, 2, 3));
+        // In survival: it goes off
+        p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        com.waylays.eraphones.event.Triggers.watchForTest(p);
         helper.succeedWhen(() -> {
             helper.assertBlockPresent(Blocks.GOLD_BLOCK, new BlockPos(3, 2, 3));
             com.waylays.eraphones.event.Triggers.removeForTest(helper.getLevel().getServer(), name);
-            helper.getLevel().getServer().getPlayerList().remove(p);
         });
     }
 
