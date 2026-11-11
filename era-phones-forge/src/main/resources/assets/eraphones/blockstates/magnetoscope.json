@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "eraphones:block/magnetoscope"
+    },
+    "facing=west": {
+      "model": "eraphones:block/magnetoscope",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "eraphones:block/magnetoscope",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "eraphones:block/magnetoscope",
+      "y": 270
+    }
+  }
+}

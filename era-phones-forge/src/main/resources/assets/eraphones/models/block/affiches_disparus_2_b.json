@@ -1,0 +1,42 @@
+{
+  "render_type": "minecraft:cutout",
+  "ambientocclusion": false,
+  "textures": {
+    "t": "eraphones:block/affiches_disparus_2_b",
+    "particle": "eraphones:block/affiches_disparus_2_b"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0.05
+      ],
+      "to": [
+        16,
+        16,
+        0.3
+      ],
+      "faces": {
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#t"
+        },
+        "north": {
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ],
+          "texture": "#t"
+        }
+      }
+    }
+  ]
+}

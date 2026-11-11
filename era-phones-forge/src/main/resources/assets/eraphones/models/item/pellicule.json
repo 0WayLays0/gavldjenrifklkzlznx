@@ -1,0 +1,39 @@
+{
+  "parent": "eraphones:item/pellicule_3d",
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -1.56,
+        -0.68
+      ],
+      "scale": [
+        0.249,
+        0.249,
+        0.249
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -1.56,
+        -0.68
+      ],
+      "scale": [
+        0.249,
+        0.249,
+        0.249
+      ]
+    }
+  }
+}

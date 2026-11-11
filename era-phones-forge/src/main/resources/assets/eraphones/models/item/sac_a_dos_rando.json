@@ -1,0 +1,39 @@
+{
+  "parent": "eraphones:item/sac_a_dos_rando_3d",
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -3.74,
+        -4.27
+      ],
+      "scale": [
+        0.543,
+        0.543,
+        0.543
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -3.74,
+        -4.27
+      ],
+      "scale": [
+        0.543,
+        0.543,
+        0.543
+      ]
+    }
+  }
+}

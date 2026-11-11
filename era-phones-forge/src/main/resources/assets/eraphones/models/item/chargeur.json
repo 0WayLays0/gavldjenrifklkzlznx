@@ -1,0 +1,14 @@
+{
+  "loader": "forge:separate_transforms",
+  "base": {
+    "parent": "eraphones:item/chargeur_3d"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "eraphones:item/chargeur_icon"
+    },
+    "fixed": {
+      "parent": "eraphones:item/chargeur_icon"
+    }
+  }
+}

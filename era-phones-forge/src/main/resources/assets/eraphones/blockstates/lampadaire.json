@@ -1,0 +1,124 @@
+{
+  "variants": {
+    "facing=south,lit=false,part=0": {
+      "model": "eraphones:block/lampadaire"
+    },
+    "facing=south,lit=false,part=1": {
+      "model": "eraphones:block/lampadaire_milieu"
+    },
+    "facing=south,lit=false,part=2": {
+      "model": "eraphones:block/lampadaire_poteau"
+    },
+    "facing=south,lit=false,part=3": {
+      "model": "eraphones:block/lampadaire_haut"
+    },
+    "facing=south,lit=true,part=0": {
+      "model": "eraphones:block/lampadaire"
+    },
+    "facing=south,lit=true,part=1": {
+      "model": "eraphones:block/lampadaire_milieu"
+    },
+    "facing=south,lit=true,part=2": {
+      "model": "eraphones:block/lampadaire_poteau"
+    },
+    "facing=south,lit=true,part=3": {
+      "model": "eraphones:block/lampadaire_haut_allume"
+    },
+    "facing=west,lit=false,part=0": {
+      "model": "eraphones:block/lampadaire",
+      "y": 90
+    },
+    "facing=west,lit=false,part=1": {
+      "model": "eraphones:block/lampadaire_milieu",
+      "y": 90
+    },
+    "facing=west,lit=false,part=2": {
+      "model": "eraphones:block/lampadaire_poteau",
+      "y": 90
+    },
+    "facing=west,lit=false,part=3": {
+      "model": "eraphones:block/lampadaire_haut",
+      "y": 90
+    },
+    "facing=west,lit=true,part=0": {
+      "model": "eraphones:block/lampadaire",
+      "y": 90
+    },
+    "facing=west,lit=true,part=1": {
+      "model": "eraphones:block/lampadaire_milieu",
+      "y": 90
+    },
+    "facing=west,lit=true,part=2": {
+      "model": "eraphones:block/lampadaire_poteau",
+      "y": 90
+    },
+    "facing=west,lit=true,part=3": {
+      "model": "eraphones:block/lampadaire_haut_allume",
+      "y": 90
+    },
+    "facing=north,lit=false,part=0": {
+      "model": "eraphones:block/lampadaire",
+      "y": 180
+    },
+    "facing=north,lit=false,part=1": {
+      "model": "eraphones:block/lampadaire_milieu",
+      "y": 180
+    },
+    "facing=north,lit=false,part=2": {
+      "model": "eraphones:block/lampadaire_poteau",
+      "y": 180
+    },
+    "facing=north,lit=false,part=3": {
+      "model": "eraphones:block/lampadaire_haut",
+      "y": 180
+    },
+    "facing=north,lit=true,part=0": {
+      "model": "eraphones:block/lampadaire",
+      "y": 180
+    },
+    "facing=north,lit=true,part=1": {
+      "model": "eraphones:block/lampadaire_milieu",
+      "y": 180
+    },
+    "facing=north,lit=true,part=2": {
+      "model": "eraphones:block/lampadaire_poteau",
+      "y": 180
+    },
+    "facing=north,lit=true,part=3": {
+      "model": "eraphones:block/lampadaire_haut_allume",
+      "y": 180
+    },
+    "facing=east,lit=false,part=0": {
+      "model": "eraphones:block/lampadaire",
+      "y": 270
+    },
+    "facing=east,lit=false,part=1": {
+      "model": "eraphones:block/lampadaire_milieu",
+      "y": 270
+    },
+    "facing=east,lit=false,part=2": {
+      "model": "eraphones:block/lampadaire_poteau",
+      "y": 270
+    },
+    "facing=east,lit=false,part=3": {
+      "model": "eraphones:block/lampadaire_haut",
+      "y": 270
+    },
+    "facing=east,lit=true,part=0": {
+      "model": "eraphones:block/lampadaire",
+      "y": 270
+    },
+    "facing=east,lit=true,part=1": {
+      "model": "eraphones:block/lampadaire_milieu",
+      "y": 270
+    },
+    "facing=east,lit=true,part=2": {
+      "model": "eraphones:block/lampadaire_poteau",
+      "y": 270
+    },
+    "facing=east,lit=true,part=3": {
+      "model": "eraphones:block/lampadaire_haut_allume",
+      "y": 270
+    }
+  }
+}

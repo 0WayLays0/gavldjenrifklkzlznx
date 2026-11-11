@@ -1,0 +1,47 @@
+{
+  "parent": "eraphones:item/baladeur_3d",
+  "overrides": [
+    {
+      "predicate": {
+        "eraphones:charge": 1
+      },
+      "model": "eraphones:item/baladeur_charge"
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.09,
+        -1.1,
+        0.58
+      ],
+      "scale": [
+        0.341,
+        0.341,
+        0.341
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.09,
+        -1.1,
+        0.58
+      ],
+      "scale": [
+        0.341,
+        0.341,
+        0.341
+      ]
+    }
+  }
+}

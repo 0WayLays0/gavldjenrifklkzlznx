@@ -1,0 +1,39 @@
+{
+  "parent": "eraphones:item/appareil_photo_3d",
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -1.77,
+        -0.22
+      ],
+      "scale": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -1.77,
+        -0.22
+      ],
+      "scale": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    }
+  }
+}

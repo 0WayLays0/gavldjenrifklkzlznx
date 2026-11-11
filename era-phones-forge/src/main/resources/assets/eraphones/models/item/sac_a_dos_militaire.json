@@ -1,0 +1,39 @@
+{
+  "parent": "eraphones:item/sac_a_dos_militaire_3d",
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -3.56,
+        -3.18
+      ],
+      "scale": [
+        0.597,
+        0.597,
+        0.597
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -3.56,
+        -3.18
+      ],
+      "scale": [
+        0.597,
+        0.597,
+        0.597
+      ]
+    }
+  }
+}

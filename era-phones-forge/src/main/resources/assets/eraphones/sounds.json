@@ -1,0 +1,116 @@
+{
+  "radio_static": {
+    "sounds": [
+      {
+        "name": "eraphones:radio_static"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.radio_static"
+  },
+  "talkie_squelch": {
+    "sounds": [
+      {
+        "name": "eraphones:talkie_squelch"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.talkie_squelch"
+  },
+  "boite_a_musique": {
+    "sounds": [
+      {
+        "name": "eraphones:boite_a_musique",
+        "attenuation_distance": 20
+      }
+    ],
+    "subtitle": "subtitles.eraphones.boite_a_musique"
+  },
+  "coeur_peur": {
+    "sounds": [
+      {
+        "name": "eraphones:coeur_peur"
+      }
+    ]
+  },
+  "souffle_peur": {
+    "sounds": [
+      {
+        "name": "eraphones:souffle_peur"
+      }
+    ]
+  },
+  "photo_declic": {
+    "sounds": [
+      {
+        "name": "eraphones:photo_declic"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.photo_declic"
+  },
+  "cabine_sonnerie": {
+    "sounds": [
+      {
+        "name": "eraphones:cabine_sonnerie",
+        "attenuation_distance": 32
+      }
+    ],
+    "subtitle": "subtitles.eraphones.cabine_sonnerie"
+  },
+  "cabine_piece": {
+    "sounds": [
+      {
+        "name": "eraphones:cabine_piece"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.cabine_piece"
+  },
+  "cabine_touche": {
+    "sounds": [
+      {
+        "name": "eraphones:cabine_touche"
+      }
+    ]
+  },
+  "velo_sonnette": {
+    "sounds": [
+      {
+        "name": "eraphones:velo_sonnette",
+        "attenuation_distance": 24
+      }
+    ],
+    "subtitle": "subtitles.eraphones.velo_sonnette"
+  },
+  "lampadaire_bourdonnement": {
+    "sounds": [
+      {
+        "name": "eraphones:lampadaire_bourdonnement",
+        "attenuation_distance": 20
+      }
+    ],
+    "subtitle": "subtitles.eraphones.lampadaire_bourdonnement"
+  },
+  "lampadaire_claquement": {
+    "sounds": [
+      {
+        "name": "eraphones:lampadaire_claquement",
+        "attenuation_distance": 20
+      }
+    ],
+    "subtitle": "subtitles.eraphones.lampadaire_claquement"
+  },
+  "coupure_courant": {
+    "sounds": [
+      {
+        "name": "eraphones:coupure_courant"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.coupure_courant"
+  },
+  "repondeur_bip": {
+    "sounds": [
+      {
+        "name": "eraphones:repondeur_bip"
+      }
+    ],
+    "subtitle": "subtitles.eraphones.repondeur_bip"
+  }
+}

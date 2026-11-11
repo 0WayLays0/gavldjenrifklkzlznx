@@ -13,3 +13,7 @@ run-gametest/
 .settings/
 bin/
 __pycache__/
+era-phones-forge/build/
+era-phones-forge/run/
+era-phones-forge/run-gametest/
+era-phones-forge/.gradle/

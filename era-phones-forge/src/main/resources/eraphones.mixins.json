@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.waylays.eraphones.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "eraphones.refmap.json",
+  "client": [
+    "HumanoidModelMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "EntityRiderMixin",
+    "ChunkMapAccessor",
+    "TrackedEntityAccessor",
+    "LivingEntityAccessor"
+  ]
+}

@@ -1,0 +1,266 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "t": "eraphones:block/lecteur_carte",
+    "particle": "eraphones:block/lecteur_carte"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        4,
+        0
+      ],
+      "to": [
+        11,
+        13,
+        1.6
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.0,
+            0.0,
+            5.25,
+            7.875
+          ],
+          "texture": "#t"
+        },
+        "south": {
+          "uv": [
+            5.25,
+            0.0,
+            10.5,
+            7.875
+          ],
+          "texture": "#t"
+        },
+        "east": {
+          "uv": [
+            10.5,
+            0.0,
+            11.90625,
+            7.875
+          ],
+          "texture": "#t"
+        },
+        "west": {
+          "uv": [
+            11.90625,
+            0.0,
+            13.3125,
+            7.875
+          ],
+          "texture": "#t"
+        },
+        "up": {
+          "uv": [
+            0.0,
+            7.875,
+            5.25,
+            9.28125
+          ],
+          "texture": "#t"
+        },
+        "down": {
+          "uv": [
+            5.25,
+            7.875,
+            10.5,
+            9.28125
+          ],
+          "texture": "#t"
+        }
+      }
+    },
+    {
+      "from": [
+        10.6,
+        6,
+        1.6
+      ],
+      "to": [
+        11,
+        11.5,
+        1.9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10.5,
+            7.875,
+            10.84375,
+            12.6875
+          ],
+          "texture": "#t"
+        },
+        "south": {
+          "uv": [
+            10.84375,
+            7.875,
+            11.1875,
+            12.6875
+          ],
+          "texture": "#t"
+        },
+        "east": {
+          "uv": [
+            11.1875,
+            7.875,
+            11.4375,
+            12.6875
+          ],
+          "texture": "#t"
+        },
+        "west": {
+          "uv": [
+            11.4375,
+            7.875,
+            11.6875,
+            12.6875
+          ],
+          "texture": "#t"
+        },
+        "up": {
+          "uv": [
+            11.6875,
+            7.875,
+            12.03125,
+            8.125
+          ],
+          "texture": "#t"
+        },
+        "down": {
+          "uv": [
+            12.03125,
+            7.875,
+            12.375,
+            8.125
+          ],
+          "texture": "#t"
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        35,
+        0
+      ],
+      "translation": [
+        0,
+        1.5,
+        0
+      ],
+      "scale": [
+        0.72,
+        0.72,
+        0.72
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        72,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        1
+      ],
+      "scale": [
+        0.36,
+        0.36,
+        0.36
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        72,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        1
+      ],
+      "scale": [
+        0.36,
+        0.36,
+        0.36
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        8,
+        -24,
+        0
+      ],
+      "translation": [
+        -1,
+        5.5,
+        -2
+      ],
+      "scale": [
+        0.32,
+        0.32,
+        0.32
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        8,
+        24,
+        0
+      ],
+      "translation": [
+        -1,
+        5.5,
+        -2
+      ],
+      "scale": [
+        0.32,
+        0.32,
+        0.32
+      ]
+    }
+  }
+}
