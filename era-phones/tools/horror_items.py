@@ -162,7 +162,7 @@ def doll():
             for x in range(4, w, 10):
                 d.ellipse((x - 1.5, y - 1.5, x + 1.5, y + 1.5), fill=(236, 200, 210, 255))
         # Faded, a stain or two
-        d.ellipse((w * .6, h * .5, w * .8, h * .65), fill=(170, 120, 120, 90))
+        d.ellipse((w * .6, h * .5, w * .8, h * .65), fill=(198, 138, 150, 255))
 
     def hem(tile):
         w, h = tile.size

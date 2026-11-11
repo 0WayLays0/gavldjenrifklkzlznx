@@ -389,9 +389,13 @@ def vcr():
     def front(tile):
         w, h = tile.size
         vgrad(tile, (214, 216, 222), (150, 154, 160))
-        d = ImageDraw.Draw(tile)
+        # Brushed lines, blended over (drawn straight on, their faint alpha would make holes in the face)
+        lines = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        ld = ImageDraw.Draw(lines)
         for y in range(0, h, 2):
-            d.line((0, y, w, y), fill=(255, 255, 255, 18))
+            ld.line((0, y, w, y), fill=(255, 255, 255, 18))
+        tile.alpha_composite(lines)
+        d = ImageDraw.Draw(tile)
         d.rounded_rectangle((10, 12, int(w * .45), h - 14), radius=3, fill=(26, 28, 32, 255))
         d.line((12, 16, int(w * .45) - 2, 16), fill=(70, 72, 80, 255))
         d.rounded_rectangle((int(w * .52), 12, w - 12, 38), radius=3, fill=(10, 12, 16, 255))

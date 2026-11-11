@@ -3,8 +3,8 @@ package com.waylays.eraphones.arms.client;
 import com.waylays.eraphones.EraPhones;
 import com.waylays.eraphones.arms.Arms;
 import com.waylays.eraphones.arms.Proc;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -12,10 +12,33 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 import java.util.List;
 
-/** The chance effects written under an item's name: "5 % on a blow: sets on fire (4 s)". */
+/** The chance effects written under an item's name: "✦ 5 % on a blow → the target: Poison II (4 s)". */
 @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT)
 public final class ArmsClient {
     private ArmsClient() {}
+
+    public static Component line(Proc raw) {
+        Proc p = raw.normalized();
+        String chance = p.chance() == Math.rint(p.chance()) ? String.valueOf((int) p.chance()) : String.valueOf(p.chance());
+        MutableComponent what = Effects.name(p.type()).copy();
+        if (!p.special() && p.power() > 1) {
+            what.append(" " + roman(p.power()));
+        } else if (p.special() && p.power() > 0 && !p.type().equals("*feu")) {
+            what.append(" " + p.power() + (p.type().equals("*vol_de_vie") ? " %" : ""));
+        }
+        if (p.seconds() > 0 && !p.type().equals("*foudre") && !p.type().equals("*degats") && !p.type().equals("*epines")
+                && !p.type().equals("*soin") && !p.type().equals("*vol_de_vie") && !p.type().equals("*recul")) {
+            what.append(" (" + p.seconds() + " s)");
+        }
+        return Component.translatable(p.guard() ? "arms.eraphones.line_guard" : "arms.eraphones.line_strike", chance,
+                        Component.translatable(p.self() ? "arms.eraphones.on_self" : "arms.eraphones.on_other"), what)
+                .withColor(p.guard() ? 0xFF7FD4FF : 0xFFFFB45A);
+    }
+
+    static String roman(int n) {
+        String[] r = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
+        return n >= 0 && n < r.length ? r[n] : String.valueOf(n);
+    }
 
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {
@@ -25,15 +48,7 @@ public final class ArmsClient {
         }
         event.getToolTip().add(Component.empty());
         for (Proc p : procs) {
-            Proc.Kind k = Proc.Kind.of(p.type());
-            if (k == null) {
-                continue;
-            }
-            String chance = p.chance() == Math.rint(p.chance()) ? String.valueOf((int) p.chance()) : String.valueOf(p.chance());
-            Component what = Component.translatable("arms.eraphones.proc." + k.id);
-            String details = (k.usesPower ? " " + p.power() : "") + (k.usesSeconds ? " (" + p.seconds() + " s)" : "");
-            event.getToolTip().add(Component.translatable(k.strike ? "arms.eraphones.line_strike" : "arms.eraphones.line_guard", chance, what, details)
-                    .withStyle(k.strike ? ChatFormatting.GOLD : ChatFormatting.AQUA));
+            event.getToolTip().add(line(p));
         }
     }
 }

@@ -1,3 +1,39 @@
 {
-  "parent": "eraphones:item/talkie_walkie_3d"
+  "parent": "eraphones:item/talkie_walkie_3d",
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        -0.07,
+        -1.29,
+        0.14
+      ],
+      "scale": [
+        0.357,
+        0.357,
+        0.357
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        -0.07,
+        -1.29,
+        0.14
+      ],
+      "scale": [
+        0.357,
+        0.357,
+        0.357
+      ]
+    }
+  }
 }

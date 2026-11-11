@@ -117,13 +117,16 @@ Un **baladeur** à cassette (onglet Son & image) : une cassette dedans à la foi
 ## Outils du staff (lot 2)
 
 ### Atelier d'armes : `/arme`
-Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme` : l'atelier s'ouvre sur lui, en trois onglets.
-- **Général** : son nom, 4 lignes de lore (couleurs : `&c` rouge, `&6` or, `&e` jaune, `&a` vert, `&b` turquoise, `&9` bleu, `&d` rose, `&l` gras), incassable, brillance.
-- **Stats** : dégâts, vitesse d'attaque (comme affichés sous l'objet : une main nue = 1 et 4), armure, robustesse, résistance au recul, vitesse (%), PV max (+), portée (+). Une case vide = rien. Pour une armure, les stats comptent quand elle est portée ; pour le reste, en main.
-- **Effets %** : jusqu'à 6 effets à pourcentage. Clic sur le nom pour changer l'effet ; puis la chance en %, la force, les secondes.
-  - **En frappant** (orange, l'arme en main) : enflamme, poison, flétrissure, lenteur, faiblesse, cécité, nausée, gel, foudre, recul, vol de vie %, dégâts bonus, lévitation.
-  - **En étant frappé** (bleu, sur ce qu'on porte ou tient) : épines, brûle l'attaquant, repousse l'attaquant, ralentit l'attaquant, soin, résistance, vitesse, absorption, régénération, invisibilité.
-  - Les effets s'affichent sous l'objet (« ✦ 5 % en frappant : enflamme (4 s) »).
+Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme`. L'atelier s'ouvre : l'objet en haut, quatre onglets, et à droite l'**aperçu** de l'objet tel qu'il sera (nom, lore, stats, effets), mis à jour pendant que tu écris.
+- **Général** : son nom, incassable, brillance. Pastilles de couleur : un clic ajoute le code (`&c` rouge, `&6` or…), plus `&l` gras, `&o` italique, `&n` souligné, `&r` normal.
+- **Lore** : une grande zone de texte, jusqu'à **16 lignes** (Entrée pour changer de ligne), avec les mêmes pastilles de couleur.
+- **Stats** : dégâts, vitesse d'attaque (comme affichés sous l'objet : une main nue = 1 et 4), armure, robustesse, résistance au recul, vitesse (%), PV max (+), portée (+). Une case vide = rien.
+- **Effets %** : jusqu'à 8 lignes. Pour chacune :
+  - **Quand** : *Frappe* (quand celui qui le tient tape) ou *Défense* (quand celui qui le porte ou le tient est touché) ;
+  - **l'effet** : clic dessus ouvre la liste de **tous les effets du jeu et de tous les mods installés**, avec leur icône, qu'on fait défiler à la molette, et une **barre de recherche** (Entrée prend le premier). En tête, les actions de l'atelier : enflamme, foudre, recul, vol de vie, dégâts ±, épines, soin, gel ;
+  - **Sur** : *Autre* (celui qu'on frappe, ou celui qui nous frappe) ou *Soi* ;
+  - la **chance en %**, la **force** (niveau de l'effet, ou points, ou % pour le vol de vie), les **secondes**.
+  - Sous l'objet : « ✦ 5 % en frappant → l'autre : Poison II (5 s) ».
 
 ### Porter quelqu'un
 Accroupi + clic droit main vide sur un joueur : il reçoit une demande dans le chat ([Accepter] ou `/porter accepter`). Il est alors porté dans les bras, allongé, devant le porteur, qui marche plus lentement. Accroupi + clic droit main vide (ou `/porter lacher`) : on le pose. Le porté descend en s'accroupissant. Staff : `/porter <porteur> <porté>` sans demander.

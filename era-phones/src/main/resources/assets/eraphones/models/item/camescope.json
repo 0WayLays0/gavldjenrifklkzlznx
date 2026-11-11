@@ -1,6 +1,40 @@
 {
   "parent": "eraphones:item/camescope_3d",
   "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        -0.63,
+        -3.3,
+        -2.09
+      ],
+      "scale": [
+        0.646,
+        0.646,
+        0.646
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        -0.63,
+        -3.3,
+        -2.09
+      ],
+      "scale": [
+        0.646,
+        0.646,
+        0.646
+      ]
+    },
     "firstperson_righthand": {
       "rotation": [
         0,

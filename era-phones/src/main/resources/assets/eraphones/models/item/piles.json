@@ -1,3 +1,39 @@
 {
-  "parent": "eraphones:item/piles_3d"
+  "parent": "eraphones:item/piles_3d",
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -1.57,
+        -0.72
+      ],
+      "scale": [
+        0.271,
+        0.271,
+        0.271
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -1.57,
+        -0.72
+      ],
+      "scale": [
+        0.271,
+        0.271,
+        0.271
+      ]
+    }
+  }
 }

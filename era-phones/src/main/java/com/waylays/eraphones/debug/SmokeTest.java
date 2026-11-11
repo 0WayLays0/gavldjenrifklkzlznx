@@ -1008,8 +1008,8 @@ public final class SmokeTest {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
             if (p != null) {
                 ItemStack sword = new ItemStack(net.minecraft.world.item.Items.IRON_SWORD);
-                sword.set(com.waylays.eraphones.arms.Arms.PROCS.get(), java.util.List.of(new com.waylays.eraphones.arms.Proc("feu", 5, 1, 4),
-                        new com.waylays.eraphones.arms.Proc("epines", 10, 2, 0)));
+                sword.set(com.waylays.eraphones.arms.Arms.PROCS.get(), java.util.List.of(new com.waylays.eraphones.arms.Proc("*feu", 5, 1, 4, false, false),
+                        new com.waylays.eraphones.arms.Proc("minecraft:poison", 10, 2, 5, false, false)));
                 p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sword);
             }
         }));
@@ -1026,6 +1026,17 @@ public final class SmokeTest {
             }
         });
         STEPS.add(() -> shot(mc, "arms_effects"));
+        STEPS.add(() -> {
+            if (mc.screen != null) {
+                for (net.minecraft.client.gui.components.events.GuiEventListener w : mc.screen.children()) {
+                    if (w instanceof net.minecraft.client.gui.components.Button b && b.getMessage().getString().startsWith("+")) {
+                        b.onPress();
+                        break;
+                    }
+                }
+            }
+        });
+        STEPS.add(() -> shot(mc, "arms_picker"));
         STEPS.add(() -> {
             mc.setScreen(null);
             server.execute(() -> {

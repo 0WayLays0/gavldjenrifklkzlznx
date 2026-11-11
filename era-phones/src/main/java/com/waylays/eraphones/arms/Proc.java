@@ -7,53 +7,55 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 import java.util.List;
+import java.util.Map;
 
 /**
- * An effect with a chance: on a weapon, when it strikes ({@code chance} percent of the time); on armour (or anything
- * held), when its bearer is struck. {@code power} is its strength (a level, points of damage or health, a percent),
- * {@code seconds} how long it lasts.
+ * An effect with a chance, on an item: rolled when its holder strikes ({@code guard} false), or when its wearer (or
+ * holder) is struck ({@code guard} true); {@code chance} percent of the time. {@code type} is any effect of the game
+ * or of a mod ("minecraft:poison", "somemod:bleeding"), or one of the workshop's own actions ("*feu": sets on fire,
+ * "*foudre", "*recul", "*vol_de_vie", "*degats", "*epines", "*soin", "*gel"). It falls on the other one (the one
+ * struck, or the attacker) or on oneself ({@code self}). {@code power}: its level, or points, or a percent;
+ * {@code seconds}: how long it lasts.
  */
-public record Proc(String type, float chance, int power, int seconds) {
+public record Proc(String type, float chance, int power, int seconds, boolean guard, boolean self) {
     public static final Codec<Proc> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.fieldOf("type").forGetter(Proc::type),
             Codec.FLOAT.fieldOf("chance").forGetter(Proc::chance),
             Codec.INT.fieldOf("power").forGetter(Proc::power),
-            Codec.INT.fieldOf("seconds").forGetter(Proc::seconds)).apply(i, Proc::new));
+            Codec.INT.fieldOf("seconds").forGetter(Proc::seconds),
+            Codec.BOOL.optionalFieldOf("guard", false).forGetter(Proc::guard),
+            Codec.BOOL.optionalFieldOf("self", false).forGetter(Proc::self)).apply(i, Proc::new));
     public static final Codec<List<Proc>> LIST_CODEC = CODEC.listOf();
     public static final StreamCodec<RegistryFriendlyByteBuf, Proc> STREAM = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, Proc::type, ByteBufCodecs.FLOAT, Proc::chance, ByteBufCodecs.VAR_INT, Proc::power,
-            ByteBufCodecs.VAR_INT, Proc::seconds, Proc::new);
+            ByteBufCodecs.VAR_INT, Proc::seconds, ByteBufCodecs.BOOL, Proc::guard, ByteBufCodecs.BOOL, Proc::self, Proc::new);
     public static final StreamCodec<RegistryFriendlyByteBuf, List<Proc>> LIST_STREAM = STREAM.apply(ByteBufCodecs.list(16));
 
-    /** The kinds: their name, whether they come of a blow struck (else of a blow taken), what they use. */
-    public enum Kind {
-        FEU("feu", true, false, true), POISON("poison", true, true, true), WITHER("wither", true, true, true),
-        LENTEUR("lenteur", true, true, true), FAIBLESSE("faiblesse", true, true, true), CECITE("cecite", true, false, true),
-        NAUSEE("nausee", true, false, true), GEL("gel", true, true, true), FOUDRE("foudre", true, true, false),
-        RECUL("recul", true, true, false), VOL_DE_VIE("vol_de_vie", true, true, false), DEGATS("degats", true, true, false),
-        LEVITATION("levitation", true, true, true),
-        EPINES("epines", false, true, false), BRULURE("brulure", false, false, true), REPOUSSER("repousser", false, true, false),
-        RALENTIR("ralentir", false, true, true), SOIN("soin", false, true, false), RESISTANCE("resistance", false, true, true),
-        VITESSE("vitesse", false, true, true), ABSORPTION("absorption", false, true, true), REGENERATION("regeneration", false, true, true),
-        INVISIBILITE("invisibilite", false, false, true);
+    /** The workshop's own actions (not effects of the game). */
+    public static final List<String> SPECIALS = List.of("*feu", "*foudre", "*recul", "*vol_de_vie", "*degats", "*epines", "*soin", "*gel");
 
-        public final String id;
-        public final boolean strike, usesPower, usesSeconds;
+    public boolean special() {
+        return type.startsWith("*");
+    }
 
-        Kind(String id, boolean strike, boolean usesPower, boolean usesSeconds) {
-            this.id = id;
-            this.strike = strike;
-            this.usesPower = usesPower;
-            this.usesSeconds = usesSeconds;
-        }
+    /** The first workshop's kinds, read as these. */
+    private static final Map<String, String[]> OLD = Map.ofEntries(
+            Map.entry("feu", new String[] {"*feu", "0", "0"}), Map.entry("foudre", new String[] {"*foudre", "0", "0"}),
+            Map.entry("recul", new String[] {"*recul", "0", "0"}), Map.entry("vol_de_vie", new String[] {"*vol_de_vie", "0", "1"}),
+            Map.entry("degats", new String[] {"*degats", "0", "0"}), Map.entry("gel", new String[] {"*gel", "0", "0"}),
+            Map.entry("poison", new String[] {"minecraft:poison", "0", "0"}), Map.entry("wither", new String[] {"minecraft:wither", "0", "0"}),
+            Map.entry("lenteur", new String[] {"minecraft:slowness", "0", "0"}), Map.entry("faiblesse", new String[] {"minecraft:weakness", "0", "0"}),
+            Map.entry("cecite", new String[] {"minecraft:blindness", "0", "0"}), Map.entry("nausee", new String[] {"minecraft:nausea", "0", "0"}),
+            Map.entry("levitation", new String[] {"minecraft:levitation", "0", "0"}), Map.entry("epines", new String[] {"*epines", "1", "0"}),
+            Map.entry("brulure", new String[] {"*feu", "1", "0"}), Map.entry("repousser", new String[] {"*recul", "1", "0"}),
+            Map.entry("ralentir", new String[] {"minecraft:slowness", "1", "0"}), Map.entry("soin", new String[] {"*soin", "1", "1"}),
+            Map.entry("resistance", new String[] {"minecraft:resistance", "1", "1"}), Map.entry("vitesse", new String[] {"minecraft:speed", "1", "1"}),
+            Map.entry("absorption", new String[] {"minecraft:absorption", "1", "1"}), Map.entry("regeneration", new String[] {"minecraft:regeneration", "1", "1"}),
+            Map.entry("invisibilite", new String[] {"minecraft:invisibility", "1", "1"}));
 
-        public static Kind of(String id) {
-            for (Kind k : values()) {
-                if (k.id.equals(id)) {
-                    return k;
-                }
-            }
-            return null;
-        }
+    /** This, as the workshop now reads it (the first workshop's kinds turned to the new ones). */
+    public Proc normalized() {
+        String[] o = OLD.get(type);
+        return o == null ? this : new Proc(o[0], chance, power, seconds, o[1].equals("1"), o[2].equals("1"));
     }
 }

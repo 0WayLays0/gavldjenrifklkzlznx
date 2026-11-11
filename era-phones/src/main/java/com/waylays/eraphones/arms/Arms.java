@@ -6,6 +6,7 @@ import com.waylays.eraphones.rp.RpConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
@@ -186,8 +187,9 @@ public final class Arms {
         stack.set(DataComponents.ATTRIBUTE_MODIFIERS, b.build());
         List<Proc> procs = new ArrayList<>();
         for (Proc pr : e.procs()) {
-            if (Proc.Kind.of(pr.type()) != null && pr.chance() > 0) {
-                procs.add(new Proc(pr.type(), Math.min(100, pr.chance()), Math.max(0, Math.min(100, pr.power())), Math.max(0, Math.min(600, pr.seconds()))));
+            if (known(pr.type()) && pr.chance() > 0) {
+                procs.add(new Proc(pr.type(), Math.min(100, pr.chance()), Math.max(0, Math.min(255, pr.power())), Math.max(0, Math.min(3600, pr.seconds())),
+                        pr.guard(), pr.self()));
             }
         }
         if (procs.isEmpty()) {
@@ -216,38 +218,34 @@ public final class Arms {
         }
         BUSY.set(true);
         try {
-            // A blow struck: the weapon's effects (only for a blow of the hand)
+            // A blow struck: what the striker holds (only for a blow of the hand)
             if (event.getSource().getDirectEntity() == attacker) {
                 List<Proc> procs = attacker.getMainHandItem().get(PROCS.get());
                 if (procs != null) {
-                    for (Proc p : procs) {
-                        Proc.Kind k = Proc.Kind.of(p.type());
-                        if (k != null && k.strike && RANDOM.nextFloat() * 100 < p.chance()) {
-                            strike(k, p, attacker, victim, event);
+                    for (Proc raw : procs) {
+                        Proc p = raw.normalized();
+                        if (!p.guard() && RANDOM.nextFloat() * 100 < p.chance()) {
+                            fire(p, attacker, victim, event);
                         }
                     }
                 }
             }
-            // A blow taken: what the victim wears or holds
+            // A blow taken: what the one struck wears or holds
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 List<Proc> procs = victim.getItemBySlot(slot).get(PROCS.get());
                 if (procs == null) {
                     continue;
                 }
-                for (Proc p : procs) {
-                    Proc.Kind k = Proc.Kind.of(p.type());
-                    if (k != null && !k.strike && RANDOM.nextFloat() * 100 < p.chance()) {
-                        guard(k, p, victim, attacker);
+                for (Proc raw : procs) {
+                    Proc p = raw.normalized();
+                    if (p.guard() && RANDOM.nextFloat() * 100 < p.chance()) {
+                        fire(p, victim, attacker, event);
                     }
                 }
             }
         } finally {
             BUSY.set(false);
         }
-    }
-
-    private static void effect(LivingEntity e, Holder<MobEffect> effect, Proc p) {
-        e.addEffect(new MobEffectInstance(effect, Math.max(1, p.seconds()) * 20, Math.max(0, p.power() - 1)));
     }
 
     private static void flash(LivingEntity e) {
@@ -257,62 +255,58 @@ public final class Arms {
         }
     }
 
-    private static void strike(Proc.Kind k, Proc p, LivingEntity a, LivingEntity v, LivingIncomingDamageEvent event) {
-        switch (k) {
-            case FEU -> v.igniteForSeconds(Math.max(1, p.seconds()));
-            case POISON -> effect(v, MobEffects.POISON, p);
-            case WITHER -> effect(v, MobEffects.WITHER, p);
-            case LENTEUR -> effect(v, MobEffects.MOVEMENT_SLOWDOWN, p);
-            case FAIBLESSE -> effect(v, MobEffects.WEAKNESS, p);
-            case CECITE -> effect(v, MobEffects.BLINDNESS, new Proc(p.type(), p.chance(), 1, p.seconds()));
-            case NAUSEE -> effect(v, MobEffects.CONFUSION, new Proc(p.type(), p.chance(), 1, p.seconds()));
-            case LEVITATION -> effect(v, MobEffects.LEVITATION, p);
-            case GEL -> {
-                effect(v, MobEffects.MOVEMENT_SLOWDOWN, new Proc(p.type(), p.chance(), p.power() + 1, p.seconds()));
-                v.setTicksFrozen(Math.max(v.getTicksFrozen(), 140 + p.seconds() * 20));
+    /** {@code p} happens: {@code me} is its item's bearer, {@code other} the one struck or striking. */
+    private static void fire(Proc p, LivingEntity me, LivingEntity other, LivingIncomingDamageEvent event) {
+        LivingEntity t = p.self() ? me : other;
+        int secs = Math.max(0, p.seconds()), power = Math.max(0, p.power());
+        if (!p.special()) {
+            ResourceLocation id = ResourceLocation.tryParse(p.type());
+            Holder<MobEffect> effect = id == null ? null : BuiltInRegistries.MOB_EFFECT.getHolder(id).orElse(null);
+            if (effect == null) {
+                return;
             }
-            case FOUDRE -> {
-                LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(v.level());
+            t.addEffect(new MobEffectInstance(effect, Math.max(1, secs * 20), Math.max(0, power - 1)), me);
+            flash(t);
+            return;
+        }
+        switch (p.type()) {
+            case "*feu" -> t.igniteForSeconds(Math.max(1, secs));
+            case "*foudre" -> {
+                LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(t.level());
                 if (bolt != null) {
-                    bolt.moveTo(v.getX(), v.getY(), v.getZ());
+                    bolt.moveTo(t.getX(), t.getY(), t.getZ());
                     bolt.setVisualOnly(true);
-                    v.level().addFreshEntity(bolt);
+                    t.level().addFreshEntity(bolt);
                 }
-                v.hurt(v.damageSources().lightningBolt(), Math.max(1, p.power()));
+                t.hurt(t.damageSources().lightningBolt(), Math.max(1, power));
             }
-            case RECUL -> {
-                Vec3 d = v.position().subtract(a.position()).multiply(1, 0, 1).normalize();
-                v.knockback(.4 + p.power() * .4, -d.x, -d.z);
+            case "*recul" -> {
+                LivingEntity from = t == other ? me : other;
+                Vec3 d = t.position().subtract(from.position()).multiply(1, 0, 1).normalize();
+                t.knockback(.4 + power * .4, -d.x, -d.z);
             }
-            case VOL_DE_VIE -> a.heal(event.getAmount() * p.power() / 100f);
-            case DEGATS -> event.setAmount(event.getAmount() + p.power());
+            case "*vol_de_vie" -> me.heal(event.getAmount() * power / 100f);
+            case "*degats" -> event.setAmount(p.guard() ? Math.max(0, event.getAmount() - power) : event.getAmount() + power);
+            case "*epines" -> t.hurt(t.damageSources().thorns(me), Math.max(1, power));
+            case "*soin" -> t.heal(Math.max(1, power));
+            case "*gel" -> {
+                t.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, Math.max(1, secs) * 20, power), me);
+                t.setTicksFrozen(Math.max(t.getTicksFrozen(), 140 + secs * 20));
+            }
             default -> {
                 return;
             }
         }
-        flash(v);
+        flash(t);
     }
 
-    private static void guard(Proc.Kind k, Proc p, LivingEntity w, LivingEntity a) {
-        switch (k) {
-            case EPINES -> a.hurt(w.damageSources().thorns(w), Math.max(1, p.power()));
-            case BRULURE -> a.igniteForSeconds(Math.max(1, p.seconds()));
-            case REPOUSSER -> {
-                Vec3 d = a.position().subtract(w.position()).multiply(1, 0, 1).normalize();
-                a.knockback(.4 + p.power() * .4, -d.x, -d.z);
-            }
-            case RALENTIR -> effect(a, MobEffects.MOVEMENT_SLOWDOWN, p);
-            case SOIN -> w.heal(Math.max(1, p.power()));
-            case RESISTANCE -> effect(w, MobEffects.DAMAGE_RESISTANCE, p);
-            case VITESSE -> effect(w, MobEffects.MOVEMENT_SPEED, p);
-            case ABSORPTION -> effect(w, MobEffects.ABSORPTION, p);
-            case REGENERATION -> effect(w, MobEffects.REGENERATION, p);
-            case INVISIBILITE -> effect(w, MobEffects.INVISIBILITY, new Proc(p.type(), p.chance(), 1, p.seconds()));
-            default -> {
-                return;
-            }
+    /** Whether {@code type} is an effect of the game (or a mod) or one of the workshop's own. */
+    public static boolean known(String type) {
+        if (Proc.SPECIALS.contains(type)) {
+            return true;
         }
-        flash(w);
+        ResourceLocation id = ResourceLocation.tryParse(type);
+        return id != null && BuiltInRegistries.MOB_EFFECT.containsKey(id);
     }
 
     // ---------------------------------------------------------------- payloads
@@ -333,7 +327,7 @@ public final class Arms {
             implements CustomPacketPayload {
         public static final Type<Edit> TYPE = new Type<>(EraPhones.id("arms_edit"));
         public static final StreamCodec<RegistryFriendlyByteBuf, Edit> CODEC = StreamCodec.composite(
-                ByteBufCodecs.stringUtf8(200), Edit::name, ByteBufCodecs.stringUtf8(200).apply(ByteBufCodecs.list(8)), Edit::lore,
+                ByteBufCodecs.stringUtf8(200), Edit::name, ByteBufCodecs.stringUtf8(300).apply(ByteBufCodecs.list(16)), Edit::lore,
                 ByteBufCodecs.BOOL, Edit::unbreakable, ByteBufCodecs.BOOL, Edit::glint, ByteBufCodecs.FLOAT.apply(ByteBufCodecs.list(16)), Edit::stats,
                 Proc.LIST_STREAM, Edit::procs, Edit::new);
 

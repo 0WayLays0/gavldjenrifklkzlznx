@@ -1,3 +1,39 @@
 {
-  "parent": "eraphones:item/cadenas_3d"
+  "parent": "eraphones:item/cadenas_3d",
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -2.2,
+        -0.43
+      ],
+      "scale": [
+        0.291,
+        0.291,
+        0.291
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -108.07,
+        0.0,
+        -180.0
+      ],
+      "translation": [
+        0.0,
+        -2.2,
+        -0.43
+      ],
+      "scale": [
+        0.291,
+        0.291,
+        0.291
+      ]
+    }
+  }
 }
