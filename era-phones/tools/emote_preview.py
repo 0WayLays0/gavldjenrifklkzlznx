@@ -144,16 +144,16 @@ def to_world(P, pts):
     return w
 
 
-def render(P, view_yaw, size=(260, 300), scale=95, ground=0.0):
-    img = Image.new("RGB", size, (236, 240, 244))
+def render(P, view_yaw, size=(260, 300), scale=95, ground=0.0, clear=False, pitch=-12):
+    img = Image.new("RGBA" if clear else "RGB", size, (0, 0, 0, 0) if clear else (236, 240, 244))
     d = ImageDraw.Draw(img)
-    cam = ry(R(view_yaw)) @ rx(R(-12))
+    cam = ry(R(view_yaw)) @ rx(R(pitch))
     light = np.array([.4, .8, -.45])
     light /= np.linalg.norm(light)
     polys = []
     cx, cy = size[0] / 2, size[1] * .86
     # the ground line
-    for gx in np.linspace(-1.2, 1.2, 13):
+    for gx in ([] if clear else np.linspace(-1.2, 1.2, 13)):
         a = cam.T @ np.array([gx, ground, -1.2])
         bb = cam.T @ np.array([gx, ground, 1.2])
         d.line((cx - a[0] * scale, cy - a[1] * scale, cx - bb[0] * scale, cy - bb[1] * scale), fill=(214, 218, 224))
@@ -171,7 +171,7 @@ def render(P, view_yaw, size=(260, 300), scale=95, ground=0.0):
             polys.append((q[:, 2].mean(), [(cx - p[0] * scale, cy - p[1] * scale) for p in q], tuple(int(min(255, ch * k)) for ch in colour)))
     polys.sort(key=lambda p: -p[0])
     for _, pts, col in polys:
-        d.polygon(pts, fill=col, outline=tuple(max(0, ch - 40) for ch in col))
+        d.polygon(pts, fill=col + ((255,) if clear else ()), outline=tuple(max(0, ch - 40) for ch in col) + ((255,) if clear else ()))
     return img
 
 
@@ -201,6 +201,53 @@ def gif(path, out, view=-35):
     end = data["emote"]["endTick"]
     frames = [render(pose_at(tracks, t), view, (260, 300), 95) for t in range(0, end + 1)]
     frames[0].save(out, save_all=True, append_images=frames[1:], duration=50, loop=0)
+
+
+def icon(path, out, tick, view=-28, side=256):
+    """The emote's icon: its most telling pose, drawn big and smooth, on a dark round of circus red and gold."""
+    from PIL import ImageFilter
+    data, tracks = load(path)
+    big = 4
+    fig = render(pose_at(tracks, tick), view, (side * big * 2, side * big * 2), side * big * .8, clear=True, pitch=-10)
+    box = fig.getbbox()
+    fig = fig.crop(box)
+    room = side * .78
+    k = min(room / fig.width, room / fig.height)
+    fig = fig.resize((max(1, int(fig.width * k)), max(1, int(fig.height * k))), Image.LANCZOS)
+    S = side * big
+    bg = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(bg)
+    m = S * .03
+    # a round: gold rim, deep red, darker to the edge, a few faint stripes like a circus tent
+    d.ellipse((m, m, S - m, S - m), fill=(214, 168, 70, 255))
+    inner = S * .07
+    d.ellipse((inner, inner, S - inner, S - inner), fill=(70, 10, 16, 255))
+    import math as _m
+    cx = cy = S / 2
+    r = S / 2 - inner
+    for i in range(12):
+        a0 = i / 12 * 2 * _m.pi
+        a1 = (i + .5) / 12 * 2 * _m.pi
+        d.polygon([(cx, cy), (cx + r * _m.cos(a0), cy + r * _m.sin(a0)), (cx + r * _m.cos(a1), cy + r * _m.sin(a1))], fill=(92, 16, 24, 255))
+    glow = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    ImageDraw.Draw(glow).ellipse((S * .25, S * .2, S * .75, S * .7), fill=(255, 200, 120, 70))
+    glow = glow.filter(ImageFilter.GaussianBlur(S * .08))
+    bg = Image.alpha_composite(bg, glow)
+    mask = Image.new("L", (S, S), 0)
+    ImageDraw.Draw(mask).ellipse((inner, inner, S - inner, S - inner), fill=255)
+    vign = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    ImageDraw.Draw(vign).ellipse((inner, inner, S - inner, S - inner), outline=(0, 0, 0, 150), width=int(S * .06))
+    vign = vign.filter(ImageFilter.GaussianBlur(S * .03))
+    bg = Image.alpha_composite(bg, Image.composite(vign, Image.new("RGBA", (S, S), (0, 0, 0, 0)), mask))
+    bg = bg.resize((side, side), Image.LANCZOS)
+    # the figure's shadow, then the figure
+    shadow = Image.new("RGBA", fig.size, (0, 0, 0, 0))
+    shadow.putalpha(fig.split()[3].point(lambda a: a * 0.5))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(3))
+    x, y = int((side - fig.width) / 2), int((side - fig.height) / 2 + side * .02)
+    bg.alpha_composite(shadow, (x + 3, y + 4))
+    bg.alpha_composite(fig, (x, y))
+    bg.save(out)
 
 
 if __name__ == "__main__":

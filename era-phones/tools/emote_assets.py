@@ -521,15 +521,23 @@ def puppet():
 
 
 ALL = (skip, dance, tilt, sit, ledge, offer, beckon, giggle, peekaboo, bow, puppet)
+# The tick of each emote's icon: its most telling pose
+ICON_TICK = {"clown_sautille": 5, "clown_danse": 34, "clown_tete_penchee": 44, "clown_assis": 20, "clown_assis_rebord": 6,
+             "clown_tend_objet": 10, "clown_viens": 14, "clown_rire": 46, "clown_coucou": 30, "clown_reverence": 40,
+             "clown_marionnette": 9}
 
 
 def main():
+    import emote_preview
     if os.path.isdir(OUT):
         for f in os.listdir(OUT):
-            if f.endswith(".json"):
+            if f.endswith(".json") or f.endswith(".png"):
                 os.remove(os.path.join(OUT, f))
     for fn in ALL:
-        fn().write()
+        e = fn()
+        e.write()
+        # Emotecraft shows the picture of the same name beside the emote as its icon
+        emote_preview.icon(os.path.join(OUT, e.name + ".json"), os.path.join(OUT, e.name + ".png"), ICON_TICK.get(e.name, 0))
 
 
 if __name__ == "__main__":

@@ -62,6 +62,7 @@ jobs:
           path: |
             era-phones/build/libs/epoque-rp-*.jar
             era-phones/emotes/*.json
+            era-phones/emotes/*.png
           if-no-files-found: error
 
       - name: Report

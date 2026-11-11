@@ -169,7 +169,7 @@ Dans `emotes/` (et dans le zip du build) : onze emotes **dans le style d'un clow
 | `clown_reverence` | Grande révérence de théâtre, sans jamais te quitter des yeux. |
 | `clown_marionnette` | Pendu à des fils invisibles : un bras, un genou, la tête tirés puis lâchés. |
 
-Installation : avec **Emotecraft**, copier les `.json` dans `.minecraft/emotes/`, relancer le jeu, les mettre sur la roue des emotes. Avec Emotecraft aussi sur le serveur, les autres joueurs qui l'ont voient l'emote. `tools/emote_preview.py` les dessine sur un joueur en blocs pour les vérifier.
+Chacune a son **icône** (`.png` du même nom : le clown dans sa pose, sur un rond rouge et or). Installation : avec **Emotecraft**, copier les `.json` **et les `.png`** dans `.minecraft/emotes/`, relancer le jeu, les mettre sur la roue des emotes. Avec Emotecraft aussi sur le serveur, les autres joueurs qui l'ont voient l'emote. `tools/emote_preview.py` les dessine sur un joueur en blocs pour les vérifier.
 
 ## Les téléphones
 
