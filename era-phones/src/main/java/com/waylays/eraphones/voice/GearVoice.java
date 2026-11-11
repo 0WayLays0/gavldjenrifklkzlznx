@@ -83,6 +83,22 @@ final class GearVoice implements Audio {
     }
 
     @Override
+    public Object playTo(net.minecraft.server.level.ServerPlayer listener, Supplier<short[]> frames) {
+        de.maxhenkel.voicechat.api.VoicechatConnection c = api.getConnectionOf(listener.getUUID());
+        if (c == null) {
+            return null;
+        }
+        de.maxhenkel.voicechat.api.audiochannel.StaticAudioChannel channel = api.createStaticAudioChannel(UUID.randomUUID(),
+                api.fromServerLevel(listener.serverLevel()), c);
+        if (channel == null) {
+            return null;
+        }
+        AudioPlayer player = api.createAudioPlayer(channel, api.createEncoder(), frames);
+        player.startPlaying();
+        return player;
+    }
+
+    @Override
     public void stop(Object handle) {
         if (handle instanceof AudioPlayer p) {
             p.stopPlaying();

@@ -119,5 +119,22 @@ TEXTS.update({
     "pack.eraphones.none": ("You have no backpack on", "Tu n'as pas de sac à dos sur le dos"),
 })
 
+TEXTS.update({
+    "item.eraphones.baladeur": ("Personal Cassette Player", "Baladeur"),
+    "walkman.eraphones.help": ("Use: play / pause · Cassette in the other hand + use: put it in · Crouch + use: take it out",
+                               "Clic droit : lecture / pause · Cassette dans l'autre main + clic droit : la mettre · Accroupi + clic droit : l'enlever"),
+    "walkman.eraphones.no_tape": ("No cassette in it", "Pas de cassette dedans"),
+    "walkman.eraphones.has_tape": ("Cassette: %s", "Cassette : %s"),
+    "walkman.eraphones.empty": ("There is no cassette in it", "Il n'y a pas de cassette dedans"),
+    "walkman.eraphones.loaded": ("Put in: %s", "Cassette mise : %s"),
+    "walkman.eraphones.playing": ("♪ %s", "♪ %s"),
+    "walkman.eraphones.paused": ("Paused", "Pause"),
+    "walkman.eraphones.ended": ("The tape has reached its end", "La cassette est arrivée au bout"),
+    "walkman.eraphones.blank": ("This cassette is blank", "Cette cassette est vierge"),
+    "walkman.eraphones.no_voice": ("You need Simple Voice Chat (connected) to hear it", "Il faut Simple Voice Chat (connecté) pour l'entendre"),
+    "size.eraphones.own": ("You are %s cm tall", "Tu mesures %s cm"),
+    "size.eraphones.set": ("%s is now %s cm tall", "%s mesure maintenant %s cm"),
+})
+
 for _k, _v in POSTER_NAMES.items():
     TEXTS["block.eraphones." + _k] = _v

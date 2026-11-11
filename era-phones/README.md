@@ -100,11 +100,19 @@ Exemple : `/declencheur action ruelle son rire`, `/declencheur action ruelle att
 
 Les joueurs (sauf en créatif ou en spectateur) n'ont **pas d'inventaire** : seulement les **5 premières cases** de leur barre, dessinée plus courte, centrée, plus la main secondaire. La molette fait le tour de ces 5 cases. Les autres cases sont grisées et fermées dans tous les écrans (inventaire, coffres…). Ce qui arrive dans une case fermée va dans le sac à dos, sinon dans une case libre de la main, sinon par terre. On ne ramasse rien s'il n'y a pas de place.
 
-Un **sac à dos** se porte sur le dos (à la place du plastron) et donne **10 cases de plus**. Clic droit avec le sac en main : il s'ouvre. Accroupi + clic droit : on le met sur le dos. Porté, la touche **B** l'ouvre (réglable dans les touches). On le voit sur le dos des joueurs. Un sac ne va pas dans un sac.
+Un **sac à dos** (un peu plus petit que le joueur) se porte sur le dos (à la place du plastron) et donne **10 cases de plus**. Clic droit avec le sac en main : il s'ouvre. Accroupi + clic droit : on le met sur le dos. Porté, la touche **B** l'ouvre (réglable dans les touches). On le voit sur le dos des joueurs. Un sac ne va pas dans un sac.
 
 Huit sacs : rouge d'école (rabat, porte-clés), en jean (coutures orange), militaire (deux poches, boucles, poches de côté), en cuir (rabat à sangles), jaune à écussons, violet étoilé, de sport noir (bandes blanches, poches de côté), de randonnée orange (rabat, sac de couchage roulé dessus). Recette : cuir, ficelle, et la teinture de sa couleur.
 
 Configuration serveur (`eraphones-server.toml`) : `limitedInventory` (true/false), `hotbarSlots` (1 à 9, 5 par défaut).
+
+## Baladeur et casque
+
+Un **baladeur** à cassette (onglet Son & image) : une cassette dedans à la fois. Clic droit : lecture ou pause. La musique n'est entendue **que par celui qui l'écoute** (dans son casque, avec Simple Voice Chat), et elle continue tant que le baladeur est sur lui (en main ou dans sa barre). Pendant l'écoute, les autres voient un **casque à mousse orange** sur sa tête. Pour mettre une cassette : cassette dans l'autre main + clic droit (l'ancienne revient dans cette main), ou dans l'inventaire, clic droit avec la cassette sur le baladeur. Accroupi + clic droit (ou clic droit à vide sur lui dans l'inventaire) : la cassette sort. La cassette garde l'endroit où elle s'est arrêtée ; arrivée au bout, elle repart du début. On voit la cassette à travers la vitre du baladeur.
+
+## Taille des joueurs : `/taille`
+
+`/taille <joueurs> <cm>` (de 50 à 400 cm, 180 = normal), `/taille <joueurs> normale`, `/taille` (sa propre taille, pour tout le monde). Tout suit la taille : le corps dessiné, la hitbox, la hauteur des yeux (donc ce qu'on voit), la caméra à la 3e personne, la portée des mains, la marche qu'on peut monter, un peu la vitesse et le saut, la chute sans se blesser. Gardé même après la mort et la déconnexion. Permission : comme `/horreur`.
 
 ## Les téléphones
 

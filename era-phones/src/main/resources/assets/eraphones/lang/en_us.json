@@ -185,6 +185,7 @@
   "item.eraphones.appareil_photo.empty": "No film left: load a film pack (in the other hand)",
   "item.eraphones.appareil_photo.film": "Film: %s/%s pictures",
   "item.eraphones.appareil_photo.help": "Use it to take a picture of what you see; a film pack in the other hand to load it",
+  "item.eraphones.baladeur": "Personal Cassette Player",
   "item.eraphones.ballon_rouge": "Red Balloon",
   "item.eraphones.ballon_rouge.help": "A red balloon on its string. It never comes down.",
   "item.eraphones.billet_1": "$1 Bill",
@@ -598,6 +599,8 @@
   "rp.eraphones.writing.erased": "%s writing(s) rubbed out",
   "rp.eraphones.writing.nowhere": "Look at a wall, a floor or a ceiling (32 blocks at most)",
   "rp.eraphones.writing.written": "Written",
+  "size.eraphones.own": "You are %s cm tall",
+  "size.eraphones.set": "%s is now %s cm tall",
   "subtitles.eraphones.boite_a_musique": "A music box plays",
   "subtitles.eraphones.cabine_piece": "A coin drops into a payphone",
   "subtitles.eraphones.cabine_sonnerie": "A phone booth rings",
@@ -614,5 +617,15 @@
   "tooltip.eraphones.number": "Number: %s",
   "tooltip.eraphones.open": "Use it, or press the phone key while it is in your hotbar",
   "tv.eraphones.loading": "READING THE TAPE... %s%%",
-  "tv.eraphones.unreadable": "This film's format (%s) cannot be read: convert it to H.264 MP4 (e.g. HandBrake), or install ffmpeg on the server"
+  "tv.eraphones.unreadable": "This film's format (%s) cannot be read: convert it to H.264 MP4 (e.g. HandBrake), or install ffmpeg on the server",
+  "walkman.eraphones.blank": "This cassette is blank",
+  "walkman.eraphones.empty": "There is no cassette in it",
+  "walkman.eraphones.ended": "The tape has reached its end",
+  "walkman.eraphones.has_tape": "Cassette: %s",
+  "walkman.eraphones.help": "Use: play / pause \u00b7 Cassette in the other hand + use: put it in \u00b7 Crouch + use: take it out",
+  "walkman.eraphones.loaded": "Put in: %s",
+  "walkman.eraphones.no_tape": "No cassette in it",
+  "walkman.eraphones.no_voice": "You need Simple Voice Chat (connected) to hear it",
+  "walkman.eraphones.paused": "Paused",
+  "walkman.eraphones.playing": "\u266a %s"
 }

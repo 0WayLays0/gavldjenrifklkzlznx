@@ -230,6 +230,7 @@ public final class GearRegistry {
                 out.accept(VCR_ITEM.get());
                 out.accept(TV_ITEM.get());
                 out.accept(CASSETTE.get());
+                out.accept(com.waylays.eraphones.walkman.WalkmanRegistry.WALKMAN.get());
                 out.accept(CAMCORDER.get());
             }).build());
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB_DAILY = EraRegistry.TABS.register("vie_quotidienne", () -> CreativeModeTab.builder()

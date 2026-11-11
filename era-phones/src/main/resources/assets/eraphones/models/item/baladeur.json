@@ -1,0 +1,11 @@
+{
+  "parent": "eraphones:item/baladeur_3d",
+  "overrides": [
+    {
+      "predicate": {
+        "eraphones:charge": 1
+      },
+      "model": "eraphones:item/baladeur_charge"
+    }
+  ]
+}

@@ -964,6 +964,45 @@ public final class SmokeTest {
                 }
             });
         });
+        // The walkman, a cassette in it, the headphones on; then the heights: 100 cm, 300 cm (the hitbox with them)
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            ItemStack w = new ItemStack(com.waylays.eraphones.walkman.WalkmanRegistry.WALKMAN.get());
+            com.waylays.eraphones.walkman.WalkmanItem.setCassette(w, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CASSETTE.get()));
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, w);
+        }));
+        STEPS.add(() -> {
+            com.waylays.eraphones.walkman.client.WalkmanClient.listening(new com.waylays.eraphones.walkman.Walkmans.Listening(mc.player.getUUID(), true));
+            mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+            mc.player.setXRot(5);
+        });
+        STEPS.add(() -> shot(mc, "walkman_headphones"));
+        STEPS.add(() -> {
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            com.waylays.eraphones.walkman.client.WalkmanClient.listening(new com.waylays.eraphones.walkman.Walkmans.Listening(mc.player.getUUID(), false));
+            command(mc, "taille @s 100");
+        });
+        STEPS.add(() -> {
+            if (Math.abs(mc.player.getBbHeight() - 1.0f) > .05f) {
+                fail("at 100 cm the player is {} blocks tall", mc.player.getBbHeight());
+            }
+            mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+        });
+        STEPS.add(() -> shot(mc, "size_100"));
+        STEPS.add(() -> command(mc, "taille @s 300"));
+        STEPS.add(() -> {
+            if (Math.abs(mc.player.getBbHeight() - 3.0f) > .1f) {
+                fail("at 300 cm the player is {} blocks tall", mc.player.getBbHeight());
+            }
+        });
+        STEPS.add(() -> shot(mc, "size_300"));
+        STEPS.add(() -> {
+            command(mc, "taille @s normale");
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+        });
         // The camcorder: a few seconds filmed on a blank cassette, which then holds a film the televisions can play
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);

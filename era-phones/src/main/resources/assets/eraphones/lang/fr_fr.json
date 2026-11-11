@@ -185,6 +185,7 @@
   "item.eraphones.appareil_photo.empty": "Plus de pellicule : recharge avec une pellicule (dans l'autre main)",
   "item.eraphones.appareil_photo.film": "Pellicule : %s/%s photos",
   "item.eraphones.appareil_photo.help": "Utilise-le pour photographier ce que tu vois ; une pellicule dans l'autre main pour le recharger",
+  "item.eraphones.baladeur": "Baladeur",
   "item.eraphones.ballon_rouge": "Ballon rouge",
   "item.eraphones.ballon_rouge.help": "Un ballon rouge au bout de sa ficelle. Il ne redescend jamais.",
   "item.eraphones.billet_1": "Billet de 1 $",
@@ -598,6 +599,8 @@
   "rp.eraphones.writing.erased": "%s \u00e9criture(s) effac\u00e9e(s)",
   "rp.eraphones.writing.nowhere": "Regarde un mur, un sol ou un plafond (32 blocs au plus)",
   "rp.eraphones.writing.written": "\u00c9crit",
+  "size.eraphones.own": "Tu mesures %s cm",
+  "size.eraphones.set": "%s mesure maintenant %s cm",
   "subtitles.eraphones.boite_a_musique": "Une bo\u00eete \u00e0 musique joue",
   "subtitles.eraphones.cabine_piece": "Une pi\u00e8ce tombe dans le publiphone",
   "subtitles.eraphones.cabine_sonnerie": "Une cabine t\u00e9l\u00e9phonique sonne",
@@ -614,5 +617,15 @@
   "tooltip.eraphones.number": "Num\u00e9ro : %s",
   "tooltip.eraphones.open": "Utilise-le, ou appuie sur la touche du t\u00e9l\u00e9phone s'il est dans ta barre d'action",
   "tv.eraphones.loading": "LECTURE DE LA CASSETTE\u2026 %s %%",
-  "tv.eraphones.unreadable": "Format du film (%s) illisible : convertis-le en MP4 H.264 (ex. HandBrake), ou installe ffmpeg sur le serveur"
+  "tv.eraphones.unreadable": "Format du film (%s) illisible : convertis-le en MP4 H.264 (ex. HandBrake), ou installe ffmpeg sur le serveur",
+  "walkman.eraphones.blank": "Cette cassette est vierge",
+  "walkman.eraphones.empty": "Il n'y a pas de cassette dedans",
+  "walkman.eraphones.ended": "La cassette est arriv\u00e9e au bout",
+  "walkman.eraphones.has_tape": "Cassette : %s",
+  "walkman.eraphones.help": "Clic droit : lecture / pause \u00b7 Cassette dans l'autre main + clic droit : la mettre \u00b7 Accroupi + clic droit : l'enlever",
+  "walkman.eraphones.loaded": "Cassette mise : %s",
+  "walkman.eraphones.no_tape": "Pas de cassette dedans",
+  "walkman.eraphones.no_voice": "Il faut Simple Voice Chat (connect\u00e9) pour l'entendre",
+  "walkman.eraphones.paused": "Pause",
+  "walkman.eraphones.playing": "\u266a %s"
 }

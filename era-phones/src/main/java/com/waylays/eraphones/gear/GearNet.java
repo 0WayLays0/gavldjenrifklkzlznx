@@ -41,6 +41,7 @@ public final class GearNet {
         CamNet.register(r);
         com.waylays.eraphones.event.EventNet.register(r);
         com.waylays.eraphones.pack.Packs.register(r);
+        com.waylays.eraphones.walkman.Walkmans.register(r);
         r.playToClient(Card.TYPE, Card.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.card(p));
         r.playToClient(Stations.TYPE, Stations.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.stations(p));
     }

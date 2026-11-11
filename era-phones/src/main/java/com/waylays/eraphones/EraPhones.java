@@ -27,6 +27,7 @@ public final class EraPhones {
         com.waylays.eraphones.registry.GearRegistry.register(modBus);
         com.waylays.eraphones.event.EventRegistry.register(modBus);
         com.waylays.eraphones.pack.PackRegistry.register(modBus);
+        com.waylays.eraphones.walkman.WalkmanRegistry.init();
         modBus.addListener(PhoneNet::register);
         container.registerConfig(ModConfig.Type.SERVER, com.waylays.eraphones.rp.RpConfig.SPEC);
     }

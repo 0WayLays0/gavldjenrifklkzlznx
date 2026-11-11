@@ -22,6 +22,10 @@ public interface Audio {
     /** Starts a sound coming out of {@code pos}, heard {@code distance} blocks round; {@code frames} gives each frame, null to end. */
     Object play(ServerLevel level, Vec3 pos, float distance, Supplier<short[]> frames);
 
+    /** Starts a sound heard by {@code listener} alone, as in headphones; null if it cannot be (no voice chat for them). */
+    @Nullable
+    Object playTo(net.minecraft.server.level.ServerPlayer listener, Supplier<short[]> frames);
+
     void stop(Object handle);
 
     boolean playing(Object handle);
