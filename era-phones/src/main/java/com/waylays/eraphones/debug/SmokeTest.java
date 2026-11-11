@@ -746,6 +746,144 @@ public final class SmokeTest {
             }
         }));
         STEPS.add(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
+        // The event's things: a wall of missing children's posters, the code box (its wheels, then opened with its code,
+        // a balloon rising), the star fragment (floating, then carried by a game master and moved), closed eyes
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            net.minecraft.server.level.ServerLevel lv = p.serverLevel();
+            net.minecraft.core.Direction dir = p.getDirection();
+            net.minecraft.core.BlockPos base = p.blockPosition().relative(dir, 5);
+            for (int a = -3; a <= 3; a++) {
+                for (int b = -16; b <= 1; b++) {
+                    net.minecraft.core.BlockPos q = base.relative(dir.getClockWise(), a).relative(dir, b);
+                    lv.setBlockAndUpdate(q.below(), net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
+                    for (int y = 0; y < 4; y++) {
+                        lv.setBlockAndUpdate(q.above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+                    }
+                }
+            }
+            // The wall: bricks, three blocks high, the posters on its face
+            int k = 0;
+            for (int a = -3; a <= 3; a++) {
+                for (int y = 0; y < 3; y++) {
+                    net.minecraft.core.BlockPos w = base.relative(dir, 1).relative(dir.getClockWise(), a).above(y);
+                    lv.setBlockAndUpdate(w, net.minecraft.world.level.block.Blocks.BRICKS.defaultBlockState());
+                    net.minecraft.world.level.block.Block poster = com.waylays.eraphones.event.EventRegistry.POSTER_BLOCKS
+                            .get(k++ % com.waylays.eraphones.event.EventRegistry.POSTER_BLOCKS.size()).get();
+                    lv.setBlockAndUpdate(w.relative(dir.getOpposite()), poster.defaultBlockState()
+                            .setValue(com.waylays.eraphones.event.PosterBlock.FACING, dir.getOpposite()));
+                }
+            }
+            EVENT_AT = base.relative(dir.getOpposite(), 2);
+            lv.setBlockAndUpdate(EVENT_AT, com.waylays.eraphones.event.EventRegistry.CODE_BOX.get().defaultBlockState()
+                    .setValue(com.waylays.eraphones.event.CodeBoxBlock.FACING, dir.getOpposite()));
+            if (lv.getBlockEntity(EVENT_AT) instanceof com.waylays.eraphones.event.CodeBoxBlockEntity box) {
+                box.setCode("1984");
+            } else {
+                fail("the code box has no block entity");
+            }
+            net.minecraft.world.phys.Vec3 eye = net.minecraft.world.phys.Vec3.atBottomCenterOf(base.relative(dir.getOpposite(), 5));
+            p.teleportTo(lv, eye.x, eye.y, eye.z, dir.toYRot(), 8);
+        }));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "event_posters"));
+        STEPS.add(() -> mc.setScreen(new com.waylays.eraphones.event.client.CodeScreen(EVENT_AT, 4, "1984")));
+        STEPS.add(() -> shot(mc, "event_codebox_screen"));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            server.execute(() -> {
+                ServerPlayer p = server.getPlayerList().getPlayer(id);
+                if (p != null && p.level().getBlockEntity(EVENT_AT) instanceof com.waylays.eraphones.event.CodeBoxBlockEntity box) {
+                    box.attempt(p, "0000");
+                    if (box.open()) {
+                        fail("the code box opened with a wrong code");
+                    }
+                    box.attempt(p, "1984");
+                    if (!box.open()) {
+                        fail("the code box did not open with its code");
+                    }
+                }
+            });
+        });
+        STEPS.add(() -> shot(mc, "event_codebox_open"));
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            com.waylays.eraphones.event.StarFragment f = com.waylays.eraphones.event.EventRegistry.FRAGMENT.get().create(p.level());
+            if (f == null) {
+                fail("no star fragment could be made");
+                return;
+            }
+            net.minecraft.world.phys.Vec3 at = p.position().add(p.getLookAngle().multiply(1, 0, 1).normalize().scale(1.7));
+            f.moveTo(at.x, p.getY(), at.z, p.getYRot(), 0);
+            p.level().addFreshEntity(f);
+            FRAGMENT = f.getUUID();
+        }));
+        STEPS.add(() -> shot(mc, "event_fragment"));
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            net.minecraft.world.entity.Entity f = p == null ? null : p.serverLevel().getEntity(FRAGMENT);
+            if (f == null) {
+                fail("the star fragment is gone");
+                return;
+            }
+            // A game master in creative lifts it alone
+            f.interact(p, net.minecraft.world.InteractionHand.MAIN_HAND);
+            if (p.getVehicle() != f) {
+                fail("a game master in creative could not lift the star fragment");
+            }
+        }));
+        STEPS.add(() -> {
+            mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+            mc.player.setXRot(10);
+        });
+        STEPS.add(() -> shot(mc, "event_fragment_carried"));
+        STEPS.add(() -> {
+            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+            if (mc.player.getVehicle() != null) {
+                FRAGMENT_START = mc.player.getVehicle().position();
+            }
+            mc.player.setYRot(mc.player.getYRot() + 180);
+            net.minecraft.client.KeyMapping.set(mc.options.keyUp.getKey(), true);
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "event_fragment_moving"));
+        STEPS.add(() -> {
+            net.minecraft.client.KeyMapping.set(mc.options.keyUp.getKey(), false);
+            if (mc.player.getVehicle() == null || FRAGMENT_START == null) {
+                fail("the game master is not carrying the star fragment");
+            } else if (mc.player.getVehicle().position().distanceTo(FRAGMENT_START) < 1.5) {
+                fail("the star fragment did not move when pushed ({} blocks)", mc.player.getVehicle().position().distanceTo(FRAGMENT_START));
+            }
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            server.execute(() -> {
+                ServerPlayer p = server.getPlayerList().getPlayer(id);
+                if (p != null) {
+                    p.stopRiding();
+                    com.waylays.eraphones.rp.RpService.me(p, "ferme les yeux");
+                }
+            });
+        });
+        STEPS.add(() -> shot(mc, "event_eyes_closed"));
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> {
+        });
+        STEPS.add(() -> shot(mc, "event_eyes_open"));
+        STEPS.add(() -> {
+            if (!com.waylays.eraphones.rp.RpService.closesEyes("/me ferme lentement... non: Il ferme les yeux") || com.waylays.eraphones.rp.RpService.closesEyes("ferme la porte")) {
+                fail("closed eyes are not told apart in /me");
+            }
+        });
         // The camcorder: a few seconds filmed on a blank cassette, which then holds a film the televisions can play
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -864,83 +1002,6 @@ public final class SmokeTest {
             });
             STEPS.add(() -> shot(mc, "held3_" + name));
             STEPS.add(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
-        // The camcorder: a few seconds filmed on a blank cassette, which then holds a film the televisions can play
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null) {
-                return;
-            }
-            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CAMCORDER.get()));
-            p.getInventory().setItem(34, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CASSETTE.get()));
-            if (!com.waylays.eraphones.gear.CamNet.start(p)) {
-                fail("the camcorder did not start filming");
-            }
-        }));
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> shot(mc, "camcorder"));
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null) {
-                return;
-            }
-            com.waylays.eraphones.gear.CamNet.stop(p);
-            String film = p.getInventory().getItem(34).get(com.waylays.eraphones.registry.GearRegistry.TAPE.get());
-            if (film == null || com.waylays.eraphones.gear.Video.prepare(film) != com.waylays.eraphones.gear.Video.State.READY
-                    || com.waylays.eraphones.gear.Video.frame(film, 5) == null) {
-                fail("the camcorder's film cannot be played ({})", film);
-            }
-        }));
-        // A street lamp at night, then a power cut: it buzzes and goes out
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null) {
-                return;
-            }
-            net.minecraft.core.Direction dir = p.getDirection();
-            net.minecraft.core.BlockPos at = p.blockPosition().relative(dir, 4).relative(dir.getClockWise(), 1);
-            for (int y = 0; y < 5; y++) {
-                p.serverLevel().setBlockAndUpdate(at.above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
-            }
-            net.minecraft.world.level.block.state.BlockState lamp = com.waylays.eraphones.registry.GearRegistry.LAMP_POST.get().defaultBlockState()
-                    .setValue(com.waylays.eraphones.gear.block.LampPostBlock.FACING, dir.getCounterClockWise());
-            p.serverLevel().setBlockAndUpdate(at, lamp);
-            for (int k = 1; k <= com.waylays.eraphones.gear.block.LampPostBlock.TOP; k++) {
-                p.serverLevel().setBlockAndUpdate(at.above(k), lamp.setValue(com.waylays.eraphones.gear.block.LampPostBlock.PART, k));
-            }
-            LAMP = at;
-            p.serverLevel().setDayTime(18000);
-        }));
-        STEPS.add(() -> mc.player.setXRot(-12));
-        for (int k = 0; k < 3; k++) {
-            STEPS.add(() -> {
-            });
-        }
-        STEPS.add(() -> server.execute(() -> {
-            net.minecraft.world.level.block.state.BlockState head = server.overworld().getBlockState(LAMP.above(com.waylays.eraphones.gear.block.LampPostBlock.TOP));
-            if (!head.is(com.waylays.eraphones.registry.GearRegistry.LAMP_POST.get()) || !head.getValue(com.waylays.eraphones.gear.block.LampPostBlock.LIT)) {
-                fail("the street lamp did not light up at night ({})", head);
-            }
-        }));
-        STEPS.add(() -> shot(mc, "lamp_night"));
-        STEPS.add(() -> server.execute(() -> com.waylays.eraphones.gear.Power.start(server.overworld(), LAMP, 24, 0, false)));
-        for (int k = 0; k < 2; k++) {
-            STEPS.add(() -> {
-            });
-        }
-        STEPS.add(() -> server.execute(() -> {
-            net.minecraft.world.level.block.state.BlockState head = server.overworld().getBlockState(LAMP.above(com.waylays.eraphones.gear.block.LampPostBlock.TOP));
-            if (head.is(com.waylays.eraphones.registry.GearRegistry.LAMP_POST.get()) && head.getValue(com.waylays.eraphones.gear.block.LampPostBlock.LIT)) {
-                fail("the street lamp stayed lit in a power cut");
-            }
-        }));
-        STEPS.add(() -> shot(mc, "power_cut"));
-        STEPS.add(() -> server.execute(() -> {
-            com.waylays.eraphones.gear.Power.end(server.overworld(), null);
-            server.overworld().setDayTime(6000);
-        }));
         }
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -1003,6 +1064,9 @@ public final class SmokeTest {
 
     private static net.minecraft.core.BlockPos BOOTH = net.minecraft.core.BlockPos.ZERO;
     private static java.util.UUID BIKE;
+    private static java.util.UUID FRAGMENT;
+    private static net.minecraft.core.BlockPos EVENT_AT = net.minecraft.core.BlockPos.ZERO;
+    private static net.minecraft.world.phys.Vec3 FRAGMENT_START;
     private static net.minecraft.core.BlockPos LAMP = net.minecraft.core.BlockPos.ZERO;
     private static net.minecraft.world.phys.Vec3 BIKE_START;
 

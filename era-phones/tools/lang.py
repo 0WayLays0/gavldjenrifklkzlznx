@@ -410,6 +410,7 @@ MOON = [("Full moon", "Pleine lune"), ("Waning gibbous", "Gibbeuse décroissante
         ("First quarter", "Premier quartier"), ("Waxing gibbous", "Gibbeuse croissante")]
 
 RP = {
+    "eyes.staff": ("%s closes their eyes", "%s ferme les yeux"),
     "stranger": ("A stranger", "Un inconnu"),
     "says": ("says:", "dit :"),
     "rolls_one": ("rolled a die out of %s:", "a lancé un dé sur %s :"),
@@ -506,8 +507,13 @@ RP = {
 }
 
 
+# The event's things (the missing children's posters, the code box, the star fragment, the triggers): event_lang.py
+import event_lang  # noqa: E402
+
+
 def all_texts():
     t = dict(T)
+    t.update(event_lang.TEXTS)
     for k, v in APPS.items():
         t[P + "app." + k] = v
     for k, v in MENU.items():

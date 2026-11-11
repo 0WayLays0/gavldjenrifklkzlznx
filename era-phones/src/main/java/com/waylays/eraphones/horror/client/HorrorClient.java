@@ -22,6 +22,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -131,6 +132,7 @@ public final class HorrorClient {
             case "tremblement" -> play("entity.warden.emerge", .6f, .9f);
             case "narration" -> play("block.amethyst_block.chime", .5f, .5f);
             case "peur" -> lastBeat = -1;
+            case "yeux" -> play("item.armor.equip_leather", .6f, .25f);
             default -> {
             }
         }
@@ -201,6 +203,9 @@ public final class HorrorClient {
         }
         if ((a = active("coupure")) != null) {
             blackout(g, a, w, h);
+        }
+        if ((a = active("yeux")) != null) {
+            eyelids(g, a, w, h);
         }
         if ((a = active("murmure")) != null) {
             whisper(g, a, w, h);
@@ -407,6 +412,59 @@ public final class HorrorClient {
             g.fill(0, 0, w, h, (int) (255 * dark) << 24);
             vignette(g, w, h, 0x000000, 1);
         }
+    }
+
+    /**
+     * Closed eyes: the eyelids come down from above and up from below, curved like a real eye's, the light through them
+     * a warm dark red for a moment before all goes black; a flutter as they shut; held; then they lift with a blink.
+     */
+    private static void eyelids(GuiGraphics g, Active a, int w, int h) {
+        float t = a.age(), left = a.left();
+        float shut;
+        if (t < .9f) {
+            // Coming down, with a little flutter halfway
+            float k = t / .9f;
+            shut = k < .45f ? ease(k / .45f) * .7f : k < .6f ? .7f - .12f * Mth.sin((k - .45f) / .15f * Mth.PI) : .7f + .3f * ease((k - .6f) / .4f);
+        } else if (left > .9f) {
+            shut = 1;
+        } else if (left > 0) {
+            // Lifting: halfway, a blink, then open
+            float k = 1 - left / .9f;
+            shut = k < .35f ? 1 - .55f * ease(k / .35f) : k < .55f ? .45f + .55f * Mth.sin((k - .35f) / .2f * Mth.PI) : .45f * (1 - ease((k - .55f) / .45f));
+        } else {
+            return;
+        }
+        shut = clamp(shut);
+        // Behind the lids: the world dimmed, reddish, then black
+        float behind = clamp((t - .6f) / .8f) * clamp(left / .6f);
+        if (shut > .02f) {
+            vignette(g, w, h, 0x000000, .6f * shut);
+        }
+        // Each lid's edge is curved: lowest in the middle for the upper one, highest in the middle for the lower one
+        int strips = Math.max(40, w / 6);
+        float half = h / 2f;
+        for (int i = 0; i < strips; i++) {
+            int x0 = i * w / strips, x1 = (i + 1) * w / strips;
+            float u = ((x0 + x1) / 2f / w) * 2 - 1;
+            float curve = (float) Math.sqrt(Math.max(0, 1 - u * u * .8f));
+            float upper = half * (shut * (.9f + .1f * curve) + (shut < 1 ? (1 - shut) * 0 : 0));
+            float reach = Math.min(half + 1, upper * (.75f + .25f * curve) + (shut >= .999f ? h : 0));
+            int top = (int) Math.ceil(reach);
+            int bottom = h - top;
+            // The lid itself, nearly black, with the soft red of light through skin near its edge
+            g.fill(x0, 0, x1, Math.max(0, top - 6), 0xFF000000);
+            g.fillGradient(x0, Math.max(0, top - 6), x1, top, 0xFF000000, 0xFF1A0404);
+            g.fill(x0, Math.min(h, bottom + 6), x1, h, 0xFF000000);
+            g.fillGradient(x0, bottom, x1, Math.min(h, bottom + 6), 0xFF1A0404, 0xFF000000);
+        }
+        if (behind > 0) {
+            g.fill(0, 0, w, h, ((int) (255 * behind) << 24) | 0x0A0202);
+        }
+    }
+
+    private static float ease(float k) {
+        k = clamp(k);
+        return k * k * (3 - 2 * k);
     }
 
     /** Words in the head: letter by letter, trembling, in dark red, the screen's edges darkening round them. */

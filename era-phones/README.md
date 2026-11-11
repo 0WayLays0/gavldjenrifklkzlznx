@@ -12,7 +12,7 @@ Contenu original (noms, modèles, sonneries, icônes) : aucune marque réelle ; 
 
 Quatre onglets : **Époque RP · Téléphones**, **· Lumière & radio** (lampe torche, piles, talkie-walkie, poste de
 radio), **· Son & image** (magnétoscope, cassette), **· Vie quotidienne** (pièces et billets, carte d'identité,
-feuille de papier, journal).
+feuille de papier, journal), **· Horreur** et **· Événement** (affiches « Disparu », boîte à code, fragment d'étoile).
 
 ## Les objets des années 80
 
@@ -65,6 +65,36 @@ Les coupures ne survivent pas à un redémarrage du serveur.
 | `/lampe <joueurs> eteindre` · `clignoter [secondes]` · `casser` · `reparer` | Éteindre leurs lampes torches, les faire clignoter (10 s par défaut, avec de petits grésillements), les casser (elles ne s'allument plus, « Cassée » dans la description) ou les réparer. |
 | `/identite delivrer <joueur>` | Donne à ce joueur une carte d'identité établie à son nom. |
 | `/journal imprimer <exemplaires> Titre \| texte` | Imprime le journal (jusqu'à 64 exemplaires). |
+
+## L'événement (onglet « Événement »)
+
+Des outils faits pour un grand événement d'horreur en ville, pensés pour un maître du jeu **seul**.
+
+| Chose | Comment ça marche |
+|---|---|
+| Affiches « Disparu(e) » (15 blocs) | À coller sur n'importe quel mur (clic sur la face du mur ; on passe à travers). Un enfant seul sur six papiers différents : neuf, jauni, coin arraché, lavé par la pluie, vieux de trente ans (le cycle d'avant), à moitié arraché. Deux enfants (deux dispositions), trois, quatre. Deux tas d'affiches collées les unes sur les autres. Trois « murs d'affiches » qui se raccordent bloc après bloc pour couvrir tout un mur. Les photos d'enfants, les noms et les numéros sont inventés. Les bandelettes du bas sont en partie arrachées. |
+| Boîte à code | Vieux coffret d'acier avec quatre molettes en laiton. Clic droit : on voit les molettes de près. On les tourne (clic en haut ou en bas, molette de la souris, ou en tapant les chiffres), puis on appuie sur « Ouvrir ». Avec le bon code, la boîte s'ouvre, un ballon rouge en sort (visible par tous ceux qui sont autour) et on prend ce qu'elle contient (9 cases). Les joueurs ne peuvent pas la casser. **Le maître du jeu en créatif** voit le code, peut faire du nombre des molettes le nouveau code (« En faire le code »), et la remplit accroupi + clic droit. `/boitecode` (en la regardant) : `code <3 à 6 chiffres>`, `fermer`, `ouvrir`, `ballon true\|false`, `info`. |
+| Fragment d'étoile | Le maître du jeu le pose (objet, en créatif). Il flotte, brille (il éclaire vraiment autour de lui), scintille. Le premier joueur qui fait clic droit lit « Tu ne sembles pas assez fort pour porter seul ce fragment… » et attend un deuxième porteur (30 s, à 5 blocs). Le deuxième fait clic droit : ils le soulèvent à deux. Un troisième et un quatrième peuvent venir aider. Les porteurs se placent autour (face à face à deux, en triangle à trois, en carré à quatre), les deux mains dessus, et marchent à petits pas lourds. Chacun pousse où il veut aller : si tout le monde va du même côté, le fragment avance. S'ils tirent chacun de leur côté, il bouge à peine et on leur demande « un peu de coordination ». Celui qui ne pousse pas est entraîné. Vitesse : lent à deux, un peu moins à trois, encore un peu moins à quatre. Accroupi pour lâcher ; seul, c'est trop lourd et il est reposé. Un maître du jeu en créatif le porte seul, sans ralentir. **Le joueur qui a le tag `clown`** (`/tag <joueur> add clown`) est repoussé à 7 blocs du fragment. |
+| `/me ferme les yeux` | Dans un `/me`, « ferme les yeux » (ou « ferme ses yeux », « closes his eyes »…) ferme les yeux du joueur sur son écran : les paupières descendent, tout est noir pendant 6 s, puis elles se rouvrent avec un clignement. Les maîtres du jeu reçoivent « X ferme les yeux » dans le chat. |
+
+### Déclencheurs de zone : `/declencheur`
+
+Une zone invisible ; quand un joueur y entre, ce qui a été prévu lui arrive tout seul. Les joueurs en créatif ou en spectateur ne déclenchent rien (le maître du jeu peut construire tranquille). Gardé avec le monde.
+
+1. `/declencheur pos1` puis `/declencheur pos2` : les deux coins (là où tu es, ou `pos1 x y z`).
+2. `/declencheur creer <nom>` : la zone (affichée en poussière rouge pendant 10 s).
+3. `/declencheur action <nom> ...`, autant de fois que voulu, dans l'ordre :
+   - `son <son>` (derrière le joueur), `ballon`, `yeux`, `lampe` (sa lampe torche casse) ;
+   - `brouillard | coupure | sang | peur | tremblement | flotter [secondes]` ;
+   - `murmure <texte>`, `narration <texte>` ;
+   - `panne <rayon> <secondes>` ou `clignote <rayon> <secondes>` (le quartier autour de la zone) ;
+   - `sms <numéro|inconnu> <texte>` (sur le téléphone qu'il porte) ;
+   - `commande <commande>` (n'importe quelle commande ; `{joueur}` = son pseudo, `@s` = lui) ;
+   - `attendre <secondes>` : une pause avant la suite.
+4. `/declencheur mode <nom> une_fois | chaque_joueur | toujours [secondes entre deux]` (par défaut : une seule fois).
+5. `/declencheur tester <nom> [joueur]`, `liste`, `info <nom>`, `montrer [secondes]` (voir les zones), `actif <nom> true|false`, `reset <nom>` (pour qu'il se relance), `vider <nom>`, `supprimer <nom>`.
+
+Exemple : `/declencheur action ruelle son rire`, `/declencheur action ruelle attendre 3`, `/declencheur action ruelle ballon`.
 
 ## Les téléphones
 

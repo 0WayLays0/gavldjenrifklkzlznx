@@ -78,7 +78,37 @@ public final class RpService {
         Component line = Component.empty().append(colored("✦ ", ME)).append(nameOf(p, ME))
                 .append(colored(" " + text, ME).withStyle(ChatFormatting.ITALIC));
         tell(p, RpConfig.get(RpConfig.ACTION_RANGE, 20), line, 0, null, "* " + text, ME);
+        if (closesEyes(text)) {
+            closeEyes(p);
+        }
     }
+
+    /** "/me ferme les yeux" (or closes their eyes): the words that shut a player's eyes. */
+    private static final java.util.regex.Pattern EYES = java.util.regex.Pattern.compile(
+            "(ferm\\p{L}*|clos\\p{L}*)\\s+(les|ses|mes|leurs|their|his|her|my|the)?\\s*(yeux|paupi\\p{L}*|eyes|eyelids)",
+            java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
+
+    public static boolean closesEyes(String text) {
+        return EYES.matcher(text).find();
+    }
+
+    /**
+     * A player closing their eyes: their own screen goes dark for six seconds, the eyelids coming down and lifting
+     * again; the game masters are told (it is how a player escapes what is not real).
+     */
+    public static void closeEyes(ServerPlayer p) {
+        com.waylays.eraphones.horror.HorrorService.show(java.util.List.of(p), "yeux", EYES_TICKS, "", null);
+        int level = RpConfig.get(RpConfig.HORROR_PERMISSION, 2);
+        Component note = Component.translatable("rp.eraphones.eyes.staff", name(p)).withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC);
+        for (ServerPlayer gm : p.server.getPlayerList().getPlayers()) {
+            if (gm != p && gm.hasPermissions(level)) {
+                gm.sendSystemMessage(note);
+            }
+        }
+    }
+
+    /** How long closed eyes stay closed (ticks). */
+    public static final int EYES_TICKS = 120;
 
     public static void doing(ServerPlayer p, String text) {
         Component line = Component.empty().append(colored("◆ ", DO)).append(colored(text, DO).withStyle(ChatFormatting.ITALIC))

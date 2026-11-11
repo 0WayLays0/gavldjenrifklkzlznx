@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "eraphones:block/affiche_disparu_2"
+    },
+    "facing=west": {
+      "model": "eraphones:block/affiche_disparu_2",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "eraphones:block/affiche_disparu_2",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "eraphones:block/affiche_disparu_2",
+      "y": 270
+    }
+  }
+}
