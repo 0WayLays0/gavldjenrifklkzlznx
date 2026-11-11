@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import event_assets  # noqa: E402
 import gear_assets  # noqa: E402
+import pack_assets  # noqa: E402
 import horror_assets  # noqa: E402
 import lang  # noqa: E402
 import models  # noqa: E402
@@ -21,6 +22,7 @@ if __name__ == "__main__":
     horror_assets.main()
     gear_assets.main()
     event_assets.main()
+    pack_assets.main()
     writing_assets.main()
     models.main()
     lang.main()

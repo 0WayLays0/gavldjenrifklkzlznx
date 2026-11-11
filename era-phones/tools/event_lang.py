@@ -100,5 +100,24 @@ TEXTS = {
                                "/declencheur liste | info | montrer [s] | actif <nom> true|false | reset | vider | supprimer (les joueurs en créatif ne déclenchent rien)"),
 }
 
+TEXTS.update({
+    "itemGroup.eraphones.sacs_a_dos": ("Backpacks", "Sacs à dos"),
+    "item.eraphones.sac_a_dos_rouge": ("Red School Backpack", "Sac à dos d'école rouge"),
+    "item.eraphones.sac_a_dos_jean": ("Denim Backpack", "Sac à dos en jean"),
+    "item.eraphones.sac_a_dos_militaire": ("Army Backpack", "Sac à dos militaire"),
+    "item.eraphones.sac_a_dos_cuir": ("Leather Rucksack", "Sac à dos en cuir"),
+    "item.eraphones.sac_a_dos_jaune": ("Yellow Backpack with Patches", "Sac à dos jaune à écussons"),
+    "item.eraphones.sac_a_dos_violet": ("Purple Star Backpack", "Sac à dos violet étoilé"),
+    "item.eraphones.sac_a_dos_sport": ("Black Sports Backpack", "Sac à dos de sport noir"),
+    "item.eraphones.sac_a_dos_rando": ("Hiking Backpack", "Sac de randonnée"),
+    "key.eraphones.backpack": ("Open the backpack", "Ouvrir le sac à dos"),
+    "pack.eraphones.holds": ("%s / %s pockets used", "%s / %s poches utilisées"),
+    "pack.eraphones.help": ("Use: open it · Crouch + use: put it on · Worn: B opens it",
+                            "Clic droit : l'ouvrir · Accroupi + clic droit : le mettre · Porté : B l'ouvre"),
+    "pack.eraphones.in_hand": ("In your hands", "Dans tes mains"),
+    "pack.eraphones.no_room": ("No more room: you put it down", "Plus de place : tu le poses par terre"),
+    "pack.eraphones.none": ("You have no backpack on", "Tu n'as pas de sac à dos sur le dos"),
+})
+
 for _k, _v in POSTER_NAMES.items():
     TEXTS["block.eraphones." + _k] = _v

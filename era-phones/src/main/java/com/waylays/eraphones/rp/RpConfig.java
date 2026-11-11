@@ -6,8 +6,8 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public final class RpConfig {
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.BooleanValue LOCAL_CHAT;
-    public static final ModConfigSpec.IntValue SAY_RANGE, ACTION_RANGE, WHISPER_RANGE, SHOUT_RANGE, HIDE_PERMISSION, HORROR_PERMISSION, VOICE_PERMISSION;
-    public static final ModConfigSpec.BooleanValue NAMEPLATES, BUBBLES, PHONE_VOICE;
+    public static final ModConfigSpec.IntValue SAY_RANGE, ACTION_RANGE, WHISPER_RANGE, SHOUT_RANGE, HIDE_PERMISSION, HORROR_PERMISSION, VOICE_PERMISSION, HOTBAR_SLOTS;
+    public static final ModConfigSpec.BooleanValue NAMEPLATES, BUBBLES, PHONE_VOICE, LIMITED_INVENTORY;
 
     static {
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
@@ -24,6 +24,9 @@ public final class RpConfig {
         PHONE_VOICE = b.comment("With Simple Voice Chat: whether the two ends of a phone call hear each other's voice").define("phoneVoice", true);
         HORROR_PERMISSION = b.comment("The permission level needed for /horreur (sounds, visions, fog, a red balloon...)").defineInRange("horreurPermission", 2, 0, 4);
         VOICE_PERMISSION = b.comment("The permission level needed for /voix (with Simple Voice Chat: a changed voice)").defineInRange("voixPermission", 2, 0, 4);
+        LIMITED_INVENTORY = b.comment("Whether players (not in creative or spectator) carry only the first hotbar slots, and a backpack")
+                .define("limitedInventory", true);
+        HOTBAR_SLOTS = b.comment("How many hotbar slots players may use when the inventory is limited").defineInRange("hotbarSlots", 5, 1, 9);
         b.pop();
         SPEC = b.build();
     }
@@ -38,7 +41,7 @@ public final class RpConfig {
         }
     }
 
-    static boolean get(ModConfigSpec.BooleanValue v, boolean fallback) {
+    public static boolean get(ModConfigSpec.BooleanValue v, boolean fallback) {
         try {
             return v.get();
         } catch (IllegalStateException e) {

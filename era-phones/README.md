@@ -12,7 +12,7 @@ Contenu original (noms, modèles, sonneries, icônes) : aucune marque réelle ; 
 
 Quatre onglets : **Époque RP · Téléphones**, **· Lumière & radio** (lampe torche, piles, talkie-walkie, poste de
 radio), **· Son & image** (magnétoscope, cassette), **· Vie quotidienne** (pièces et billets, carte d'identité,
-feuille de papier, journal), **· Horreur** et **· Événement** (affiches « Disparu », boîte à code, fragment d'étoile).
+feuille de papier, journal), **· Horreur**, **· Événement** (affiches « Disparu », boîte à code, fragment d'étoile) et **· Sacs à dos**.
 
 ## Les objets des années 80
 
@@ -95,6 +95,16 @@ Une zone invisible ; quand un joueur y entre, ce qui a été prévu lui arrive t
 5. `/declencheur tester <nom> [joueur]`, `liste`, `info <nom>`, `montrer [secondes]` (voir les zones), `actif <nom> true|false`, `reset <nom>` (pour qu'il se relance), `vider <nom>`, `supprimer <nom>`.
 
 Exemple : `/declencheur action ruelle son rire`, `/declencheur action ruelle attendre 3`, `/declencheur action ruelle ballon`.
+
+## Inventaire limité et sacs à dos
+
+Les joueurs (sauf en créatif ou en spectateur) n'ont **pas d'inventaire** : seulement les **5 premières cases** de leur barre, dessinée plus courte, centrée, plus la main secondaire. La molette fait le tour de ces 5 cases. Les autres cases sont grisées et fermées dans tous les écrans (inventaire, coffres…). Ce qui arrive dans une case fermée va dans le sac à dos, sinon dans une case libre de la main, sinon par terre. On ne ramasse rien s'il n'y a pas de place.
+
+Un **sac à dos** se porte sur le dos (à la place du plastron) et donne **10 cases de plus**. Clic droit avec le sac en main : il s'ouvre. Accroupi + clic droit : on le met sur le dos. Porté, la touche **B** l'ouvre (réglable dans les touches). On le voit sur le dos des joueurs. Un sac ne va pas dans un sac.
+
+Huit sacs : rouge d'école (rabat, porte-clés), en jean (coutures orange), militaire (deux poches, boucles, poches de côté), en cuir (rabat à sangles), jaune à écussons, violet étoilé, de sport noir (bandes blanches, poches de côté), de randonnée orange (rabat, sac de couchage roulé dessus). Recette : cuir, ficelle, et la teinture de sa couleur.
+
+Configuration serveur (`eraphones-server.toml`) : `limitedInventory` (true/false), `hotbarSlots` (1 à 9, 5 par défaut).
 
 ## Les téléphones
 

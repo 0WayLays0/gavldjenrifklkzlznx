@@ -179,7 +179,7 @@ public final class SmokeTest {
         STEPS.add(() -> {
             select(mc, 5);
             mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
-            command(mc, "setname Bill Denbrough");
+            command(mc, "setname Thomas Hale");
         });
         STEPS.add(() -> command(mc, "me ouvre lentement la porte de la cave"));
         STEPS.add(() -> command(mc, "roll 1d20"));
@@ -191,7 +191,7 @@ public final class SmokeTest {
                 + "La police demande à toute personne ayant des informations de se manifester. Les enfants sont priés de ne pas sortir après la tombée de la nuit."));
         STEPS.add(() -> {
             shot(mc, "rp_chat");
-            if (!mc.player.getDisplayName().getString().equals("Bill Denbrough")) {
+            if (!mc.player.getDisplayName().getString().equals("Thomas Hale")) {
                 fail("the character's name is not shown: {}", mc.player.getDisplayName().getString());
             } else {
                 log("rp: the character's name is shown");
@@ -359,7 +359,7 @@ public final class SmokeTest {
             mc.setScreen(null);
             select(mc, 7);
             com.waylays.eraphones.gear.client.GearClient.card(new com.waylays.eraphones.gear.GearNet.Card(mc.player.getUUID().toString(),
-                    "Bill Denbrough", "412-63-1980", "Grand, mince, cheveux roux, bégaie un peu quand il a peur.", ""));
+                    "Thomas Hale", "412-63-1980", "Grand, mince, cheveux roux, bégaie un peu quand il a peur.", ""));
         });
         STEPS.add(() -> shot(mc, "gear_card"));
         STEPS.add(() -> {
@@ -755,7 +755,8 @@ public final class SmokeTest {
             }
             net.minecraft.server.level.ServerLevel lv = p.serverLevel();
             net.minecraft.core.Direction dir = p.getDirection();
-            net.minecraft.core.BlockPos base = p.blockPosition().relative(dir, 5);
+            // On a platform high in the air: dry, lit, nothing in the way
+            net.minecraft.core.BlockPos base = new net.minecraft.core.BlockPos(p.getBlockX(), 150, p.getBlockZ()).relative(dir, 5);
             for (int a = -3; a <= 3; a++) {
                 for (int b = -16; b <= 1; b++) {
                     net.minecraft.core.BlockPos q = base.relative(dir.getClockWise(), a).relative(dir, b);
@@ -840,16 +841,19 @@ public final class SmokeTest {
             }
         }));
         STEPS.add(() -> {
-            mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
-            mc.player.setXRot(10);
+            // Looking where the body faces: at the fragment, over the shoulder
+            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+            mc.player.setYRot(mc.player.yBodyRot);
+            mc.player.setXRot(25);
         });
         STEPS.add(() -> shot(mc, "event_fragment_carried"));
+        STEPS.add(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT));
+        STEPS.add(() -> shot(mc, "event_fragment_carried_front"));
         STEPS.add(() -> {
             mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
             if (mc.player.getVehicle() != null) {
                 FRAGMENT_START = mc.player.getVehicle().position();
             }
-            mc.player.setYRot(mc.player.getYRot() + 180);
             net.minecraft.client.KeyMapping.set(mc.options.keyUp.getKey(), true);
         });
         STEPS.add(() -> {
@@ -883,6 +887,73 @@ public final class SmokeTest {
             if (!com.waylays.eraphones.rp.RpService.closesEyes("/me ferme lentement... non: Il ferme les yeux") || com.waylays.eraphones.rp.RpService.closesEyes("ferme la porte")) {
                 fail("closed eyes are not told apart in /me");
             }
+        });
+        // The limited inventory: in survival, five hand slots; what lands further goes into the backpack worn
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            p.getInventory().clearContent();
+            p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(com.waylays.eraphones.pack.PackRegistry.BACKPACKS.get(7).get()));
+            p.getInventory().setItem(0, new ItemStack(com.waylays.eraphones.registry.GearRegistry.FLASHLIGHT.get()));
+            p.getInventory().setItem(1, new ItemStack(com.waylays.eraphones.registry.GearRegistry.NEWSPAPER.get(), 3));
+            p.getInventory().setItem(7, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CASSETTE.get()));
+            p.getInventory().setItem(20, new ItemStack(net.minecraft.world.item.Items.APPLE, 5));
+        }));
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null) {
+                return;
+            }
+            if (!p.getInventory().getItem(7).isEmpty() || !p.getInventory().getItem(20).isEmpty()) {
+                fail("items stayed in the slots out of reach");
+            }
+            if (com.waylays.eraphones.pack.Packs.count(com.waylays.eraphones.pack.Packs.worn(p)) < 2) {
+                fail("the items out of reach did not go into the backpack ({})", com.waylays.eraphones.pack.Packs.count(com.waylays.eraphones.pack.Packs.worn(p)));
+            }
+        }));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            mc.player.setXRot(10);
+        });
+        STEPS.add(() -> shot(mc, "pack_hotbar"));
+        STEPS.add(() -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)));
+        STEPS.add(() -> shot(mc, "pack_inventory"));
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            net.neoforged.neoforge.network.PacketDistributor.sendToServer(new com.waylays.eraphones.pack.Packs.Open());
+        });
+        STEPS.add(() -> {
+            if (!(mc.screen instanceof com.waylays.eraphones.pack.client.BackpackScreen)) {
+                fail("the backpack did not open (screen {})", mc.screen);
+            }
+            shot(mc, "pack_open");
+        });
+        STEPS.add(() -> {
+            mc.setScreen(null);
+            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+            mc.player.setXRot(20);
+        });
+        STEPS.add(() -> shot(mc, "pack_back"));
+        STEPS.add(() -> server.execute(() -> {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p != null) {
+                p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(com.waylays.eraphones.pack.PackRegistry.BACKPACKS.get(0).get()));
+            }
+        }));
+        STEPS.add(() -> shot(mc, "pack_back_red"));
+        STEPS.add(() -> {
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            server.execute(() -> {
+                ServerPlayer p = server.getPlayerList().getPlayer(id);
+                if (p != null) {
+                    p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, ItemStack.EMPTY);
+                    p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+                }
+            });
         });
         // The camcorder: a few seconds filmed on a blank cassette, which then holds a film the televisions can play
         STEPS.add(() -> server.execute(() -> {
