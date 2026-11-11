@@ -69,7 +69,8 @@ public class FragmentRenderer extends EntityRenderer<StarFragment> {
         // The shards, turning slowly
         pose.mulPose(Axis.YP.rotationDegrees(t * (held ? .6f : 1.2f)));
         pose.mulPose(Axis.XP.rotationDegrees(8 * Mth.sin(t * .03f)));
-        VertexConsumer vc = buffers.getBuffer(RenderType.entityTranslucentEmissive(CRYSTAL));
+        // Lit by itself: drawn without the world's shading (its facets carry their own light)
+        VertexConsumer vc = buffers.getBuffer(RenderType.beaconBeam(CRYSTAL, false));
         for (int i = 0; i < SHARDS.length; i++) {
             float[] s = SHARDS[i];
             float twinkle = .82f + .18f * Mth.sin(t * .17f + i * 1.9f);
@@ -118,7 +119,7 @@ public class FragmentRenderer extends EntityRenderer<StarFragment> {
     /** A three-cornered facet (drawn as a quad with its last corner twice), coloured by how it meets the light. */
     private static void face(PoseStack.Pose m, VertexConsumer vc, Vector3f a, Vector3f b, Vector3f c, float twinkle, float vMid, float vEnd, int k) {
         Vector3f n = new Vector3f(b).sub(a).cross(new Vector3f(c).sub(a)).normalize();
-        float lit = .62f + .38f * Math.max(0, n.dot(LIGHT));
+        float lit = .7f + .3f * Math.max(0, n.dot(LIGHT));
         float edge = (k % 3 == 0 ? 1.06f : 1f) * twinkle;
         // Warm white-gold at the heart, toward a cold lilac-blue at the points
         int[] warm = {255, 236, 190}, cold = {196, 210, 255};

@@ -895,6 +895,11 @@ public final class SmokeTest {
                 return;
             }
             p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // What the player carries is put aside, and given back after
+            SAVED.clear();
+            for (int i = 0; i < 36; i++) {
+                SAVED.add(p.getInventory().getItem(i).copy());
+            }
             p.getInventory().clearContent();
             p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(com.waylays.eraphones.pack.PackRegistry.BACKPACKS.get(7).get()));
             p.getInventory().setItem(0, new ItemStack(com.waylays.eraphones.registry.GearRegistry.FLASHLIGHT.get()));
@@ -952,6 +957,10 @@ public final class SmokeTest {
                 if (p != null) {
                     p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, ItemStack.EMPTY);
                     p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+                    p.getInventory().clearContent();
+                    for (int i = 0; i < SAVED.size(); i++) {
+                        p.getInventory().setItem(i, SAVED.get(i));
+                    }
                 }
             });
         });
@@ -1136,6 +1145,7 @@ public final class SmokeTest {
     private static net.minecraft.core.BlockPos BOOTH = net.minecraft.core.BlockPos.ZERO;
     private static java.util.UUID BIKE;
     private static java.util.UUID FRAGMENT;
+    private static final java.util.List<ItemStack> SAVED = new java.util.ArrayList<>();
     private static net.minecraft.core.BlockPos EVENT_AT = net.minecraft.core.BlockPos.ZERO;
     private static net.minecraft.world.phys.Vec3 FRAGMENT_START;
     private static net.minecraft.core.BlockPos LAMP = net.minecraft.core.BlockPos.ZERO;
