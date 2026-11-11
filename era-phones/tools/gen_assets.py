@@ -6,6 +6,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import emote_assets  # noqa: E402
 import event_assets  # noqa: E402
 import gear_assets  # noqa: E402
 import pack_assets  # noqa: E402
@@ -29,6 +30,7 @@ if __name__ == "__main__":
     walkman_assets.main()
     lock_assets.main()
     held_fix.main()
+    emote_assets.main()
     writing_assets.main()
     models.main()
     lang.main()

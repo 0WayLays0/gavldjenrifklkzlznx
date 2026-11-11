@@ -140,6 +140,26 @@ Un **lecteur de carte** se pose sur un mur à côté d'une porte (on ne peut pas
 ### `/vitesse` et `/hp`
 `/vitesse <joueurs> <fois>` (1 = normal, 0.5 = moitié, 2 = double) ou `normale`. `/hp <joueurs> <points>` (20 = normal = 10 cœurs) ou `normal`. Gardés après la mort et la déconnexion. Les **effets** qu'un joueur a quand il meurt (donnés par `/effect` ou autrement) lui sont rendus quand il réapparaît, avec le temps qui leur restait.
 
+## Jauge de peur, photos épinglées, emotes
+
+### Jauge de peur : `/peur jauge`
+Chaque joueur a une peur de 0 à 100 %. Elle **monte** dans le noir (une lampe torche allumée, une torche ou une lanterne en main comptent comme de la lumière), seul, la nuit dehors, blessé, avec des monstres autour, et d'un coup quand le staff lui envoie quelque chose (`/horreur` sons, murmure, coupure, sang, ballon, `/peur`, coups reçus). Elle **descend** à la lumière et à plusieurs. À partir d'un tiers : le cœur bat, de plus en plus vite, les bords de l'écran s'assombrissent au rythme du cœur ; au-delà des deux tiers : le souffle court, la vue tremble et se brouille un peu. Un petit cœur et un tracé de moniteur en bas à gauche la montrent.
+**Le staff** (ceux qui peuvent utiliser `/horreur`), et les joueurs en créatif ou spectateur, **ne ressentent rien**.
+- `/peur jauge on` / `/peur jauge off` : l'active ou la coupe pour tout le serveur (gardé avec le monde) ;
+- `/peur jauge` ou `/peur jauge info` : l'état, et la peur de chaque joueur ;
+- `/peur jauge <joueurs> <0-100>` : la régler à la main.
+
+### Photos épinglées (Polaroid)
+L'**appareil photo instantané** (onglet Objets) prend ce que tu vois ; la photo sort et se révèle en une minute. **Accroupi + clic droit** avec une photo sur un **mur** : elle y est épinglée (une punaise de couleur, un peu de travers) ; sur une **table ou le sol** : elle y est posée. On y voit l'image, et le nom de qui l'a prise. Clic droit dessus : on la regarde en grand. Un coup : on la reprend. Plusieurs côte à côte font un **tableau d'enquête**.
+
+### Emotes (mod Emotecraft)
+Dans `emotes/` : trois emotes **dans le style d'un clown inquiétant** (faites ici de zéro, image par image, pas copiées d'un film) :
+- `clown_sautille.json` : il sautille d'un pied sur l'autre, genoux hauts, bras ballants comme une marionnette, penché en avant, la tête droite et fixe pendant que le corps rebondit ;
+- `clown_danse.json` : danse molle et saccadée, d'une hanche sur l'autre, les bras qui battent l'air, les genoux qui lâchent, la tête qui penche à contretemps ;
+- `clown_tete_penchee.json` : immobile, la tête se penche lentement sur l'épaule, les bras pendants, puis un sursaut de temps en temps.
+
+Installation : avec **Emotecraft** installé, copier les fichiers `.json` dans le dossier `.minecraft/emotes/` (le créer s'il n'existe pas), relancer le jeu, puis les mettre sur la roue des emotes (touche B par défaut, *Config* des emotes). Avec Emotecraft aussi sur le serveur, les autres joueurs qui ont Emotecraft voient l'emote.
+
 ## Les téléphones
 
 | Objet | Époque | Ce qu'il fait |

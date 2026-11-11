@@ -59,7 +59,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: epoque-rp-jar
-          path: era-phones/build/libs/epoque-rp-*.jar
+          path: |
+            era-phones/build/libs/epoque-rp-*.jar
+            era-phones/emotes/*.json
           if-no-files-found: error
 
       - name: Report
