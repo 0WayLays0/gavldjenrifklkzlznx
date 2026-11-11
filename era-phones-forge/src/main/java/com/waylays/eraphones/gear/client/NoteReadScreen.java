@@ -22,7 +22,8 @@ public class NoteReadScreen extends GearScreen {
     }
 
     @Override
-    public boolean mouseScrolled(double mx, double my, double sx, double sy) {
+    public boolean mouseScrolled(double mx, double my, double sy) {
+        double sx = 0;
         scroll = Math.max(0, Math.min(more, scroll - (int) Math.signum(sy)));
         return true;
     }

@@ -103,7 +103,7 @@ public final class CamClient {
 
     @SubscribeEvent
     public static void onLayers(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll(EraPhones.id("camcorder"), CamClient::viewfinder);
+        event.registerAboveAll("camcorder", (gui, g, pt, w, h) -> CamClient.viewfinder(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
     }
 
     /** The viewfinder: what a camcorder of the time showed over its picture. */

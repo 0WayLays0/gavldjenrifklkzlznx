@@ -167,8 +167,8 @@ public final class PackClient {
         }
 
         @SubscribeEvent
-        public static void onScreens(RegisterMenuScreensEvent event) {
-            event.register(PackRegistry.MENU.get(), BackpackScreen::new);
+        public static void onScreens(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
+            event.enqueueWork(() -> net.minecraft.client.gui.screens.MenuScreens.register(PackRegistry.MENU.get(), BackpackScreen::new));
         }
 
         @SubscribeEvent

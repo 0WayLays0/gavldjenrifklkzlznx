@@ -29,7 +29,7 @@ import java.util.Set;
 public final class PhoneGameTests {
     private PhoneGameTests() {}
 
-    @GameTest(template = "platform", skyAccess = true, timeoutTicks = 100)
+    @GameTest(template = "platform", timeoutTicks = 100)
     public static void aBoothHasItsNumberAndRings(GameTestHelper helper) {
         net.minecraft.world.level.block.state.BlockState lower = com.waylays.eraphones.registry.GearRegistry.BOOTH.get().defaultBlockState();
         helper.setBlock(new BlockPos(1, 2, 1), lower);
@@ -53,7 +53,7 @@ public final class PhoneGameTests {
     }
 
     /** A zone trigger goes off when a player in survival walks into it (its action: a gold block placed); not in creative. */
-    @GameTest(template = "platform", skyAccess = true, timeoutTicks = 40)
+    @GameTest(template = "platform", timeoutTicks = 40)
     public static void aZoneTriggerGoesOff(GameTestHelper helper) {
         net.minecraft.server.level.ServerPlayer p = net.minecraftforge.common.util.FakePlayerFactory.get(helper.getLevel(),
                 new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "zone_tester"));
@@ -76,7 +76,7 @@ public final class PhoneGameTests {
         });
     }
 
-    @GameTest(template = "platform", skyAccess = true)
+    @GameTest(template = "platform")
     public static void numbersAreRead(GameTestHelper helper) {
         helper.assertTrue("555-0142".equals(Numbers.normalize("5550142")), "seven digits");
         helper.assertTrue("555-0142".equals(Numbers.normalize("555 01 42")), "spaces");
@@ -86,7 +86,7 @@ public final class PhoneGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", skyAccess = true)
+    @GameTest(template = "platform")
     public static void everyPhoneHasItsNumber(GameTestHelper helper) {
         Set<String> seen = new HashSet<>();
         for (Era era : Era.values()) {
@@ -102,7 +102,7 @@ public final class PhoneGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", skyAccess = true)
+    @GameTest(template = "platform")
     public static void messagesWaitAndAreRead(GameTestHelper helper) {
         LineData d = LineData.get(helper.getLevel().getServer());
         String a = d.newLine(Era.SMART, helper.getLevel().getRandom());
@@ -121,7 +121,7 @@ public final class PhoneGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", skyAccess = true)
+    @GameTest(template = "platform")
     public static void theNetworkFadesUnderARoof(GameTestHelper helper) {
         BlockPos open = helper.absolutePos(new BlockPos(1, 2, 1));
         helper.assertTrue(Signal.bars(helper.getLevel(), open, Era.SMART) == 4, "four bars under the open sky, got "
@@ -140,7 +140,7 @@ public final class PhoneGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", skyAccess = true)
+    @GameTest(template = "platform")
     public static void horrorSoundsExist(GameTestHelper helper) {
         java.util.Set<String> ids = new java.util.TreeSet<>(com.waylays.eraphones.horror.HorrorService.soundIds());
         // And the ones the victims' own screens play
@@ -154,7 +154,7 @@ public final class PhoneGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", skyAccess = true)
+    @GameTest(template = "platform")
     public static void voicesStayClean(GameTestHelper helper) {
         int rate = com.waylays.eraphones.horror.VoiceFx.RATE;
         for (String v : com.waylays.eraphones.horror.VoiceFx.VOICES) {
@@ -191,7 +191,7 @@ public final class PhoneGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "platform", skyAccess = true)
+    @GameTest(template = "platform")
     public static void tapesAndThings(GameTestHelper helper) {
         // A stereo recording at 44.1 kHz brought to one channel at 48 kHz
         short[] stereo = new short[44100 * 2];

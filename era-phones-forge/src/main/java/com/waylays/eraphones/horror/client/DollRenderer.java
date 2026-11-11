@@ -49,8 +49,8 @@ public class DollRenderer implements BlockEntityRenderer<DollBlockEntity> {
         float u0 = col / 4f, u1 = (col + 1) / 4f, v0 = row / 2f, v1 = (row + 1) / 2f;
         float[][] uv = {{u0, v0}, {u1, v0}, {u1, v1}, {u0, v1}};
         for (int i = 0; i < 4; i++) {
-            vc.addVertex(p, c[i * 3], c[i * 3 + 1], c[i * 3 + 2]).setColor(255, 255, 255, 255).setUv(uv[i][0], uv[i][1])
-                    .setOverlay(overlay).setLight(light).setNormal(p, nx, ny, nz);
+            vc.vertex(p.pose(), c[i * 3], c[i * 3 + 1], c[i * 3 + 2]).color(255, 255, 255, 255).uv(uv[i][0], uv[i][1])
+                    .overlayCoords(overlay).uv2(light).normal(p.normal(), nx, ny, nz).endVertex();
         }
     }
 }

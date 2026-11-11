@@ -4,7 +4,6 @@ import com.waylays.eraphones.EraPhones;
 import com.waylays.eraphones.rp.RpConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import com.waylays.eraphones.compat.StreamCodec;
@@ -17,7 +16,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -56,15 +54,15 @@ public final class Packs {
 
     public static NonNullList<ItemStack> contents(ItemStack bag) {
         NonNullList<ItemStack> list = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        ItemContainerContents c = bag.get(DataComponents.CONTAINER);
-        if (c != null) {
-            c.copyInto(list);
+        List<ItemStack> c = com.waylays.eraphones.compat.ItemData.items(bag);
+        for (int i = 0; i < c.size() && i < SIZE; i++) {
+            list.set(i, c.get(i));
         }
         return list;
     }
 
     public static void store(ItemStack bag, NonNullList<ItemStack> list) {
-        bag.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(list));
+        com.waylays.eraphones.compat.ItemData.setItems(bag, list);
     }
 
     public static int count(ItemStack bag) {
@@ -152,7 +150,7 @@ public final class Packs {
         if (event.phase != TickEvent.Phase.END) {
             return;
         }
-        if (!(event.getEntity() instanceof ServerPlayer p) || !limited(p)) {
+        if (!(event.player instanceof ServerPlayer p) || !limited(p)) {
             return;
         }
         Inventory inv = p.getInventory();
@@ -178,9 +176,9 @@ public final class Packs {
 
     @SubscribeEvent
     public static void onPickup(EntityItemPickupEvent event) {
-        Player p = event.getPlayer();
-        if (!p.level().isClientSide && limited(p) && !room(p, event.getItemEntity().getItem())) {
-            event.setCanPickup(TriState.FALSE);
+        Player p = event.getEntity();
+        if (!p.level().isClientSide && limited(p) && !room(p, event.getItem().getItem())) {
+            event.setCanceled(true);
         }
     }
 

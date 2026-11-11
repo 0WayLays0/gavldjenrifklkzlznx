@@ -11,7 +11,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -331,7 +330,7 @@ public final class Locks extends SavedData {
         ItemStack b = new ItemStack(LockRegistry.BADGE_ITEM.get());
         String id = newKey();
         LockRegistry.BADGE.get().set(b, id);
-        b.set(DataComponents.CUSTOM_NAME, Component.literal(name).withStyle(s -> s.withItalic(false)));
+        b.setHoverName(Component.literal(name).withStyle(s -> s.withItalic(false)));
         p.getInventory().add(b);
         c.getSource().sendSuccess(() -> Component.translatable("lock.eraphones.badge_made", name, id).withStyle(ChatFormatting.GOLD), false);
         return 1;

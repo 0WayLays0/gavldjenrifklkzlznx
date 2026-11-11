@@ -29,8 +29,7 @@ public class MusicBoxBlock extends GearBlock {
         super(properties, 4, 0, 5, 12, 7, 11);
     }
 
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level instanceof ServerLevel sl) {
             long now = sl.getGameTime();
             Long until = PLAYING.get(pos.asLong());
@@ -42,5 +41,12 @@ public class MusicBoxBlock extends GearBlock {
             sl.sendParticles(ParticleTypes.NOTE, pos.getX() + .5, pos.getY() + .7, pos.getZ() + .5, 1, 0, 0, 0, 0);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** 1.20.1's single use(): the item's use first, then the hand's (as 1.21 splits them). */
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+                                 net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        return hand == net.minecraft.world.InteractionHand.MAIN_HAND ? useWithoutItem(state, level, pos, player, hit) : InteractionResult.PASS;
     }
 }

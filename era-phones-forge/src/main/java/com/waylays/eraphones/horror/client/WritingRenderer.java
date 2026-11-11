@@ -138,9 +138,9 @@ public class WritingRenderer extends EntityRenderer<WallWriting> {
 
     private static void quad(VertexConsumer vc, PoseStack.Pose p, int light, int a, float x0, float y0, float x1, float y1, float u0, float v0,
                              float u1, float v1) {
-        vc.addVertex(p, x0, y1, 0).setColor(255, 255, 255, a).setUv(u0, v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(p, 0, 0, 1);
-        vc.addVertex(p, x1, y1, 0).setColor(255, 255, 255, a).setUv(u1, v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(p, 0, 0, 1);
-        vc.addVertex(p, x1, y0, 0).setColor(255, 255, 255, a).setUv(u1, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(p, 0, 0, 1);
-        vc.addVertex(p, x0, y0, 0).setColor(255, 255, 255, a).setUv(u0, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(p, 0, 0, 1);
+        vc.vertex(p.pose(), x0, y1, 0).color(255, 255, 255, a).uv(u0, v1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(p.normal(), 0, 0, 1).endVertex();
+        vc.vertex(p.pose(), x1, y1, 0).color(255, 255, 255, a).uv(u1, v1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(p.normal(), 0, 0, 1).endVertex();
+        vc.vertex(p.pose(), x1, y0, 0).color(255, 255, 255, a).uv(u1, v0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(p.normal(), 0, 0, 1).endVertex();
+        vc.vertex(p.pose(), x0, y0, 0).color(255, 255, 255, a).uv(u0, v0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(p.normal(), 0, 0, 1).endVertex();
     }
 }

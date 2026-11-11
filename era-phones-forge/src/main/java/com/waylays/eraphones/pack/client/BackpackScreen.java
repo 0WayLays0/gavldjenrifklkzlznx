@@ -25,6 +25,7 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackMenu> {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
+        renderBackground(g);
         super.render(g, mx, my, pt);
         renderTooltip(g, mx, my);
     }

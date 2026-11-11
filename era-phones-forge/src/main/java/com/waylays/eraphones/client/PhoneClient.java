@@ -245,7 +245,7 @@ public final class PhoneClient {
         }
     }
 
-    public static void send(net.minecraft.network.protocol.common.custom.CustomPacketPayload payload) {
+    public static void send(com.waylays.eraphones.compat.CustomPacketPayload payload) {
         if (Minecraft.getInstance().getConnection() != null) {
             PacketDistributor.sendToServer(payload);
         }
@@ -698,7 +698,7 @@ public final class PhoneClient {
 
     @SubscribeEvent
     public static void onRegisterLayers(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll(EraPhones.id("phone_hud"), PhoneHud::render);
+        event.registerAboveAll("phone_hud", (gui, g, pt, w, h) -> PhoneHud.render(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
     }
 
     @SubscribeEvent

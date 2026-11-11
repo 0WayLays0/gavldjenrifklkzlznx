@@ -8,7 +8,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -32,16 +31,16 @@ public class CardScreen extends GearScreen {
         this.card = card;
     }
 
-    private PlayerSkin skin() {
+    private net.minecraft.resources.ResourceLocation skin() {
         UUID id;
         try {
             id = UUID.fromString(card.owner());
         } catch (IllegalArgumentException e) {
-            return DefaultPlayerSkin.get(new UUID(0, 0));
+            return DefaultPlayerSkin.getDefaultSkin(new UUID(0, 0));
         }
         var conn = Minecraft.getInstance().getConnection();
         PlayerInfo info = conn == null ? null : conn.getPlayerInfo(id);
-        return info != null ? info.getSkin() : DefaultPlayerSkin.get(id);
+        return info != null ? info.getSkinLocation() : DefaultPlayerSkin.getDefaultSkin(id);
     }
 
     /** The two lines of the reading strip, made of the name and the number. */

@@ -203,8 +203,8 @@ public final class HorrorClient {
 
     @SubscribeEvent
     public static void onRegisterLayers(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll(EraPhones.id("horror"), HorrorClient::render);
-        event.registerBelowAll(EraPhones.id("horror_blur"), HorrorClient::fearBlur);
+        event.registerAboveAll("horror", (gui, g, pt, w, h) -> HorrorClient.render(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
+        event.registerBelowAll("horror_blur", (gui, g, pt, w, h) -> HorrorClient.fearBlur(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
     }
 
     private static void render(GuiGraphics g, DeltaTracker delta) {
@@ -710,7 +710,7 @@ public final class HorrorClient {
     }
 
     private static void vertex(VertexConsumer vc, PoseStack.Pose pose, float x, float y, float u, float v, int alpha, int light) {
-        vc.addVertex(pose, x, y, 0).setColor(255, 255, 255, alpha).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 0, 1);
+        vc.vertex(pose.pose(), x, y, 0).color(255, 255, 255, alpha).uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(pose.normal(), 0, 0, 1).endVertex();
     }
 
     /** The balloon bursts: a bang, red shreds falling. */

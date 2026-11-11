@@ -4,7 +4,6 @@ import com.waylays.eraphones.gear.CassetteItem;
 import com.waylays.eraphones.gear.Tape;
 import com.waylays.eraphones.registry.GearRegistry;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -18,7 +17,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -35,12 +33,12 @@ public class WalkmanItem extends Item {
     }
 
     public static ItemStack cassette(ItemStack walkman) {
-        ItemContainerContents c = walkman.get(DataComponents.CONTAINER);
-        return c == null ? ItemStack.EMPTY : c.copyOne();
+        List<ItemStack> c = com.waylays.eraphones.compat.ItemData.items(walkman);
+        return c.isEmpty() ? ItemStack.EMPTY : c.get(0).copy();
     }
 
     public static void setCassette(ItemStack walkman, ItemStack cassette) {
-        walkman.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(cassette.isEmpty() ? List.of() : List.of(cassette.copyWithCount(1))));
+        com.waylays.eraphones.compat.ItemData.setItems(walkman, cassette.isEmpty() ? List.of() : List.of(cassette.copyWithCount(1)));
     }
 
     @Override

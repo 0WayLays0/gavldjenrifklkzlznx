@@ -5,7 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import com.waylays.eraphones.compat.ItemInteractionResult;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -85,8 +85,7 @@ public class CardReaderBlock extends HorizontalDirectionalBlock implements Entit
                 : (l, p, s, be) -> ((CardReaderBlockEntity) be).tick((ServerLevel) l);
     }
 
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+        public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
                                               BlockHitResult hit) {
         if (!(stack.getItem() instanceof BadgeItem)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
@@ -97,11 +96,21 @@ public class CardReaderBlock extends HorizontalDirectionalBlock implements Entit
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof CardReaderBlockEntity r && player instanceof ServerPlayer p) {
             r.info(p);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** 1.20.1's single use(): the item's use first, then the hand's (as 1.21 splits them). */
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+                                 net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        com.waylays.eraphones.compat.ItemInteractionResult r = useItemOn(player.getItemInHand(hand), state, level, pos, player, hand, hit);
+        if (r != com.waylays.eraphones.compat.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) {
+            return r.result();
+        }
+        return hand == net.minecraft.world.InteractionHand.MAIN_HAND ? useWithoutItem(state, level, pos, player, hit) : InteractionResult.PASS;
     }
 }

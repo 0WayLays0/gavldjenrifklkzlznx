@@ -106,6 +106,7 @@ public class NoteEditScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
+        renderBackground(g);
         super.render(g, mx, my, pt);
         // The page as it will look
         g.pose().pushPose();

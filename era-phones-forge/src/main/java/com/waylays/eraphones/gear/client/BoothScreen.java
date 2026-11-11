@@ -233,13 +233,13 @@ public class BoothScreen extends Screen {
 
     // ---------------------------------------------------------------- drawing
 
-    @Override
-    public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
+        public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
         g.fill(0, 0, width, height, 0x88000000);
     }
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
+        renderBackground(g, mx, my, pt);
         super.render(g, mx, my, pt);
         long now = System.currentTimeMillis();
         double x = ux(mx), y = uy(my);

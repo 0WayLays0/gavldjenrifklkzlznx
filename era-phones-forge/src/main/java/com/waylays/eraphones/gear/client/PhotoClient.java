@@ -149,7 +149,7 @@ public final class PhotoClient {
 
     @SubscribeEvent
     public static void onLayers(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll(EraPhones.id("camera_flash"), PhotoClient::flash);
+        event.registerAboveAll("camera_flash", (gui, g, pt, w, h) -> PhotoClient.flash(g, new com.waylays.eraphones.compat.DeltaTracker(pt)));
     }
 
     /** The flash, white and gone in a moment. */

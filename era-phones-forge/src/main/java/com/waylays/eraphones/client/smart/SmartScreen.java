@@ -157,8 +157,7 @@ public class SmartScreen extends Screen {
 
     // ---------------------------------------------------------------- drawing
 
-    @Override
-    public void renderBackground(GuiGraphics g, int mx, int my, float partialTicks) {
+        public void renderBackground(GuiGraphics g, int mx, int my, float partialTicks) {
         // No blur: the world stays in view; only a soft shade on the phone's side
         g.fillGradient(width / 2, 0, width, height, 0x00000000, 0x00000000);
     }
@@ -741,7 +740,8 @@ public class SmartScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double sx, double sy) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double sy) {
+        double sx = 0;
         if (app != null && appProgress() >= 1) {
             return app.scrolled(lx(mouseX), ly(mouseY), sy);
         }

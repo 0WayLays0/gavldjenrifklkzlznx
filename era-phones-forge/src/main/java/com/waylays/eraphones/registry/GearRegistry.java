@@ -55,7 +55,7 @@ public final class GearRegistry {
                     .updateInterval(20).noSummon().build("ecriture"));
 
     private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> component(String name, Codec<T> codec,
-            net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf, T> stream) {
+            com.waylays.eraphones.compat.StreamCodec<? super com.waylays.eraphones.compat.RegistryFriendlyByteBuf, T> stream) {
         return EraRegistry.COMPONENTS.register(name, () -> DataComponentType.<T>builder().persistent(codec).networkSynchronized(stream).build());
     }
 

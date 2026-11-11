@@ -70,7 +70,7 @@ public class StarFragment extends Entity {
     }
 
     @Override
-    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+    protected void defineSynchedData() {
     }
 
     @Override

@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import com.waylays.eraphones.compat.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -37,8 +37,7 @@ public class VcrBlock extends GearBlock implements EntityBlock {
         return new VcrBlockEntity(pos, state);
     }
 
-    @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+        public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
             BlockHitResult hit) {
         if (!(stack.getItem() instanceof CassetteItem)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
@@ -49,8 +48,7 @@ public class VcrBlock extends GearBlock implements EntityBlock {
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) {
             com.waylays.eraphones.gear.client.GearClient.openVcr(pos);
         }
@@ -75,5 +73,16 @@ public class VcrBlock extends GearBlock implements EntityBlock {
             return null;
         }
         return (l, p, s, be) -> ((VcrBlockEntity) be).serverTick();
+    }
+
+    /** 1.20.1's single use(): the item's use first, then the hand's (as 1.21 splits them). */
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+                                 net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        com.waylays.eraphones.compat.ItemInteractionResult r = useItemOn(player.getItemInHand(hand), state, level, pos, player, hand, hit);
+        if (r != com.waylays.eraphones.compat.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) {
+            return r.result();
+        }
+        return hand == net.minecraft.world.InteractionHand.MAIN_HAND ? useWithoutItem(state, level, pos, player, hit) : InteractionResult.PASS;
     }
 }

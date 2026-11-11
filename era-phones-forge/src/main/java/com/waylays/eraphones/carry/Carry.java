@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class Carry {
-    private static final ResourceLocation SLOW = EraPhones.id("porter");
+    private static final java.util.UUID SLOW = java.util.UUID.nameUUIDFromBytes("eraphones:porter".getBytes(java.nio.charset.StandardCharsets.UTF_8));
     /** Asked: the one asked, who asks, until when (game time). */
     private static final Map<UUID, Ask> ASKED = new ConcurrentHashMap<>();
 
@@ -121,17 +121,17 @@ public final class Carry {
         if (event.phase != TickEvent.Phase.END) {
             return;
         }
-        if (event.getEntity().level().isClientSide || event.getEntity().tickCount % 5 != 0) {
+        if (event.player.level().isClientSide || event.player.tickCount % 5 != 0) {
             return;
         }
-        Player p = event.getEntity();
+        Player p = event.player;
         AttributeInstance a = p.getAttribute(Attributes.MOVEMENT_SPEED);
         if (a == null) {
             return;
         }
         boolean carrying = p.getFirstPassenger() instanceof Player;
         if (carrying && !a.hasModifier(SLOW)) {
-            a.addTransientModifier(new AttributeModifier(SLOW, -.3, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+            a.addTransientModifier(new AttributeModifier(SLOW, "eraphones", -.3, AttributeModifier.Operation.MULTIPLY_TOTAL));
         } else if (!carrying && a.hasModifier(SLOW)) {
             a.removeModifier(SLOW);
         }

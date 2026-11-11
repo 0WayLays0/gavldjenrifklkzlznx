@@ -135,8 +135,7 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
         return SHAPES[state.getValue(PART)][state.getValue(FACING).get2DDataValue()];
     }
 
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && player instanceof ServerPlayer sp) {
             BlockPos base = pos.below(state.getValue(PART));
             if (level.getBlockEntity(base) instanceof BoothBlockEntity booth) {
@@ -160,5 +159,12 @@ public class BoothBlock extends HorizontalDirectionalBlock implements EntityBloc
             return null;
         }
         return (l, p, s, be) -> ((BoothBlockEntity) be).serverTick();
+    }
+
+    /** 1.20.1's single use(): the item's use first, then the hand's (as 1.21 splits them). */
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+                                 net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        return hand == net.minecraft.world.InteractionHand.MAIN_HAND ? useWithoutItem(state, level, pos, player, hit) : InteractionResult.PASS;
     }
 }

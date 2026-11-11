@@ -10,7 +10,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,21 +40,34 @@ public final class Sizes {
 
     private Sizes() {}
 
-    private record Part(Holder<Attribute> attribute, AttributeModifier.Operation op, boolean root) {}
+    private record Part(java.util.function.Supplier<Attribute> attribute, AttributeModifier.Operation op, double base, boolean root) {}
 
-    /** What changes with the height: the size itself (added to 1), the rest in proportion (or as its square root). */
+    /**
+     * What changes with the height besides the size itself (1.20.1 has no size attribute: the hitbox and the eyes follow
+     * the entity's own size, the body is drawn bigger or smaller, the jump and the fall are taken care of below): the
+     * step up, the hands' reach (added, from their usual values), the stride (as the square root).
+     */
     private static final List<Part> PARTS = List.of(
-            new Part(Attributes.SCALE, AttributeModifier.Operation.ADD_VALUE, false),
-            new Part(Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false),
-            new Part(Attributes.BLOCK_INTERACTION_RANGE, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false),
-            new Part(Attributes.ENTITY_INTERACTION_RANGE, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false),
-            new Part(Attributes.SAFE_FALL_DISTANCE, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, false),
-            new Part(Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, true),
-            new Part(Attributes.JUMP_STRENGTH, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, true));
+            new Part(() -> net.minecraftforge.common.ForgeMod.STEP_HEIGHT_ADDITION.get(), AttributeModifier.Operation.ADDITION, .6, false),
+            new Part(() -> net.minecraftforge.common.ForgeMod.BLOCK_REACH.get(), AttributeModifier.Operation.ADDITION, 4.5, false),
+            new Part(() -> net.minecraftforge.common.ForgeMod.ENTITY_REACH.get(), AttributeModifier.Operation.ADDITION, 3, false),
+            new Part(() -> Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.MULTIPLY_BASE, 1, true));
+    private static final java.util.UUID UUID_ = java.util.UUID.nameUUIDFromBytes("eraphones:taille".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    /** The heights known on this side (by entity id): the server's players, and on a client those it was told of. */
+    private static final java.util.Map<Integer, Integer> KNOWN = new java.util.concurrent.ConcurrentHashMap<>();
 
     public static int of(Player p) {
+        Integer known = KNOWN.get(p.getId());
+        if (known != null && p.level().isClientSide) {
+            return known;
+        }
         int cm = p.getPersistentData().getInt(KEY);
         return cm <= 0 ? NORMAL : cm;
+    }
+
+    /** The size, 1 for the usual height. */
+    public static float scale(Player p) {
+        return of(p) / (float) NORMAL;
     }
 
     /** Makes {@code p} {@code cm} tall. */
@@ -63,22 +75,92 @@ public final class Sizes {
         cm = Math.max(MIN, Math.min(MAX, cm));
         double k = cm / (double) NORMAL;
         for (Part part : PARTS) {
-            AttributeInstance a = p.getAttribute(part.attribute);
+            AttributeInstance a = p.getAttribute(part.attribute.get());
             if (a == null) {
                 continue;
             }
-            a.removeModifier(ID);
+            a.removeModifier(UUID_);
             if (cm != NORMAL) {
-                double v = part.root ? Math.sqrt(k) - 1 : k - 1;
-                a.addPermanentModifier(new AttributeModifier(ID, v, part.op));
+                double v = part.root ? Math.sqrt(k) - 1 : part.base * (k - 1);
+                a.addPermanentModifier(new AttributeModifier(UUID_, "eraphones taille", v, part.op));
             }
         }
         if (cm == NORMAL) {
             p.getPersistentData().remove(KEY);
+            KNOWN.remove(p.getId());
         } else {
             p.getPersistentData().putInt(KEY, cm);
+            KNOWN.put(p.getId(), cm);
         }
         p.refreshDimensions();
+        if (p instanceof ServerPlayer sp) {
+            com.waylays.eraphones.compat.PacketDistributor.sendToPlayersTrackingEntityAndSelf(sp, new Sync(sp.getId(), cm));
+        }
+    }
+
+    /** The hitbox and the eyes, drawn from the height. */
+    @SubscribeEvent
+    public static void onSize(net.minecraftforge.event.entity.EntityEvent.Size event) {
+        if (event.getEntity() instanceof Player p) {
+            float k = scale(p);
+            if (k != 1f) {
+                event.setNewSize(event.getNewSize().scale(k), false);
+                event.setNewEyeHeight(event.getNewEyeHeight() * k);
+            }
+        }
+    }
+
+    /** The jump, a little higher or lower (as the square root). */
+    @SubscribeEvent
+    public static void onJump(net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent event) {
+        if (event.getEntity() instanceof Player p && scale(p) != 1f) {
+            net.minecraft.world.phys.Vec3 v = p.getDeltaMovement();
+            p.setDeltaMovement(v.x, v.y * Math.sqrt(scale(p)), v.z);
+        }
+    }
+
+    /** The fall taken without harm, in proportion. */
+    @SubscribeEvent
+    public static void onFall(net.minecraftforge.event.entity.living.LivingFallEvent event) {
+        if (event.getEntity() instanceof Player p && scale(p) != 1f) {
+            event.setDistance(event.getDistance() / scale(p));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onTracking(PlayerEvent.StartTracking event) {
+        if (event.getTarget() instanceof ServerPlayer target && event.getEntity() instanceof ServerPlayer viewer && of(target) != NORMAL) {
+            com.waylays.eraphones.compat.PacketDistributor.sendToPlayer(viewer, new Sync(target.getId(), of(target)));
+        }
+    }
+
+    public static void register(com.waylays.eraphones.compat.PayloadRegistrar r) {
+        r.playToClient(Sync.TYPE, Sync.CODEC, (p, c) -> {
+            if (p.cm() == NORMAL) {
+                KNOWN.remove(p.id());
+            } else {
+                KNOWN.put(p.id(), p.cm());
+            }
+            net.minecraft.world.entity.Entity e = c.player() == null ? null : c.player().level().getEntity(p.id());
+            if (e != null) {
+                e.refreshDimensions();
+            }
+        });
+    }
+
+    /** A player's height, to the clients that see them. */
+    public record Sync(int id, int cm) implements com.waylays.eraphones.compat.CustomPacketPayload {
+        public static final Type<Sync> TYPE = new Type<>(EraPhones.id("size_sync"));
+        public static final com.waylays.eraphones.compat.StreamCodec<net.minecraft.network.FriendlyByteBuf, Sync> CODEC =
+                com.waylays.eraphones.compat.CustomPacketPayload.codec((p, b) -> {
+                    b.writeVarInt(p.id);
+                    b.writeVarInt(p.cm);
+                }, b -> new Sync(b.readVarInt(), b.readVarInt()));
+
+        @Override
+        public Type<Sync> type() {
+            return TYPE;
+        }
     }
 
     @SubscribeEvent

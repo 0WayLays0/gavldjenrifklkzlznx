@@ -45,8 +45,7 @@ public abstract class GearScreen extends Screen {
         py = (height - bodyH * scale) / 2;
     }
 
-    @Override
-    public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
+        public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
         g.fillGradient(0, 0, width, height, 0x70000000, 0xA0000000);
     }
 

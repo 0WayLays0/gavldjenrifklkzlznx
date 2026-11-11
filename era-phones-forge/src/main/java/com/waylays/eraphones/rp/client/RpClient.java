@@ -78,7 +78,7 @@ public final class RpClient {
     @SubscribeEvent
     public static void onNameTag(RenderNameTagEvent event) {
         if (event.getEntity() instanceof Player && !nameplates()) {
-            event.setCanRender(TriState.FALSE);
+            event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
         }
     }
 

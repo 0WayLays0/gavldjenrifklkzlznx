@@ -88,10 +88,10 @@ public class FragmentRenderer extends EntityRenderer<StarFragment> {
     private static void quad(PoseStack pose, VertexConsumer vc, float size, int r, int g, int b, int a) {
         Matrix4f m = pose.last().pose();
         float h = size / 2;
-        vc.addVertex(m, -h, -h, 0).setColor(r, g, b, a).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
-        vc.addVertex(m, h, -h, 0).setColor(r, g, b, a).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
-        vc.addVertex(m, h, h, 0).setColor(r, g, b, a).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
-        vc.addVertex(m, -h, h, 0).setColor(r, g, b, a).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
+        vc.vertex(m, -h, -h, 0).color(r, g, b, a).uv(0, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
+        vc.vertex(m, h, -h, 0).color(r, g, b, a).uv(1, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
+        vc.vertex(m, h, h, 0).color(r, g, b, a).uv(1, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
+        vc.vertex(m, -h, h, 0).color(r, g, b, a).uv(0, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(0, 0, 1).endVertex();
     }
 
     /**
@@ -139,7 +139,7 @@ public class FragmentRenderer extends EntityRenderer<StarFragment> {
     }
 
     private static void put(PoseStack.Pose m, VertexConsumer vc, Vector3f p, int[] c, float u, float v, Vector3f n) {
-        vc.addVertex(m.pose(), p.x, p.y, p.z).setColor(c[0], c[1], c[2], 235).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT).setNormal(m, n.x, n.y, n.z);
+        vc.vertex(m.pose(), p.x, p.y, p.z).color(c[0], c[1], c[2], 235).uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(LightTexture.FULL_BRIGHT).normal(m.normal(), n.x, n.y, n.z).endVertex();
     }
 }

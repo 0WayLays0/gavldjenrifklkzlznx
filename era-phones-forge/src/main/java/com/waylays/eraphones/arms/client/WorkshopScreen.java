@@ -8,13 +8,11 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.ItemLore;
 import com.waylays.eraphones.compat.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
@@ -71,12 +69,11 @@ public class WorkshopScreen extends Screen {
     public WorkshopScreen(ItemStack stack) {
         super(Component.translatable("arms.eraphones.title"));
         this.stack = stack.copy();
-        Component custom = stack.get(DataComponents.CUSTOM_NAME);
+        Component custom = com.waylays.eraphones.compat.ItemData.name(stack);
         name = custom == null ? "" : custom.getString().replace('§', '&');
-        ItemLore l = stack.get(DataComponents.LORE);
         StringBuilder b = new StringBuilder();
-        if (l != null) {
-            for (Component c : l.lines()) {
+        {
+            for (Component c : com.waylays.eraphones.compat.ItemData.lore(stack)) {
                 if (b.length() > 0) {
                     b.append('\n');
                 }
@@ -84,8 +81,8 @@ public class WorkshopScreen extends Screen {
             }
         }
         lore = b.toString();
-        unbreakable = stack.has(DataComponents.UNBREAKABLE);
-        glint = Boolean.TRUE.equals(stack.get(DataComponents.ENCHANTMENT_GLINT_OVERRIDE));
+        unbreakable = com.waylays.eraphones.compat.ItemData.unbreakable(stack);
+        glint = com.waylays.eraphones.compat.ItemData.glint(stack);
         double[] v = Arms.stats(stack);
         for (int i = 0; i < stats.length; i++) {
             stats[i] = Double.isNaN(v[i]) ? "" : trim(v[i]);
@@ -368,12 +365,13 @@ public class WorkshopScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mx, double my, double dx, double dy) {
+    public boolean mouseScrolled(double mx, double my, double dy) {
+        double dx = 0;
         if (picking >= 0) {
             pickScroll = Mth.clamp(pickScroll - (int) Math.signum(dy) * 2, 0, Math.max(0, shown.size() - visibleRows()));
             return true;
         }
-        return super.mouseScrolled(mx, my, dx, dy);
+        return super.mouseScrolled(mx, my, dy);
     }
 
     @Override
@@ -442,8 +440,7 @@ public class WorkshopScreen extends Screen {
 
     // ---------------------------------------------------------------- drawing
 
-    @Override
-    public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
+        public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
         g.fill(0, 0, width, height, 0xA0000000);
         g.fill(x0 - 2, y0 - 2, x0 + W + 2, y0 + H + 2, GOLD_DIM);
         g.fill(x0 - 1, y0 - 1, x0 + W + 1, y0 + H + 1, 0xFF05070A);
@@ -462,6 +459,7 @@ public class WorkshopScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
+        renderBackground(g, mx, my, pt);
         super.render(g, mx, my, pt);
         // The header: the item big, the title, what it is
         g.pose().pushPose();

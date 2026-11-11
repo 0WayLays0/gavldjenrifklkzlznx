@@ -97,18 +97,18 @@ public class RemoteScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mx, double my, double sx, double sy) {
+    public boolean mouseScrolled(double mx, double my, double sy) {
+        double sx = 0;
         int rows = (H - 30 - 34) / ROW;
         if (mx < x0 + LIST) {
             scroll = Math.max(0, Math.min(scroll - (int) Math.signum(sy), ids.size() - rows));
             return true;
         }
-        return super.mouseScrolled(mx, my, sx, sy);
+        return super.mouseScrolled(mx, my, sy);
     }
 
-    @Override
-    public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
-        super.renderBackground(g, mx, my, pt);
+        public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
+        super.renderBackground(g);
         PhoneUI.round(g, x0, y0, W, H, 8, 0xF0140F12);
         PhoneUI.round(g, x0 + 1, y0 + 1, W - 2, 20, 7, 0xFF3A1418);
         PhoneUI.round(g, x0 + 6, y0 + 26, LIST - 4, H - 56, 4, 0xFF0B0809);
@@ -116,6 +116,7 @@ public class RemoteScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
+        renderBackground(g, mx, my, pt);
         super.render(g, mx, my, pt);
         PhoneUI.centered(g, title.getString(), x0 + W / 2f, y0 + 7, 0xFFFFD0D0, 1);
         int listY = y0 + 30, rows = (H - 30 - 34) / ROW;

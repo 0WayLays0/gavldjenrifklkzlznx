@@ -31,10 +31,10 @@ public class TvRenderer implements BlockEntityRenderer<TvBlockEntity> {
         Matrix4f m = pose.last().pose();
         float x0 = X0 / 16, x1 = X1 / 16, y0 = Y0 / 16, y1 = Y1 / 16, z = Z / 16;
         int full = LightTexture.FULL_BRIGHT;
-        vc.addVertex(m, x0, y0, z).setColor(255, 255, 255, 255).setUv(0, 1).setLight(full);
-        vc.addVertex(m, x1, y0, z).setColor(255, 255, 255, 255).setUv(1, 1).setLight(full);
-        vc.addVertex(m, x1, y1, z).setColor(255, 255, 255, 255).setUv(1, 0).setLight(full);
-        vc.addVertex(m, x0, y1, z).setColor(255, 255, 255, 255).setUv(0, 0).setLight(full);
+        vc.vertex(m, x0, y0, z).color(255, 255, 255, 255).uv(0, 1).uv2(full).endVertex();
+        vc.vertex(m, x1, y0, z).color(255, 255, 255, 255).uv(1, 1).uv2(full).endVertex();
+        vc.vertex(m, x1, y1, z).color(255, 255, 255, 255).uv(1, 0).uv2(full).endVertex();
+        vc.vertex(m, x0, y1, z).color(255, 255, 255, 255).uv(0, 0).uv2(full).endVertex();
         // Words over the snow: a film being read, or one that cannot be
         net.minecraft.network.chat.Component caption = TvClient.caption(tv.getBlockPos());
         if (caption != null) {

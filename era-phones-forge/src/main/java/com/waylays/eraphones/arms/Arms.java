@@ -8,7 +8,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import com.waylays.eraphones.compat.DataComponentType;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import com.waylays.eraphones.compat.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -25,7 +24,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -34,9 +32,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.component.ItemLore;
-import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -61,9 +56,18 @@ public final class Arms {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<Proc>>> PROCS = EraRegistry.COMPONENTS.register("effets_chance",
             () -> DataComponentType.<List<Proc>>builder().persistent(Proc.LIST_CODEC).networkSynchronized(Proc.LIST_STREAM).build());
     /** The stats the workshop sets, in its order. */
-    public static final List<Holder<Attribute>> STATS = List.of(Attributes.ATTACK_DAMAGE, Attributes.ATTACK_SPEED, Attributes.ARMOR,
-            Attributes.ARMOR_TOUGHNESS, Attributes.KNOCKBACK_RESISTANCE, Attributes.MOVEMENT_SPEED, Attributes.MAX_HEALTH,
-            Attributes.ENTITY_INTERACTION_RANGE);
+    public static final List<java.util.function.Supplier<Attribute>> STATS = List.of(() -> Attributes.ATTACK_DAMAGE, () -> Attributes.ATTACK_SPEED,
+            () -> Attributes.ARMOR, () -> Attributes.ARMOR_TOUGHNESS, () -> Attributes.KNOCKBACK_RESISTANCE, () -> Attributes.MOVEMENT_SPEED,
+            () -> Attributes.MAX_HEALTH, () -> net.minecraftforge.common.ForgeMod.ENTITY_REACH.get());
+
+    private static int statIndex(Attribute a) {
+        for (int i = 0; i < STATS.size(); i++) {
+            if (STATS.get(i).get() == a) {
+                return i;
+            }
+        }
+        return -1;
+    }
     /** What the workshop shows a stat as, against the modifier: the hand's own attack damage (1) and speed (4) added. */
     public static final double[] SHOWN_BASE = {1, 4, 0, 0, 0, 0, 0, 0};
     private static final Random RANDOM = new Random();
@@ -75,37 +79,36 @@ public final class Arms {
     public static void init() {
     }
 
-    public static EquipmentSlotGroup group(ItemStack stack) {
+    public static EquipmentSlot group(ItemStack stack) {
         Item item = stack.getItem();
         if (item instanceof Equipable e && e.getEquipmentSlot().isArmor()) {
-            return EquipmentSlotGroup.bySlot(e.getEquipmentSlot());
+            return e.getEquipmentSlot();
         }
-        return EquipmentSlotGroup.MAINHAND;
+        return EquipmentSlot.MAINHAND;
     }
 
-    private static ResourceLocation idFor(int i, EquipmentSlotGroup g) {
+    private static java.util.UUID idFor(int i, EquipmentSlot g) {
         // The hand's own damage and speed keep the game's ids: shown as the weapon's base, in green
-        if (g == EquipmentSlotGroup.MAINHAND && i == 0) {
-            return new ResourceLocation("base_attack_damage");
+        if (g == EquipmentSlot.MAINHAND && i == 0) {
+            return java.util.UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
         }
-        if (g == EquipmentSlotGroup.MAINHAND && i == 1) {
-            return new ResourceLocation("base_attack_speed");
+        if (g == EquipmentSlot.MAINHAND && i == 1) {
+            return java.util.UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
         }
-        return EraPhones.id("atelier_" + i + "_" + g.getSerializedName());
+        return java.util.UUID.nameUUIDFromBytes(("eraphones:atelier_" + i + "_" + g.getName()).getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     /** The stats as the workshop shows them (NaN: not set). */
     public static double[] stats(ItemStack stack) {
         double[] out = new double[STATS.size()];
         java.util.Arrays.fill(out, Double.NaN);
-        ItemAttributeModifiers mods = stack.getAttributeModifiers();
-        for (ItemAttributeModifiers.Entry e : mods.modifiers()) {
-            int i = STATS.indexOf(e.attribute());
+        for (com.waylays.eraphones.compat.ItemData.Modifier e : com.waylays.eraphones.compat.ItemData.modifiers(stack)) {
+            int i = statIndex(e.attribute());
             if (i < 0) {
                 continue;
             }
-            double v = e.modifier().amount();
-            if (i == 5 && e.modifier().operation() != AttributeModifier.Operation.ADD_VALUE) {
+            double v = e.modifier().getAmount();
+            if (i == 5 && e.modifier().getOperation() != AttributeModifier.Operation.ADDITION) {
                 v *= 100;
             }
             out[i] = (Double.isNaN(out[i]) ? SHOWN_BASE[i] : out[i]) + v;
@@ -142,48 +145,33 @@ public final class Arms {
         if (stack.isEmpty()) {
             return;
         }
-        if (e.name().isBlank()) {
-            stack.remove(DataComponents.CUSTOM_NAME);
-        } else {
-            stack.set(DataComponents.CUSTOM_NAME, Component.literal(colours(e.name())).withStyle(s -> s.withItalic(false)));
-        }
+        com.waylays.eraphones.compat.ItemData.setName(stack, e.name().isBlank() ? null
+                : Component.literal(colours(e.name())).withStyle(s -> s.withItalic(false)));
         List<Component> lore = new ArrayList<>();
         // Blank lines are kept: they space the lore out
         for (String l : e.lore()) {
             lore.add(Component.literal(colours(l)).withStyle(s -> s.withItalic(false).withColor(ChatFormatting.GRAY)));
         }
-        if (lore.isEmpty()) {
-            stack.remove(DataComponents.LORE);
-        } else {
-            stack.set(DataComponents.LORE, new ItemLore(lore));
-        }
-        if (e.unbreakable()) {
-            stack.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-        } else {
-            stack.remove(DataComponents.UNBREAKABLE);
-        }
-        if (e.glint()) {
-            stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-        } else {
-            stack.remove(DataComponents.ENCHANTMENT_GLINT_OVERRIDE);
-        }
+        com.waylays.eraphones.compat.ItemData.setLore(stack, lore);
+        com.waylays.eraphones.compat.ItemData.setUnbreakable(stack, e.unbreakable());
+        com.waylays.eraphones.compat.ItemData.setGlint(stack, e.glint());
         // The stats: set ones replace the item's, unset ones are left out
-        EquipmentSlotGroup g = group(stack);
-        ItemAttributeModifiers.Builder b = ItemAttributeModifiers.builder();
+        EquipmentSlot g = group(stack);
+        List<com.waylays.eraphones.compat.ItemData.Modifier> b = new ArrayList<>();
         for (int i = 0; i < STATS.size() && i < e.stats().size(); i++) {
             float v = e.stats().get(i);
             if (Float.isNaN(v)) {
                 continue;
             }
             double amount = v - SHOWN_BASE[i];
-            AttributeModifier.Operation op = AttributeModifier.Operation.ADD_VALUE;
+            AttributeModifier.Operation op = AttributeModifier.Operation.ADDITION;
             if (i == 5) {
                 amount = v / 100.0;
-                op = AttributeModifier.Operation.ADD_MULTIPLIED_BASE;
+                op = AttributeModifier.Operation.MULTIPLY_BASE;
             }
-            b.add(STATS.get(i), new AttributeModifier(idFor(i, g), amount, op), g);
+            b.add(new com.waylays.eraphones.compat.ItemData.Modifier(STATS.get(i).get(), new AttributeModifier(idFor(i, g), "eraphones atelier", amount, op), g));
         }
-        stack.set(DataComponents.ATTRIBUTE_MODIFIERS, b.build());
+        com.waylays.eraphones.compat.ItemData.setModifiers(stack, b);
         List<Proc> procs = new ArrayList<>();
         for (Proc pr : e.procs()) {
             if (known(pr.type()) && pr.chance() > 0) {
@@ -260,7 +248,7 @@ public final class Arms {
         int secs = Math.max(0, p.seconds()), power = Math.max(0, p.power());
         if (!p.special()) {
             ResourceLocation id = ResourceLocation.tryParse(p.type());
-            Holder<MobEffect> effect = id == null ? null : BuiltInRegistries.MOB_EFFECT.getHolder(id).orElse(null);
+            MobEffect effect = id == null ? null : BuiltInRegistries.MOB_EFFECT.get(id);
             if (effect == null) {
                 return;
             }
@@ -269,7 +257,7 @@ public final class Arms {
             return;
         }
         switch (p.type()) {
-            case "*feu" -> t.igniteForSeconds(Math.max(1, secs));
+            case "*feu" -> t.setSecondsOnFire(Math.max(1, secs));
             case "*foudre" -> {
                 LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(t.level());
                 if (bolt != null) {

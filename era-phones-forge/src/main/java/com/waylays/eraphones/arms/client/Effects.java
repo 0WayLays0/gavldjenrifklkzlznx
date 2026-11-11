@@ -82,7 +82,7 @@ public final class Effects {
             return;
         }
         ResourceLocation rl = ResourceLocation.tryParse(id);
-        Holder<MobEffect> h = rl == null ? null : BuiltInRegistries.MOB_EFFECT.getHolder(rl).orElse(null);
+        MobEffect h = rl == null ? null : BuiltInRegistries.MOB_EFFECT.get(rl);
         if (h != null) {
             g.blit(x, y, 0, size, size, Minecraft.getInstance().getMobEffectTextures().get(h));
         }

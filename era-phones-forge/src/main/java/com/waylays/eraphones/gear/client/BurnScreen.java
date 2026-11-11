@@ -126,17 +126,17 @@ public class BurnScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mx, double my, double sx, double sy) {
+    public boolean mouseScrolled(double mx, double my, double sy) {
+        double sx = 0;
         if (my >= listY && my < listY + ROWS * ROW) {
             scroll = Math.max(0, Math.min(scroll - (int) Math.signum(sy), files.size() - ROWS));
             return true;
         }
-        return super.mouseScrolled(mx, my, sx, sy);
+        return super.mouseScrolled(mx, my, sy);
     }
 
-    @Override
-    public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
-        super.renderBackground(g, mx, my, pt);
+        public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
+        super.renderBackground(g);
         int h = 64 + ROWS * ROW + 76;
         PhoneUI.round(g, x0, y0, W, h, 8, 0xF0181A22);
         PhoneUI.round(g, x0 + 1, y0 + 1, W - 2, 16, 7, 0xFF262A36);
@@ -144,6 +144,7 @@ public class BurnScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
+        renderBackground(g, mx, my, pt);
         super.render(g, mx, my, pt);
         PhoneUI.centered(g, title.getString(), x0 + W / 2f, y0 + 5, PhoneUI.WHITE, 1);
         // The folder, then its recordings

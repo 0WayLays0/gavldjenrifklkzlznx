@@ -126,7 +126,8 @@ public class CodeScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mx, double my, double dx, double dy) {
+    public boolean mouseScrolled(double mx, double my, double dy) {
+        double dx = 0;
         double x = ux(mx);
         for (int i = 0; i < wheel.length; i++) {
             int wx = wheelX(i);
@@ -135,7 +136,7 @@ public class CodeScreen extends Screen {
                 return true;
             }
         }
-        return super.mouseScrolled(mx, my, dx, dy);
+        return super.mouseScrolled(mx, my, dy);
     }
 
     @Override
@@ -172,13 +173,13 @@ public class CodeScreen extends Screen {
 
     // ---------------------------------------------------------------- drawing
 
-    @Override
-    public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
+        public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
         g.fill(0, 0, width, height, 0xA0000000);
     }
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
+        renderBackground(g, mx, my, pt);
         super.render(g, mx, my, pt);
         long now = System.currentTimeMillis();
         float dt = lastFrame == 0 ? 0 : Math.min(.1f, (now - lastFrame) / 1000f);

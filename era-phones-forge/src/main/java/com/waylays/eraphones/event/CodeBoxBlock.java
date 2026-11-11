@@ -44,8 +44,7 @@ public class CodeBoxBlock extends GearBlock implements EntityBlock {
         return new CodeBoxBlockEntity(pos, state);
     }
 
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof CodeBoxBlockEntity box && player instanceof ServerPlayer sp) {
             box.use(sp);
         }
@@ -58,5 +57,12 @@ public class CodeBoxBlock extends GearBlock implements EntityBlock {
             Containers.dropContents(level, pos, box.items());
         }
         super.onRemove(state, level, pos, newState, moved);
+    }
+
+    /** 1.20.1's single use(): the item's use first, then the hand's (as 1.21 splits them). */
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+                                 net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        return hand == net.minecraft.world.InteractionHand.MAIN_HAND ? useWithoutItem(state, level, pos, player, hit) : InteractionResult.PASS;
     }
 }

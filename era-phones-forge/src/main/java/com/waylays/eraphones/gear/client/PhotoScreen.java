@@ -96,6 +96,7 @@ public class PhotoScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
+        renderBackground(g);
         super.render(g, mx, my, pt);
         float dev = develop();
         if (Math.abs(dev - shownDev) > .01f || shownDev < 0) {

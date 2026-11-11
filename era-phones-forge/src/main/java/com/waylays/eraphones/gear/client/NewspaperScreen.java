@@ -52,7 +52,8 @@ public class NewspaperScreen extends GearScreen {
     }
 
     @Override
-    public boolean mouseScrolled(double mx, double my, double sx, double sy) {
+    public boolean mouseScrolled(double mx, double my, double sy) {
+        double sx = 0;
         scroll = Math.max(0, Math.min(max, scroll - (float) sy * 14));
         return true;
     }

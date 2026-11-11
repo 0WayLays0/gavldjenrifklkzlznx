@@ -43,11 +43,10 @@ public class TvBlock extends GearBlock implements EntityBlock {
         return new TvBlockEntity(pos, state);
     }
 
-    @Override
-    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level, BlockPos pos,
+        public com.waylays.eraphones.compat.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level, BlockPos pos,
             Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
         if (!(stack.getItem() instanceof com.waylays.eraphones.gear.CassetteItem)) {
-            return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return com.waylays.eraphones.compat.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof TvBlockEntity tv) {
             if (tv.hasCassette()) {
@@ -59,7 +58,7 @@ public class TvBlock extends GearBlock implements EntityBlock {
                 level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, .35f, 1.7f);
             }
         }
-        return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return com.waylays.eraphones.compat.ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override
@@ -83,8 +82,7 @@ public class TvBlock extends GearBlock implements EntityBlock {
         return (l, p, s, be) -> ((TvBlockEntity) be).serverTick();
     }
 
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && player.isShiftKeyDown() && level.getBlockEntity(pos) instanceof TvBlockEntity tv && tv.hasCassette()) {
             // Crouching: the cassette comes out
             net.minecraft.world.item.ItemStack tape = tv.takeCassette();
@@ -106,5 +104,16 @@ public class TvBlock extends GearBlock implements EntityBlock {
             }
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** 1.20.1's single use(): the item's use first, then the hand's (as 1.21 splits them). */
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+                                 net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        com.waylays.eraphones.compat.ItemInteractionResult r = useItemOn(player.getItemInHand(hand), state, level, pos, player, hand, hit);
+        if (r != com.waylays.eraphones.compat.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) {
+            return r.result();
+        }
+        return hand == net.minecraft.world.InteractionHand.MAIN_HAND ? useWithoutItem(state, level, pos, player, hit) : InteractionResult.PASS;
     }
 }

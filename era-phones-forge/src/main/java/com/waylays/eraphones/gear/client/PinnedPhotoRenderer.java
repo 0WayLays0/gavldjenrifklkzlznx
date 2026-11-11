@@ -154,9 +154,9 @@ public class PinnedPhotoRenderer implements BlockEntityRenderer<PinnedPhotoBlock
     /** A flat face over (x0, y0)-(x1, y1) at depth z, facing out (+z); its texture's top at y1. */
     private static void quad(VertexConsumer vc, PoseStack.Pose p, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1,
                              float z, int argb, int light, int overlay) {
-        vc.addVertex(p, x0, y0, z).setColor(argb).setUv(u0, v1).setOverlay(overlay).setLight(light).setNormal(p, 0, 0, 1);
-        vc.addVertex(p, x1, y0, z).setColor(argb).setUv(u1, v1).setOverlay(overlay).setLight(light).setNormal(p, 0, 0, 1);
-        vc.addVertex(p, x1, y1, z).setColor(argb).setUv(u1, v0).setOverlay(overlay).setLight(light).setNormal(p, 0, 0, 1);
-        vc.addVertex(p, x0, y1, z).setColor(argb).setUv(u0, v0).setOverlay(overlay).setLight(light).setNormal(p, 0, 0, 1);
+        vc.vertex(p.pose(), x0, y0, z).color(argb).uv(u0, v1).overlayCoords(overlay).uv2(light).normal(p.normal(), 0, 0, 1).endVertex();
+        vc.vertex(p.pose(), x1, y0, z).color(argb).uv(u1, v1).overlayCoords(overlay).uv2(light).normal(p.normal(), 0, 0, 1).endVertex();
+        vc.vertex(p.pose(), x1, y1, z).color(argb).uv(u1, v0).overlayCoords(overlay).uv2(light).normal(p.normal(), 0, 0, 1).endVertex();
+        vc.vertex(p.pose(), x0, y1, z).color(argb).uv(u0, v0).overlayCoords(overlay).uv2(light).normal(p.normal(), 0, 0, 1).endVertex();
     }
 }

@@ -39,7 +39,8 @@ import java.util.Collection;
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class Body {
-    private static final ResourceLocation SPEED = EraPhones.id("vitesse"), HEALTH = EraPhones.id("hp");
+    private static final java.util.UUID SPEED = java.util.UUID.nameUUIDFromBytes("eraphones:vitesse".getBytes(java.nio.charset.StandardCharsets.UTF_8)),
+            HEALTH = java.util.UUID.nameUUIDFromBytes("eraphones:hp".getBytes(java.nio.charset.StandardCharsets.UTF_8));
     private static final String SPEED_KEY = EraPhones.MODID + "_vitesse", HEALTH_KEY = EraPhones.MODID + "_hp", EFFECTS_KEY = EraPhones.MODID + "_effets";
 
     private Body() {}
@@ -59,7 +60,7 @@ public final class Body {
         if (a != null) {
             a.removeModifier(SPEED);
             if (Math.abs(times - 1) > 1e-3) {
-                a.addPermanentModifier(new AttributeModifier(SPEED, times - 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+                a.addPermanentModifier(new AttributeModifier(SPEED, "eraphones", times - 1, AttributeModifier.Operation.MULTIPLY_TOTAL));
             }
         }
         if (Math.abs(times - 1) > 1e-3) {
@@ -74,7 +75,7 @@ public final class Body {
         if (a != null) {
             a.removeModifier(HEALTH);
             if (points != 20) {
-                a.addPermanentModifier(new AttributeModifier(HEALTH, points - 20, AttributeModifier.Operation.ADD_VALUE));
+                a.addPermanentModifier(new AttributeModifier(HEALTH, "eraphones", points - 20, AttributeModifier.Operation.ADDITION));
             }
         }
         if (points != 20) {

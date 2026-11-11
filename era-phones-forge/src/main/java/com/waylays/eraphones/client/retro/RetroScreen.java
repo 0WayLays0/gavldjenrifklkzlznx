@@ -156,8 +156,7 @@ public abstract class RetroScreen extends Screen {
         g.pose().popPose();
     }
 
-    @Override
-    public void renderBackground(GuiGraphics g, int mx, int my, float partialTicks) {
+        public void renderBackground(GuiGraphics g, int mx, int my, float partialTicks) {
     }
 
     @Override

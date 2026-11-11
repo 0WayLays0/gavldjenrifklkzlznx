@@ -144,7 +144,7 @@ public final class HorrorService {
     }
 
     private static void play(ServerPlayer p, Step s, @Nullable Vec3 fixed) {
-        Optional<Holder.Reference<SoundEvent>> sound = BuiltInRegistries.SOUND_EVENT.getHolder(new ResourceLocation(s.sound));
+        Optional<Holder.Reference<SoundEvent>> sound = BuiltInRegistries.SOUND_EVENT.getHolder(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.SOUND_EVENT, new ResourceLocation(s.sound)));
         if (sound.isEmpty()) {
             EraPhones.LOGGER.warn("No sound {}", s.sound);
             return;

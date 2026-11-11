@@ -149,7 +149,8 @@ public class RadioScreen extends GearScreen {
     }
 
     @Override
-    public boolean mouseScrolled(double mx, double my, double sx, double sy) {
+    public boolean mouseScrolled(double mx, double my, double sy) {
+        double sx = 0;
         RadioBlockEntity r = radio();
         if (r != null) {
             send(r.on(), r.frequency() + (sy > 0 ? 1 : -1), r.volume());
