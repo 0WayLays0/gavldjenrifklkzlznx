@@ -21,6 +21,7 @@ public final class ArcanesNetwork {
         registrar.playToClient(GoldCoatPacket.TYPE, GoldCoatPacket.STREAM_CODEC, GoldCoatPacket::handle);
         registrar.playToServer(AltarRitualPacket.TYPE, AltarRitualPacket.STREAM_CODEC, AltarRitualPacket::handle);
         MusicPackets.register(registrar);
+        com.waylays.arcanes.editor.SpellEditorNet.register(registrar);
     }
 
     /** Plays the player animation {@code animation} on {@code player}, for them and everyone around. */

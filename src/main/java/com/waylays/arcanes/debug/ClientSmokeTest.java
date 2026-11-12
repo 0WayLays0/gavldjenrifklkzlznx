@@ -211,7 +211,7 @@ public final class ClientSmokeTest {
                 }
             }
             case SETTLING -> {
-                if (creativeTab(mc) && musicPlayer(mc) && ticks >= SETTLE_TICKS) {
+                if (creativeTab(mc) && musicPlayer(mc) && spellEditor(mc) && ticks >= SETTLE_TICKS) {
                     mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
                     stage = Stage.CASTING;
                     ticks = 0;
@@ -654,6 +654,98 @@ public final class ClientSmokeTest {
             musicStep = 3;
         }
         return musicStep > 2;
+    }
+
+    private static int editorStep;
+    private static int editorTick;
+
+    /**
+     * The spell editor: {@code /arcanes sorts} opens it (photographed with {@code editor} in {@code arcanes.shots}); a
+     * change sent from it (a cooldown in Iron's config, a base mana of the editor's own) must reach the spell, and
+     * taking it off must give the spell its own values back. Returns whether it is done.
+     */
+    private static boolean spellEditor(Minecraft mc) {
+        if (editorStep > 4) {
+            return true;
+        }
+        if (editorStep == 0 && ticks < 40) {
+            return false;
+        }
+        AbstractSpell tiger = ModSpells.MANA_TIGER.get();
+        ResourceLocation id = tiger.getSpellResource();
+        try {
+            switch (editorStep) {
+                case 0 -> {
+                    mc.player.connection.sendCommand("arcanes sorts");
+                    editorTick = ticks;
+                    editorStep = 1;
+                }
+                case 1 -> {
+                    if (!(mc.screen instanceof com.waylays.arcanes.editor.client.SpellEditorScreen screen)) {
+                        if (ticks - editorTick > 100) {
+                            failures.incrementAndGet();
+                            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL /arcanes sorts did not open the spell editor");
+                            editorStep = 5;
+                        }
+                        return false;
+                    }
+                    if (ticks - editorTick < 30) {
+                        return false;
+                    }
+                    log("spell editor: open, {} spells listed", screen.spellCount());
+                    if (screen.spellCount() < 100) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the spell editor lists only {} spells", screen.spellCount());
+                    }
+                    if (SHOTS.contains("editor")) {
+                        screenshot(mc, "spell_editor");
+                    }
+                    net.neoforged.neoforge.network.PacketDistributor.sendToServer(new com.waylays.arcanes.editor.SpellEditorNet.Edit(List.of(id),
+                            java.util.Map.of("irons_spellbooks:cooldown_in_seconds", "7.5"), java.util.Map.of("base_mana", 123.0), false));
+                    editorTick = ticks;
+                    editorStep = 2;
+                }
+                case 2 -> {
+                    if (ticks - editorTick < 30) {
+                        return false;
+                    }
+                    if (tiger.getManaCost(1) != 123 || tiger.getSpellCooldown() != 150) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the spell editor's change did not reach the spell (mana {}, cooldown {} ticks)",
+                                tiger.getManaCost(1), tiger.getSpellCooldown());
+                    } else {
+                        log("spell editor: a saved change reached the spell (mana 123, cooldown 7.5 s)");
+                    }
+                    net.neoforged.neoforge.network.PacketDistributor.sendToServer(new com.waylays.arcanes.editor.SpellEditorNet.Edit(List.of(id),
+                            java.util.Map.of(), java.util.Map.of(), true));
+                    editorTick = ticks;
+                    editorStep = 3;
+                }
+                case 3 -> {
+                    if (ticks - editorTick < 30) {
+                        return false;
+                    }
+                    if (tiger.getManaCost(1) != 75 || tiger.getSpellCooldown() != 900) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the spell editor's reset did not give the spell its own values back (mana {}, cooldown {} ticks)",
+                                tiger.getManaCost(1), tiger.getSpellCooldown());
+                    } else {
+                        log("spell editor: reset, the spell has its own values back");
+                    }
+                    mc.setScreen(null);
+                    editorStep = 5;
+                }
+                default -> {
+                }
+            }
+        } catch (Throwable t) {
+            failures.incrementAndGet();
+            StackTraceElement where = java.util.Arrays.stream(t.getStackTrace()).filter(f -> f.getClassName().startsWith("com.waylays.")).findFirst().orElse(null);
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the spell editor: {}{}", t, where != null ? " at " + where : "", t);
+            mc.setScreen(null);
+            editorStep = 5;
+        }
+        return editorStep > 4;
     }
 
     /**
