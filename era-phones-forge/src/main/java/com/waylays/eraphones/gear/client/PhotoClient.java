@@ -168,8 +168,8 @@ public final class PhotoClient {
 
     /** The handlers that listen on the mod bus (registration events). */
     @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
-    public static final class ModBus {
-        private ModBus() {
+    public static final class PhotoModBus {
+        private PhotoModBus() {
         }
 
         @SubscribeEvent
