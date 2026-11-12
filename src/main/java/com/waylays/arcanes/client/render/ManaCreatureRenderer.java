@@ -31,6 +31,9 @@ public class ManaCreatureRenderer<T extends Mob, M extends EntityModel<T>> exten
     /** The red mana of the salamander, with eyes: its skin and its glow. */
     public static final ResourceLocation RED_SKIN_EYES = ArcanesOublies.id("textures/entity/mana_skin_red_eyes.png");
     public static final ResourceLocation RED_GLOW_EYES = ArcanesOublies.id("textures/entity/mana_glow_red_eyes.png");
+    /** The tiger's striped mana, with eyes: its skin and its glow (the stripes alight). */
+    public static final ResourceLocation TIGER_SKIN_EYES = ArcanesOublies.id("textures/entity/mana_skin_tiger_eyes.png");
+    public static final ResourceLocation TIGER_GLOW_EYES = ArcanesOublies.id("textures/entity/mana_glow_tiger_eyes.png");
 
     public ManaCreatureRenderer(EntityRendererProvider.Context context, M model, float shadow, float scale, boolean eyes) {
         this(context, model, shadow, scale, eyes ? SKIN_EYES : SKIN, eyes ? GLOW_EYES : GLOW);

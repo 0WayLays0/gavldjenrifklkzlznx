@@ -30,6 +30,8 @@ import com.waylays.arcanes.entity.errethys.ManaWolf;
 import com.waylays.arcanes.entity.errethys.ManaKangaroo;
 import com.waylays.arcanes.entity.errethys.ManaFox;
 import com.waylays.arcanes.entity.errethys.ManaSalamander;
+import com.waylays.arcanes.entity.errethys.ManaScarab;
+import com.waylays.arcanes.entity.errethys.ManaTiger;
 import com.waylays.arcanes.entity.errethys.ManaFalcon;
 import com.waylays.arcanes.entity.errethys.ManaButterfly;
 import com.waylays.arcanes.entity.errethys.ManaCrow;
@@ -363,6 +365,12 @@ public final class ModEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<ManaKangaroo>> MANA_KANGAROO = register("mana_kangaroo",
             EntityType.Builder.<ManaKangaroo>of(ManaKangaroo::new, MobCategory.MISC).sized(.7f, 1.8f).clientTrackingRange(10));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaTiger>> MANA_TIGER = register("mana_tiger",
+            EntityType.Builder.<ManaTiger>of(ManaTiger::new, MobCategory.MISC).sized(1f, 1.2f).clientTrackingRange(10));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ManaScarab>> MANA_SCARAB = register("mana_scarab",
+            EntityType.Builder.<ManaScarab>of(ManaScarab::new, MobCategory.MISC).sized(.45f, .32f).clientTrackingRange(10));
 
     public static final DeferredHolder<EntityType<?>, EntityType<ManaFalcon>> MANA_FALCON = register("mana_falcon",
             EntityType.Builder.<ManaFalcon>of(ManaFalcon::new, MobCategory.MISC).sized(1.4f, 1.1f).clientTrackingRange(10));
@@ -735,6 +743,8 @@ public final class ModEntities {
         event.put(MANA_BUTTERFLY.get(), ManaButterfly.createAttributes().build());
         event.put(MANA_KANGAROO.get(), ManaKangaroo.createAttributes().build());
         event.put(MANA_FALCON.get(), ManaFalcon.createAttributes().build());
+        event.put(MANA_TIGER.get(), ManaTiger.createAttributes().build());
+        event.put(MANA_SCARAB.get(), ManaScarab.createAttributes().build());
         event.put(RIDDEN_COMET.get(), RiddenComet.createAttributes().build());
         event.put(STAR_LION.get(), StarLion.createAttributes().build());
         event.put(WOOD_GUARDIAN.get(), WoodGuardian.createAttributes().build());

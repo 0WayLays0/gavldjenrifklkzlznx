@@ -6,6 +6,8 @@ import com.waylays.arcanes.client.model.ManaWolfModel;
 import com.waylays.arcanes.client.model.ManaKangarooModel;
 import com.waylays.arcanes.client.model.ManaFoxModel;
 import com.waylays.arcanes.client.model.ManaSalamanderModel;
+import com.waylays.arcanes.client.model.ManaScarabModel;
+import com.waylays.arcanes.client.model.ManaTigerModel;
 import com.waylays.arcanes.client.model.ManaFalconModel;
 import com.waylays.arcanes.client.model.ManaButterflyModel;
 import com.waylays.arcanes.client.model.ManaPiranhaModel;
@@ -354,6 +356,11 @@ public final class ClientSetup {
                 context -> new ManaCreatureRenderer<>(context, new ManaKangarooModel(context.bakeLayer(ManaKangarooModel.LAYER)), .4f, 1.05f, true));
         event.registerEntityRenderer(ModEntities.MANA_FALCON.get(),
                 context -> new ManaCreatureRenderer<>(context, new ManaFalconModel(context.bakeLayer(ManaFalconModel.LAYER)), .6f, 1.5f, true));
+        event.registerEntityRenderer(ModEntities.MANA_TIGER.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaTigerModel(context.bakeLayer(ManaTigerModel.LAYER)), .55f, 1.15f,
+                        ManaCreatureRenderer.TIGER_SKIN_EYES, ManaCreatureRenderer.TIGER_GLOW_EYES));
+        event.registerEntityRenderer(ModEntities.MANA_SCARAB.get(),
+                context -> new ManaCreatureRenderer<>(context, new ManaScarabModel(context.bakeLayer(ManaScarabModel.LAYER)), .3f, .75f, true));
     }
 
     /** The gold of Gold magic can cover any body: every living thing's renderer, and the players', draw it. */
@@ -403,6 +410,8 @@ public final class ClientSetup {
         event.registerLayerDefinition(ManaButterflyModel.LAYER, ManaButterflyModel::createBodyLayer);
         event.registerLayerDefinition(ManaKangarooModel.LAYER, ManaKangarooModel::createBodyLayer);
         event.registerLayerDefinition(ManaFalconModel.LAYER, ManaFalconModel::createBodyLayer);
+        event.registerLayerDefinition(ManaTigerModel.LAYER, ManaTigerModel::createBodyLayer);
+        event.registerLayerDefinition(ManaScarabModel.LAYER, ManaScarabModel::createBodyLayer);
     }
 
     @SubscribeEvent

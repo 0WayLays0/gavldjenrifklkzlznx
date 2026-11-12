@@ -9,6 +9,8 @@ import com.waylays.arcanes.entity.errethys.ManaCrow;
 import com.waylays.arcanes.entity.errethys.ManaFalcon;
 import com.waylays.arcanes.entity.errethys.ManaFox;
 import com.waylays.arcanes.entity.errethys.ManaSalamander;
+import com.waylays.arcanes.entity.errethys.ManaScarab;
+import com.waylays.arcanes.entity.errethys.ManaTiger;
 import com.waylays.arcanes.entity.errethys.ManaKangaroo;
 import com.waylays.arcanes.entity.errethys.ManaRat;
 import com.waylays.arcanes.entity.errethys.ManaPiranha;
@@ -103,7 +105,7 @@ public final class ErrethysGameTests {
                 count++;
             }
         }
-        helper.assertTrue(count == 11, "expected 11 Errethys spells, got " + count);
+        helper.assertTrue(count == 13, "expected 13 Errethys spells, got " + count);
         helper.assertTrue(helper.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).containsKey(ModSchools.ERRETHYS_MAGIC),
                 "errethys_magic damage type missing");
         helper.assertTrue(errethys.isFocus(new ItemStack(Items.PRISMARINE_CRYSTALS)), "prismarine crystals are not the Errethys focus");
@@ -125,6 +127,8 @@ public final class ErrethysGameTests {
         ModSpells.MANA_WOLF.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_BUTTERFLY.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         ModSpells.MANA_KANGAROO.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_TIGER.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
+        ModSpells.MANA_SCARAB.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         // Casting again replaces the creature instead of adding one
         ModSpells.MANA_RATS.get().onCast(helper.getLevel(), 5, caster, CastSource.COMMAND, magicData);
         helper.assertTrue(around(helper, ManaRat.class, caster).size() == 1, "expected 1 rat, got " + around(helper, ManaRat.class, caster).size());
@@ -136,6 +140,9 @@ public final class ErrethysGameTests {
         helper.assertTrue(around(helper, ManaWolf.class, caster).size() == 1, "expected 1 wolf, got " + around(helper, ManaWolf.class, caster).size());
         helper.assertTrue(around(helper, ManaButterfly.class, caster).size() == 1, "expected 1 butterfly, got " + around(helper, ManaButterfly.class, caster).size());
         helper.assertTrue(around(helper, ManaKangaroo.class, caster).size() == 1, "expected 1 kangaroo, got " + around(helper, ManaKangaroo.class, caster).size());
+        helper.assertTrue(around(helper, ManaTiger.class, caster).size() == 1, "expected 1 tiger, got " + around(helper, ManaTiger.class, caster).size());
+        helper.assertTrue(around(helper, ManaScarab.class, caster).size() == 1, "expected 1 scarab, got " + around(helper, ManaScarab.class, caster).size());
+        helper.assertTrue(around(helper, ManaScarab.class, caster).get(0).getWard() == 1, "the scarab of a level 5 spell should give Resistance II");
         ManaRat rat = around(helper, ManaRat.class, caster).get(0);
         helper.assertTrue(rat.getMaxHealth() == 1, "the rat should have 1 health, has " + rat.getMaxHealth());
         for (ManaSummon summon : around(helper, ManaSummon.class, caster)) {
@@ -364,5 +371,23 @@ public final class ErrethysGameTests {
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_kangaroo", timeoutTicks = 300)
     public static void manaKangarooBoxes(GameTestHelper helper) {
         fight(helper, ModSpells.MANA_KANGAROO, () -> {}, new Vindicator[1], false);
+    }
+
+    /** The tiger goes for what its summoner fights (pouncing from afar, clawing up close). */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_tiger", timeoutTicks = 300)
+    public static void manaTigerHunts(GameTestHelper helper) {
+        fight(helper, ModSpells.MANA_TIGER, () -> {}, new Vindicator[1], false);
+    }
+
+    /** The scarab bites what its summoner fights, and wards its summoner (Resistance) while it is close to them. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "errethys_scarab", timeoutTicks = 300)
+    public static void manaScarabWardsItsSummoner(GameTestHelper helper) {
+        Vindicator[] foe = new Vindicator[1];
+        fight(helper, ModSpells.MANA_SCARAB, () -> {
+            List<ManaScarab> scarabs = helper.getLevel().getEntitiesOfClass(ManaScarab.class, foe[0].getBoundingBox().inflate(12));
+            helper.assertTrue(!scarabs.isEmpty(), "the scarab is gone");
+            LivingEntity master = scarabs.get(0).getSummoner();
+            helper.assertTrue(master != null && master.hasEffect(MobEffects.DAMAGE_RESISTANCE), "the scarab did not ward its summoner");
+        }, foe, false);
     }
 }

@@ -323,6 +323,100 @@ def mana_falcon_icon():
     ])
 
 
+def mana_skin_tiger():
+    """The tiger's mana: the sky-blue skin crossed by stripes of deep indigo, wavering down the texture's columns so
+    that they run round the body, the legs and the tail like a tiger's; eyes in the bright corner."""
+    img = mana_skin(True)
+    px = img.load()
+    for y in range(64):
+        for x in range(64):
+            if x >= 60 and y >= 60:
+                continue
+            s = _stripe(x, y)
+            if s > 0:
+                r, gg, b, a = px[x, y]
+                c = g.lerp((r, gg, b), TIGER_STRIPE, s)
+                px[x, y] = c + (min(255, int(a + 70 * s)),)
+    return img
+
+
+TIGER_STRIPE = (18, 30, 92)
+
+
+def _stripe(x, y):
+    """0..1: how much a tiger stripe covers (x, y): narrow bands every 9 or 10 pixels, wavering and tapering."""
+    wobble = fbm(x / 11 + 3, y / 7, 3, 211) * 5.5
+    phase = (x + wobble) / 9.5
+    d = abs(phase - round(phase))
+    taper = fbm(x / 5, y / 5 + 9, 2, 212)
+    width = .05 + .13 * taper
+    return smoothstep(width + .07, width - .03, d)
+
+
+def mana_glow_tiger():
+    """Its light: dim mana, the stripes glowing a vivid cyan from within."""
+    img = mana_glow(True)
+    px = img.load()
+    for y in range(64):
+        for x in range(64):
+            if x >= 60 and y >= 60:
+                continue
+            s = _stripe(x, y)
+            if s > 0:
+                r, gg, b, a = px[x, y]
+                px[x, y] = g.lerp((r, gg, b), (80, 210, 255), s * .75) + (255,)
+    return img
+
+
+def mana_tiger_icon():
+    """A tiger's head seen from the front, roaring: rounded ears, glowing stripes, fangs of light."""
+    img = g.spell_background(8, 8, (40, 96, 150), NIGHT)
+    img.alpha_composite(g.from_grid([
+        "................",
+        "..bb........bb..",
+        ".bLLb......bLLb.",
+        ".bLdLbbbbbbLdLb.",
+        "..bLLLdLLdLLLb..",
+        ".bLdLLLddLLLdLb.",
+        ".bLLeeLLLLeeLLb.",
+        "bdLLLLLLLLLLLLdb",
+        "bLdLLLbkkbLLLdLb",
+        "bLLdLbkkkkbLdLLb",
+        ".bLLLbkddkbLLLb.",
+        ".bdLLbekkebLLdb.",
+        "..bLLLbeebLLLb..",
+        "...bbLLLLLLbb...",
+        ".....bbbbbb.....",
+        "................",
+    ], dict(LEGEND, d=(30, 70, 150))))
+    return img
+
+
+def mana_scarab_icon():
+    """A scarab seen from above: the toothed head, the shield of its thorax, the domed wing-cases parted by a seam of
+    light, six legs splayed."""
+    img = g.spell_background(8, 8, (40, 96, 150), NIGHT)
+    img.alpha_composite(g.from_grid([
+        "................",
+        "......kbbk......",
+        ".....bkLLkb.....",
+        "..t..beLLeb..t..",
+        "...tbLLLLLLbt...",
+        "....bLLLLLLb....",
+        ".tt.bbbkkbbb.tt.",
+        "...bLLLbbLLLb...",
+        "..bLLLLbbLLLLb..",
+        "ttbLkLLbbLLkLbtt",
+        "..bLLLLbbLLLLb..",
+        "..bLLLLbbLLLLb..",
+        ".tbLLLLkkLLLLbt.",
+        "t..bLLLkkLLLb..t",
+        "....bbLLLLbb....",
+        "......bbbb......",
+    ], LEGEND))
+    return img
+
+
 def affinity_ring_errethys():
     return g.from_grid([
         "................",
@@ -353,10 +447,14 @@ def main():
     # The salamander's red mana, embers in its veins
     g.save(mana_skin(True, RED, RED_LIGHT), "textures/entity/mana_skin_red_eyes.png")
     g.save(mana_glow(True, (34, 6, 3), (215, 92, 36), (255, 220, 160)), "textures/entity/mana_glow_red_eyes.png")
+    # The tiger's stripes, dark on its skin and glowing in its light
+    g.save(mana_skin_tiger(), "textures/entity/mana_skin_tiger_eyes.png")
+    g.save(mana_glow_tiger(), "textures/entity/mana_glow_tiger_eyes.png")
     for name, fn in (("mana_rats", mana_rats_icon), ("mana_piranha", mana_piranha_icon), ("mana_dromedary", mana_dromedary_icon),
                      ("mana_serpent", mana_serpent_icon), ("mana_crows", mana_crows_icon), ("mana_fox", mana_fox_icon),
                      ("mana_wolf", mana_wolf_icon), ("mana_butterfly", mana_butterfly_icon), ("mana_kangaroo", mana_kangaroo_icon),
-                     ("mana_falcon", mana_falcon_icon), ("mana_salamander", mana_salamander_icon)):
+                     ("mana_falcon", mana_falcon_icon), ("mana_salamander", mana_salamander_icon),
+                     ("mana_tiger", mana_tiger_icon), ("mana_scarab", mana_scarab_icon)):
         g.save(fn(), f"textures/gui/spell_icons/{name}.png")
     g.save(affinity_ring_errethys(), "textures/item/affinity_ring_errethys.png")
     g.write_json("models/item/affinity_ring_errethys.json", {"parent": "item/generated", "textures": {"layer0": "arcanes_oublies:item/affinity_ring_errethys"}})
