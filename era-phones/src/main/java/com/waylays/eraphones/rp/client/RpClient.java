@@ -34,8 +34,8 @@ public final class RpClient {
     private static final long LIFE = 7000, FADE = 800;
     private static final Map<UUID, String> NAMES = new HashMap<>();
     private static final Map<Integer, List<Said>> BUBBLES = new HashMap<>();
-    /** The server hides the names over the heads (/pseudos cacher). */
-    private static boolean namesHidden;
+    /** The server hides the names over the heads (the default; /pseudos afficher shows them). */
+    private static boolean namesHidden = true;
 
     private record Said(String text, int color, long at) {}
 
@@ -140,6 +140,6 @@ public final class RpClient {
     public static void onLeave(ClientPlayerNetworkEvent.LoggingOut event) {
         NAMES.clear();
         BUBBLES.clear();
-        namesHidden = false;
+        namesHidden = true;
     }
 }

@@ -196,6 +196,14 @@ public final class SmokeTest {
             } else {
                 log("rp: the character's name is shown");
             }
+            // Names over the heads are hidden by default, through a team whose names are never shown
+            var server = mc.getSingleplayerServer();
+            var team = server == null ? null : server.getScoreboard().getPlayersTeam(mc.player.getScoreboardName());
+            if (team == null || team.getNameTagVisibility() != net.minecraft.world.scores.Team.Visibility.NEVER) {
+                fail("the names over the heads are not hidden by default (team {})", team == null ? "none" : team.getName());
+            } else {
+                log("rp: the names over the heads are hidden by default");
+            }
         });
         // The game masters' tools of fear, on oneself: each shown, then stopped
         STEPS.add(() -> {
