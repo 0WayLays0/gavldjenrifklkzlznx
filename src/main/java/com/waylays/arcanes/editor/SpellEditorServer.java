@@ -161,7 +161,7 @@ public final class SpellEditorServer {
             }
             try {
                 JsonElement element = JsonParser.parseString(value);
-                Object decoded = param.datatype().decode(ops, element).getOrThrow().getFirst();
+                Object decoded = ((com.mojang.datafixers.util.Pair<?, ?>) param.datatype().decode(ops, element).getOrThrow()).getFirst();
                 Object def = SpellConfigManager.getSpellDefaultConfigValue(spell, param);
                 if (!decoded.equals(def)) {
                     json.add(full, element);
