@@ -28,14 +28,11 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /**
  * A limited inventory: players (not in creative or spectator) carry only the first few hotbar slots (five, unless the
- * server says otherwise); anything that lands elsewhere goes into their backpack, else into a free hand slot, else to
- * the ground; they pick up nothing they have no room for. A backpack worn (in the chest's place) holds ten more.
+ * server says otherwise); anything that lands elsewhere goes into a free hand slot, else to the ground; they pick up
+ * nothing they have no room for.
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class Packs {
-    /** What a backpack holds. */
-    public static final int SIZE = 10;
-
     private Packs() {}
 
     public static boolean limited(Player p) {
@@ -45,37 +42,6 @@ public final class Packs {
     /** How many hotbar slots may be used. */
     public static int slots() {
         return Math.max(1, Math.min(9, RpConfig.get(RpConfig.HOTBAR_SLOTS, 5)));
-    }
-
-    /** The backpack {@code p} wears, or empty. */
-    public static ItemStack worn(Player p) {
-        ItemStack s = p.getItemBySlot(EquipmentSlot.CHEST);
-        return s.getItem() instanceof BackpackItem ? s : ItemStack.EMPTY;
-    }
-
-    // ---------------------------------------------------------------- what a backpack holds
-
-    public static NonNullList<ItemStack> contents(ItemStack bag) {
-        NonNullList<ItemStack> list = NonNullList.withSize(SIZE, ItemStack.EMPTY);
-        ItemContainerContents c = bag.get(DataComponents.CONTAINER);
-        if (c != null) {
-            c.copyInto(list);
-        }
-        return list;
-    }
-
-    public static void store(ItemStack bag, NonNullList<ItemStack> list) {
-        bag.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(list));
-    }
-
-    public static int count(ItemStack bag) {
-        int n = 0;
-        for (ItemStack s : contents(bag)) {
-            if (!s.isEmpty()) {
-                n++;
-            }
-        }
-        return n;
     }
 
     /** Puts what it can of {@code stack} into {@code list} (merging first); returns what is left. */
@@ -93,20 +59,6 @@ public final class Packs {
                 list.set(i, stack.copy());
                 stack.setCount(0);
             }
-        }
-        return stack;
-    }
-
-    private static ItemStack intoBag(Player p, ItemStack stack) {
-        ItemStack bag = worn(p);
-        if (bag.isEmpty() || stack.getItem() instanceof BackpackItem) {
-            return stack;
-        }
-        NonNullList<ItemStack> list = contents(bag);
-        int before = stack.getCount();
-        stack = fill(list, 0, SIZE, stack);
-        if (stack.getCount() != before) {
-            store(bag, list);
         }
         return stack;
     }
@@ -134,15 +86,6 @@ public final class Packs {
                 return true;
             }
         }
-        ItemStack bag = worn(p);
-        if (bag.isEmpty() || stack.getItem() instanceof BackpackItem) {
-            return false;
-        }
-        for (ItemStack in : contents(bag)) {
-            if (in.isEmpty() || ItemStack.isSameItemSameComponents(in, stack) && in.getCount() < in.getMaxStackSize()) {
-                return true;
-            }
-        }
         return false;
     }
 
@@ -162,7 +105,6 @@ public final class Packs {
                 continue;
             }
             inv.setItem(i, ItemStack.EMPTY);
-            s = intoBag(p, s);
             s = intoHands(inv, s);
             if (!s.isEmpty()) {
                 p.drop(s, false, true);
@@ -179,48 +121,6 @@ public final class Packs {
         Player p = event.getPlayer();
         if (!p.level().isClientSide && limited(p) && !room(p, event.getItemEntity().getItem())) {
             event.setCanPickup(TriState.FALSE);
-        }
-    }
-
-    // ---------------------------------------------------------------- opening it
-
-    /** Opens {@code bag} (worn or in hand) for {@code p}. */
-    public static void open(ServerPlayer p, ItemStack bag) {
-        if (!(bag.getItem() instanceof BackpackItem b)) {
-            return;
-        }
-        int hands = limited(p) ? slots() : 9;
-        p.level().playSound(null, p.blockPosition(), SoundEvents.ARMOR_EQUIP_LEATHER.value(), SoundSource.PLAYERS, .6f, 1.3f);
-        p.openMenu(new SimpleMenuProvider((id, inv, pl) -> new BackpackMenu(id, inv, bag, b.style(), hands), bag.getHoverName()), buf -> {
-            buf.writeVarInt(b.style());
-            buf.writeVarInt(hands);
-        });
-    }
-
-    public static void register(PayloadRegistrar r) {
-        r.playToServer(Open.TYPE, Open.CODEC, (o, c) -> c.enqueueWork(() -> openWorn(c)));
-    }
-
-    private static void openWorn(IPayloadContext c) {
-        if (!(c.player() instanceof ServerPlayer p)) {
-            return;
-        }
-        ItemStack bag = worn(p);
-        if (bag.isEmpty()) {
-            p.displayClientMessage(Component.translatable("pack.eraphones.none").withStyle(ChatFormatting.GRAY), true);
-            return;
-        }
-        open(p, bag);
-    }
-
-    /** The backpack key was pressed. */
-    public record Open() implements CustomPacketPayload {
-        public static final Type<Open> TYPE = new Type<>(EraPhones.id("pack_open"));
-        public static final StreamCodec<FriendlyByteBuf, Open> CODEC = StreamCodec.unit(new Open());
-
-        @Override
-        public Type<Open> type() {
-            return TYPE;
         }
     }
 }

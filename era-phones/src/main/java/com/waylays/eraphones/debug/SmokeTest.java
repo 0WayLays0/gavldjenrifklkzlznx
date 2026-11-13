@@ -304,7 +304,6 @@ public final class SmokeTest {
             ItemStack walkie = new ItemStack(com.waylays.eraphones.registry.GearRegistry.WALKIE.get());
             com.waylays.eraphones.gear.Gear.setOn(walkie, true);
             p.getInventory().setItem(6, walkie);
-            p.getInventory().setItem(7, new ItemStack(com.waylays.eraphones.registry.GearRegistry.ID_CARD.get()));
             ItemStack paper = new ItemStack(com.waylays.eraphones.registry.GearRegistry.NEWSPAPER.get());
             paper.set(com.waylays.eraphones.registry.GearRegistry.NEWS_TITLE.get(), "Le cirque s'installe au parc");
             paper.set(com.waylays.eraphones.registry.GearRegistry.NEWS_TEXT.get(), "Les roulottes sont arrivées cette nuit. Personne ne les a vues "
@@ -428,10 +427,6 @@ public final class SmokeTest {
             p.serverLevel().setBlockAndUpdate(vcrPos.above(), com.waylays.eraphones.registry.GearRegistry.TV.get().defaultBlockState()
                     .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, face)
                     .setValue(com.waylays.eraphones.gear.block.TvBlock.LIT, true));
-            p.serverLevel().setBlockAndUpdate(radioPos.relative(left), com.waylays.eraphones.registry.GearRegistry.DOLL.get().defaultBlockState()
-                    .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, face));
-            p.serverLevel().setBlockAndUpdate(radioPos.relative(left, 2), com.waylays.eraphones.registry.GearRegistry.MUSIC_BOX_BLOCK.get().defaultBlockState()
-                    .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, face));
         }));
         STEPS.add(() -> {
             mc.setScreen(null);
@@ -468,9 +463,6 @@ public final class SmokeTest {
             }
         });
         STEPS.add(() -> shot(mc, "horror_things"));
-        STEPS.add(() -> mc.setScreen(new com.waylays.eraphones.horror.client.RemoteScreen(
-                java.util.List.of(new java.util.UUID(1, 2).toString(), new java.util.UUID(3, 4).toString()), java.util.List.of("Bill (4 m)", "Beverly (12 m)"))));
-        STEPS.add(() -> shot(mc, "horror_remote"));
         STEPS.add(() -> {
             mc.setScreen(null);
             com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("narration", 400,
@@ -754,8 +746,7 @@ public final class SmokeTest {
             }
         }));
         STEPS.add(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
-        // The event's things: a wall of missing children's posters, the code box (its wheels, then opened with its code,
-        // a balloon rising), the star fragment (floating, then carried by a game master and moved), closed eyes
+        // Closed eyes (/me ferme les yeux), on a platform high in the air
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
             if (p == null) {
@@ -774,111 +765,16 @@ public final class SmokeTest {
                     }
                 }
             }
-            // The wall: bricks, three blocks high, the posters on its face
-            int k = 0;
-            for (int a = -3; a <= 3; a++) {
-                for (int y = 0; y < 3; y++) {
-                    net.minecraft.core.BlockPos w = base.relative(dir, 1).relative(dir.getClockWise(), a).above(y);
-                    lv.setBlockAndUpdate(w, net.minecraft.world.level.block.Blocks.BRICKS.defaultBlockState());
-                    net.minecraft.world.level.block.Block poster = com.waylays.eraphones.event.EventRegistry.POSTER_BLOCKS
-                            .get(k++ % com.waylays.eraphones.event.EventRegistry.POSTER_BLOCKS.size()).get();
-                    lv.setBlockAndUpdate(w.relative(dir.getOpposite()), poster.defaultBlockState()
-                            .setValue(com.waylays.eraphones.event.PosterBlock.FACING, dir.getOpposite()));
-                }
-            }
-            EVENT_AT = base.relative(dir.getOpposite(), 2);
-            lv.setBlockAndUpdate(EVENT_AT, com.waylays.eraphones.event.EventRegistry.CODE_BOX.get().defaultBlockState()
-                    .setValue(com.waylays.eraphones.event.CodeBoxBlock.FACING, dir.getOpposite()));
-            if (lv.getBlockEntity(EVENT_AT) instanceof com.waylays.eraphones.event.CodeBoxBlockEntity box) {
-                box.setCode("1984");
-            } else {
-                fail("the code box has no block entity");
-            }
             net.minecraft.world.phys.Vec3 eye = net.minecraft.world.phys.Vec3.atBottomCenterOf(base.relative(dir.getOpposite(), 5));
             p.teleportTo(lv, eye.x, eye.y, eye.z, dir.toYRot(), 8);
         }));
         STEPS.add(() -> {
         });
-        STEPS.add(() -> shot(mc, "event_posters"));
-        STEPS.add(() -> mc.setScreen(new com.waylays.eraphones.event.client.CodeScreen(EVENT_AT, 4, "1984")));
-        STEPS.add(() -> shot(mc, "event_codebox_screen"));
         STEPS.add(() -> {
-            mc.setScreen(null);
-            server.execute(() -> {
-                ServerPlayer p = server.getPlayerList().getPlayer(id);
-                if (p != null && p.level().getBlockEntity(EVENT_AT) instanceof com.waylays.eraphones.event.CodeBoxBlockEntity box) {
-                    box.attempt(p, "0000");
-                    if (box.open()) {
-                        fail("the code box opened with a wrong code");
-                    }
-                    box.attempt(p, "1984");
-                    if (!box.open()) {
-                        fail("the code box did not open with its code");
-                    }
-                }
-            });
-        });
-        STEPS.add(() -> shot(mc, "event_codebox_open"));
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null) {
-                return;
-            }
-            com.waylays.eraphones.event.StarFragment f = com.waylays.eraphones.event.EventRegistry.FRAGMENT.get().create(p.level());
-            if (f == null) {
-                fail("no star fragment could be made");
-                return;
-            }
-            net.minecraft.world.phys.Vec3 at = p.position().add(p.getLookAngle().multiply(1, 0, 1).normalize().scale(1.7));
-            f.moveTo(at.x, p.getY(), at.z, p.getYRot(), 0);
-            p.level().addFreshEntity(f);
-            FRAGMENT = f.getUUID();
-        }));
-        STEPS.add(() -> shot(mc, "event_fragment"));
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            net.minecraft.world.entity.Entity f = p == null ? null : p.serverLevel().getEntity(FRAGMENT);
-            if (f == null) {
-                fail("the star fragment is gone");
-                return;
-            }
-            // A game master in creative lifts it alone
-            f.interact(p, net.minecraft.world.InteractionHand.MAIN_HAND);
-            if (p.getVehicle() != f) {
-                fail("a game master in creative could not lift the star fragment");
-            }
-        }));
-        STEPS.add(() -> {
-            // Looking where the body faces: at the fragment, over the shoulder
-            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
-            mc.player.setYRot(mc.player.yBodyRot);
-            mc.player.setXRot(25);
-        });
-        STEPS.add(() -> shot(mc, "event_fragment_carried"));
-        STEPS.add(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT));
-        STEPS.add(() -> shot(mc, "event_fragment_carried_front"));
-        STEPS.add(() -> {
-            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
-            if (mc.player.getVehicle() != null) {
-                FRAGMENT_START = mc.player.getVehicle().position();
-            }
-            net.minecraft.client.KeyMapping.set(mc.options.keyUp.getKey(), true);
-        });
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> shot(mc, "event_fragment_moving"));
-        STEPS.add(() -> {
-            net.minecraft.client.KeyMapping.set(mc.options.keyUp.getKey(), false);
-            if (mc.player.getVehicle() == null || FRAGMENT_START == null) {
-                fail("the game master is not carrying the star fragment");
-            } else if (mc.player.getVehicle().position().distanceTo(FRAGMENT_START) < 1.5) {
-                fail("the star fragment did not move when pushed ({} blocks)", mc.player.getVehicle().position().distanceTo(FRAGMENT_START));
-            }
             mc.options.setCameraType(CameraType.FIRST_PERSON);
             server.execute(() -> {
                 ServerPlayer p = server.getPlayerList().getPlayer(id);
                 if (p != null) {
-                    p.stopRiding();
                     com.waylays.eraphones.rp.RpService.me(p, "ferme les yeux");
                 }
             });
@@ -972,7 +868,7 @@ public final class SmokeTest {
                 fail("closed eyes are not told apart in /me");
             }
         });
-        // The limited inventory: in survival, five hand slots; what lands further goes into the backpack worn
+        // The limited inventory: in survival, five hand slots; what lands further goes into a free one, else to the ground
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
             if (p == null) {
@@ -985,7 +881,6 @@ public final class SmokeTest {
                 SAVED.add(p.getInventory().getItem(i).copy());
             }
             p.getInventory().clearContent();
-            p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(com.waylays.eraphones.pack.PackRegistry.BACKPACKS.get(7).get()));
             p.getInventory().setItem(0, new ItemStack(com.waylays.eraphones.registry.GearRegistry.FLASHLIGHT.get()));
             p.getInventory().setItem(1, new ItemStack(com.waylays.eraphones.registry.GearRegistry.NEWSPAPER.get(), 3));
             p.getInventory().setItem(7, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CASSETTE.get()));
@@ -999,9 +894,6 @@ public final class SmokeTest {
             if (!p.getInventory().getItem(7).isEmpty() || !p.getInventory().getItem(20).isEmpty()) {
                 fail("items stayed in the slots out of reach");
             }
-            if (com.waylays.eraphones.pack.Packs.count(com.waylays.eraphones.pack.Packs.worn(p)) < 2) {
-                fail("the items out of reach did not go into the backpack ({})", com.waylays.eraphones.pack.Packs.count(com.waylays.eraphones.pack.Packs.worn(p)));
-            }
         }));
         STEPS.add(() -> {
             mc.setScreen(null);
@@ -1011,29 +903,6 @@ public final class SmokeTest {
         STEPS.add(() -> shot(mc, "pack_hotbar"));
         STEPS.add(() -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)));
         STEPS.add(() -> shot(mc, "pack_inventory"));
-        STEPS.add(() -> {
-            mc.setScreen(null);
-            net.neoforged.neoforge.network.PacketDistributor.sendToServer(new com.waylays.eraphones.pack.Packs.Open());
-        });
-        STEPS.add(() -> {
-            if (!(mc.screen instanceof com.waylays.eraphones.pack.client.BackpackScreen)) {
-                fail("the backpack did not open (screen {})", mc.screen);
-            }
-            shot(mc, "pack_open");
-        });
-        STEPS.add(() -> {
-            mc.setScreen(null);
-            mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
-            mc.player.setXRot(20);
-        });
-        STEPS.add(() -> shot(mc, "pack_back"));
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p != null) {
-                p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(com.waylays.eraphones.pack.PackRegistry.BACKPACKS.get(0).get()));
-            }
-        }));
-        STEPS.add(() -> shot(mc, "pack_back_red"));
         STEPS.add(() -> {
             mc.options.setCameraType(CameraType.FIRST_PERSON);
             server.execute(() -> {
@@ -1369,11 +1238,8 @@ public final class SmokeTest {
 
     private static net.minecraft.core.BlockPos BOOTH = net.minecraft.core.BlockPos.ZERO;
     private static java.util.UUID BIKE;
-    private static java.util.UUID FRAGMENT;
     private static net.minecraft.core.BlockPos READER = net.minecraft.core.BlockPos.ZERO, DOOR = net.minecraft.core.BlockPos.ZERO;
     private static final java.util.List<ItemStack> SAVED = new java.util.ArrayList<>();
-    private static net.minecraft.core.BlockPos EVENT_AT = net.minecraft.core.BlockPos.ZERO;
-    private static net.minecraft.world.phys.Vec3 FRAGMENT_START;
     private static net.minecraft.core.BlockPos LAMP = net.minecraft.core.BlockPos.ZERO;
     private static net.minecraft.world.phys.Vec3 BIKE_START;
 

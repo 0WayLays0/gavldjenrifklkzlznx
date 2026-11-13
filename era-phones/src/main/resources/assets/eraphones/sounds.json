@@ -15,26 +15,10 @@
     ],
     "subtitle": "subtitles.eraphones.talkie_squelch"
   },
-  "boite_a_musique": {
-    "sounds": [
-      {
-        "name": "eraphones:boite_a_musique",
-        "attenuation_distance": 20
-      }
-    ],
-    "subtitle": "subtitles.eraphones.boite_a_musique"
-  },
   "coeur_peur": {
     "sounds": [
       {
         "name": "eraphones:coeur_peur"
-      }
-    ]
-  },
-  "souffle_peur": {
-    "sounds": [
-      {
-        "name": "eraphones:souffle_peur"
       }
     ]
   },

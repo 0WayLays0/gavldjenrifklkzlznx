@@ -26,7 +26,6 @@ public final class EraPhones {
         EraRegistry.register(modBus);
         com.waylays.eraphones.registry.GearRegistry.register(modBus);
         com.waylays.eraphones.event.EventRegistry.register(modBus);
-        com.waylays.eraphones.pack.PackRegistry.register(modBus);
         com.waylays.eraphones.walkman.WalkmanRegistry.init();
         com.waylays.eraphones.lock.LockRegistry.register(modBus);
         com.waylays.eraphones.arms.Arms.init();

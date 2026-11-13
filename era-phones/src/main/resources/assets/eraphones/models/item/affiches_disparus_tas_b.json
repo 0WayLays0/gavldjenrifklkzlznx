@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "eraphones:block/affiches_disparus_tas_b"
-  }
-}

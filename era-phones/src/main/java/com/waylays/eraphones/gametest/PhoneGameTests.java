@@ -234,8 +234,11 @@ public final class PhoneGameTests {
         radio.set(true, 2000, 50);
         helper.assertTrue(radio.frequency() == com.waylays.eraphones.gear.Stations.MAX && radio.volume() == 10, "kept within the band");
         helper.assertTrue(com.waylays.eraphones.gear.Stations.tuned(1003, 1004) && !com.waylays.eraphones.gear.Stations.tuned(1003, 1006), "tuning");
-        // Money exists in every face value
-        helper.assertTrue(com.waylays.eraphones.registry.GearRegistry.MONEY.size() == 8, "the money");
+        // What was taken out of the role play is gone for good: money, identity cards, backpacks, the horror and event things
+        for (String gone : new String[] {"piece_25c", "billet_10", "carte_identite", "sac_a_dos_rouge", "poupee", "boite_a_musique", "ballon_rouge",
+                "telecommande_mj", "boite_code", "fragment_etoile", "affiche_disparu_1"}) {
+            helper.assertFalse(net.minecraft.core.registries.BuiltInRegistries.ITEM.containsKey(com.waylays.eraphones.EraPhones.id(gone)), gone + " is still there");
+        }
         helper.succeed();
     }
 }

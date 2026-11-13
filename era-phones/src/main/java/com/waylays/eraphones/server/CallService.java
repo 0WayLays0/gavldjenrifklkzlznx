@@ -171,7 +171,7 @@ public final class CallService {
         return true;
     }
 
-    /** {@code p}, at the booth of {@code booth}, dials {@code raw} (the coin already taken). */
+    /** {@code p}, at the booth of {@code booth}, dials {@code raw} (calls from a booth are free). */
     public static boolean dialFromBooth(ServerPlayer p, String booth, String raw) {
         if (of(p.getUUID()) != null || of(booth) != null) {
             return false;

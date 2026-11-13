@@ -87,24 +87,6 @@ public class BoothScreen extends Screen {
         return state() == 1 || state() == 3;
     }
 
-    private static Item coin() {
-        return BoothNet.coin();
-    }
-
-    private static int coins() {
-        Player p = Minecraft.getInstance().player;
-        if (p == null) {
-            return 0;
-        }
-        int n = 0;
-        for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
-            if (p.getInventory().getItem(i).is(coin())) {
-                n += p.getInventory().getItem(i).getCount();
-            }
-        }
-        return n;
-    }
-
     private void say(String key) {
         flash = Component.translatable(key).getString();
         flashUntil = System.currentTimeMillis() + 2200;
@@ -127,11 +109,6 @@ public class BoothScreen extends Screen {
         }
         if (dialed.isEmpty()) {
             say("booth.eraphones.dial_first");
-            return;
-        }
-        Player p = Minecraft.getInstance().player;
-        if (p != null && !p.getAbilities().instabuild && coins() <= 0) {
-            say("booth.eraphones.no_coin");
             return;
         }
         PhoneClient.send(new BoothNet.Dial(pos, dialed));
@@ -376,19 +353,9 @@ public class BoothScreen extends Screen {
         g.drawString(font, number, 0, 0, 0xFFFFFFFF, false);
         g.pose().popPose();
         int yy = 70;
-        for (FormattedCharSequence r : font.split(Component.translatable("booth.eraphones.help", BoothNet.PRICE), w - 20)) {
+        for (FormattedCharSequence r : font.split(Component.translatable("booth.eraphones.help"), w - 20)) {
             g.drawString(font, r, tx, yy, 0xFFB8BCC6, false);
             yy += 10;
-        }
-        int c = coins();
-        Player p = Minecraft.getInstance().player;
-        boolean free = p != null && p.getAbilities().instabuild;
-        yy += 8;
-        g.drawString(font, free ? Component.translatable("booth.eraphones.free") : Component.translatable("booth.eraphones.coins", c), tx, yy,
-                free || c > 0 ? 0xFF9CF5A6 : 0xFFFF8A8A, false);
-        float pulse = .5f + .5f * Mth.sin(now / 300f);
-        if (!inCall() && !free && c == 0) {
-            g.drawString(font, Component.translatable("booth.eraphones.no_coin"), tx, yy + 12, 0xFF000000 | (int) (150 + 100 * pulse) << 16 | 0x6A6A, false);
         }
     }
 }

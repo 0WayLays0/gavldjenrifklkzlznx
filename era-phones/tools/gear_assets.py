@@ -557,8 +557,6 @@ def sounds():
     env = np.clip(t / .01, 0, 1) * np.clip((.3 - t) / .03, 0, 1)
     beep = np.sin(2 * np.pi * 1250 * t) * (t < .07) * .5
     ogg("talkie_squelch", (burst * .6 * env + beep) * .9)
-    import horror_items
-    ogg("boite_a_musique", horror_items.music_box_tune(rate))
     # Fear: one heartbeat as heard from inside (a deep thud, its echo)
     n = int(rate * .62)
     t = np.arange(n) / rate
@@ -569,21 +567,6 @@ def sounds():
 
     beat = thud(0, 52, 1) + thud(.21, 44, .7) + band(rng.normal(0, 1, n), 30, 160) * np.exp(-t * 18) * .25
     ogg("coeur_peur", beat / np.abs(beat).max() * .95)
-    # Fear, past two thirds: a short shaking breath, in through the mouth then out (its own noise, the rest unchanged)
-    br = np.random.default_rng(31)
-    n = int(rate * 1.45)
-    t = np.arange(n) / rate
-
-    def puff(at, length, lo, hi, k):
-        x = band(br.normal(0, 1, n), lo, hi)
-        x /= np.abs(x).max()
-        tt = (t - at) / length
-        env = np.where((tt >= 0) & (tt <= 1), np.sin(np.clip(tt, 0, 1) * np.pi) ** 1.5, 0)
-        shake = 1 + .35 * np.sin(2 * np.pi * 9.5 * t + br.uniform(0, 6)) * np.sin(2 * np.pi * 3.1 * t)
-        return x * env * shake * k
-
-    breath = puff(.02, .42, 700, 4200, .8) + puff(.52, .7, 300, 2600, 1.0)
-    ogg("souffle_peur", breath / np.abs(breath).max() * .7)
     import photo_assets
     ogg("photo_declic", photo_assets.shutter(rate))
     import booth_assets
@@ -601,10 +584,7 @@ def sounds():
     kit.write_json("sounds.json", {
         "radio_static": {"sounds": [{"name": "eraphones:radio_static"}], "subtitle": "subtitles.eraphones.radio_static"},
         "talkie_squelch": {"sounds": [{"name": "eraphones:talkie_squelch"}], "subtitle": "subtitles.eraphones.talkie_squelch"},
-        "boite_a_musique": {"sounds": [{"name": "eraphones:boite_a_musique", "attenuation_distance": 20}],
-                            "subtitle": "subtitles.eraphones.boite_a_musique"},
         "coeur_peur": {"sounds": [{"name": "eraphones:coeur_peur"}]},
-        "souffle_peur": {"sounds": [{"name": "eraphones:souffle_peur"}]},
         "photo_declic": {"sounds": [{"name": "eraphones:photo_declic"}], "subtitle": "subtitles.eraphones.photo_declic"},
         "cabine_sonnerie": {"sounds": [{"name": "eraphones:cabine_sonnerie", "attenuation_distance": 32}],
                             "subtitle": "subtitles.eraphones.cabine_sonnerie"},
@@ -634,7 +614,6 @@ def recipes():
     shaped("radio", ["  I", "PRP", "PWP"], {"I": "minecraft:iron_ingot", "P": "minecraft:dark_oak_planks", "R": "minecraft:redstone",
                                              "W": "minecraft:white_wool"})
     shaped("magnetoscope", ["III", "RCR", "III"], {"I": "minecraft:iron_ingot", "R": "minecraft:redstone", "C": "minecraft:copper_ingot"})
-    shaped("carte_identite", ["P", "D"], {"P": "minecraft:paper", "D": "minecraft:blue_dye"})
 
 
 def main():
@@ -644,7 +623,7 @@ def main():
     cassette()
     radio()
     vcr()
-    gear_items.main(MONEY, money_id)
+    gear_items.main()
     import horror_items
     horror_items.main()
     import photo_assets

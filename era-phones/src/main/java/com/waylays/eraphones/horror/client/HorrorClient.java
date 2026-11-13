@@ -87,7 +87,7 @@ public final class HorrorClient {
 
     private static final List<Active> ACTIVE = new ArrayList<>();
     /** The heartbeat: when the next one is due, when the last one was (ms). */
-    private static long nextBeat, lastBeatAt, nextBreath;
+    private static long nextBeat, lastBeatAt;
     /** The fear gauge from the server (0 to 100) and as it is shown, eased. */
     private static float gaugeLevel, gaugeShown;
     private static java.lang.reflect.Field blurField;
@@ -108,10 +108,6 @@ public final class HorrorClient {
         if (s != null) {
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(s, pitch, volume));
         }
-    }
-
-    public static void openRemote(HorrorNet.OpenRemote p) {
-        Minecraft.getInstance().setScreen(new RemoteScreen(p.ids(), p.names()));
     }
 
     public static void effect(HorrorNet.Effect e) {
@@ -164,7 +160,7 @@ public final class HorrorClient {
                 it.remove();
             }
         }
-        // Fear (a game master's, or the gauge's): the heart pounding, faster as it takes hold; past two thirds, the breath short
+        // Fear (a game master's, or the gauge's): the heart pounding, faster as it takes hold
         gaugeShown += (gaugeLevel - gaugeShown) * .08f;
         if (Math.abs(gaugeLevel - gaugeShown) < .05f) {
             gaugeShown = gaugeLevel;
@@ -175,12 +171,6 @@ public final class HorrorClient {
                 lastBeatAt = now;
                 nextBeat = now + (long) (heartPeriod(f) * 1000);
                 mc.getSoundManager().play(SimpleSoundInstance.forUI(com.waylays.eraphones.registry.GearRegistry.HEARTBEAT.get(), 1, .25f + .75f * f));
-            }
-            float breath = clamp((f - .6f) / .4f);
-            if (breath > 0 && now >= nextBreath) {
-                nextBreath = now + (long) (2600 - 900 * breath);
-                mc.getSoundManager().play(SimpleSoundInstance.forUI(com.waylays.eraphones.registry.GearRegistry.FEAR_BREATH.get(),
-                        .95f + mc.player.getRandom().nextFloat() * .1f, .25f + .55f * breath));
             }
         }
         // A heart beating under the blood

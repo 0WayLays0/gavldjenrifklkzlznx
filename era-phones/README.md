@@ -2,7 +2,7 @@
 
 Mod NeoForge 1.21.1 **séparé** (son propre `.jar`, `epoque-rp-<version>.jar`, sans Arcanes Oubliés ni Iron's Spells)
 pour un serveur de jeu de rôle : téléphones d'époque, objets du quotidien des années 80 (lampe torche, talkie-walkie,
-poste de radio, magnétoscope et cassettes, argent, carte d'identité, journal), commandes de RP et outils des maîtres
+poste de radio, magnétoscope et cassettes, journal), commandes de RP et outils des maîtres
 du jeu. L'identifiant interne du mod reste `eraphones` : les objets déjà dans les mondes sont conservés. Tout reste dans le personnage : on ne voit jamais un pseudo
 de compte, seulement des numéros, les noms enregistrés dans les répertoires et les noms des personnages.
 
@@ -11,8 +11,8 @@ Contenu original (noms, modèles, sonneries, icônes) : aucune marque réelle ; 
 ## Le menu créatif
 
 Quatre onglets : **Époque RP · Téléphones**, **· Lumière & radio** (lampe torche, piles, talkie-walkie, poste de
-radio), **· Son & image** (magnétoscope, cassette), **· Vie quotidienne** (pièces et billets, carte d'identité,
-feuille de papier, journal), **· Horreur**, **· Événement** (affiches « Disparu », boîte à code, fragment d'étoile) et **· Sacs à dos**.
+radio), **· Son & image** (magnétoscope, cassette, baladeur, caméscope) et **· Vie quotidienne** (appareil photo, cabine,
+vélos, lampadaire, répondeur, feuille de papier, journal, cadenas, clés, lecteur de carte, badge).
 
 ## Les objets des années 80
 
@@ -23,21 +23,15 @@ feuille de papier, journal), **· Horreur**, **· Événement** (affiches « Dis
 | Talkie-walkie | Clic droit : sa façade (marche/arrêt, canal 1 à 16, piles). Avec Simple Voice Chat, en le tenant en main et en parlant, ta voix sort (avec un son de radio) des talkies allumés sur le même canal, où qu'ils soient dans l'inventaire, et ceux qui sont autour l'entendent aussi. Un « kssht » au début de chaque message. |
 | Poste de radio (bloc) | Clic droit : allumer, régler la fréquence (88 à 108 FM, cadran à faire glisser, molette ou boutons) et le volume. Il grésille entre les stations ; l'œil magique s'allume quand une station passe. Une station, c'est un maître du jeu qui fait `/radio emettre 100.3` : sa voix sort des radios réglées dessus (`/radio arreter` pour finir). |
 | Magnétoscope (bloc) + cassette | Clic droit sur le magnétoscope avec une cassette en main pour l'insérer (ou bouton « Insérer » sur sa façade). Touches : ⏏ éjecter, ◀◀ rembobiner, ▶ lecture, ❚❚ pause, ■ stop, ▶▶ avance rapide ; compteur de bande. Le son sort du magnétoscope (16 blocs autour, Simple Voice Chat requis). Comme une vraie bande : pour revenir au début il faut rembobiner, et on entend tout défiler à l'envers ; la cassette éjectée garde l'endroit où en était la bande. |
-| Pièces et billets | 10 et 25 cents (frappées en relief, tranche striée), billets de 1, 5, 10, 20, 50 et 100 dollars imprimés recto verso, en 3D (dessins originaux). |
 | Télévision (bloc) | Lecteur intégré : clic droit avec une cassette pour l'insérer, elle se lance tout de suite. Clic droit pour allumer/éteindre (éteindre met en pause), accroupi + clic droit pour éjecter. Sans cassette, posée à 4 blocs ou moins d'un magnétoscope, elle montre ce qu'il lit. Image : image de vieux poste cathodique (lignes, couleurs qui bavent, image qui tremble et se déchire, bande d'interférence, bas de l'image abîmé par la bande), son de petit haut-parleur usé avec décrochages. Écran bleu sans cassette, neige et grésillement sans magnétoscope. Rembobiner ou avancer fait défiler l'image aussi. Le film est préparé une fois par le serveur (≈ 1 min pour 3 min de film), puis gardé. Sans Simple Voice Chat, l'image défile quand même, sans le son. |
-| Boîte à musique (bloc) | Clic droit : une petite valse en mineur, qui ralentit et baisse quand le ressort se détend (24 s). |
-| Poupée de porcelaine (bloc) | Sa tête se tourne vers le joueur le plus proche… seulement quand tu ne la regardes pas. |
-| Ballon rouge | Un ballon rouge au bout de sa ficelle, à tenir. |
-| Télécommande du MJ (staff) | Clic droit : liste des joueurs à 64 blocs (clique pour choisir), touches pour brouillard, coupure, sang, tremblement, flotter, vertige, ballon, tout arrêter, les 12 sons, et un texte à murmurer ou narrer. |
 | Cassette vierge | Clic droit (staff) : le dossier des cassettes s'ouvre sur ton ordinateur et un écran liste les MP3 qui s'y trouvent ; choisis-en un, écris l'étiquette, « Graver ». Le fichier est envoyé au serveur (aucune limite de taille, environ 3 Mo par seconde) et gravé pour toujours sur la cassette tenue. Un joueur sans droits voit seulement qu'elle est vierge. |
 | Appareil photo instantané + pellicule | Clic droit : photographie ce que tu vois (sans la main ni l'interface), une photo sort de l'appareil. Pellicule de 10 photos ; pour recharger, une pellicule dans l'autre main. La photo se regarde (clic droit) dans son cadre blanc, signée du nom du photographe ; à peine sortie, elle se révèle en une minute (d'abord gris-bleu, puis les formes, puis les couleurs). |
-| Cabine téléphonique (bloc, 3 de haut) | Assez haute pour s'y tenir debout. Cadre alu, vitres fumées, enseigne lumineuse « TELEPHONE » qui éclaire la rue, publiphone en acier avec combiné. Chaque cabine a son numéro (555-9xxx, affiché sur l'écran du publiphone). Clic droit : le publiphone s'ouvre ; compose au clavier (souris ou clavier de l'ordinateur), « Appeler » : une pièce de 25 cents par appel, rendue si l'appel ne passe pas (gratuit en créatif). Appelée (par un joueur ou par un MJ avec un numéro masqué), elle sonne fort dans la rue : celui qui décroche (clic droit) répond. S'éloigner de la cabine coupe l'appel. |
+| Cabine téléphonique (bloc, 3 de haut) | Assez haute pour s'y tenir debout. Cadre alu, vitres fumées, enseigne lumineuse « TELEPHONE » qui éclaire la rue, publiphone en acier avec combiné. Chaque cabine a son numéro (555-9xxx, affiché sur l'écran du publiphone). Clic droit : le publiphone s'ouvre ; compose au clavier (souris ou clavier de l'ordinateur), « Appeler » : les appels sont gratuits. Appelée (par un joueur ou par un MJ avec un numéro masqué), elle sonne fort dans la rue : celui qui décroche (clic droit) répond. S'éloigner de la cabine coupe l'appel. |
 | Vélo des années 80 | Cadre rouge, selle banane avec sissy bar chromé, guidon haut avec mousses, garde-boues chromés, pneus à flancs blancs, lampe, sonnette (dessins originaux). Utilise-le sur le sol pour le poser, utilise-le pour monter. Avancer pédale (il accélère jusqu'à ~30 km/h), reculer freine, il va où tu regardes et penche dans les virages, sauter fait sonner la sonnette, s'accroupir pour descendre. Il monte une marche d'un bloc, roule en roue libre, ralentit dans l'eau. Les roues et le pédalier tournent, le guidon tourne dans les virages, le cycliste pédale. Frappe-le pour le ramasser. |
 | Vélos (4 modèles) | Chopper rouge (selle banane, sissy bar), vélo de course bleu (guidon de course, pneus fins, bidon), vélo de ville vert à cadre bas (panier en osier, porte-bagages, selle en cuir à ressorts), BMX chromé (plaque « 80 », mousses jaunes, pneus à crampons). Même conduite pour les quatre. |
 | Lampadaire (bloc, 4 de haut) | Poteau galvanisé, bras au-dessus de la rue, tête « cobra » au verre sodium orange. Les lampadaires s'allument un par un à la tombée de la nuit (ils grésillent et clignotent en chauffant) et s'éteignent à l'aube. |
 | Caméscope VHS | À porter sur l'épaule. Clic droit : il filme ce que tu vois (sans ta main ni l'interface) sur une cassette vierge que tu as sur toi, à 10 images/s, jusqu'à 15 min ; dans le viseur : REC qui clignote, le temps filmé, la date du jeu, la batterie. Clic droit encore (ou le ranger) : stop. La cassette se met ensuite dans une télé cathodique et le film passe. **Le son** : avec Simple Voice Chat, ta voix quand tu parles en filmant est enregistrée sur la bande, et aussi celles des joueurs qui parlent à 8 blocs ou moins (plus ils sont loin, moins on les entend) ; à la télé on les entend au bon moment, avec le son abîmé du vieux poste. Les autres bruits du jeu ne sont pas enregistrés. |
 | Répondeur téléphonique (bloc) | Boîtier beige à deux micro-cassettes, compteur rouge, voyant de message. Clic droit avec ton téléphone en main : il est relié à ton numéro. Un appel sans réponse (9 s, ou 3 s si le téléphone est éteint ou pas sur toi) est pris par le répondeur : l'appelant entend un bip et laisse son message, à la voix (Simple Voice Chat, jusqu'à 1 min) et/ou par écrit. Le voyant clignote tant qu'il y a des messages. Clic droit : il les passe dans son petit haut-parleur (et les liste dans le tchat : numéro, quand, durée, texte) ; accroupi + clic droit : tout effacer. Il ne marche pas pendant une panne de courant. |
-| Carte d'identité | Vierge, elle est établie au nom de la première personne qui l'utilise (nom RP, signalement de `/desc`, numéro). Clic droit pour la regarder (avec la photo du visage du personnage), clic droit sur quelqu'un pour la lui montrer. |
 | Journal | Imprimé par les maîtres du jeu ; clic droit pour le lire. |
 | Feuille de papier | Clic droit : on écrit dessus avec la page sous les yeux qui se remplit en direct (titre, texte jusqu'à 2000 caractères avec retours à la ligne), on choisit le papier (feuille de carnet, papier à lettre, vieux parchemin, post-it, page arrachée, papier quadrillé, fiche bristol, vieux papier taché), l'encre (noire, bleue, rouge, verte, crayon) et l'écriture (à la main, penchée, ou tapée à la machine). « Garder » en fait un brouillon qu'on peut reprendre ; « Signer » la ferme avec le nom du personnage : ensuite, clic droit pour la lire, page entière à l'écran (molette pour les longs textes). Une pile de feuilles vierges en donne une écrite à la fois. |
 
@@ -63,18 +57,14 @@ Les coupures ne survivent pas à un redémarrage du serveur.
 | `/cassette graver <fichier> <titre>` | Donne une cassette de ce fichier, avec ce titre sur l'étiquette. Elle ne peut plus être modifiée. |
 | `/radio emettre <fréquence>` · `/radio arreter` | Passer à l'antenne sur une fréquence (ta voix sort des radios réglées dessus), ou s'arrêter. |
 | `/lampe <joueurs> eteindre` · `clignoter [secondes]` · `casser` · `reparer` | Éteindre leurs lampes torches, les faire clignoter (10 s par défaut, avec de petits grésillements), les casser (elles ne s'allument plus, « Cassée » dans la description) ou les réparer. |
-| `/identite delivrer <joueur>` | Donne à ce joueur une carte d'identité établie à son nom. |
 | `/journal imprimer <exemplaires> Titre \| texte` | Imprime le journal (jusqu'à 64 exemplaires). |
 
-## L'événement (onglet « Événement »)
+## Outils d'événement
 
 Des outils faits pour un grand événement d'horreur en ville, pensés pour un maître du jeu **seul**.
 
 | Chose | Comment ça marche |
 |---|---|
-| Affiches « Disparu(e) » (15 blocs) | À coller sur n'importe quel mur (clic sur la face du mur ; on passe à travers). Un enfant seul sur six papiers différents : neuf, jauni, coin arraché, lavé par la pluie, vieux de trente ans (le cycle d'avant), à moitié arraché. Deux enfants (deux dispositions), trois, quatre. Deux tas d'affiches collées les unes sur les autres. Trois « murs d'affiches » qui se raccordent bloc après bloc pour couvrir tout un mur. Les photos d'enfants, les noms et les numéros sont inventés. Les bandelettes du bas sont en partie arrachées. |
-| Boîte à code | Vieux coffret d'acier avec quatre molettes en laiton. Clic droit : on voit les molettes de près. On les tourne (clic en haut ou en bas, molette de la souris, ou en tapant les chiffres), puis on appuie sur « Ouvrir ». Avec le bon code, la boîte s'ouvre et on prend ce qu'elle contient (9 cases). Les joueurs ne peuvent pas la casser. **Le maître du jeu en créatif** voit le code, peut faire du nombre des molettes le nouveau code (« En faire le code »), et la remplit accroupi + clic droit. `/boitecode` (en la regardant) : `code <3 à 6 chiffres>`, `fermer`, `ouvrir`, `info`. |
-| Fragment d'étoile | Le maître du jeu le pose (objet, en créatif). Il flotte, brille (il éclaire vraiment autour de lui), scintille. Le premier joueur qui fait clic droit lit « Tu ne sembles pas assez fort pour porter seul ce fragment… » et attend un deuxième porteur (30 s, à 5 blocs). Le deuxième fait clic droit : ils le soulèvent à deux. Un troisième et un quatrième peuvent venir aider. Les porteurs se placent autour (face à face à deux, en triangle à trois, en carré à quatre), les deux mains dessus, et marchent à petits pas lourds. Chacun pousse où il veut aller : si tout le monde va du même côté, le fragment avance. S'ils tirent chacun de leur côté, il bouge à peine et on leur demande « un peu de coordination ». Celui qui ne pousse pas est entraîné. Vitesse : lent à deux, un peu moins à trois, encore un peu moins à quatre. Accroupi pour lâcher ; seul, c'est trop lourd et il est reposé. Un maître du jeu en créatif le porte seul, sans ralentir. **Le joueur qui a le tag `clown`** (`/tag <joueur> add clown`) est repoussé à 7 blocs du fragment. |
 | `/me ferme les yeux` | Dans un `/me`, « ferme les yeux » (ou « ferme ses yeux », « closes his eyes »…) ferme les yeux du joueur sur son écran : les paupières descendent, tout est noir pendant 6 s, puis elles se rouvrent avec un clignement. Les maîtres du jeu reçoivent « X ferme les yeux » dans le chat. |
 
 ### Déclencheurs de zone : `/declencheur`
@@ -98,13 +88,9 @@ Exemple : `/declencheur action ruelle son rire`, `/declencheur action ruelle att
 
 **Important :** les joueurs en **créatif** ou spectateur ne déclenchent rien (pour que le staff puisse circuler). Pour essayer une zone toi-même : `/declencheur moi` (tu la déclenches même en créatif ; à nouveau pour arrêter), ou `/declencheur tester <nom>`, ou passe en survie. En mode `une_fois`, la zone ne part qu'une fois : `reset <nom>` pour la réarmer. Quand une zone part, le staff le voit au-dessus de sa barre (« Déclencheur X lancé par Y »).
 
-## Inventaire limité et sacs à dos
+## Inventaire limité
 
-Les joueurs (sauf en créatif ou en spectateur) n'ont **pas d'inventaire** : seulement les **5 premières cases** de leur barre, dessinée plus courte, centrée, plus la main secondaire. La molette fait le tour de ces 5 cases. Les autres cases sont grisées et fermées dans tous les écrans (inventaire, coffres…). Ce qui arrive dans une case fermée va dans le sac à dos, sinon dans une case libre de la main, sinon par terre. On ne ramasse rien s'il n'y a pas de place.
-
-Un **sac à dos** (un peu plus petit que le joueur) se porte sur le dos (à la place du plastron) et donne **10 cases de plus**. Clic droit avec le sac en main : il s'ouvre. Accroupi + clic droit : on le met sur le dos. Porté, la touche **B** l'ouvre (réglable dans les touches). On le voit sur le dos des joueurs. Un sac ne va pas dans un sac.
-
-Huit sacs : rouge d'école (rabat, porte-clés), en jean (coutures orange), militaire (deux poches, boucles, poches de côté), en cuir (rabat à sangles), jaune à écussons, violet étoilé, de sport noir (bandes blanches, poches de côté), de randonnée orange (rabat, sac de couchage roulé dessus). Recette : cuir, ficelle, et la teinture de sa couleur.
+Les joueurs (sauf en créatif ou en spectateur) n'ont **pas d'inventaire** : seulement les **5 premières cases** de leur barre, dessinée plus courte, centrée, plus la main secondaire. La molette fait le tour de ces 5 cases. Les autres cases sont grisées et fermées dans tous les écrans (inventaire, coffres…). Ce qui arrive dans une case fermée va dans une case libre de la main, sinon par terre. On ne ramasse rien s'il n'y a pas de place.
 
 Configuration serveur (`eraphones-server.toml`) : `limitedInventory` (true/false), `hotbarSlots` (1 à 9, 5 par défaut).
 
@@ -145,7 +131,7 @@ Un **lecteur de carte** se pose sur un mur à côté d'une porte (on ne peut pas
 ## Jauge de peur, photos épinglées, emotes
 
 ### Jauge de peur : `/peur jauge`
-Chaque joueur a une peur de 0 à 100 %. Elle **monte** dans le noir (une lampe torche allumée, une torche ou une lanterne en main comptent comme de la lumière), seul, la nuit dehors, blessé, avec des monstres autour, et d'un coup quand le staff lui envoie quelque chose (`/horreur` sons, murmure, coupure, sang, ballon, `/peur`, coups reçus). Elle **descend** à la lumière et à plusieurs. À partir d'un tiers : le cœur bat, de plus en plus vite, les bords de l'écran s'assombrissent au rythme du cœur ; au-delà des deux tiers : le souffle court, la vue tremble et se brouille un peu. Un petit cœur et un tracé de moniteur en bas à gauche la montrent.
+Chaque joueur a une peur de 0 à 100 %. Elle **monte** dans le noir (une lampe torche allumée, une torche ou une lanterne en main comptent comme de la lumière), seul, la nuit dehors, blessé, avec des monstres autour, et d'un coup quand le staff lui envoie quelque chose (`/horreur` sons, murmure, coupure, sang, ballon, `/peur`, coups reçus). Elle **descend** à la lumière et à plusieurs. À partir d'un tiers : le cœur bat, de plus en plus vite, les bords de l'écran s'assombrissent au rythme du cœur ; au-delà des deux tiers : la vue tremble et se brouille un peu. Un petit cœur et un tracé de moniteur en bas à gauche la montrent.
 **Le staff** (ceux qui peuvent utiliser `/horreur`), et les joueurs en créatif ou spectateur, **ne ressentent rien**.
 - `/peur jauge on` / `/peur jauge off` : l'active ou la coupe pour tout le serveur (gardé avec le monde) ;
 - `/peur jauge` ou `/peur jauge info` : l'état, et la peur de chaque joueur ;

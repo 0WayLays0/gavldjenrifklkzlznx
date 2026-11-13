@@ -338,15 +338,8 @@ def music_box_tune(rate=48000):
 
 def recipes():
     ga.shaped("television", ["PGP", "PRP", "P P"], {"P": "minecraft:dark_oak_planks", "G": "minecraft:glass_pane", "R": "minecraft:redstone"})
-    ga.shaped("boite_a_musique", [" G ", "PNP"], {"G": "minecraft:gold_nugget", "P": "minecraft:dark_oak_planks", "N": "minecraft:note_block"})
-    ga.shaped("poupee", [" B ", "WPW", " W "], {"B": "minecraft:bone_meal", "W": "minecraft:pink_wool", "P": "minecraft:white_wool"})
-    ga.shaped("ballon_rouge", ["R", "S"], {"R": "minecraft:red_dye", "S": "minecraft:string"})
 
 
 def main():
     television()
-    music_box()
-    doll()
-    balloon()
-    remote()
     recipes()

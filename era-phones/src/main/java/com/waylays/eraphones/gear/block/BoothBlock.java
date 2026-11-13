@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 
 /**
  * A phone booth, three blocks tall (two and three quarters to its roof) and open at the front: a payphone inside on its back wall, a lit sign on its roof. It
- * has a number of its own (555-9xxx) on the phone network: a coin of 25 cents calls any phone from it, and when it is
+ * has a number of its own (555-9xxx) on the phone network: it calls any phone, for free, and when it is
  * called it rings out loud in the street until someone picks up its handset (uses it).
  */
 public class BoothBlock extends HorizontalDirectionalBlock implements EntityBlock {

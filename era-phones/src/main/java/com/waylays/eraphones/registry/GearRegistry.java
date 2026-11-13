@@ -5,7 +5,6 @@ import com.waylays.eraphones.EraPhones;
 import com.waylays.eraphones.gear.BatteryItem;
 import com.waylays.eraphones.gear.CassetteItem;
 import com.waylays.eraphones.gear.FlashlightItem;
-import com.waylays.eraphones.gear.IdCardItem;
 import com.waylays.eraphones.gear.NewspaperItem;
 import com.waylays.eraphones.gear.WalkieItem;
 import com.waylays.eraphones.gear.block.RadioBlock;
@@ -35,8 +34,8 @@ import java.util.List;
 
 /**
  * The things of the role play besides the phones: a torch and its batteries, a walkie-talkie, a table radio, a video
- * recorder and its cassettes, money, an identity card, a newspaper; what they carry (power, channel, the tape, the
- * card's holder, the paper's article); their sounds; and the creative tabs, one per kind of thing.
+ * recorder and its cassettes, a newspaper; what they carry (power, channel, the tape, the paper's article); their
+ * sounds; and the creative tabs, one per kind of thing.
  */
 public final class GearRegistry {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(EraPhones.MODID);
@@ -73,11 +72,6 @@ public final class GearRegistry {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> TAPE = text("tape");
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> TAPE_LABEL = text("tape_label");
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> TAPE_POS = component("tape_pos", Codec.LONG, ByteBufCodecs.VAR_LONG);
-    /** An identity card's holder (their account, their character's name), its number, what it says of them. */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_OWNER = text("card_owner");
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_NAME = text("card_name");
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_NUMBER = text("card_number");
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CARD_DESC = text("card_desc");
     /** A sheet of paper: its title and text, its paper (0-4), its ink (0-4), written by hand or typed, who signed it. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NOTE_TITLE = text("note_title");
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NOTE_TEXT = text("note_text");
@@ -97,9 +91,7 @@ public final class GearRegistry {
 
     public static final DeferredHolder<SoundEvent, SoundEvent> RADIO_STATIC = sound("radio_static");
     public static final DeferredHolder<SoundEvent, SoundEvent> TALKIE_SQUELCH = sound("talkie_squelch");
-    public static final DeferredHolder<SoundEvent, SoundEvent> MUSIC_BOX = sound("boite_a_musique");
     public static final DeferredHolder<SoundEvent, SoundEvent> HEARTBEAT = sound("coeur_peur");
-    public static final DeferredHolder<SoundEvent, SoundEvent> FEAR_BREATH = sound("souffle_peur");
     public static final DeferredHolder<SoundEvent, SoundEvent> SHUTTER = sound("photo_declic");
     public static final DeferredHolder<SoundEvent, SoundEvent> BIKE_BELL = sound("velo_sonnette");
     public static final DeferredHolder<SoundEvent, SoundEvent> LAMP_BUZZ = sound("lampadaire_bourdonnement");
@@ -122,10 +114,6 @@ public final class GearRegistry {
     public static final DeferredBlock<com.waylays.eraphones.gear.block.TvBlock> TV = BLOCKS.register("television",
             () -> new com.waylays.eraphones.gear.block.TvBlock(BlockBehaviour.Properties.of().strength(1.5f).sound(SoundType.WOOD).noOcclusion()
                     .lightLevel(s -> s.getValue(com.waylays.eraphones.gear.block.TvBlock.LIT) ? 7 : 0)));
-    public static final DeferredBlock<com.waylays.eraphones.horror.block.MusicBoxBlock> MUSIC_BOX_BLOCK = BLOCKS.register("boite_a_musique",
-            () -> new com.waylays.eraphones.horror.block.MusicBoxBlock(BlockBehaviour.Properties.of().strength(.8f).sound(SoundType.WOOD).noOcclusion()));
-    public static final DeferredBlock<com.waylays.eraphones.horror.block.DollBlock> DOLL = BLOCKS.register("poupee",
-            () -> new com.waylays.eraphones.horror.block.DollBlock(BlockBehaviour.Properties.of().strength(.6f).sound(SoundType.WOOL).noOcclusion()));
 
     public static final DeferredBlock<com.waylays.eraphones.gear.block.BoothBlock> BOOTH = BLOCKS.register("cabine_telephonique",
             () -> new com.waylays.eraphones.gear.block.BoothBlock(BlockBehaviour.Properties.of().strength(2.5f, 6f).sound(SoundType.METAL).noOcclusion()
@@ -145,8 +133,6 @@ public final class GearRegistry {
             "cabine_telephonique", () -> BlockEntityType.Builder.of(com.waylays.eraphones.gear.block.BoothBlockEntity::new, BOOTH.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.waylays.eraphones.gear.block.TvBlockEntity>> TV_BE = BLOCK_ENTITIES.register("television",
             () -> BlockEntityType.Builder.of(com.waylays.eraphones.gear.block.TvBlockEntity::new, TV.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.waylays.eraphones.horror.block.DollBlockEntity>> DOLL_BE = BLOCK_ENTITIES.register("poupee",
-            () -> BlockEntityType.Builder.of(com.waylays.eraphones.horror.block.DollBlockEntity::new, DOLL.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RadioBlockEntity>> RADIO_BE = BLOCK_ENTITIES.register("radio",
             () -> BlockEntityType.Builder.of(RadioBlockEntity::new, RADIO.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<VcrBlockEntity>> VCR_BE = BLOCK_ENTITIES.register("magnetoscope",
@@ -179,15 +165,7 @@ public final class GearRegistry {
     public static final DeferredHolder<Item, Item> BOOTH_ITEM = EraRegistry.ITEMS.register("cabine_telephonique",
             () -> new BlockItem(BOOTH.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> TV_ITEM = EraRegistry.ITEMS.register("television", () -> new BlockItem(TV.get(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> MUSIC_BOX_ITEM = EraRegistry.ITEMS.register("boite_a_musique",
-            () -> new BlockItem(MUSIC_BOX_BLOCK.get(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> DOLL_ITEM = EraRegistry.ITEMS.register("poupee", () -> new BlockItem(DOLL.get(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> BALLOON = EraRegistry.ITEMS.register("ballon_rouge",
-            () -> new com.waylays.eraphones.horror.BalloonItem(new Item.Properties().stacksTo(1)));
-    public static final DeferredHolder<Item, Item> REMOTE = EraRegistry.ITEMS.register("telecommande_mj",
-            () -> new com.waylays.eraphones.horror.RemoteItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
     public static final DeferredHolder<Item, Item> CASSETTE = EraRegistry.ITEMS.register("cassette", () -> new CassetteItem(new Item.Properties().stacksTo(1)));
-    public static final DeferredHolder<Item, Item> ID_CARD = EraRegistry.ITEMS.register("carte_identite", () -> new IdCardItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<Item, Item> NOTE = EraRegistry.ITEMS.register("feuille",
             () -> new com.waylays.eraphones.gear.NoteItem(new Item.Properties().stacksTo(16)));
     public static final DeferredHolder<Item, Item> CAMERA = EraRegistry.ITEMS.register("appareil_photo",
@@ -196,20 +174,6 @@ public final class GearRegistry {
     public static final DeferredHolder<Item, Item> PHOTOGRAPH = EraRegistry.ITEMS.register("photo",
             () -> new com.waylays.eraphones.gear.PhotoItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<Item, Item> NEWSPAPER = EraRegistry.ITEMS.register("journal_papier", () -> new NewspaperItem(new Item.Properties().stacksTo(16)));
-
-    /** The money: dollar bills and coins, by face value in cents. */
-    public static final int[] MONEY_CENTS = {10, 25, 100, 500, 1000, 2000, 5000, 10000};
-    public static final List<DeferredHolder<Item, Item>> MONEY = new ArrayList<>();
-
-    static {
-        for (int cents : MONEY_CENTS) {
-            MONEY.add(EraRegistry.ITEMS.register(moneyId(cents), () -> new Item(new Item.Properties().stacksTo(64))));
-        }
-    }
-
-    public static String moneyId(int cents) {
-        return cents < 100 ? "piece_" + cents + "c" : "billet_" + cents / 100;
-    }
 
     // ---------------------------------------------------------------- the creative tabs, one per kind of thing
 
@@ -236,13 +200,9 @@ public final class GearRegistry {
             }).build());
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB_DAILY = EraRegistry.TABS.register("vie_quotidienne", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.eraphones.vie_quotidienne"))
-            .icon(() -> new ItemStack(MONEY.get(5).get()))
+            .icon(() -> new ItemStack(CAMERA.get()))
             .withTabsBefore(TAB_TAPE.getId())
             .displayItems((p, out) -> {
-                for (DeferredHolder<Item, Item> m : MONEY) {
-                    out.accept(m.get());
-                }
-                out.accept(ID_CARD.get());
                 out.accept(CAMERA.get());
                 out.accept(FILM_PACK.get());
                 out.accept(BOOTH_ITEM.get());
@@ -253,17 +213,10 @@ public final class GearRegistry {
                 out.accept(MACHINE_ITEM.get());
                 out.accept(NOTE.get());
                 out.accept(NEWSPAPER.get());
-            }).build());
-
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB_HORROR = EraRegistry.TABS.register("horreur", () -> CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.eraphones.horreur"))
-            .icon(() -> new ItemStack(BALLOON.get()))
-            .withTabsBefore(TAB_DAILY.getId())
-            .displayItems((p, out) -> {
-                out.accept(REMOTE.get());
-                out.accept(BALLOON.get());
-                out.accept(DOLL_ITEM.get());
-                out.accept(MUSIC_BOX_ITEM.get());
+                out.accept(com.waylays.eraphones.lock.LockRegistry.PADLOCK.get());
+                out.accept(com.waylays.eraphones.lock.LockRegistry.KEY_ITEM.get());
+                out.accept(com.waylays.eraphones.lock.LockRegistry.READER_ITEM.get());
+                out.accept(com.waylays.eraphones.lock.LockRegistry.BADGE_ITEM.get());
             }).build());
 
     private GearRegistry() {}

@@ -665,16 +665,6 @@ def sheet():
 
 # ------------------------------------------------------------------------------------------------ all of them
 
-def main(money, money_id):
-    """{money}: face value in cents -> paper tint (None for a coin)."""
-    s = Sheet("argent", 1024)
-    for cents, tint in money.items():
-        if tint is None:
-            coin(s, cents, money_id(cents))
-    for cents, tint in money.items():
-        if tint is not None:
-            bill(s, cents // 100, tint, money_id(cents))
-    s.save()
-    id_card()
+def main():
     newspaper()
     sheet()

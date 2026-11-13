@@ -2,7 +2,6 @@ package com.waylays.eraphones.pack.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.waylays.eraphones.EraPhones;
-import com.waylays.eraphones.pack.PackRegistry;
 import com.waylays.eraphones.pack.Packs;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -32,12 +31,10 @@ import org.lwjgl.glfw.GLFW;
 /**
  * The limited inventory on the player's side: a hotbar of only the slots that may be used (drawn shorter, centred),
  * the selection kept to them (scrolling wraps round them), the other slots of every inventory screen shaded and
- * closed; the backpack key (B); the backpack drawn on the back; its open view.
+ * closed.
  */
 @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT)
 public final class PackClient {
-    public static final KeyMapping OPEN = new KeyMapping("key.eraphones.backpack", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B,
-            "key.categories.eraphones");
     private static final ResourceLocation HOTBAR = ResourceLocation.withDefaultNamespace("hud/hotbar");
     private static final ResourceLocation SELECTION = ResourceLocation.withDefaultNamespace("hud/hotbar_selection");
     private static final ResourceLocation OFFHAND = ResourceLocation.withDefaultNamespace("hud/hotbar_offhand_left");
@@ -56,11 +53,6 @@ public final class PackClient {
         LocalPlayer p = mc.player;
         if (p == null) {
             return;
-        }
-        while (OPEN.consumeClick()) {
-            if (mc.screen == null) {
-                PacketDistributor.sendToServer(new Packs.Open());
-            }
         }
         if (!limited()) {
             last = p.getInventory().selected;
@@ -151,30 +143,6 @@ public final class PackClient {
             Slot slot = ((AbstractContainerScreen<?>) event.getScreen()).getSlotUnderMouse();
             if (slot != null && closed(slot)) {
                 event.setCanceled(true);
-            }
-        }
-    }
-
-    @EventBusSubscriber(modid = EraPhones.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
-    public static final class Setup {
-        private Setup() {}
-
-        @SubscribeEvent
-        public static void onKeys(RegisterKeyMappingsEvent event) {
-            event.register(OPEN);
-        }
-
-        @SubscribeEvent
-        public static void onScreens(RegisterMenuScreensEvent event) {
-            event.register(PackRegistry.MENU.get(), BackpackScreen::new);
-        }
-
-        @SubscribeEvent
-        public static void onLayers(EntityRenderersEvent.AddLayers event) {
-            for (net.minecraft.client.resources.PlayerSkin.Model skin : event.getSkins()) {
-                if (event.getSkin(skin) instanceof PlayerRenderer r) {
-                    r.addLayer(new BackpackLayer(r));
-                }
             }
         }
     }

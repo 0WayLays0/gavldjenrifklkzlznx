@@ -46,8 +46,6 @@ public final class GearCommands {
                                         .executes(c -> torches(c, "clignoter", IntegerArgumentType.getInteger(c, "secondes")))))
                         .then(Commands.literal("casser").executes(c -> torches(c, "casser", 0)))
                         .then(Commands.literal("reparer").executes(c -> torches(c, "reparer", 0)))));
-        d.register(Commands.literal("identite").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
-                .then(Commands.literal("delivrer").then(Commands.argument("joueur", EntityArgument.player()).executes(GearCommands::issue))));
         d.register(Commands.literal("journal").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.literal("imprimer").then(Commands.argument("exemplaires", IntegerArgumentType.integer(1, 64))
                         .then(Commands.argument("article", StringArgumentType.greedyString()).executes(GearCommands::print)))));
@@ -138,17 +136,6 @@ public final class GearCommands {
         if (Audio.get() == null) {
             c.getSource().sendFailure(Component.translatable("gear.eraphones.needs_voicechat"));
         }
-        return 1;
-    }
-
-    private static int issue(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
-        ServerPlayer target = EntityArgument.getPlayer(c, "joueur");
-        ItemStack card = new ItemStack(GearRegistry.ID_CARD.get());
-        IdCardItem.issue(card, target);
-        if (!target.getInventory().add(card)) {
-            target.drop(card, false);
-        }
-        c.getSource().sendSuccess(() -> Component.translatable("gear.eraphones.card_issued", card.get(GearRegistry.CARD_NAME.get())).withStyle(ChatFormatting.GRAY), true);
         return 1;
     }
 

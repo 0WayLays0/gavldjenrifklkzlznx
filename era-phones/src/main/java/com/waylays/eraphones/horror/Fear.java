@@ -27,7 +27,7 @@ import java.util.UUID;
  * The fear gauge, 0 to 100, for each player who is not staff. It rises in the dark, alone, at night outside, hurt,
  * with something hostile near, and at once with whatever a game master sends them (a sound, a vision, the lights going
  * out); it falls in the light and in company. The player feels it (see HorrorClient): from a third of the way up the
- * heart beats, then faster, the edges of the sight darken, the breath comes short, the sight shakes and blurs.
+ * heart beats, then faster, the edges of the sight darken, the sight shakes and blurs.
  * The staff (who may use /horreur), and anyone in creative or spectator, feel nothing. A game master turns it on or
  * off for the whole server (/peur jauge on|off, kept with the world).
  */

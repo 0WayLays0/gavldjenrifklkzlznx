@@ -39,12 +39,9 @@ public final class GearNet {
         PhotoNet.register(r);
         BoothNet.register(r);
         CamNet.register(r);
-        com.waylays.eraphones.event.EventNet.register(r);
-        com.waylays.eraphones.pack.Packs.register(r);
         com.waylays.eraphones.walkman.Walkmans.register(r);
         com.waylays.eraphones.lock.Locks.register(r);
         com.waylays.eraphones.arms.Arms.register(r);
-        r.playToClient(Card.TYPE, Card.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.card(p));
         r.playToClient(Stations.TYPE, Stations.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.stations(p));
     }
 
@@ -115,29 +112,6 @@ public final class GearNet {
 
         @Override
         public Type<Note> type() {
-            return TYPE;
-        }
-    }
-
-    /** An identity card to look at: its holder's account, name, number and description; who shows it (empty: one's own). */
-    public record Card(String owner, String name, String number, String description, String shownBy) implements CustomPacketPayload {
-        public static final Type<Card> TYPE = payload("card");
-        public static final StreamCodec<FriendlyByteBuf, Card> CODEC = CustomPacketPayload.codec((p, b) -> {
-            b.writeUtf(p.owner, 40);
-            b.writeUtf(p.name, 64);
-            b.writeUtf(p.number, 32);
-            b.writeUtf(p.description, 512);
-            b.writeUtf(p.shownBy, 64);
-        }, b -> new Card(b.readUtf(40), b.readUtf(64), b.readUtf(32), b.readUtf(512), b.readUtf(64)));
-
-        public Card {
-            name = name.length() > 64 ? name.substring(0, 64) : name;
-            description = description.length() > 512 ? description.substring(0, 512) : description;
-            shownBy = shownBy.length() > 64 ? shownBy.substring(0, 64) : shownBy;
-        }
-
-        @Override
-        public Type<Card> type() {
             return TYPE;
         }
     }

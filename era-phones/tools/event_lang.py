@@ -1,59 +1,8 @@
-"""The texts of the event's things: the missing children's posters, the code box, the star fragment, the zone
-triggers (English, French)."""
-
-POSTER_NAMES = {
-    "affiche_disparu_1": ("Missing Poster (new)", "Affiche « Disparu » (neuve)"),
-    "affiche_disparu_2": ("Missing Poster (yellowed)", "Affiche « Disparue » (jaunie)"),
-    "affiche_disparu_3": ("Missing Poster (torn corner)", "Affiche « Disparu » (coin arraché)"),
-    "affiche_disparu_4": ("Missing Poster (rain-washed)", "Affiche « Disparue » (lavée par la pluie)"),
-    "affiche_disparu_5": ("Missing Poster (thirty years old)", "Affiche « Disparu » (vieille de trente ans)"),
-    "affiche_disparu_6": ("Missing Poster (half torn away)", "Affiche « Disparue » (à moitié arrachée)"),
-    "affiches_disparus_2_a": ("Two Missing Posters", "Deux affiches « Disparus »"),
-    "affiches_disparus_2_b": ("Two Missing Posters (askew)", "Deux affiches « Disparus » (de travers)"),
-    "affiches_disparus_3": ("Three Missing Posters", "Trois affiches « Disparus »"),
-    "affiches_disparus_4": ("Four Missing Posters", "Quatre affiches « Disparus »"),
-    "affiches_disparus_tas_a": ("Heap of Missing Posters", "Tas d'affiches « Disparus »"),
-    "affiches_disparus_tas_b": ("Heap of Missing Posters (another)", "Tas d'affiches « Disparus » (autre)"),
-    "affiches_disparus_mur_a": ("Wall of Missing Posters", "Mur d'affiches « Disparus »"),
-    "affiches_disparus_mur_b": ("Wall of Missing Posters (2)", "Mur d'affiches « Disparus » (2)"),
-    "affiches_disparus_mur_c": ("Wall of Missing Posters (3)", "Mur d'affiches « Disparus » (3)"),
-}
+"""The texts of the event's things: the zone triggers, closed eyes, the fear gauge, pinned photographs (English, French)."""
 
 E = "event.eraphones."
 
 TEXTS = {
-    "itemGroup.eraphones.evenement": ("Event", "Événement"),
-    "block.eraphones.boite_code": ("Code Box", "Boîte à code"),
-    "item.eraphones.fragment_etoile": ("Star Fragment", "Fragment d'étoile"),
-    "entity.eraphones.fragment_etoile": ("Star Fragment", "Fragment d'étoile"),
-    # The code box
-    E + "codebox.staff_hint": ("Code: %s. Set it on the wheels (in creative), or /boitecode code <digits>; /boitecode fermer locks it again.",
-                               "Code : %s. Règle-le sur les molettes (en créatif) ou /boitecode code <chiffres> ; /boitecode fermer la referme."),
-    E + "codebox.wrong": ("It doesn't open...", "Elle ne s'ouvre pas..."),
-    E + "codebox.opened": ("Click. The box opens.", "Clic. La boîte s'ouvre."),
-    E + "codebox.code_set": ("The box's code is now %s", "Le code de la boîte est maintenant %s"),
-    E + "codebox.open": ("Open", "Ouvrir"),
-    E + "codebox.set": ("Make it the code", "En faire le code"),
-    E + "codebox.known": ("Its code: %s (only you see this)", "Son code : %s (toi seul le vois)"),
-    E + "codebox.bad_code": ("A code is 3 to 6 digits", "Un code fait 3 à 6 chiffres"),
-    E + "codebox.locked": ("The box is locked again", "La boîte est refermée"),
-    E + "codebox.unlocked": ("The box is open", "La boîte est ouverte"),
-    E + "codebox.info": ("Code %s · %s", "Code %s · %s"),
-    E + "codebox.is_open": ("open", "ouverte"),
-    E + "codebox.is_locked": ("locked", "fermée"),
-    E + "codebox.look_at_one": ("Look at a code box", "Regarde une boîte à code"),
-    # The star fragment
-    E + "fragment.full": ("There is no room for another pair of hands", "Il n'y a plus de place pour une autre paire de mains"),
-    E + "fragment.joins": ("%s helps carry the fragment", "%s aide à porter le fragment"),
-    E + "fragment.lifted": ("Together, you lift the fragment...", "À deux, vous soulevez le fragment..."),
-    E + "fragment.too_heavy": ("You don't seem strong enough to carry this fragment alone... Someone has to help you.",
-                               "Tu ne sembles pas assez fort pour porter seul ce fragment... Il faut que quelqu'un t'aide."),
-    E + "fragment.waiting": ("Waiting for a second bearer...", "En attente d'un deuxième porteur..."),
-    E + "fragment.gave_up": ("You let go of the fragment", "Tu lâches le fragment"),
-    E + "fragment.set_down": ("Too heavy for one: the fragment is set down", "Trop lourd pour un seul : le fragment est reposé"),
-    E + "fragment.together": ("You're pulling against each other... A little coordination, please!",
-                              "Vous tirez chacun de votre côté... Un peu de coordination, s'il vous plaît !"),
-    E + "fragment.repelled": ("Something keeps you from coming near...", "Quelque chose t'empêche d'approcher..."),
     # The /me that closes the eyes
     # (rp.eraphones.eyes.staff is with the role-play texts)
     # The zone triggers
@@ -103,22 +52,7 @@ TEXTS = {
 }
 
 TEXTS.update({
-    "itemGroup.eraphones.sacs_a_dos": ("Backpacks", "Sacs à dos"),
-    "item.eraphones.sac_a_dos_rouge": ("Red School Backpack", "Sac à dos d'école rouge"),
-    "item.eraphones.sac_a_dos_jean": ("Denim Backpack", "Sac à dos en jean"),
-    "item.eraphones.sac_a_dos_militaire": ("Army Backpack", "Sac à dos militaire"),
-    "item.eraphones.sac_a_dos_cuir": ("Leather Rucksack", "Sac à dos en cuir"),
-    "item.eraphones.sac_a_dos_jaune": ("Yellow Backpack with Patches", "Sac à dos jaune à écussons"),
-    "item.eraphones.sac_a_dos_violet": ("Purple Star Backpack", "Sac à dos violet étoilé"),
-    "item.eraphones.sac_a_dos_sport": ("Black Sports Backpack", "Sac à dos de sport noir"),
-    "item.eraphones.sac_a_dos_rando": ("Hiking Backpack", "Sac de randonnée"),
-    "key.eraphones.backpack": ("Open the backpack", "Ouvrir le sac à dos"),
-    "pack.eraphones.holds": ("%s / %s pockets used", "%s / %s poches utilisées"),
-    "pack.eraphones.help": ("Use: open it · Crouch + use: put it on · Worn: B opens it",
-                            "Clic droit : l'ouvrir · Accroupi + clic droit : le mettre · Porté : B l'ouvre"),
-    "pack.eraphones.in_hand": ("In your hands", "Dans tes mains"),
     "pack.eraphones.no_room": ("No more room: you put it down", "Plus de place : tu le poses par terre"),
-    "pack.eraphones.none": ("You have no backpack on", "Tu n'as pas de sac à dos sur le dos"),
 })
 
 TEXTS.update({
@@ -278,5 +212,3 @@ TEXTS.update({
     "item.eraphones.photo.help": ("Use it to look at it; sneak and use it on a wall or a table to pin it there", "Utilise-la pour la regarder ; accroupi, utilise-la sur un mur ou une table pour l'y épingler"),
 })
 
-for _k, _v in POSTER_NAMES.items():
-    TEXTS["block.eraphones." + _k] = _v

@@ -19,11 +19,9 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /**
  * The phone booth between the server and its user: picking up the handset (the booth's screen opens; a ringing booth
- * is answered), and dialling a number from it, a coin of 25 cents put in first.
+ * is answered), and dialling a number from it (free).
  */
 public final class BoothNet {
-    /** What a call from a booth costs, in cents (one coin). */
-    public static final int PRICE = 25;
     /** How far from the booth its user may be (blocks). */
     private static final double REACH = 4.5;
 
@@ -32,17 +30,6 @@ public final class BoothNet {
     public static void register(PayloadRegistrar r) {
         r.playToClient(Open.TYPE, Open.CODEC, (p, c) -> c.enqueueWork(() -> com.waylays.eraphones.gear.client.BoothScreen.open(p)));
         r.playToServer(Dial.TYPE, Dial.CODEC, (p, c) -> c.enqueueWork(() -> dial(p, c)));
-    }
-
-    /** The coin a booth takes. */
-    public static Item coin() {
-        int[] cents = GearRegistry.MONEY_CENTS;
-        for (int i = 0; i < cents.length; i++) {
-            if (cents[i] == PRICE) {
-                return GearRegistry.MONEY.get(i).get();
-            }
-        }
-        throw new IllegalStateException("no coin of " + PRICE + " cents");
     }
 
     /** {@code p} picks up the handset of {@code booth}: answers it if it rings, and the payphone is shown. */
@@ -64,29 +51,8 @@ public final class BoothNet {
             p.displayClientMessage(net.minecraft.network.chat.Component.translatable("booth.eraphones.dead"), true);
             return;
         }
-        boolean free = p.getAbilities().instabuild;
-        Item coin = coin();
-        if (!free) {
-            int slot = -1;
-            for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
-                if (p.getInventory().getItem(i).is(coin)) {
-                    slot = i;
-                    break;
-                }
-            }
-            if (slot < 0) {
-                return;
-            }
-            p.getInventory().getItem(slot).shrink(1);
-        }
-        p.level().playSound(null, d.pos().above(), GearRegistry.BOOTH_COIN.get(), SoundSource.BLOCKS, .9f, 1f);
-        // A call that does not go through gives the coin back, as payphones do
-        if (!CallService.dialFromBooth(p, booth.number(), d.number()) && !free) {
-            ItemStack back = new ItemStack(coin);
-            if (!p.getInventory().add(back)) {
-                p.drop(back, false);
-            }
-        }
+        p.level().playSound(null, d.pos().above(), GearRegistry.BOOTH_KEY.get(), SoundSource.BLOCKS, .9f, 1f);
+        CallService.dialFromBooth(p, booth.number(), d.number());
     }
 
     /** To the booth's user: its payphone, to be shown; {@code answered} if picking it up answered a call. */

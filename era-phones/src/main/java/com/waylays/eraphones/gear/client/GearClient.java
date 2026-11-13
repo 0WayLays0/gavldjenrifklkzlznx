@@ -56,10 +56,6 @@ public final class GearClient {
         }
     }
 
-    public static void card(GearNet.Card card) {
-        Minecraft.getInstance().setScreen(new CardScreen(card));
-    }
-
     public static void stations(GearNet.Stations p) {
         ON_AIR.clear();
         ON_AIR.addAll(p.frequencies());
