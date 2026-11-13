@@ -897,6 +897,30 @@ public final class ClientSmokeTest {
                             com.waylays.arcanes.metier.MetierDefs.Game.DISTILL};
                     int index = metierTrial;
                     if (index >= others.length) {
+                        // Last, a station's recipe list (built here: no station block is right-clicked)
+                        if (index == others.length) {
+                            List<net.minecraft.world.item.ItemStack> in = List.of(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_NUGGET, 8),
+                                    new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TORCH));
+                            mc.setScreen(new com.waylays.arcanes.client.metier.StationScreen(new com.waylays.arcanes.metier.MetierNet.Station("artisanat",
+                                    mc.player.blockPosition(), "Artisanat", com.waylays.arcanes.metier.MetierDefs.Game.ASSEMBLY.ordinal(),
+                                    new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CRAFTING_TABLE), List.of(
+                                    new com.waylays.arcanes.metier.MetierNet.RecipeView("Lanterne", in, List.of(true, false),
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN),
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN, 2), 1, 0),
+                                    new com.waylays.arcanes.metier.MetierNet.RecipeView("Coffre", List.of(new net.minecraft.world.item.ItemStack(
+                                            net.minecraft.world.item.Items.OAK_PLANKS, 8)), List.of(true),
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST),
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST), .8, 0)), true, 0)));
+                            metierTick = ticks;
+                            metierTrial++;
+                            return false;
+                        }
+                        if (ticks - metierTick < 20) {
+                            return false;
+                        }
+                        if (shots) {
+                            screenshot(mc, "metier_station");
+                        }
                         mc.setScreen(null);
                         metierStep = 10;
                         return true;

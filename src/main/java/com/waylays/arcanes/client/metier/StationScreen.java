@@ -2,48 +2,55 @@ package com.waylays.arcanes.client.metier;
 
 import com.waylays.arcanes.metier.MetierDefs;
 import com.waylays.arcanes.metier.MetierNet;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A station's recipes (the crafting table, the smithing table, the still): what each takes, whether the player has
- * it, what a good and a perfect job give, how hard it is and how long before it can be made again. Choosing one starts
- * its minigame; the station's own screen can still be opened when the trade allows it.
+ * A station's recipes (the crafting table, the smithing table, the still), as cards over the station's scene: what
+ * each makes, what it takes (green: in the bag, red: missing), what a good and a perfect job give, how hard it is.
+ * Choosing one starts its minigame; the station's own screen can still be opened when the trade allows it.
  */
 public class StationScreen extends Screen {
-    private static final int W = 300, CARD = 46, LIST_Y = 34;
-    private static final int[] THEMES = {0xFF7A6A58, 0xFF4E8A44, 0xFF3A6EA8, 0xFFA8442A, 0xFF6A4A9A};
+    private static final int W = 380, CARD = 58, GAP = 6, LIST_Y = 52;
+    private static final int[] THEMES = {0xFF8A7458, 0xFF5A8A48, 0xFF8A6438, 0xFFB0502A, 0xFF7A4AA8};
+    private static final String[] SCENES = {"bg_mining", "bg_harvest", "bg_assembly", "bg_forge", "bg_distill"};
+    private static final ResourceLocation SLOT = Draw.tex("slot");
 
     private final MetierNet.Station station;
     private final int theme;
-    private int left, top, h, scroll, visible;
+    private final ResourceLocation scene;
+    private float left, top, k = 1;
+    private int h, scroll, visible;
     private int hovered = -1;
     private boolean hoverVanilla;
-    private final List<ItemStack> tooltipStacks = new ArrayList<>();
+    private long opened = net.minecraft.Util.getMillis();
 
     public StationScreen(MetierNet.Station station) {
         super(Component.literal(station.title()));
         this.station = station;
-        this.theme = THEMES[Mth.clamp(station.game(), 0, THEMES.length - 1)];
+        int game = Mth.clamp(station.game(), 0, THEMES.length - 1);
+        this.theme = THEMES[game];
+        this.scene = Draw.tex(SCENES[game]);
     }
 
     @Override
     protected void init() {
-        visible = Math.max(1, Math.min(station.recipes().size(), (height - 90) / (CARD + 4)));
-        h = LIST_Y + visible * (CARD + 4) + (station.vanilla() ? 30 : 10);
-        left = (width - W) / 2;
-        top = (height - h) / 2;
+        int n = Math.max(1, station.recipes().size());
+        visible = Math.max(1, Math.min(n, 4));
+        h = LIST_Y + visible * (CARD + GAP) + (station.vanilla() ? 34 : 12);
+        k = Mth.clamp(Math.min((width - 16) / (float) W, (height - 12) / (float) h), .5f, 2.6f);
+        left = (width - W * k) / 2;
+        top = (height - h * k) / 2;
         scroll = Mth.clamp(scroll, 0, Math.max(0, station.recipes().size() - visible));
     }
 
@@ -53,104 +60,8 @@ public class StationScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick);
-        g.pose().pushPose();
-        g.pose().translate(left, top, 0);
-        int mx = mouseX - left, my = mouseY - top;
-        g.fill(-3, -2, W + 4, h + 5, 0x70000000);
-        g.fillGradient(0, 0, W, h, Draw.argb(250, Draw.lerp(theme, 0xFF000000, .6f)), Draw.argb(250, Draw.lerp(theme, 0xFF000000, .85f)));
-        g.renderOutline(0, 0, W, h, Draw.lerp(theme, 0xFFFFFFFF, .3f));
-        g.fillGradient(2, 2, W - 2, 28, Draw.argb(200, theme), Draw.argb(30, theme));
-        Draw.item(g, station.icon(), 8, 6, 1.1f);
-        Draw.text(g, title, 30, 6, 0xFFFFF4E0, 1.1f);
-        Draw.text(g, Component.translatable("metier.arcanes_oublies.station.choose"), 30, 18, 0xFFD0C8B8, .75f);
-        if (station.cooldown() > 0) {
-            Component c = Component.translatable("metier.arcanes_oublies.station.wait", seconds(station.cooldown()));
-            Draw.text(g, c, W - 8 - font.width(c) * .75f, 12, 0xFFFFC060, .75f);
-        }
-        hovered = -1;
-        tooltipStacks.clear();
-        ItemStack tip = ItemStack.EMPTY;
-        List<MetierNet.RecipeView> recipes = station.recipes();
-        if (recipes.isEmpty()) {
-            Draw.centered(g, Component.translatable("metier.arcanes_oublies.station.empty"), W / 2f, LIST_Y + 14, 0xFFA09888, 1);
-        }
-        for (int i = 0; i < visible && i + scroll < recipes.size(); i++) {
-            int index = i + scroll;
-            MetierNet.RecipeView r = recipes.get(index);
-            int y = LIST_Y + i * (CARD + 4);
-            boolean over = mx >= 8 && mx < W - 8 && my >= y && my < y + CARD;
-            boolean ready = r.ready() && station.cooldown() <= 0;
-            if (over) {
-                hovered = index;
-            }
-            int fill = over ? (ready ? Draw.argb(170, Draw.lerp(theme, 0xFFFFFFFF, .15f)) : 0xA0402020) : 0x90000000;
-            Draw.frame(g, 8, y, W - 8, y + CARD, fill, over ? Draw.lerp(theme, 0xFFFFFFFF, .6f) : Draw.argb(160, theme));
-            Draw.item(g, r.perfect().isEmpty() ? r.partial() : r.perfect(), 13, y + 7, 2);
-            Draw.text(g, Component.literal(r.name()), 52, y + 4, ready ? 0xFFFFF4E0 : 0xFFC8B8A8, 1);
-            int stars = (int) Mth.clamp(Math.round(r.difficulty() * 2), 1, 8);
-            Component diff = Component.literal("★".repeat(stars)).withStyle(r.difficulty() > 1.25 ? ChatFormatting.RED : r.difficulty() < .9
-                    ? ChatFormatting.GREEN : ChatFormatting.GOLD);
-            Draw.text(g, diff, W - 14 - font.width(diff) * .75f, y + 5, 0xFFFFFFFF, .75f);
-            // What it takes
-            int x = 52;
-            Draw.text(g, Component.translatable("metier.arcanes_oublies.station.takes"), x, y + 17, 0xFFA09888, .65f);
-            x += 4;
-            for (int k = 0; k < r.inputs().size(); k++) {
-                ItemStack in = r.inputs().get(k);
-                boolean have = k < r.have().size() && r.have().get(k);
-                int ix = x + k * 20, iy = y + 26;
-                g.fill(ix - 1, iy - 1, ix + 17, iy + 17, have ? 0x4040A040 : 0x60C03030);
-                g.renderItem(in, ix, iy);
-                g.renderItemDecorations(font, in, ix, iy);
-                if (mx >= ix && mx < ix + 16 && my >= iy && my < iy + 16) {
-                    tip = in;
-                }
-            }
-            // What it gives
-            int gx = W - 92;
-            Draw.text(g, Component.translatable("metier.arcanes_oublies.station.gives"), gx, y + 17, 0xFFA09888, .65f);
-            ItemStack[] outs = {r.partial(), r.perfect()};
-            int[] colors = {0xFFB8E0FF, 0xFFFFD25A};
-            for (int k = 0; k < 2; k++) {
-                ItemStack out = outs[k];
-                int ix = gx + 4 + k * 36, iy = y + 26;
-                if (out.isEmpty()) {
-                    continue;
-                }
-                g.renderOutline(ix - 2, iy - 2, 20, 20, colors[k]);
-                g.renderItem(out, ix, iy);
-                g.renderItemDecorations(font, out, ix, iy);
-                if (mx >= ix && mx < ix + 16 && my >= iy && my < iy + 16) {
-                    tip = out;
-                }
-            }
-            if (r.cooldown() > 0) {
-                Component c = Component.translatable("metier.arcanes_oublies.station.wait", seconds(r.cooldown()));
-                Draw.text(g, c, W - 14 - font.width(c) * .7f, y + CARD - 9, 0xFFFFC060, .7f);
-            } else if (r.have().contains(false)) {
-                Component c = Component.translatable("metier.arcanes_oublies.station.lacking");
-                Draw.text(g, c, W - 14 - font.width(c) * .7f, y + CARD - 9, 0xFFFF8070, .7f);
-            }
-        }
-        if (scroll > 0) {
-            Draw.centered(g, Component.literal("▲"), W / 2f, LIST_Y - 6, 0xFFFFFFFF, .7f);
-        }
-        if (scroll + visible < recipes.size()) {
-            Draw.centered(g, Component.literal("▼"), W / 2f, LIST_Y + visible * (CARD + 4) - 3, 0xFFFFFFFF, .7f);
-        }
-        hoverVanilla = false;
-        if (station.vanilla()) {
-            int by = h - 24;
-            hoverVanilla = mx >= W / 2 - 70 && mx < W / 2 + 70 && my >= by && my < by + 16;
-            Draw.frame(g, W / 2 - 70, by, W / 2 + 70, by + 16, hoverVanilla ? 0xC0403830 : 0x90000000, hoverVanilla ? 0xFFFFE6A0 : 0xFF8A8070);
-            Draw.centered(g, Component.translatable("metier.arcanes_oublies.station.vanilla"), W / 2f, by + 4, 0xFFF0EAD8, .85f);
-        }
-        g.pose().popPose();
-        if (!tip.isEmpty()) {
-            g.renderTooltip(font, tip, mouseX, mouseY);
-        }
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        g.fillGradient(0, 0, width, height, 0x90000000, 0xB8000000);
     }
 
     private static Component seconds(int s) {
@@ -161,6 +72,133 @@ public class StationScreen extends Screen {
             return Component.translatable("metier.arcanes_oublies.time_m", s / 60, s % 60);
         }
         return Component.translatable("metier.arcanes_oublies.time_s", Math.max(1, s));
+    }
+
+    @Override
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
+        float mx = (mouseX - left) / k, my = (mouseY - top) / k;
+        float appear = Draw.ease((net.minecraft.Util.getMillis() - opened) / 250f);
+        g.pose().pushPose();
+        g.pose().translate(left, top + (1 - appear) * 10, 0);
+        g.pose().scale(k, k, 1);
+        Draw.panel(g, 0, 0, W, h, theme);
+        // The station's scene, dimmed, behind the header
+        g.enableScissor((int) left, (int) top, (int) Math.ceil(left + W * k), (int) Math.ceil(top + 44 * k));
+        Draw.picture(g, scene, 0, -40, W, -40 + W * 360 / 784f, 784, 360, 0xFF8A8A8A);
+        g.disableScissor();
+        Draw.vgrad(g, 1, 1, W - 1, 44, Draw.argb(60, theme), Draw.argb(230, Draw.lerp(theme, 0xFF000000, .8f)));
+        Draw.glow(g, 26, 22, 24, Draw.argb(90, 0xFFFFE6B0));
+        Draw.itemAt(g, station.icon(), 26, 22, 28);
+        Draw.text(g, title, 48, 10, 0xFFFFF6E6, 1.4f);
+        Draw.text(g, Component.translatable("metier.arcanes_oublies.station.choose"), 48, 27, 0xFFE0D6C4, .85f);
+        if (station.cooldown() > 0) {
+            Component c = Component.translatable("metier.arcanes_oublies.station.wait", seconds(station.cooldown()));
+            Draw.text(g, c, W - 12 - Draw.width(c, .85f), 18, 0xFFFFC060, .85f);
+        }
+        hovered = -1;
+        ItemStack tip = ItemStack.EMPTY;
+        List<MetierNet.RecipeView> recipes = station.recipes();
+        if (recipes.isEmpty()) {
+            Draw.centered(g, Component.translatable("metier.arcanes_oublies.station.empty"), W / 2f, LIST_Y + 20, 0xFFA8A090, 1);
+        }
+        for (int i = 0; i < visible && i + scroll < recipes.size(); i++) {
+            int index = i + scroll;
+            MetierNet.RecipeView r = recipes.get(index);
+            float y = LIST_Y + i * (CARD + GAP);
+            boolean over = mx >= 10 && mx < W - 10 && my >= y && my < y + CARD;
+            boolean ready = r.ready() && station.cooldown() <= 0;
+            if (over) {
+                hovered = index;
+            }
+            float lift = over ? -1.5f : 0;
+            Draw.shadow(g, W / 2f, y + CARD / 2f + 3, W - 10, CARD + 12, over ? 150 : 90);
+            Draw.vgrad(g, 10, y + lift, W - 10, y + CARD + lift, over && ready ? Draw.lerp(theme, 0xFF2A2420, .55f) : 0xF0201A16,
+                    over && ready ? Draw.lerp(theme, 0xFF100C0A, .8f) : 0xF0120E0C);
+            int edge = over ? (ready ? Draw.lerp(theme, 0xFFFFF0D0, .6f) : 0xFFB04A3A) : Draw.argb(120, Draw.lerp(theme, 0xFFFFFFFF, .3f));
+            Draw.rect(g, 10, y + lift, W - 10, y + lift + 1, edge);
+            Draw.rect(g, 10, y + CARD + lift - 1, W - 10, y + CARD + lift, Draw.argb(90, edge));
+            // What it makes
+            ItemStack shown = r.perfect().isEmpty() ? r.partial() : r.perfect();
+            Draw.picture(g, SLOT, 16, y + 7 + lift, 60, y + 51 + lift, 72, 72, 0xFFFFFFFF);
+            if (over && ready) {
+                Draw.glow(g, 38, y + 29 + lift, 26, Draw.argb(90, 0xFFFFE0A0));
+            }
+            Draw.itemAt(g, shown, 38, y + 29 + lift, 30);
+            Draw.text(g, Component.literal(r.name()), 68, y + 8 + lift, ready ? 0xFFFFF6E6 : 0xFFB8AA9A, 1.1f);
+            int pips = (int) Mth.clamp(Math.round(r.difficulty() * 2), 1, 6);
+            int pc = r.difficulty() > 1.25 ? 0xFFFF6A50 : r.difficulty() < .9 ? 0xFF8AE07A : 0xFFFFC850;
+            for (int p = 0; p < 6; p++) {
+                Draw.disc(g, 70 + Draw.width(Component.literal(r.name()), 1.1f) + 8 + p * 7, y + 12 + lift, 2.4f, p < pips ? pc : 0x38FFFFFF);
+            }
+            // What it takes: green in the bag, red missing
+            float x = 68;
+            for (int q = 0; q < r.inputs().size(); q++) {
+                ItemStack in = r.inputs().get(q);
+                boolean have = q < r.have().size() && r.have().get(q);
+                float ix = x + q * 24, iy = y + 26 + lift;
+                Draw.rect(g, ix - 1, iy - 1, ix + 21, iy + 21, have ? 0x5040C050 : 0x70D04030);
+                Draw.rect(g, ix - 1, iy + 20, ix + 21, iy + 21, have ? 0xFF60D060 : 0xFFE05040);
+                Draw.itemAt(g, in, ix + 10, iy + 10, 18);
+                g.pose().pushPose();
+                g.pose().translate(0, 0, 250);
+                Component n = Component.literal(String.valueOf(in.getCount()));
+                Draw.text(g, n, ix + 21 - Draw.width(n, .8f), iy + 13, 0xFFFFFFFF, .8f);
+                g.pose().popPose();
+                if (mx >= ix && mx < ix + 20 && my >= iy && my < iy + 20) {
+                    tip = in;
+                }
+            }
+            // What it gives: a good job, a perfect one
+            ItemStack[] outs = {r.partial(), r.perfect()};
+            int[] colors = {0xFF9AD8FF, 0xFFFFD25A};
+            for (int q = 0; q < 2; q++) {
+                ItemStack out = outs[q];
+                if (out.isEmpty()) {
+                    continue;
+                }
+                float ix = W - 74 + q * 32, iy = y + 22 + lift;
+                Draw.glow(g, ix + 11, iy + 11, 16, Draw.argb(60, colors[q]));
+                Draw.rect(g, ix - 1, iy + 22, ix + 23, iy + 23, colors[q]);
+                Draw.itemAt(g, out, ix + 11, iy + 11, 20);
+                if (q == 1) {
+                    Draw.star(g, ix + 22, iy, 5, 0xFFFFE070);
+                }
+                g.pose().pushPose();
+                g.pose().translate(0, 0, 250);
+                if (out.getCount() > 1) {
+                    Component n = Component.literal(String.valueOf(out.getCount()));
+                    Draw.text(g, n, ix + 22 - Draw.width(n, .8f), iy + 14, 0xFFFFFFFF, .8f);
+                }
+                g.pose().popPose();
+                if (mx >= ix && mx < ix + 22 && my >= iy && my < iy + 22) {
+                    tip = out;
+                }
+            }
+            if (r.cooldown() > 0) {
+                Component c = Component.translatable("metier.arcanes_oublies.station.wait", seconds(r.cooldown()));
+                Draw.text(g, c, W - 16 - Draw.width(c, .8f), y + 8 + lift, 0xFFFFC060, .8f);
+            }
+        }
+        if (scroll > 0) {
+            Draw.centered(g, Component.literal("▲"), W / 2f, LIST_Y - 9, 0xFFFFFFFF, .8f);
+        }
+        if (scroll + visible < recipes.size()) {
+            Draw.centered(g, Component.literal("▼"), W / 2f, LIST_Y + visible * (CARD + GAP) - 4, 0xFFFFFFFF, .8f);
+        }
+        hoverVanilla = false;
+        if (station.vanilla()) {
+            float by = h - 26;
+            Component label = Component.translatable("metier.arcanes_oublies.station.vanilla");
+            float bw = Draw.width(label, .9f) + 30;
+            hoverVanilla = mx >= W / 2f - bw / 2 && mx < W / 2f + bw / 2 && my >= by && my < by + 18;
+            Draw.pill(g, W / 2f - bw / 2, by, W / 2f + bw / 2, by + 18, hoverVanilla ? 0xFF4A4036 : 0xFF241E1A);
+            Draw.centered(g, label, W / 2f, by + 5, hoverVanilla ? 0xFFFFF0D0 : 0xFFC8BCA8, .9f);
+        }
+        g.pose().popPose();
+        if (!tip.isEmpty()) {
+            g.renderTooltip(font, tip, mouseX, mouseY);
+        }
     }
 
     @Override

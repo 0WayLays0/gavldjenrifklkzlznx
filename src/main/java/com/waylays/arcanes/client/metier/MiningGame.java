@@ -4,77 +4,75 @@ import com.waylays.arcanes.metier.MetierNet;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mining, "points de rupture": a boulder of ore fills the play area. Its weak points light up one after the other
- * (two at once as the vein gives), each with a ring closing on it; strike the point (click) as the ring meets it. A
- * clean blow cracks the rock along the vein; a blow too early or too late barely bites; striking beside the point, or
- * letting it pass, shakes the rock: shaken too often, it caves in and the attempt is lost. A worse pick gives smaller
- * windows, faster rings and less room for error.
+ * Mining, "points de rupture": a boulder of ore sits in the gallery. Its weak points light up one after the other (two
+ * at once as the vein gives), each with a ring closing on it; strike the point as the ring meets it. A clean blow
+ * splits the rock along the vein; too early or too late barely bites; striking beside the point, or letting it pass,
+ * shakes the rock, and shaken too often it caves in. A worse pick gives smaller windows, faster rings, less room.
  */
 public class MiningGame extends MinigameScreen {
-    private static final float CX = 170, CY = 112, RX = 120, RY = 66;
-    private static final float INNER = 7, OUTER = 34;
+    private static final ResourceLocation SCENE = Draw.tex("bg_mining"), ROCK = Draw.tex("boulder"), ORE = Draw.tex("boulder_ore");
+    private static final float CX = 210, CY = 140, BW = 300, BH = 169;
+    private static final float RX = 124, RY = 64;
+    private static final float INNER = 8, OUTER = 38;
 
     private record Point(float x, float y, float born) {}
 
-    private record Debris(float x, float y, float vx, float vy, float born, int color) {}
+    private record Crack(float x, float y, float[] path, float born) {}
 
     private final int strikes;
     private final float ringTime;
     private final int maxShake;
     private final int ore;
-    private final int[][] cells;
     private final List<Point> points = new ArrayList<>();
-    private final List<float[]> cracks = new ArrayList<>();
-    private final List<Debris> debris = new ArrayList<>();
+    private final List<Crack> cracks = new ArrayList<>();
+    private final Draw.Bits bits = new Draw.Bits();
     private int spawned, done, shaken;
     private float total;
-    private float nextAt = .4f;
-    private float swingAt = -1;
+    private float nextAt = .5f;
+    private float swingAt = -1, hitAt = -1;
 
     public MiningGame(@Nullable MetierNet.Start start, double difficulty, long seed, ItemStack subject, ItemStack tool, Component heading,
                       Component sub, float perfectAt, float criticalBelow) {
-        super(start, difficulty, seed, subject, tool, List.of(), heading, sub, perfectAt, criticalBelow, 0xFF7A6A58);
+        super(start, difficulty, seed, subject, tool, List.of(), heading, sub, perfectAt, criticalBelow, 0xFF8A7458);
         this.strikes = 5 + (int) Math.round(difficulty * 1.2);
-        this.ringTime = (float) (1.3 / difficulty);
+        this.ringTime = (float) (1.35 / difficulty);
         this.maxShake = difficulty >= 1.3 ? 2 : 3;
         this.ore = oreColor(subject);
-        // The boulder: cells of stone, some of them ore
-        cells = new int[40][24];
-        for (int x = 0; x < 40; x++) {
-            for (int y = 0; y < 24; y++) {
-                float u = (x * 8 + 4 - (CX - 160)) / 320f, v = y / 24f;
-                cells[x][y] = random.nextInt(5) == 0 ? 2 : random.nextInt(3) == 0 ? 1 : 0;
-            }
-        }
     }
 
     private static int oreColor(ItemStack s) {
         String id = BuiltInRegistries.ITEM.getKey(s.getItem()).getPath();
-        if (id.contains("copper")) return 0xFFE07A40;
-        if (id.contains("iron")) return 0xFFD8B090;
+        if (id.contains("copper")) return 0xFFE88A52;
+        if (id.contains("iron")) return 0xFFE8C4A4;
         if (id.contains("gold")) return 0xFFFFD84A;
-        if (id.contains("diamond")) return 0xFF5AE8E0;
-        if (id.contains("emerald")) return 0xFF3AE070;
-        if (id.contains("redstone")) return 0xFFE02020;
-        if (id.contains("lapis")) return 0xFF3050D0;
-        if (id.contains("coal")) return 0xFF202020;
-        if (id.contains("quartz")) return 0xFFF0E8E0;
-        return 0xFFE07A40;
+        if (id.contains("diamond")) return 0xFF6AF0E8;
+        if (id.contains("emerald")) return 0xFF4AE880;
+        if (id.contains("redstone")) return 0xFFFF3A2A;
+        if (id.contains("lapis")) return 0xFF4A6AF0;
+        if (id.contains("coal")) return 0xFF3A3A3A;
+        if (id.contains("quartz")) return 0xFFF4ECE4;
+        return 0xFFE88A52;
     }
 
     @Override
-    protected List<Component> rules() {
-        return List.of(Component.translatable("metier.arcanes_oublies.mining.rule1"), Component.translatable("metier.arcanes_oublies.mining.rule2"),
-                Component.translatable("metier.arcanes_oublies.mining.rule3", maxShake));
+    protected ResourceLocation scene() {
+        return SCENE;
+    }
+
+    @Override
+    protected List<Control> controls() {
+        return List.of(control("click", "mining.ctl_strike"));
     }
 
     @Override
@@ -89,16 +87,14 @@ public class MiningGame extends MinigameScreen {
 
     @Override
     protected void update(float dt) {
-        // New weak points
         if (spawned < strikes && time >= nextAt && points.size() < 2) {
             boolean pair = spawned >= strikes / 2 && spawned + 1 < strikes && random.nextFloat() < (difficulty >= 1.2 ? .5f : .3f) && points.isEmpty();
             spawn(0);
             if (pair) {
                 spawn(ringTime * .45f);
             }
-            nextAt = time + ringTime + .35f;
+            nextAt = time + ringTime + .4f;
         }
-        // Points let pass
         for (int i = points.size() - 1; i >= 0; i--) {
             Point p = points.get(i);
             if (time - p.born() > ringTime * 1.3f) {
@@ -107,7 +103,6 @@ public class MiningGame extends MinigameScreen {
                 miss(p.x(), p.y(), Component.translatable("metier.arcanes_oublies.mining.passed"));
             }
         }
-        debris.removeIf(d -> time - d.born() > 1.2f);
         if (shaken >= maxShake) {
             finish(liveScore(), true, Component.translatable("metier.arcanes_oublies.mining.collapse"));
         } else if (done >= strikes && points.isEmpty()) {
@@ -116,14 +111,14 @@ public class MiningGame extends MinigameScreen {
     }
 
     private void spawn(float delay) {
-        for (int tries = 0; tries < 30; tries++) {
-            float x = CX + (random.nextFloat() * 2 - 1) * (RX - 26), y = CY + (random.nextFloat() * 2 - 1) * (RY - 18);
+        for (int tries = 0; tries < 40; tries++) {
+            float x = CX + (random.nextFloat() * 2 - 1) * (RX - 22), y = CY + (random.nextFloat() * 2 - 1) * (RY - 14);
             if (!inRock(x, y)) {
                 continue;
             }
             boolean clear = true;
             for (Point o : points) {
-                if (Mth.square(o.x() - x) + Mth.square(o.y() - y) < 60 * 60) {
+                if (Mth.square(o.x() - x) + Mth.square(o.y() - y) < 64 * 64) {
                     clear = false;
                 }
             }
@@ -135,7 +130,6 @@ public class MiningGame extends MinigameScreen {
         }
     }
 
-    /** The ring's radius round {@code p} now. */
     private float ring(Point p) {
         float t = (time - p.born()) / ringTime;
         return INNER + (OUTER - INNER) * (1 - t);
@@ -143,19 +137,17 @@ public class MiningGame extends MinigameScreen {
 
     private void miss(float x, float y, Component why) {
         shaken++;
-        shake(7);
+        shake(8);
         flash(why, 0xFFFF7060);
         sound(SoundEvents.GRAVEL_BREAK, .7f, .8f);
-        for (int i = 0; i < 6; i++) {
-            debris.add(new Debris(x, y, (random.nextFloat() - .5f) * 80, -random.nextFloat() * 60, time, 0xFF6A6058));
-        }
+        bits.chips(random, time, x, y, 6, 0xFF6A625A);
     }
 
     @Override
     protected void onMouseDown(double mx, double my, int button) {
         swingAt = time;
         Point best = null;
-        float bestD = 15;
+        float bestD = 16;
         for (Point p : points) {
             if (time < p.born()) {
                 continue;
@@ -174,15 +166,16 @@ public class MiningGame extends MinigameScreen {
         }
         points.remove(best);
         done++;
+        hitAt = time;
         float err = Math.abs(ring(best) - INNER);
         float q;
         Component word;
         int color;
-        if (err < 2.5f) {
+        if (err < 3f) {
             q = 1;
             word = Component.translatable("metier.arcanes_oublies.mining.clean");
             color = 0xFFFFE070;
-        } else if (err < 6.5f) {
+        } else if (err < 7.5f) {
             q = .75f;
             word = Component.translatable("metier.arcanes_oublies.mining.good");
             color = 0xFFB8E0FF;
@@ -193,81 +186,102 @@ public class MiningGame extends MinigameScreen {
         }
         total += q;
         flash(word, color);
-        shake(q >= 1 ? 4 : 2.5f);
+        shake(q >= 1 ? 5 : 3);
         sound(q >= .75f ? SoundEvents.STONE_BREAK : SoundEvents.STONE_HIT, q >= 1 ? 1.2f : .9f, .9f);
-        // A crack along the vein from the point, and chips of ore
-        float a = random.nextFloat() * Mth.TWO_PI, len = 18 + q * 30;
-        cracks.add(new float[] {best.x(), best.y(), best.x() + Mth.cos(a) * len, best.y() + Mth.sin(a) * len * .7f, q});
-        for (int i = 0; i < 6 + (int) (q * 8); i++) {
-            debris.add(new Debris(best.x(), best.y(), (random.nextFloat() - .5f) * 120, -40 - random.nextFloat() * 90, time, random.nextBoolean() ? ore : 0xFF7A7068));
+        if (q >= 1) {
+            sound(SoundEvents.AMETHYST_BLOCK_CHIME, 1.6f, .5f);
         }
+        // A crack running from the point, wandering
+        int n = 3 + (int) (q * 3);
+        float[] path = new float[n * 2 + 2];
+        float a = random.nextFloat() * Mth.TWO_PI, x = best.x(), y = best.y();
+        path[0] = x;
+        path[1] = y;
+        for (int i = 1; i <= n; i++) {
+            a += (random.nextFloat() - .5f) * 1.1f;
+            float step = 6 + random.nextFloat() * 6;
+            x += Mth.cos(a) * step;
+            y += Mth.sin(a) * step * .7f;
+            path[i * 2] = x;
+            path[i * 2 + 1] = y;
+        }
+        cracks.add(new Crack(best.x(), best.y(), path, time));
+        bits.sparks(random, time, best.x(), best.y(), 8 + (int) (q * 10), 140, 0xFFFFC070);
+        bits.chips(random, time, best.x(), best.y(), 5 + (int) (q * 6), ore);
     }
 
     @Override
-    protected void drawGame(GuiGraphics g, int mx, int my) {
-        // Cave wall
-        g.fillGradient(AX0, AY0, AX1, AY1, 0xFF201C1A, 0xFF100E0D);
-        // The boulder, cell by cell
-        for (int x = 0; x < 40; x++) {
-            for (int y = 0; y < 24; y++) {
-                float px = CX - RX + x * (RX * 2 / 40f), py = CY - RY + y * (RY * 2 / 24f);
-                float cx = px + 3, cy = py + 3;
-                if (!inRock(cx, cy)) {
-                    continue;
-                }
-                float shade = .55f + .45f * (1 - (cy - (CY - RY)) / (RY * 2)) - .15f * Math.abs((cx - CX) / RX);
-                int base = cells[x][y] == 2 ? ore : cells[x][y] == 1 ? 0xFF8A8278 : 0xFF6E675F;
-                int c = Draw.lerp(0xFF000000, base, Mth.clamp(shade, .2f, 1));
-                g.fill((int) px, (int) py, (int) (px + RX * 2 / 40f) + 1, (int) (py + RY * 2 / 24f) + 1, c);
+    protected void drawGame(GuiGraphics g, float mx, float my) {
+        // Lantern light flickering on the wall
+        float flick = .85f + .1f * Mth.sin(time * 7) + .05f * Mth.sin(time * 17);
+        Draw.glow(g, AX0 + 60, AY0 + 30, 90, Draw.argb((int) (40 * flick), 0xFFFFA040));
+        // The boulder, its shadow, its veins, glowing more as it gives
+        Draw.shadow(g, CX + 6, CY + BH * .42f, BW * 1.05f, 40, 190);
+        float hit = hitAt < 0 ? 0 : Math.max(0, 1 - (time - hitAt) * 6);
+        float bob = hit * 1.5f;
+        Draw.picture(g, ROCK, CX - BW / 2, CY - BH / 2 + bob, CX + BW / 2, CY + BH / 2 + bob, 512, 288, 0xFFFFFFFF);
+        Draw.picture(g, ORE, CX - BW / 2, CY - BH / 2 + bob, CX + BW / 2, CY + BH / 2 + bob, 512, 288, ore);
+        float shown = (float) done / Math.max(1, strikes);
+        Draw.glow(g, CX, CY, 110, Draw.argb((int) (20 + 40 * shown), ore));
+        // Cracks: dark, with a lit lip
+        for (Crack c : cracks) {
+            float grow = Math.min(1, (time - c.born()) * 8);
+            float[] p = c.path();
+            int segs = p.length / 2 - 1;
+            int drawn = Math.max(1, (int) (segs * grow));
+            for (int i = 0; i < drawn; i++) {
+                float w = 2.6f * (1 - i / (float) segs) + .6f;
+                Draw.stroke(g, p[i * 2], p[i * 2 + 1] + bob, p[i * 2 + 2], p[i * 2 + 3] + bob, w, 0xF0140F0C);
+                Draw.line(g, p[i * 2] + .6f, p[i * 2 + 1] + bob + w * .6f, p[i * 2 + 2] + .6f, p[i * 2 + 3] + bob + w * .6f, .6f, 0x50FFE6C0);
+            }
+            if (time - c.born() < .3f) {
+                Draw.glow(g, c.x(), c.y() + bob, 22, Draw.argb((int) (200 * (1 - (time - c.born()) / .3f)), 0xFFFFE0A0));
             }
         }
-        // Cracks
-        for (float[] c : cracks) {
-            Draw.line(g, c[0], c[1], c[2], c[3], 2, 0xFF141210);
-            Draw.line(g, c[0] + 1, c[1], (c[0] + c[2]) / 2 + 3, (c[1] + c[3]) / 2 - 2, 1, 0xFF262220);
-        }
-        // Weak points and their rings
+        // Weak points and their closing rings
         for (Point p : points) {
             if (time < p.born()) {
                 continue;
             }
             float r = ring(p);
-            float glow = .6f + .4f * Mth.sin(time * 14);
-            Draw.disc(g, p.x(), p.y(), INNER + 2, Draw.argb(120, ore));
-            Draw.disc(g, p.x(), p.y(), INNER - 2, Draw.argb((int) (200 + 55 * glow), 0xFFFFF0C0));
-            // The star of the crack
-            for (int k = 0; k < 4; k++) {
-                float a = k * Mth.HALF_PI + .4f;
-                Draw.line(g, p.x(), p.y(), p.x() + Mth.cos(a) * 9, p.y() + Mth.sin(a) * 9, 1, 0xFF1A1410);
-            }
+            float in = Math.min(1, (time - p.born()) * 6);
             float err = Math.abs(r - INNER);
-            int rc = err < 2.5f ? 0xFFFFE070 : err < 6.5f ? 0xFFB8E0FF : 0xFFFFFFFF;
-            Draw.ring(g, p.x(), p.y(), Math.max(1, r), 1.6f, Draw.argb(230, rc));
-            Draw.ring(g, p.x(), p.y(), INNER, 1, 0x90FFE070);
+            float pulse = .7f + .3f * Mth.sin(time * 12);
+            Draw.glow(g, p.x(), p.y(), 26 * in, Draw.argb((int) (120 * pulse), ore));
+            Draw.glow(g, p.x(), p.y(), 10 * in, Draw.argb((int) (230 * pulse), 0xFFFFF4D0));
+            Draw.disc(g, p.x(), p.y(), 2.2f * in, 0xFFFFFFFF);
+            int rc = err < 3f ? 0xFFFFE070 : err < 7.5f ? 0xFFBEE6FF : 0xFFFFFFFF;
+            Draw.ring(g, p.x(), p.y(), INNER + 1.5f, Draw.argb(110, 0xFFFFE070), true);
+            Draw.ring(g, p.x(), p.y(), Math.max(2, r), Draw.argb((int) (240 * in), rc), true);
+            if (err < 3f) {
+                Draw.glow(g, p.x(), p.y(), r + 8, Draw.argb(90, 0xFFFFE070));
+            }
         }
-        // Chips and dust
-        for (Debris d : debris) {
-            float t = time - d.born();
-            float x = d.x() + d.vx() * t, y = d.y() + d.vy() * t + 160 * t * t;
-            int a = (int) (255 * (1 - t / 1.2f));
-            g.fill((int) x - 1, (int) y - 1, (int) x + 2, (int) y + 2, Draw.argb(a, d.color()));
-        }
-        // How it holds: the strikes left and the rock's shaking
+        bits.draw(g, time);
+        // Strikes left (nuggets) and the rock's shaking (stones that crack)
+        float sx = AX0 + 16;
         for (int i = 0; i < strikes; i++) {
-            int x = AX0 + 8 + i * 9;
-            Draw.disc(g, x + 3, AY0 + 9, 3, i < done ? 0xFF5A5048 : ore);
+            boolean used = i < done;
+            Draw.disc(g, sx + i * 11, AY0 + 14, 4, used ? 0xFF3A342E : ore);
+            if (!used) {
+                Draw.disc(g, sx + i * 11 - 1.2f, AY0 + 12.8f, 1.4f, 0x90FFFFFF);
+            }
         }
-        Component hold = Component.translatable("metier.arcanes_oublies.mining.shaking");
-        Draw.text(g, hold, AX1 - 80, AY0 + 5, 0xFFE0D0C0, .7f);
         for (int i = 0; i < maxShake; i++) {
-            int x = AX1 - 20 - i * 12;
-            g.fill(x, AY0 + 14, x + 9, AY0 + 19, i < shaken ? 0xFFFF5040 : 0x60FFFFFF);
+            float x = AX1 - 18 - i * 14;
+            boolean lost = i < shaken;
+            Draw.disc(g, x, AY0 + 14, 5, lost ? 0xFFB83A2A : 0xFF5A524A);
+            if (lost) {
+                Draw.line(g, x - 3, AY0 + 11, x + 3, AY0 + 17, 1.2f, 0xFF1A0E0A);
+                Draw.line(g, x + 3, AY0 + 11, x - 3, AY0 + 17, 1.2f, 0xFF1A0E0A);
+            }
         }
         // The pick, swinging when it strikes
-        float swing = swingAt < 0 ? 0 : Mth.clamp((time - swingAt) / .18f, 0, 1);
-        float angle = -35 + (swing < 1 ? 70 * Mth.sin(swing * Mth.PI) : 0);
-        if (mx > AX0 && mx < AX1 && my > AY0 && my < AY1) {
-            Draw.itemRotated(g, tool.isEmpty() ? new ItemStack(net.minecraft.world.item.Items.IRON_PICKAXE) : tool, mx + 10, my - 10, 1.6f, angle);
+        if (inArea(mx, my)) {
+            float swing = swingAt < 0 ? 1 : Mth.clamp((time - swingAt) / .2f, 0, 1);
+            float angle = -30 + (swing < 1 ? 75 * Mth.sin(swing * Mth.PI) : 0);
+            Draw.shadow(g, mx + 6, my + 8, 26, 12, 70);
+            Draw.itemRotated(g, tool.isEmpty() ? new ItemStack(Items.IRON_PICKAXE) : tool, mx + 12, my - 10, 2.1f, angle);
         }
     }
 }

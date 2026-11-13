@@ -50,7 +50,7 @@ import java.util.function.Supplier;
 public class MetierEditorScreen extends Screen {
     private static final int GOLD = 0xFFDEB25C, GOLD_LIGHT = 0xFFFFE6A0, TEXT = 0xFFF2ECE0, DIM = 0xFFA89E8C, RED = 0xFFFF6A5A, GREEN = 0xFF8AE07A,
             BLUE = 0xFF8FD4FF, PANEL = 0xF0161210, PANEL2 = 0xC0221C18;
-    private static final int LIST_W = 136, ROW = 20;
+    private static final int LIST_W = 160, ROW = 24;
     private static final int[] GAME_COLORS = {0xFF9A8A78, 0xFF6EAA5A, 0xFF5A8EC8, 0xFFD06438, 0xFF9A6AD0};
     private static final ItemStack[] GAME_ICONS = {new ItemStack(Items.IRON_PICKAXE), new ItemStack(Items.TORCHFLOWER),
             new ItemStack(Items.CRAFTING_TABLE), new ItemStack(Items.SMITHING_TABLE), new ItemStack(Items.BREWING_STAND)};
@@ -150,8 +150,8 @@ public class MetierEditorScreen extends Screen {
 
     @Override
     protected void init() {
-        w = Math.min(width - 12, 480);
-        h = Math.min(height - 12, 310);
+        w = Math.min(width - 12, 600);
+        h = Math.min(height - 12, 400);
         left = (width - w) / 2;
         top = (height - h) / 2;
         cx0 = left + LIST_W + 12;
@@ -184,13 +184,13 @@ public class MetierEditorScreen extends Screen {
 
     private void buildList() {
         int x = left + 6, y = top + 30;
-        int rows = (h - 30 - 58) / 18;
+        int rows = (h - 30 - 64) / 21;
         listScroll = Mth.clamp(listScroll, 0, Math.max(0, config.metiers.size() - rows));
         for (int i = 0; i < rows && i + listScroll < config.metiers.size(); i++) {
             int index = i + listScroll;
             Def d = config.metiers.get(index);
             int color = GAME_COLORS[d.game.ordinal()];
-            buttons.add(new Btn(x, y + i * 18, LIST_W, 17, () -> Component.literal(d.name), () -> {
+            buttons.add(new Btn(x, y + i * 21, LIST_W, 19, () -> Component.literal(d.name), () -> {
                 selected = index;
                 recipe = 0;
                 scroll = 0;
@@ -199,16 +199,16 @@ public class MetierEditorScreen extends Screen {
                 }
                 rebuildWidgets();
             }, Component.literal(d.id).withStyle(ChatFormatting.GRAY).append("\n").append(gameName(d.game)), color, () -> selected == index));
-            icons.add(new Icon(x + 2, y + i * 18, () -> d.blocks.isEmpty() ? GAME_ICONS[d.game.ordinal()] : blockIcon(d.blocks.get(0)), null));
+            icons.add(new Icon(x + 2, y + i * 21 + 1, () -> d.blocks.isEmpty() ? GAME_ICONS[d.game.ordinal()] : blockIcon(d.blocks.get(0)), null));
         }
         int by = top + h - 56;
-        btn(x, by, 66, tr("new_deposit"), () -> change(() -> addDef(false)), tr("new_deposit.tip"));
-        btn(x + 70, by, 66, tr("new_station"), () -> change(() -> addDef(true)), tr("new_station.tip"));
-        btn(x, by + 18, 66, tr("duplicate"), () -> change(this::duplicateDef), null);
-        btn(x + 70, by + 18, 66, () -> tr("delete"), () -> change(this::deleteDef), tr("delete.tip"), RED, () -> false);
-        btn(x, by + 36, 32, Component.literal("▲"), () -> change(() -> moveDef(-1)), tr("move.tip"));
-        btn(x + 34, by + 36, 32, Component.literal("▼"), () -> change(() -> moveDef(1)), tr("move.tip"));
-        btn(x + 70, by + 36, 66, tr("defaults"), () -> change(() -> {
+        btn(x, by, 78, tr("new_deposit"), () -> change(() -> addDef(false)), tr("new_deposit.tip"));
+        btn(x + 82, by, 78, tr("new_station"), () -> change(() -> addDef(true)), tr("new_station.tip"));
+        btn(x, by + 18, 78, tr("duplicate"), () -> change(this::duplicateDef), null);
+        btn(x + 82, by + 18, 78, () -> tr("delete"), () -> change(this::deleteDef), tr("delete.tip"), RED, () -> false);
+        btn(x, by + 36, 38, Component.literal("▲"), () -> change(() -> moveDef(-1)), tr("move.tip"));
+        btn(x + 40, by + 36, 38, Component.literal("▼"), () -> change(() -> moveDef(1)), tr("move.tip"));
+        btn(x + 82, by + 36, 78, tr("defaults"), () -> change(() -> {
             config = MetierDefs.defaults();
             selected = 0;
             say(tr("defaults.done"), GOLD_LIGHT);
@@ -264,7 +264,7 @@ public class MetierEditorScreen extends Screen {
     private void label(int x, int y, Component text, int color) {
         int sy = rowY(y);
         if (sy >= 0) {
-            labels.add(new Label(x, sy + 4, text, color, .85f));
+            labels.add(new Label(x, sy + 4, text, color, 1));
         }
     }
 
@@ -387,7 +387,7 @@ public class MetierEditorScreen extends Screen {
     }
 
     private int general(Def d, int y) {
-        int lx = cx0 + 4, fx = cx0 + 150, fw = Math.min(170, cx1 - fx - 4);
+        int lx = cx0 + 4, fx = cx0 + 190, fw = Math.min(200, cx1 - fx - 4);
         heading(y, tr("identity"), GOLD_LIGHT);
         y += 18;
         label(lx, y, tr("name"), TEXT);
@@ -407,14 +407,7 @@ public class MetierEditorScreen extends Screen {
             icons.add(new Icon(lx + 154, sy, () -> GAME_ICONS[d.game.ordinal()], null));
         }
         y += ROW;
-        for (var seq : font.split(Component.translatable("metier.arcanes_oublies.game." + d.game.name().toLowerCase(Locale.ROOT) + ".desc"), cx1 - lx - 8)) {
-            int ly = rowY(y);
-            if (ly >= 0) {
-                labels.add(new Label(lx, ly + 2, Component.literal(asString(seq)), DIM, .85f));
-            }
-            y += 10;
-        }
-        y += 6;
+        y += 4;
         label(lx, y, tr("difficulty"), TEXT);
         number(fx, y, 60, () -> d.difficulty, v -> d.difficulty = v, .05, .2, 5, false, tr("difficulty.tip"));
         y += ROW;
@@ -816,10 +809,8 @@ public class MetierEditorScreen extends Screen {
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         renderTransparentBackground(g);
         g.fill(left - 3, top - 2, left + w + 4, top + h + 5, 0x70000000);
-        g.fillGradient(left, top, left + w, top + h, PANEL, 0xF00C0A08);
-        g.renderOutline(left, top, w, h, GOLD);
-        g.renderOutline(left + 1, top + 1, w - 2, h - 2, 0x607A5A22);
-        g.fillGradient(left + 2, top + 2, left + w - 2, top + 24, 0xC05A4020, 0x205A4020);
+        Draw.panel(g, left, top, left + w, top + h, 0xFF8A6438);
+        g.fillGradient(left + 1, top + 1, left + w - 1, top + 26, 0xA05A4020, 0x005A4020);
         Draw.item(g, new ItemStack(Items.SMITHING_TABLE), left + 6, top + 5, 1);
         Draw.text(g, title, left + 26, top + 6, GOLD_LIGHT, 1.1f);
         Component count = tr("count", config.metiers.size());
@@ -846,8 +837,8 @@ public class MetierEditorScreen extends Screen {
             int fill = lit ? Draw.argb(over ? 200 : 150, Draw.lerp(b.color(), 0xFF000000, .55f)) : over ? 0xC0302820 : 0x90000000;
             Draw.frame(g, b.x(), b.y(), b.x() + b.w(), b.y() + b.h(), fill, over || lit ? b.color() : Draw.argb(150, Draw.lerp(b.color(), 0xFF000000, .4f)));
             Component label = b.label().get();
-            boolean listRow = b.h() == 17;
-            float scale = .8f;
+            boolean listRow = b.h() == 19;
+            float scale = .9f;
             int maxW = (int) ((b.w() - (listRow ? 24 : 6)) / scale);
             String text = label.getString();
             if (font.width(text) > maxW) {

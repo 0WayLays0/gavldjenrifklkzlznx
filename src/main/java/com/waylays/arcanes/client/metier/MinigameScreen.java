@@ -2,14 +2,15 @@ package com.waylays.arcanes.client.metier;
 
 import com.waylays.arcanes.metier.MetierDefs;
 import com.waylays.arcanes.metier.MetierNet;
-import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -20,16 +21,22 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The frame every trade's minigame is played in: a title bar (what is worked, with what, how hard), the play area, a
- * quality gauge with the partial and perfect marks, and the countdown, the result and what came of it. A minigame
- * started from the editor is a trial: nothing is sent, nothing given.
+ * The frame every trade's minigame is played in, scaled to the screen: a header (what is worked, with what, how hard),
+ * the painted scene the game is drawn on, a quality gauge with the partial and perfect marks, the keys along the
+ * bottom; a countdown before, the result after. A minigame started from the editor is a trial: nothing is sent, nothing
+ * given.
  */
 public abstract class MinigameScreen extends Screen {
-    protected static final int W = 340, H = 226;
+    /** The window's size in its own units (it is scaled to fit the screen). */
+    protected static final int W = 420, H = 272;
     /** The play area, in the window. */
-    protected static final int AX0 = 10, AY0 = 36, AX1 = 330, AY1 = 196;
+    protected static final int AX0 = 12, AY0 = 46, AX1 = 408, AY1 = 226;
+    private static final long INTRO = 2000;
 
     private enum State {INTRO, PLAY, WAITING, RESULT}
+
+    /** A key and what it does, shown along the bottom of the scene. */
+    protected record Control(Component key, Component label) {}
 
     @Nullable
     protected final MetierNet.Start start;
@@ -39,14 +46,13 @@ public abstract class MinigameScreen extends Screen {
     protected final List<ItemStack> inputs;
     private final Component heading, subheading;
     private final float perfectAt, criticalBelow;
-    private final int theme;
+    protected final int theme;
 
     private State state = State.INTRO;
     private long stateAt = Util.getMillis();
     private long lastFrame = Util.getMillis();
     protected float time;
-    private float finalScore;
-    private boolean finalCritical;
+    private float finalScore, shownScore;
     @Nullable
     private Component reason;
     @Nullable
@@ -55,14 +61,15 @@ public abstract class MinigameScreen extends Screen {
     @Nullable
     private Component stopped;
     private long escapeAt = -10000;
-    protected int left, top;
+    /** Where the window is on screen, and its scale. */
+    protected float left, top, k = 1;
     private float shake;
-    /** A word shown over the play area for a moment (Net !, Raté…). */
     @Nullable
     private Component flash;
     private int flashColor;
     private long flashAt;
-    /** The screen to go back to (the editor, after a trial). */
+    private final Draw.Bits confetti = new Draw.Bits();
+    private float resultClock;
     @Nullable
     private Screen returnTo;
 
@@ -82,12 +89,6 @@ public abstract class MinigameScreen extends Screen {
         this.theme = theme;
     }
 
-    @Override
-    protected void init() {
-        left = (width - W) / 2;
-        top = (height - H) / 2;
-    }
-
     public MinigameScreen returnTo(@Nullable Screen screen) {
         returnTo = screen;
         return this;
@@ -96,6 +97,13 @@ public abstract class MinigameScreen extends Screen {
     @Override
     public void onClose() {
         Minecraft.getInstance().setScreen(returnTo);
+    }
+
+    @Override
+    protected void init() {
+        k = Mth.clamp(Math.min((width - 16) / (float) W, (height - 12) / (float) H), .5f, 3.2f);
+        left = (width - W * k) / 2;
+        top = (height - H * k) / 2;
     }
 
     @Override
@@ -108,19 +116,29 @@ public abstract class MinigameScreen extends Screen {
     /** Advances the game by {@code dt} seconds. */
     protected abstract void update(float dt);
 
-    /** Draws the play area (window coordinates; the mouse too). */
-    protected abstract void drawGame(GuiGraphics g, int mx, int my);
+    /** The painted scene behind the game (784 x 360). */
+    protected abstract ResourceLocation scene();
 
-    /** The rules, shown during the countdown. */
-    protected abstract List<Component> rules();
+    /** Draws the game over its scene (window units; the mouse too). */
+    protected abstract void drawGame(GuiGraphics g, float mx, float my);
+
+    /** The keys, shown along the bottom of the scene. */
+    protected abstract List<Control> controls();
 
     /** The score so far (0 to 1), for the gauge. */
     protected abstract float liveScore();
+
+    protected static Control control(String key, String label) {
+        return new Control(Component.translatable("metier.arcanes_oublies.key." + key), Component.translatable("metier.arcanes_oublies." + label));
+    }
 
     protected void onMouseDown(double mx, double my, int button) {
     }
 
     protected void onMouseUp(double mx, double my, int button) {
+    }
+
+    protected void onMouseDrag(double mx, double my, int button) {
     }
 
     protected void onKeyDown(int key) {
@@ -142,7 +160,6 @@ public abstract class MinigameScreen extends Screen {
             return;
         }
         finalScore = Mth.clamp(score, 0, 1);
-        finalCritical = critical;
         reason = why;
         setState(State.WAITING);
         if (start != null) {
@@ -151,7 +168,7 @@ public abstract class MinigameScreen extends Screen {
             practiceOutcome = critical || finalScore < criticalBelow ? 0 : finalScore >= perfectAt ? 2 : 1;
             setState(State.RESULT);
         }
-        sound(critical ? net.minecraft.sounds.SoundEvents.ITEM_BREAK : net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL.value(), critical ? .8f : 1.2f, .6f);
+        sound(critical ? SoundEvents.ITEM_BREAK : SoundEvents.NOTE_BLOCK_BELL.value(), critical ? .8f : 1.2f, .6f);
     }
 
     protected void flash(Component text, int color) {
@@ -168,9 +185,8 @@ public abstract class MinigameScreen extends Screen {
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound, pitch, volume));
     }
 
-    /** 1 at difficulty 1, more as it gets harder: {@code base * difficulty^power}. */
-    protected double hard(double base, double power) {
-        return base * Math.pow(difficulty, power);
+    protected boolean inArea(double mx, double my) {
+        return mx >= AX0 && mx < AX1 && my >= AY0 && my < AY1;
     }
 
     // ---------------------------------------------------------------- from the server
@@ -202,9 +218,19 @@ public abstract class MinigameScreen extends Screen {
     private void setState(State s) {
         state = s;
         stateAt = Util.getMillis();
+        resultClock = 0;
+    }
+
+    private int resultIndex() {
+        return Mth.clamp(outcome != null ? outcome.outcome() : practiceOutcome, 0, 2);
     }
 
     // ---------------------------------------------------------------- drawing
+
+    @Override
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        g.fillGradient(0, 0, width, height, 0x90000000, 0xB8000000);
+    }
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
@@ -212,156 +238,228 @@ public abstract class MinigameScreen extends Screen {
         long now = Util.getMillis();
         float dt = Math.min(.05f, (now - lastFrame) / 1000f);
         lastFrame = now;
-        if (state == State.INTRO && now - stateAt > 2600) {
+        if (state == State.INTRO && now - stateAt > INTRO) {
             setState(State.PLAY);
+            sound(SoundEvents.NOTE_BLOCK_PLING.value(), 1.6f, .5f);
         }
         if (state == State.PLAY) {
             time += dt;
             update(dt);
         }
-        shake = Math.max(0, shake - dt * 18);
+        if (state == State.RESULT) {
+            resultClock += dt;
+        }
+        shownScore = Mth.lerp(Math.min(1, dt * 8), shownScore, state == State.PLAY || state == State.INTRO ? liveScore() : finalScore);
+        shake = Math.max(0, shake - dt * 22);
         float sx = shake > 0 ? (random.nextFloat() - .5f) * shake : 0, sy = shake > 0 ? (random.nextFloat() - .5f) * shake : 0;
+        float mx = (mouseX - left) / k, my = (mouseY - top) / k;
         g.pose().pushPose();
-        g.pose().translate(left + sx, top + sy, 0);
-        int mx = mouseX - left, my = mouseY - top;
+        g.pose().translate(left, top, 0);
+        g.pose().scale(k, k, 1);
         drawWindow(g);
-        g.enableScissor(left + AX0, top + AY0, left + AX1, top + AY1);
-        drawGame(g, mx, my);
-        g.disableScissor();
-        drawGauge(g);
-        if (flash != null && now - flashAt < 700) {
-            float t = (now - flashAt) / 700f;
-            Draw.centered(g, flash, W / 2f, AY0 + 8 - t * 6, Draw.argb((int) (255 * (1 - t * t)), flashColor), 1.6f);
+        g.enableScissor((int) (left + AX0 * k), (int) (top + AY0 * k), (int) Math.ceil(left + AX1 * k), (int) Math.ceil(top + AY1 * k));
+        g.pose().pushPose();
+        g.pose().translate(sx, sy, 0);
+        Draw.picture(g, scene(), AX0 - 4, AY0 - 2, AX1 + 4, AY1 + 2, 784, 360, 0xFFFFFFFF);
+        drawGame(g, mx - sx, my - sy);
+        g.pose().popPose();
+        // Inner shadow along the scene's edges
+        Draw.vgrad(g, AX0, AY0, AX1, AY0 + 10, 0x70000000, 0x00000000);
+        Draw.vgrad(g, AX0, AY1 - 8, AX1, AY1, 0x00000000, 0x60000000);
+        if (state == State.PLAY) {
+            drawControls(g);
+        }
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 400);
+        if (flash != null && now - flashAt < 800) {
+            float t = (now - flashAt) / 800f;
+            float pop = .8f + .4f * Draw.back(Math.min(1, t * 5));
+            int a = (int) (255 * (1 - Math.max(0, t - .5f) * 2));
+            Draw.title(g, flash, (AX0 + AX1) / 2f, AY0 + 14 - t * 6, Draw.argb(a, flashColor), 1.5f * pop);
         }
         if (state == State.INTRO) {
             drawIntro(g, now);
         } else if (state == State.WAITING || state == State.RESULT) {
-            drawResult(g, now);
+            drawResult(g, now, dt);
         }
         if (state == State.PLAY && now - escapeAt < 2500) {
-            Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.give_up"), W / 2f, AY1 - 12, 0xFFFF7070, 1);
+            Draw.title(g, Component.translatable("metier.arcanes_oublies.game.give_up"), (AX0 + AX1) / 2f, AY1 - 34, 0xFFFF8070, 1);
         }
+        g.pose().popPose();
+        g.disableScissor();
+        drawGauge(g);
         g.pose().popPose();
     }
 
     private void drawWindow(GuiGraphics g) {
-        g.fill(-3, -2, W + 4, H + 5, 0x70000000);
-        g.fillGradient(0, 0, W, H, Draw.argb(250, Draw.lerp(theme, 0xFF000000, .55f)), Draw.argb(250, Draw.lerp(theme, 0xFF000000, .82f)));
-        g.renderOutline(0, 0, W, H, Draw.lerp(theme, 0xFFFFFFFF, .25f));
-        g.renderOutline(1, 1, W - 2, H - 2, Draw.argb(120, theme));
-        g.fillGradient(2, 2, W - 2, 30, Draw.argb(200, theme), Draw.argb(40, theme));
-        Draw.item(g, subject, 8, 7, 1.1f);
-        Draw.text(g, heading, 30, 6, 0xFFFFF4E0, 1.1f);
-        Draw.text(g, subheading, 30, 18, 0xFFD0C8B8, .75f);
+        Draw.panel(g, 0, 0, W, H, theme);
+        // Header: the theme's colour fading out, the subject, the title, the tool, the difficulty
+        Draw.vgrad(g, 1, 1, W - 1, 42, Draw.argb(140, theme), Draw.argb(0, theme));
+        Draw.glow(g, 24, 22, 24, Draw.argb(80, Draw.lerp(theme, 0xFFFFFFFF, .4f)));
+        Draw.itemAt(g, subject, 24, 22, 26);
+        Draw.text(g, heading, 46, 10, 0xFFFFF6E6, 1.35f);
+        Draw.text(g, subheading, 46, 27, Draw.lerp(theme, 0xFFFFFFFF, .7f), .85f);
+        float x = W - 14;
         if (!tool.isEmpty()) {
-            Draw.item(g, tool, W - 26, 7, 1);
+            Draw.itemAt(g, tool, x - 11, 22, 22);
+            x -= 30;
         }
-        // Difficulty, as stars
-        int stars = (int) Mth.clamp(Math.round(difficulty * 2), 1, 8);
-        Component diff = Component.translatable("metier.arcanes_oublies.game.difficulty").append(" ")
-                .append(Component.literal("★".repeat(stars)).withStyle(difficulty > 1.25 ? ChatFormatting.RED : difficulty < .9 ? ChatFormatting.GREEN : ChatFormatting.GOLD));
-        Draw.text(g, diff, W - 34 - font.width(diff) * .75f, 12, 0xFFE0D8C8, .75f);
-        Draw.frame(g, AX0 - 1, AY0 - 1, AX1 + 1, AY1 + 1, 0x50000000, Draw.argb(160, theme));
+        int pips = (int) Mth.clamp(Math.round(difficulty * 2), 1, 6);
+        int pipColor = difficulty > 1.25 ? 0xFFFF6A50 : difficulty < .9 ? 0xFF8AE07A : 0xFFFFC850;
+        for (int i = 0; i < 6; i++) {
+            float px = x - (5 - i) * 9 - 4;
+            Draw.disc(g, px, 22, 3.2f, i < pips ? pipColor : 0x38FFFFFF);
+        }
+        Draw.rect(g, AX0 - 2, AY0 - 2, AX1 + 2, AY1 + 2, Draw.argb(220, Draw.lerp(theme, 0, .7f)));
+    }
+
+    private void drawControls(GuiGraphics g) {
+        List<Control> list = controls();
+        if (list.isEmpty()) {
+            return;
+        }
+        int alpha = time < 5 ? 235 : 140;
+        float total = 0;
+        for (Control c : list) {
+            total += Math.max(14, Draw.width(c.key(), .8f) + 8) + 4 + Draw.width(c.label(), .85f) + 12;
+        }
+        float x = (AX0 + AX1) / 2f - total / 2, y = AY1 - 16;
+        Draw.vgrad(g, AX0, AY1 - 28, AX1, AY1, 0x00000000, Draw.argb(alpha / 2, 0));
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 300);
+        for (Control c : list) {
+            x += Draw.keycap(g, c.key(), c.label(), x, y, alpha);
+        }
+        g.pose().popPose();
     }
 
     private void drawGauge(GuiGraphics g) {
-        int x0 = 60, x1 = W - 60, y = AY1 + 9;
-        float s = state == State.PLAY || state == State.INTRO ? liveScore() : finalScore;
-        Draw.text(g, Component.translatable("metier.arcanes_oublies.game.quality"), 10, y - 2, 0xFFD0C8B8, .75f);
-        g.fill(x0, y, x1, y + 8, 0xA0000000);
-        int fillTo = x0 + (int) ((x1 - x0) * Mth.clamp(s, 0, 1));
-        int color = s >= perfectAt ? 0xFFFFD25A : s >= criticalBelow ? 0xFF8FD4FF : 0xFFFF6060;
-        g.fillGradient(x0, y, fillTo, y + 8, color, Draw.lerp(color, 0xFF000000, .4f));
-        g.renderOutline(x0 - 1, y - 1, x1 - x0 + 2, 10, 0xFF8A8070);
-        int pc = x0 + (int) ((x1 - x0) * perfectAt), cc = x0 + (int) ((x1 - x0) * criticalBelow);
-        g.fill(pc, y - 2, pc + 1, y + 10, 0xFFFFD25A);
-        g.fill(cc, y - 2, cc + 1, y + 10, 0xFFFF6060);
-        Component label = s >= perfectAt ? Component.translatable("metier.arcanes_oublies.outcome.perfect")
-                : s >= criticalBelow ? Component.translatable("metier.arcanes_oublies.outcome.partial") : Component.translatable("metier.arcanes_oublies.outcome.critical");
-        Draw.text(g, label, x1 + 6, y - 1, color, .75f);
+        float x0 = 76, x1 = W - 92, y = AY1 + 20;
+        float s = shownScore;
+        int color = s >= perfectAt ? 0xFFFFD25A : s >= criticalBelow ? 0xFF8FD4FF : 0xFFFF6A5A;
+        Draw.text(g, Component.translatable("metier.arcanes_oublies.game.quality"), 14, y - 1, 0xFFD8CEBC, .95f);
+        Draw.pill(g, x0 - 2, y - 2, x1 + 2, y + 10, 0xFF0C0A08);
+        Draw.pill(g, x0, y, x1, y + 8, 0xFF2A2420);
+        float fill = x0 + (x1 - x0) * Mth.clamp(s, 0, 1);
+        if (fill > x0 + 1) {
+            Draw.pill(g, x0, y, fill, y + 8, color);
+            Draw.pill(g, x0 + 2, y + 1, Math.max(x0 + 4, fill - 2), y + 3.5f, Draw.argb(100, 0xFFFFFFFF));
+            Draw.glow(g, fill, y + 4, 10, Draw.argb(110, color));
+        }
+        float pc = x0 + (x1 - x0) * perfectAt, cc = x0 + (x1 - x0) * criticalBelow;
+        Draw.rect(g, pc - .5f, y - 3, pc + .5f, y + 11, 0xFFFFD25A);
+        Draw.rect(g, cc - .5f, y - 3, cc + .5f, y + 11, 0xFFFF6A5A);
+        Draw.star(g, pc, y - 4, 6, 0xFFFFE070);
+        Component label = Component.translatable("metier.arcanes_oublies.outcome." + (s >= perfectAt ? "perfect" : s >= criticalBelow ? "partial" : "critical"));
+        Draw.text(g, label, x1 + 10, y, color, .95f);
     }
 
     private void drawIntro(GuiGraphics g, long now) {
-        float t = (now - stateAt) / 2600f;
-        g.fill(AX0, AY0, AX1, AY1, 0xC0000000);
-        int y = AY0 + 14;
-        Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.how"), W / 2f, y, 0xFFFFE6A0, 1.2f);
-        y += 18;
-        for (Component line : rules()) {
-            for (var seq : font.split(line, AX1 - AX0 - 30)) {
-                g.drawString(font, seq, AX0 + 15, y, 0xFFF0EAD8, true);
-                y += 10;
-            }
-            y += 2;
-        }
-        int count = 3 - (int) (t * 3);
-        Draw.centered(g, Component.literal(count > 0 ? String.valueOf(count) : "!"), W / 2f, AY1 - 30, 0xFFFFFFFF, 2.2f);
-        Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.esc"), W / 2f, AY1 - 10, 0xFFA09888, .75f);
+        float t = (now - stateAt) / (float) INTRO;
+        Draw.rect(g, AX0, AY0, AX1, AY1, Draw.argb((int) (150 * (1 - Math.max(0, t - .85f) / .15f)), 0));
+        float cx = (AX0 + AX1) / 2f, cy = (AY0 + AY1) / 2f + 6;
+        int n = Math.max(1, 3 - (int) (t * 3));
+        float local = (t * 3) % 1;
+        float pop = Draw.back(Math.min(1, local * 3));
+        Draw.glow(g, cx, cy, 70 * pop, Draw.argb((int) (90 * (1 - local)), theme));
+        Draw.ring(g, cx, cy, 26 + 34 * local, Draw.argb((int) (200 * (1 - local)), Draw.lerp(theme, 0xFFFFFFFF, .5f)), true);
+        Draw.centered(g, Component.literal(String.valueOf(n)), cx, cy - 13 * pop, Draw.argb((int) (255 * (1 - local * .6f)), 0xFFFFFFFF), 3.2f * pop);
+        Draw.title(g, heading, cx, AY0 + 20, 0xFFFFF0D8, 1.3f);
     }
 
-    private void drawResult(GuiGraphics g, long now) {
-        float t = Math.min(1, (now - stateAt) / 350f);
-        g.fill(AX0, AY0, AX1, AY1, Draw.argb((int) (190 * t), 0));
-        int cy = AY0 + 30;
+    private void drawResult(GuiGraphics g, long now, float dt) {
+        float t = Draw.ease((now - stateAt) / 400f);
+        Draw.rect(g, AX0, AY0, AX1, AY1, Draw.argb((int) (175 * t), 0));
+        float cx = (AX0 + AX1) / 2f, cy = (AY0 + AY1) / 2f;
         if (stopped != null) {
-            Draw.centered(g, stopped, W / 2f, cy + 20, 0xFFFF9090, 1.1f);
+            Draw.title(g, stopped, cx, cy - 6, 0xFFFF9A8A, 1.3f);
+            Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.close"), cx, AY1 - 14, 0xFFA8A090, .8f);
             return;
         }
         if (state == State.WAITING) {
-            Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.waiting"), W / 2f, cy + 20, 0xFFE0D8C8, 1);
+            for (int i = 0; i < 3; i++) {
+                float a = (now / 300f + i * .33f) % 1;
+                Draw.disc(g, cx - 12 + i * 12, cy, 3 + 2 * Mth.sin(a * Mth.PI), 0xC0FFFFFF);
+            }
             return;
         }
-        int o = outcome != null ? outcome.outcome() : practiceOutcome;
-        MetierDefs.Outcome oc = MetierDefs.Outcome.values()[Mth.clamp(o, 0, 2)];
+        MetierDefs.Outcome oc = MetierDefs.Outcome.values()[resultIndex()];
         int color = switch (oc) {
             case PERFECT -> 0xFFFFD25A;
-            case PARTIAL -> 0xFFB8E0FF;
-            case CRITICAL -> 0xFFFF5050;
+            case PARTIAL -> 0xFF9AD8FF;
+            case CRITICAL -> 0xFFFF5A4A;
         };
-        float pop = 1 + .35f * (1 - t);
-        Draw.centered(g, Component.translatable("metier.arcanes_oublies.outcome." + oc.name().toLowerCase(java.util.Locale.ROOT) + ".big"), W / 2f,
-                cy - 4, color, 2.2f * pop);
-        if (reason != null) {
-            Draw.centered(g, reason, W / 2f, cy + 22, 0xFFFFB0A0, .9f);
+        float pop = Draw.back(Math.min(1, (now - stateAt) / 450f));
+        Draw.glow(g, cx, cy - 40, 120 * pop, Draw.argb(oc == MetierDefs.Outcome.CRITICAL ? 60 : 100, color));
+        if (oc == MetierDefs.Outcome.PERFECT) {
+            if (random.nextFloat() < dt * 30) {
+                confetti.add(resultClock, cx + (random.nextFloat() - .5f) * 300, AY0 + 6, (random.nextFloat() - .5f) * 30, 20 + random.nextFloat() * 30,
+                        3f, 2.5f + random.nextFloat() * 2, Draw.hsv(.07f + random.nextFloat() * .1f, .65f, 1), 30, false);
+            }
+            for (int i = 0; i < 5; i++) {
+                float a = resultClock * .7f + i * 1.2566f;
+                Draw.star(g, cx + Mth.cos(a) * 118, cy - 40 + Mth.sin(a) * 24, 7 + 3 * Mth.sin(resultClock * 5 + i), 0xB0FFF0A0);
+            }
         }
-        Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.score", Math.round(finalScore * 100)), W / 2f, cy + 34, 0xFFD8D0C0, .85f);
+        confetti.draw(g, resultClock);
+        Draw.title(g, Component.translatable("metier.arcanes_oublies.outcome." + oc.name().toLowerCase(java.util.Locale.ROOT) + ".big"), cx, cy - 54, color,
+                2.4f * pop);
+        float y = cy - 22;
+        if (reason != null) {
+            Draw.centered(g, reason, cx, y, 0xFFFFC0B0, 1);
+            y += 13;
+        }
+        Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.score", Math.round(finalScore * 100)), cx, y, 0xFFE0D8C8, .9f);
+        y += 16;
         if (outcome != null) {
             List<ItemStack> items = outcome.items();
-            int n = items.size();
-            int x = W / 2 - n * 12;
-            for (ItemStack s : items) {
-                Draw.item(g, s, x + 4, cy + 50, 1.25f);
-                g.pose().pushPose();
-                g.pose().translate(0, 0, 300);
-                g.drawString(font, "×" + s.getCount(), x + 8, cy + 72, 0xFFFFFFFF, true);
-                g.pose().popPose();
-                x += 24;
+            float x = cx - items.size() * 17;
+            for (int i = 0; i < items.size(); i++) {
+                ItemStack s = items.get(i);
+                float it = Draw.back(Mth.clamp((now - stateAt - 250 - i * 120) / 350f, 0, 1));
+                float ix = x + i * 34 + 17;
+                Draw.glow(g, ix, y + 14, 20 * it, Draw.argb(90, color));
+                Draw.itemAt(g, s, ix, y + 14, 26 * it);
+                if (it > .5f) {
+                    g.pose().pushPose();
+                    g.pose().translate(0, 0, 250);
+                    Draw.text(g, Component.literal("×" + s.getCount()), ix + 4, y + 22, 0xFFFFFFFF, .9f);
+                    g.pose().popPose();
+                }
             }
-            if (n == 0) {
-                Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.nothing"), W / 2f, cy + 56, 0xFFA09888, 1);
+            if (items.isEmpty()) {
+                Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.nothing"), cx, y + 10, 0xFFA8A090, 1);
             }
             if (outcome.durability() > 0) {
-                Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.wear", outcome.durability()), W / 2f, cy + 86, 0xFFFF9070, .85f);
+                Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.wear", outcome.durability()), cx, y + 38, 0xFFFF9A7A, .9f);
             }
         } else {
-            Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.trial"), W / 2f, cy + 56, 0xFFA0D8FF, 1);
+            Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.trial"), cx, y + 8, 0xFFA8DCFF, 1);
         }
-        Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.close"), W / 2f, AY1 - 12, 0xFFA09888, .75f);
-        if (now - stateAt > 6000) {
+        Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.close"), cx, AY1 - 14, 0xFFA8A090, .8f);
+        if (now - stateAt > 7000) {
             onClose();
         }
     }
 
     // ---------------------------------------------------------------- input
 
+    private double ux(double mouseX) {
+        return (mouseX - left) / k;
+    }
+
+    private double uy(double mouseY) {
+        return (mouseY - top) / k;
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (state == State.RESULT && Util.getMillis() - stateAt > 600) {
+        if (state == State.RESULT && Util.getMillis() - stateAt > 700) {
             onClose();
             return true;
         }
         if (state == State.PLAY) {
-            onMouseDown(mouseX - left, mouseY - top, button);
+            onMouseDown(ux(mouseX), uy(mouseY), button);
         }
         return true;
     }
@@ -369,7 +467,15 @@ public abstract class MinigameScreen extends Screen {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (state == State.PLAY) {
-            onMouseUp(mouseX - left, mouseY - top, button);
+            onMouseUp(ux(mouseX), uy(mouseY), button);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
+        if (state == State.PLAY) {
+            onMouseDrag(ux(mouseX), uy(mouseY), button);
         }
         return true;
     }
@@ -377,7 +483,7 @@ public abstract class MinigameScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (state == State.PLAY) {
-            onScroll(mouseX - left, mouseY - top, scrollY);
+            onScroll(ux(mouseX), uy(mouseY), scrollY);
         }
         return true;
     }

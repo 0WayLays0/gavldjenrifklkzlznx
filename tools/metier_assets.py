@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Trades' art: the Alembic (a copper still on a small brick furnace: the furnace with its fire mouth, the riveted
 copper pot and dome, the swan-neck pipe down to a glass receiver holding a violet distillate), its block and item
-models, blockstate, loot table and recipe.
+models, blockstate, loot table and recipe; and the minigames' art (metier_art.py).
 
 Called by gen_assets.py (run that one). Pixel style, shaded in bands. Original art.
 """
@@ -163,6 +163,8 @@ def alembic_model():
 
 
 def main():
+    import metier_art
+    metier_art.main()
     g.save(brick_texture(), "textures/block/alembic_brick.png")
     g.save(brick_texture(front=True), "textures/block/alembic_front.png")
     g.save(copper_texture(), "textures/block/alembic_copper.png")
