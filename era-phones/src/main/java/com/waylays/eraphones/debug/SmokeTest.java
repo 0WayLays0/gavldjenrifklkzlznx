@@ -897,6 +897,7 @@ public final class SmokeTest {
         STEPS.add(() -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)));
         STEPS.add(() -> shot(mc, "pack_inventory"));
         STEPS.add(() -> {
+            mc.setScreen(null);
             mc.options.setCameraType(CameraType.FIRST_PERSON);
             server.execute(() -> {
                 ServerPlayer p = server.getPlayerList().getPlayer(id);
