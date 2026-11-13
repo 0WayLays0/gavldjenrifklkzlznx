@@ -211,7 +211,7 @@ public final class ClientSmokeTest {
                 }
             }
             case SETTLING -> {
-                if (creativeTab(mc) && musicPlayer(mc) && spellEditor(mc) && ticks >= SETTLE_TICKS) {
+                if (creativeTab(mc) && musicPlayer(mc) && spellEditor(mc) && metiers(mc) && ticks >= SETTLE_TICKS) {
                     mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
                     stage = Stage.CASTING;
                     ticks = 0;
@@ -747,6 +747,203 @@ public final class ClientSmokeTest {
         }
         return editorStep > 4;
     }
+
+    private static int metierStep;
+    private static int metierTick;
+    private static net.minecraft.core.BlockPos metierOre;
+
+    /**
+     * The trades: {@code /arcanes metiers} opens their editor (the five default trades listed); then a real round on a
+     * copper ore placed next to the player, an iron pickaxe in hand: the right click opens the mining minigame from the
+     * server, giving it up (Escape twice) is settled by the server as a critical failure, and the ore turns to
+     * cobblestone; then the four other minigames are opened as trials. Photographed with {@code metiers} in
+     * {@code arcanes.shots}. Returns whether it is done.
+     */
+    private static boolean metiers(Minecraft mc) {
+        if (metierStep > 9) {
+            return true;
+        }
+        boolean shots = SHOTS.contains("metiers");
+        try {
+            switch (metierStep) {
+                case 0 -> {
+                    mc.player.connection.sendCommand("arcanes metiers");
+                    metierTick = ticks;
+                    metierStep = 1;
+                }
+                case 1 -> {
+                    if (!(mc.screen instanceof com.waylays.arcanes.client.metier.MetierEditorScreen editor)) {
+                        if (ticks - metierTick > 100) {
+                            failures.incrementAndGet();
+                            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL /arcanes metiers did not open the trades' editor");
+                            metierStep = 10;
+                        }
+                        return false;
+                    }
+                    if (ticks - metierTick < 20) {
+                        return false;
+                    }
+                    log("trades' editor: open, {} trades", editor.trades());
+                    if (editor.trades() < 5) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the trades' editor lists {} trades, expected the 5 defaults", editor.trades());
+                    }
+                    if (shots) {
+                        screenshot(mc, "metier_editor");
+                    }
+                    editor.select(0, "world");
+                    metierTick = ticks;
+                    metierStep = 2;
+                }
+                case 2 -> {
+                    if (ticks - metierTick < 10) {
+                        return false;
+                    }
+                    if (shots) {
+                        screenshot(mc, "metier_editor_blocks");
+                    }
+                    if (mc.screen instanceof com.waylays.arcanes.client.metier.MetierEditorScreen editor) {
+                        editor.select(3, "recipes");
+                    }
+                    metierTick = ticks;
+                    metierStep = 3;
+                }
+                case 3 -> {
+                    if (ticks - metierTick < 10) {
+                        return false;
+                    }
+                    if (shots) {
+                        screenshot(mc, "metier_editor_recipes");
+                    }
+                    mc.setScreen(null);
+                    metierOre = mc.player.blockPosition().offset(2, 0, 0);
+                    mc.player.connection.sendCommand("setblock " + metierOre.getX() + " " + metierOre.getY() + " " + metierOre.getZ() + " minecraft:copper_ore");
+                    mc.player.connection.sendCommand("item replace entity @s weapon.mainhand with minecraft:iron_pickaxe");
+                    metierTick = ticks;
+                    metierStep = 4;
+                }
+                case 4 -> {
+                    if (ticks - metierTick < 20) {
+                        return false;
+                    }
+                    if (!mc.level.getBlockState(metierOre).is(net.minecraft.world.level.block.Blocks.COPPER_ORE)) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the copper ore for the trades was not placed");
+                        metierStep = 7;
+                        return false;
+                    }
+                    mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.phys.BlockHitResult(
+                            net.minecraft.world.phys.Vec3.atCenterOf(metierOre), net.minecraft.core.Direction.UP, metierOre, false));
+                    metierTick = ticks;
+                    metierStep = 5;
+                }
+                case 5 -> {
+                    if (!(mc.screen instanceof com.waylays.arcanes.client.metier.MiningGame game)) {
+                        if (ticks - metierTick > 100) {
+                            failures.incrementAndGet();
+                            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL a right click on copper ore with an iron pickaxe did not open the mining minigame");
+                            metierStep = 7;
+                        }
+                        return false;
+                    }
+                    if (ticks - metierTick < 80) {
+                        return false;
+                    }
+                    if (shots) {
+                        screenshot(mc, "metier_mining");
+                    }
+                    metierGame = game;
+                    if (!game.settled()) {
+                        // (it may already have ended by itself: the rock caves in when nobody strikes)
+                        game.keyPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE, 0, 0);
+                        game.keyPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE, 0, 0);
+                    }
+                    metierTick = ticks;
+                    metierStep = 6;
+                }
+                case 6 -> {
+                    com.waylays.arcanes.client.metier.MinigameScreen game = metierGame;
+                    if (game == null || !game.settled()) {
+                        if (ticks - metierTick > 100) {
+                            failures.incrementAndGet();
+                            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the server never settled the given-up mining minigame");
+                            metierStep = 7;
+                        }
+                        return false;
+                    }
+                    if (ticks - metierTick < 20) {
+                        return false;
+                    }
+                    if (game.outcomeOrdinal() != com.waylays.arcanes.metier.MetierDefs.Outcome.CRITICAL.ordinal()) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL giving up the minigame was settled as {}, not a critical failure", game.outcomeOrdinal());
+                    } else if (!mc.level.getBlockState(metierOre).is(net.minecraft.world.level.block.Blocks.COBBLESTONE)) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the worked copper ore did not turn to cobblestone ({})", mc.level.getBlockState(metierOre));
+                    } else {
+                        log("trades: a mining round given up was a critical failure, the ore turned to cobblestone");
+                    }
+                    if (shots) {
+                        screenshot(mc, "metier_mining_result");
+                    }
+                    mc.setScreen(null);
+                    mc.player.connection.sendCommand("arcanes metiers regenerer");
+                    metierStep = 7;
+                }
+                default -> {
+                    // The other minigames, as trials: steps 7, 8 (each opened, played a moment, photographed)
+                    com.waylays.arcanes.metier.MetierDefs.Game[] others = {com.waylays.arcanes.metier.MetierDefs.Game.HARVEST,
+                            com.waylays.arcanes.metier.MetierDefs.Game.ASSEMBLY, com.waylays.arcanes.metier.MetierDefs.Game.FORGE,
+                            com.waylays.arcanes.metier.MetierDefs.Game.DISTILL};
+                    int index = metierTrial;
+                    if (index >= others.length) {
+                        mc.setScreen(null);
+                        metierStep = 10;
+                        return true;
+                    }
+                    if (metierStep == 7) {
+                        net.minecraft.world.item.ItemStack[] subjects = {new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TORCHFLOWER),
+                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN),
+                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD),
+                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.POTION)};
+                        List<net.minecraft.world.item.ItemStack> inputs = List.of(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_NUGGET, 8),
+                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TORCH));
+                        mc.setScreen(com.waylays.arcanes.client.metier.MetierClient.create(others[index], null, 1, 42L + index, subjects[index],
+                                net.minecraft.world.item.ItemStack.EMPTY, inputs, net.minecraft.network.chat.Component.literal("Smoke test"),
+                                net.minecraft.network.chat.Component.literal(others[index].name()), .8f, .25f));
+                        metierTick = ticks;
+                        metierStep = 8;
+                        return false;
+                    }
+                    if (ticks - metierTick < 80) {
+                        return false;
+                    }
+                    if (!(mc.screen instanceof com.waylays.arcanes.client.metier.MinigameScreen)) {
+                        failures.incrementAndGet();
+                        ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the {} minigame's trial closed by itself", others[index]);
+                    } else {
+                        log("trades: the {} minigame runs", others[index]);
+                        if (shots) {
+                            screenshot(mc, "metier_" + others[index].name().toLowerCase(java.util.Locale.ROOT));
+                        }
+                    }
+                    mc.setScreen(null);
+                    metierTrial++;
+                    metierStep = 7;
+                }
+            }
+        } catch (Throwable t) {
+            failures.incrementAndGet();
+            StackTraceElement where = java.util.Arrays.stream(t.getStackTrace()).filter(f -> f.getClassName().startsWith("com.waylays.")).findFirst().orElse(null);
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL the trades: {}{}", t, where != null ? " at " + where : "", t);
+            mc.setScreen(null);
+            metierStep = 10;
+        }
+        return metierStep > 9;
+    }
+
+    private static int metierTrial;
+    private static com.waylays.arcanes.client.metier.MinigameScreen metierGame;
 
     /**
      * The addon's scrolls are Iron's scroll recoloured by the game (tools/scroll_assets.py): every colour of Iron's

@@ -108,6 +108,8 @@ public final class ModItems {
     /** The Altar of Rites (see AltarOfRitesBlock). */
     public static final DeferredHolder<Item, Item> ALTAR_OF_RITES = ITEMS.register("altar_of_rites",
             () -> new net.minecraft.world.item.BlockItem(ModBlocks.ALTAR_OF_RITES.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredHolder<Item, Item> ALEMBIC = ITEMS.register("alembic",
+            () -> new net.minecraft.world.item.BlockItem(ModBlocks.ALEMBIC.get(), new Item.Properties()));
 
     private ModItems() {}
 

@@ -19,5 +19,10 @@ public final class ModBlocks {
             () -> new AltarOfRitesBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).strength(3.5f, 9).sound(SoundType.DEEPSLATE_TILES)
                     .lightLevel(state -> 7).noOcclusion()));
 
+    /** The Alembic: the alchemists' and healers' station (its recipes set in the trades' editor). */
+    public static final DeferredHolder<Block, Block> ALEMBIC = BLOCKS.register("alembic",
+            () -> new com.waylays.arcanes.metier.AlembicBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2.5f, 6)
+                    .sound(SoundType.COPPER).lightLevel(state -> 5).noOcclusion()));
+
     private ModBlocks() {}
 }
