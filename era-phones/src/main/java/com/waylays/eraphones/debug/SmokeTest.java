@@ -364,13 +364,6 @@ public final class SmokeTest {
         STEPS.add(() -> shot(mc, "gear_vcr"));
         STEPS.add(() -> {
             mc.setScreen(null);
-            select(mc, 7);
-            com.waylays.eraphones.gear.client.GearClient.card(new com.waylays.eraphones.gear.GearNet.Card(mc.player.getUUID().toString(),
-                    "Thomas Hale", "412-63-1980", "Grand, mince, cheveux roux, bégaie un peu quand il a peur.", ""));
-        });
-        STEPS.add(() -> shot(mc, "gear_card"));
-        STEPS.add(() -> {
-            mc.setScreen(null);
             select(mc, 8);
             ItemStack paper = mc.player.getMainHandItem();
             com.waylays.eraphones.gear.client.GearClient.openNewspaper(
