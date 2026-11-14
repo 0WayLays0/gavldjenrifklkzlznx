@@ -32,6 +32,9 @@ public final class EraPhones {
         com.waylays.eraphones.arms.Arms.init();
         com.waylays.eraphones.compat.Net.open(PhoneNet::register);
         net.minecraftforge.fml.ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, com.waylays.eraphones.rp.RpConfig.SPEC);
+        if (net.minecraftforge.fml.loading.FMLEnvironment.dist.isClient()) {
+            com.waylays.eraphones.client.EmoteInstaller.install();
+        }
     }
 
     public static ResourceLocation id(String path) {

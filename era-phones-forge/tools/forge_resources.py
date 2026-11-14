@@ -3,7 +3,8 @@ its generator): the same models, textures, sounds and languages, with what 1.20.
 - data folders in the plural (loot_tables, recipes, structures, tags/items, tags/blocks);
 - a recipe's result {"item": ...} (1.21: {"id": ...});
 - the loader's own keys: forge_data, forge:separate_transforms (1.21: neoforge_...).
-Run after era-phones/tools/gen_assets.py; it rewrites era-phones-forge/src/main/resources/{assets,data}."""
+Run after era-phones/tools/gen_assets.py; it writes era-phones-forge/src/main/resources/{assets,data} over what is there.
+The clown emotes (era-phones/emotes) go into the jar too."""
 import json
 import os
 import shutil
@@ -35,10 +36,8 @@ def fix_json(rel, data):
 
 
 def main():
-    for top in ("assets", "data"):
-        out = os.path.join(DST, top)
-        if os.path.isdir(out):
-            shutil.rmtree(out)
+    # Nothing is deleted first: the Forge 1.20.1 build keeps the role play, the horror tools and the objects the
+    # NeoForge build has given up (or moved to Arcanes Oubliés), so their files stay here as they are
     count = 0
     for top in ("assets", "data"):
         for root, _, files in os.walk(os.path.join(SRC, top)):
@@ -55,6 +54,14 @@ def main():
                 else:
                     shutil.copyfile(src, dst)
                 count += 1
+    # The clown emotes, carried in the jar: the mod puts them in the game's emotes folder (client/EmoteInstaller)
+    emotes = os.path.join(HERE, "..", "..", "era-phones", "emotes")
+    out = os.path.join(DST, "assets", "eraphones", "emotes")
+    os.makedirs(out, exist_ok=True)
+    for f in sorted(os.listdir(emotes)):
+        if f.endswith((".json", ".png")):
+            shutil.copyfile(os.path.join(emotes, f), os.path.join(out, f))
+            count += 1
     print(f"{count} resources written for Forge 1.20.1")
 
 
