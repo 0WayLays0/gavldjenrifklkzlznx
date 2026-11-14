@@ -12,6 +12,9 @@ description='''${mod_description}'''
 [[accessTransformers]]
 file="META-INF/accesstransformer.cfg"
 
+[[mixins]]
+config="arcanes_oublies.mixins.json"
+
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"
@@ -31,4 +34,11 @@ file="META-INF/accesstransformer.cfg"
     type="required"
     versionRange="${irons_spells_version_range}"
     ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="voicechat"
+    type="optional"
+    versionRange="*"
+    ordering="NONE"
     side="BOTH"

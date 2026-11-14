@@ -1,4 +1,4 @@
-"""The game masters' horror pictures (original art, drawn here): the red balloon that floats in the world (64 x 128, its
+"""The game masters' horror pictures (original art, drawn here, first for Époque RP): the red balloon that floats in the world (64 x 12
 string included) and the blood at the edges of the sight (a veil, a spatter, runs)."""
 import math
 

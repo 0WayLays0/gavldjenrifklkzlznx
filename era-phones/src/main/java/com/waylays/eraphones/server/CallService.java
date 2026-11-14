@@ -193,7 +193,9 @@ public final class CallService {
         if (c == null || !c.talking || text.isEmpty()) {
             return;
         }
-        com.waylays.eraphones.rp.RpService.say(p, text.length() > 256 ? text.substring(0, 256) : text);
+        text = text.length() > 256 ? text.substring(0, 256) : text;
+        Speech.aloud(p, text);
+        relay(p, text);
     }
 
     /** Passes what {@code p} just said to the other end of their call, if they are talking on one. */

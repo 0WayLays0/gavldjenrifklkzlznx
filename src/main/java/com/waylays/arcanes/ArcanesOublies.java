@@ -38,6 +38,9 @@ public class ArcanesOublies {
         ModEffects.EFFECTS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
         container.registerConfig(ModConfig.Type.SERVER, ArcanesConfig.SPEC);
+        // The role play and the game masters' tools (once part of Époque RP)
+        com.waylays.arcanes.rp.RpRegistry.register(modBus);
+        container.registerConfig(ModConfig.Type.SERVER, com.waylays.arcanes.rp.RpConfig.SPEC, MODID + "-roleplay-server.toml");
         modBus.addListener(ArcanesNetwork::register);
     }
 

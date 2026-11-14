@@ -2,7 +2,7 @@ package com.waylays.eraphones.gear;
 
 import com.waylays.eraphones.EraPhones;
 import com.waylays.eraphones.registry.GearRegistry;
-import com.waylays.eraphones.rp.RpConfig;
+import com.waylays.eraphones.EraConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -56,7 +56,7 @@ public final class TapeNet {
     }
 
     public static boolean staff(ServerPlayer p) {
-        return p.hasPermissions(RpConfig.get(RpConfig.HORROR_PERMISSION, 2));
+        return p.hasPermissions(EraConfig.staffPermission());
     }
 
     /** A blank cassette used by {@code p}: a game master gets the recording screen, anyone else is told what it is. */

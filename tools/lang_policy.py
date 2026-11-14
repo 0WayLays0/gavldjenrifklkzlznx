@@ -14,7 +14,9 @@ import os
 LANG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources", "assets", "arcanes_oublies", "lang")
 
 # Interface: French everywhere
-INTERFACE = ("metier.", "gui.", "itemGroup.", "key.", "ui.arcanes_oublies.editor.", "ui.arcanes_oublies.music.", "ui.arcanes_oublies.altar.")
+INTERFACE = ("metier.", "gui.", "itemGroup.", "key.", "ui.arcanes_oublies.editor.", "ui.arcanes_oublies.music.", "ui.arcanes_oublies.altar.",
+             # The role play and the game masters' tools (from Époque RP): all French
+             "rp.", "arms.", "event.", "carry.", "body.", "size.", "entity.arcanes_oublies.ecriture")
 # Interface keys whose French text needs a tweak once the content around them is English
 OVERRIDES = {"gui.arcanes_oublies.creative.heat": "Starfire %s (%s)"}
 

@@ -58,7 +58,7 @@ public final class PhoneNet {
         r.playToClient(CallState.TYPE, CallState.CODEC, (p, c) -> PhoneClient.callState(p));
         r.playToClient(CallLine.TYPE, CallLine.CODEC, (p, c) -> PhoneClient.callLine(p));
         r.playToClient(Haunt.TYPE, Haunt.CODEC, (p, c) -> PhoneClient.haunt(p));
-        com.waylays.eraphones.rp.RpNet.register(r);
+        com.waylays.eraphones.gear.GearNet.register(r);
     }
 
     private static void server(IPayloadContext context, java.util.function.Consumer<ServerPlayer> handler) {

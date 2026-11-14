@@ -149,7 +149,7 @@ public final class CamNet {
             return false;
         }
         tape.set(GearRegistry.TAPE.get(), file);
-        tape.set(GearRegistry.TAPE_LABEL.get(), "VHS · " + com.waylays.eraphones.rp.RpService.name(p));
+        tape.set(GearRegistry.TAPE_LABEL.get(), "VHS · " + com.waylays.eraphones.EraConfig.name(p));
         p.level().playSound(null, p.blockPosition(), SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.PLAYERS, .4f, 1.9f);
         PacketDistributor.sendToPlayer(p, new Rec(true));
         return true;

@@ -141,6 +141,7 @@ public final class ClientSetup {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.GOLD_BOLT.get(), GoldBoltRenderer::new);
+        event.registerEntityRenderer(com.waylays.arcanes.rp.RpRegistry.WRITING.get(), com.waylays.arcanes.rp.horror.client.WritingRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLDFALL_INGOT.get(), GoldfallIngotRenderer::new);
         event.registerEntityRenderer(ModEntities.MOLTEN_GOLD_BLOB.get(), MoltenGoldBlobRenderer::new);
         event.registerEntityRenderer(ModEntities.GILDED_CHAINS.get(), GildedChainsRenderer::new);

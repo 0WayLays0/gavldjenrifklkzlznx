@@ -211,7 +211,7 @@ public final class ClientSmokeTest {
                 }
             }
             case SETTLING -> {
-                if (creativeTab(mc) && musicPlayer(mc) && spellEditor(mc) && metiers(mc) && ticks >= SETTLE_TICKS) {
+                if (creativeTab(mc) && musicPlayer(mc) && spellEditor(mc) && metiers(mc) && roleplay(mc) && ticks >= SETTLE_TICKS) {
                     mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
                     stage = Stage.CASTING;
                     ticks = 0;
@@ -664,6 +664,14 @@ public final class ClientSmokeTest {
      * change sent from it (a cooldown in Iron's config, a base mana of the editor's own) must reach the spell, and
      * taking it off must give the spell its own values back. Returns whether it is done.
      */
+    /** The role play and the game masters' tools (see {@link RoleplaySmoke}). */
+    private static boolean roleplay(Minecraft mc) {
+        return RoleplaySmoke.run(mc, ticks, msg -> {
+            failures.incrementAndGet();
+            ArcanesOublies.LOGGER.error("[SmokeTest] FAIL {}", msg);
+        });
+    }
+
     private static boolean spellEditor(Minecraft mc) {
         if (editorStep > 4) {
             return true;

@@ -6,7 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.waylays.eraphones.registry.GearRegistry;
-import com.waylays.eraphones.rp.RpConfig;
+import com.waylays.eraphones.EraConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -26,19 +26,19 @@ public final class GearCommands {
     private GearCommands() {}
 
     public static void register(CommandDispatcher<CommandSourceStack> d) {
-        d.register(Commands.literal("cassette").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+        d.register(Commands.literal("cassette").requires(s -> s.hasPermission(EraConfig.staffPermission()))
                 .then(Commands.literal("liste").executes(GearCommands::tapes))
                 .then(Commands.literal("graver").then(Commands.argument("fichier", StringArgumentType.string())
                         .suggests((c, b) -> SharedSuggestionProvider.suggest(Tape.files().stream().map(f -> f.contains(" ") ? "\"" + f + "\"" : f), b))
                         .then(Commands.argument("titre", StringArgumentType.greedyString()).executes(GearCommands::record)))));
-        d.register(Commands.literal("radio").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+        d.register(Commands.literal("radio").requires(s -> s.hasPermission(EraConfig.staffPermission()))
                 .then(Commands.literal("emettre").then(Commands.argument("frequence", StringArgumentType.word()).executes(GearCommands::onAir)))
                 .then(Commands.literal("arreter").executes(c -> {
                     Stations.set(c.getSource().getServer(), c.getSource().getPlayerOrException().getUUID(), null);
                     c.getSource().sendSuccess(() -> Component.translatable("gear.eraphones.off_air").withStyle(ChatFormatting.GRAY), false);
                     return 1;
                 })));
-        d.register(Commands.literal("lampe").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+        d.register(Commands.literal("lampe").requires(s -> s.hasPermission(EraConfig.staffPermission()))
                 .then(Commands.argument("joueurs", EntityArgument.players())
                         .then(Commands.literal("eteindre").executes(c -> torches(c, "eteindre", 0)))
                         .then(Commands.literal("clignoter").executes(c -> torches(c, "clignoter", 10))
@@ -46,7 +46,7 @@ public final class GearCommands {
                                         .executes(c -> torches(c, "clignoter", IntegerArgumentType.getInteger(c, "secondes")))))
                         .then(Commands.literal("casser").executes(c -> torches(c, "casser", 0)))
                         .then(Commands.literal("reparer").executes(c -> torches(c, "reparer", 0)))));
-        d.register(Commands.literal("journal").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+        d.register(Commands.literal("journal").requires(s -> s.hasPermission(EraConfig.staffPermission()))
                 .then(Commands.literal("imprimer").then(Commands.argument("exemplaires", IntegerArgumentType.integer(1, 64))
                         .then(Commands.argument("article", StringArgumentType.greedyString()).executes(GearCommands::print)))));
     }

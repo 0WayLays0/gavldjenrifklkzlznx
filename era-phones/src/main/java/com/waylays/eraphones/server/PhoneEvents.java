@@ -169,5 +169,19 @@ public final class PhoneEvents {
     @SubscribeEvent
     public static void onCommands(RegisterCommandsEvent event) {
         PhoneCommands.register(event.getDispatcher());
+        com.waylays.eraphones.gear.GearCommands.register(event.getDispatcher());
+        TriggerHooks.register(event.getDispatcher());
+    }
+
+    /**
+     * What a player says in the chat while talking on the phone reaches the other end too (heard first, before a
+     * role play mod, Arcanes Oubliés, turns the chat into speech around the speaker).
+     */
+    @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.HIGHEST)
+    public static void onChat(net.neoforged.neoforge.event.ServerChatEvent event) {
+        String text = event.getRawText().strip();
+        if (!text.isEmpty()) {
+            CallService.relay(event.getPlayer(), text.length() > 256 ? text.substring(0, 256) : text);
+        }
     }
 }

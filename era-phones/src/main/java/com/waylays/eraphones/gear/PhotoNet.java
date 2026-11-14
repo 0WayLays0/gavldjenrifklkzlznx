@@ -44,7 +44,7 @@ public final class PhotoNet {
         ItemStack photo = new ItemStack(GearRegistry.PHOTOGRAPH.get());
         photo.set(GearRegistry.PHOTO.get(), new Picture(t.data()));
         photo.set(GearRegistry.PHOTO_TIME.get(), p.level().getGameTime());
-        photo.set(GearRegistry.PHOTO_BY.get(), com.waylays.eraphones.rp.RpService.name(p));
+        photo.set(GearRegistry.PHOTO_BY.get(), com.waylays.eraphones.EraConfig.name(p));
         if (p.getInventory().add(photo)) {
             last = "printed into the inventory";
         } else {

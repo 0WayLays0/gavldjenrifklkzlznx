@@ -2,11 +2,20 @@
 
 Mod NeoForge 1.21.1 **séparé** (son propre `.jar`, `epoque-rp-<version>.jar`, sans Arcanes Oubliés ni Iron's Spells)
 pour un serveur de jeu de rôle : téléphones d'époque, objets du quotidien des années 80 (lampe torche, talkie-walkie,
-poste de radio, magnétoscope et cassettes, journal), commandes de RP et outils des maîtres
-du jeu. L'identifiant interne du mod reste `eraphones` : les objets déjà dans les mondes sont conservés. Tout reste dans le personnage : on ne voit jamais un pseudo
+poste de radio, magnétoscope et cassettes, journal), et commandes des maîtres
+du jeu pour ces objets. L'identifiant interne du mod reste `eraphones` : les objets déjà dans les mondes sont conservés. Tout reste dans le personnage : on ne voit jamais un pseudo
 de compte, seulement des numéros, les noms enregistrés dans les répertoires et les noms des personnages.
 
 Contenu original (noms, modèles, sonneries, icônes) : aucune marque réelle ; l'opérateur fictif s'appelle **VOXA**.
+
+**Le jeu de rôle et les outils d'horreur sont dans Arcanes Oubliés** depuis la version 1.6.0 : `/setname`, `/me`, `/do`,
+`/roll`, `/try`, `/chuchoter`, `/crier`, `/hrp`, `/desc`, `/examiner`, `/voir`, `/pseudos`, `/rp`, `/narration…`,
+`/horreur`, `/peur`, `/ecrire`, `/voix`, `/declencheur`, `/taille`, `/vitesse`, `/hp`, `/porter` et `/arme`. Avec les
+deux mods, les noms des personnages s'affichent aussi sur les photos, cassettes et feuilles, ce qu'on dit au
+téléphone passe par le chat local d'Arcanes, et les déclencheurs de zone peuvent couper le courant, casser une lampe
+torche ou envoyer un SMS. Les noms, tailles, PV, vitesses, la jauge de peur et les déclencheurs d'un monde déjà
+joué sont repris tels quels. Les effets % posés par l'atelier d'armes d'avant sont gardés sur les objets mais ne font
+plus rien : il faut les reposer avec `/arme`.
 
 ## Le menu créatif
 
@@ -48,82 +57,17 @@ Les coupures ne survivent pas à un redémarrage du serveur.
 
 | Commande | Effet |
 | --- | --- |
-| `/narration <texte>` | Narration sur l'écran de tous les joueurs (bandes noires de cinéma, texte qui s'écrit) et dans leur chat. |
-| `/narrationalone <joueurs> <texte>` | La même chose pour un seul joueur (ou ceux choisis). |
-| `/narrationchat <texte>` | Narration seulement dans le chat de tous (rien à l'écran). |
-| `/narrationchatalone <joueurs> <texte>` | Pareil, pour un ou quelques joueurs. |
 | `/cassette liste` | Les fichiers MP3 disponibles sur le serveur (`config/eraphones/cassettes/`, où arrivent aussi ceux gravés depuis le jeu). |
 | `/cassette graver <fichier> <titre>` | Donne une cassette de ce fichier, avec ce titre sur l'étiquette. Elle ne peut plus être modifiée. |
 | `/radio emettre <fréquence>` · `/radio arreter` | Passer à l'antenne sur une fréquence (ta voix sort des radios réglées dessus), ou s'arrêter. |
 | `/lampe <joueurs> eteindre` · `clignoter [secondes]` · `casser` · `reparer` | Éteindre leurs lampes torches, les faire clignoter (10 s par défaut, avec de petits grésillements), les casser (elles ne s'allument plus, « Cassée » dans la description) ou les réparer. |
 | `/journal imprimer <exemplaires> Titre \| texte` | Imprime le journal (jusqu'à 64 exemplaires). |
 
-## Outils d'événement
-
-Des outils faits pour un grand événement d'horreur en ville, pensés pour un maître du jeu **seul**.
-
-| Chose | Comment ça marche |
-|---|---|
-| `/me ferme les yeux` | Dans un `/me`, « ferme les yeux » (ou « ferme ses yeux », « closes his eyes »…) ferme les yeux du joueur sur son écran : les paupières descendent, tout est noir pendant 6 s, puis elles se rouvrent avec un clignement. Les maîtres du jeu reçoivent « X ferme les yeux » dans le chat. |
-
-### Déclencheurs de zone : `/declencheur`
-
-Une zone invisible ; quand un joueur y entre, ce qui a été prévu lui arrive tout seul. Les joueurs en créatif ou en spectateur ne déclenchent rien (le maître du jeu peut construire tranquille). Gardé avec le monde.
-
-1. `/declencheur pos1` puis `/declencheur pos2` : les deux coins (là où tu es, ou `pos1 x y z`).
-2. `/declencheur creer <nom>` : la zone (affichée en poussière rouge pendant 10 s).
-3. `/declencheur action <nom> ...`, autant de fois que voulu, dans l'ordre :
-   - `son <son>` (derrière le joueur), `ballon`, `yeux`, `lampe` (sa lampe torche casse) ;
-   - `brouillard | coupure | sang | peur | tremblement | flotter [secondes]` ;
-   - `murmure <texte>`, `narration <texte>` ;
-   - `panne <rayon> <secondes>` ou `clignote <rayon> <secondes>` (le quartier autour de la zone) ;
-   - `sms <numéro|inconnu> <texte>` (sur le téléphone qu'il porte) ;
-   - `commande <commande>` (n'importe quelle commande ; `{joueur}` = son pseudo, `@s` = lui) ;
-   - `attendre <secondes>` : une pause avant la suite.
-4. `/declencheur mode <nom> une_fois | chaque_joueur | toujours [secondes entre deux]` (par défaut : une seule fois).
-5. `/declencheur tester <nom> [joueur]`, `liste`, `info <nom>`, `montrer [secondes]` (voir les zones), `actif <nom> true|false`, `reset <nom>` (pour qu'il se relance), `vider <nom>`, `supprimer <nom>`.
-
-Exemple : `/declencheur action ruelle son rire`, `/declencheur action ruelle attendre 3`, `/declencheur action ruelle ballon`.
-
-**Important :** les joueurs en **créatif** ou spectateur ne déclenchent rien (pour que le staff puisse circuler). Pour essayer une zone toi-même : `/declencheur moi` (tu la déclenches même en créatif ; à nouveau pour arrêter), ou `/declencheur tester <nom>`, ou passe en survie. En mode `une_fois`, la zone ne part qu'une fois : `reset <nom>` pour la réarmer. Quand une zone part, le staff le voit au-dessus de sa barre (« Déclencheur X lancé par Y »).
-
 ## Baladeur et casque
 
 Un **baladeur** à cassette (onglet Son & image) : une cassette dedans à la fois. Clic droit : lecture ou pause. La musique n'est entendue **que par celui qui l'écoute** (dans son casque, avec Simple Voice Chat), et elle continue tant que le baladeur est sur lui (en main ou dans sa barre). Pendant l'écoute, les autres voient un **casque à mousse orange** sur sa tête. Pour mettre une cassette : cassette dans l'autre main + clic droit (l'ancienne revient dans cette main), ou dans l'inventaire, clic droit avec la cassette sur le baladeur. Accroupi + clic droit (ou clic droit à vide sur lui dans l'inventaire) : la cassette sort. La cassette garde l'endroit où elle s'est arrêtée ; arrivée au bout, elle repart du début. On voit la cassette à travers la vitre du baladeur.
 
-## Taille des joueurs : `/taille`
-
-`/taille <joueurs> <cm>` (de 50 à 400 cm, 180 = normal), `/taille <joueurs> normale`, `/taille` (sa propre taille, pour tout le monde). Tout suit la taille : le corps dessiné, la hitbox, la hauteur des yeux (donc ce qu'on voit), la caméra à la 3e personne, la portée des mains, la marche qu'on peut monter, un peu la vitesse et le saut, la chute sans se blesser. Gardé même après la mort et la déconnexion. Permission : comme `/horreur`.
-
-## Outils du staff (lot 2)
-
-### Atelier d'armes : `/arme`
-Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme`. L'atelier s'ouvre : l'objet en haut, quatre onglets, et à droite l'**aperçu** de l'objet tel qu'il sera (nom, lore, stats, effets), mis à jour pendant que tu écris.
-- **Général** : son nom, incassable, brillance. Pastilles de couleur : un clic ajoute le code (`&c` rouge, `&6` or…), plus `&l` gras, `&o` italique, `&n` souligné, `&r` normal.
-- **Lore** : une grande zone de texte, jusqu'à **16 lignes** (Entrée pour changer de ligne), avec les mêmes pastilles de couleur.
-- **Stats** : dégâts, vitesse d'attaque (comme affichés sous l'objet : une main nue = 1 et 4), armure, robustesse, résistance au recul, vitesse (%), PV max (+), portée (+). Une case vide = rien.
-- **Effets %** : jusqu'à 8 lignes. Pour chacune :
-  - **Quand** : *Frappe* (quand celui qui le tient tape) ou *Défense* (quand celui qui le porte ou le tient est touché) ;
-  - **l'effet** : clic dessus ouvre la liste de **tous les effets du jeu et de tous les mods installés**, avec leur icône, qu'on fait défiler à la molette, et une **barre de recherche** (Entrée prend le premier). En tête, les actions de l'atelier : enflamme, foudre, recul, vol de vie, dégâts ±, épines, soin, gel ;
-  - **Sur** : *Autre* (celui qu'on frappe, ou celui qui nous frappe) ou *Soi* ;
-  - la **chance en %**, la **force** (niveau de l'effet, ou points, ou % pour le vol de vie), les **secondes**.
-  - Sous l'objet : « ✦ 5 % en frappant → l'autre : Poison II (5 s) ».
-
-### Porter quelqu'un
-Accroupi + clic droit main vide sur un joueur : il est tout de suite porté dans les bras (sans demande), allongé, devant le porteur, qui marche plus lentement. Accroupi + clic droit main vide (ou `/porter lacher`) : on le pose. Le porté descend en s'accroupissant. Staff : `/porter <porteur> <porté>`.
-
-### `/vitesse` et `/hp`
-`/vitesse <joueurs> <fois>` (1 = normal, 0.5 = moitié, 2 = double) ou `normale`. `/hp <joueurs> <points>` (20 = normal = 10 cœurs) ou `normal`. Gardés après la mort et la déconnexion. Les **effets** qu'un joueur a quand il meurt (donnés par `/effect` ou autrement) lui sont rendus quand il réapparaît, avec le temps qui leur restait.
-
-## Jauge de peur, photos épinglées, emotes
-
-### Jauge de peur : `/peur jauge`
-Chaque joueur a une peur de 0 à 100 %. Elle **monte** dans le noir (une lampe torche allumée, une torche ou une lanterne en main comptent comme de la lumière), seul, la nuit dehors, blessé, avec des monstres autour, et d'un coup quand le staff lui envoie quelque chose (`/horreur` sons, murmure, coupure, sang, ballon, `/peur`, coups reçus). Elle **descend** à la lumière et à plusieurs. À partir d'un tiers : le cœur bat, de plus en plus vite, les bords de l'écran s'assombrissent au rythme du cœur ; au-delà des deux tiers : la vue tremble et se brouille un peu. Un petit cœur et un tracé de moniteur en bas à gauche la montrent.
-**Le staff** (ceux qui peuvent utiliser `/horreur`), et les joueurs en créatif ou spectateur, **ne ressentent rien**.
-- `/peur jauge on` / `/peur jauge off` : l'active ou la coupe pour tout le serveur (gardé avec le monde) ;
-- `/peur jauge` ou `/peur jauge info` : l'état, et la peur de chaque joueur ;
-- `/peur jauge <joueurs> <0-100>` : la régler à la main.
-- `/peur jauge test` : **toi (staff), tu la ressens comme un joueur** pour l'essayer (à nouveau : arrêter) ; `/peur jauge test <0-100>` règle la tienne directement (même si la jauge est coupée).
+## Photos épinglées, emotes
 
 ### Photos épinglées (Polaroid)
 L'**appareil photo instantané** (onglet Objets) prend ce que tu vois ; la photo sort et se révèle en une minute. **Accroupi + clic droit** avec une photo sur un **mur** : elle y est épinglée (une punaise de couleur, un peu de travers) ; sur une **table ou le sol** : elle y est posée. On y voit l'image, et le nom de qui l'a prise. Clic droit dessus : on la regarde en grand. Un coup : on la reprend. Plusieurs côte à côte font un **tableau d'enquête**.
@@ -173,28 +117,7 @@ messages). Les messages attendent sur le serveur si le téléphone est éteint, 
   égouts). Sans réseau, pas d'appel ni de message ; un appel en cours coupe.
 - **Batterie** : se vide écran allumé et en appel (vite pour la brique de 1985), barre visible sous l'objet.
 
-## Le jeu de rôle
-
-| Commande | Effet |
-| --- | --- |
-| `/setname Prénom Nom` | Le nom du personnage remplace le pseudo partout (au-dessus de la tête, liste des joueurs, tout ce qui est dit). |
-| *(chat normal)* | Parole entendue autour (20 blocs) : « Bill Denbrough dit : « … » ». |
-| `/me action` | Action en violet italique, dans le chat (rien au-dessus de la tête). |
-| `/do description` | Description de la scène (ambre). |
-| `/roll [100]` | « Bill Denbrough a lancé un dé sur 100 : 42 » (dé sur 100 par défaut ; aussi `1d20`, `2d6`…). |
-| `/try action` | Tente quelque chose : réussite ou échec. |
-| `/chuchoter message` | 4 blocs ; un peu plus loin on voit seulement que quelqu'un chuchote. |
-| `/crier message` | 48 blocs. |
-| `/hrp message` | Hors personnage, à tout le monde (seul endroit où le pseudo apparaît). |
-| `/desc texte` · `/examiner joueur` | Ce que les autres voient du personnage. |
-| `/voir joueur` · `/voir tous` · `/voir personne` | N'être **vu et entendu que** par ce(s) joueur(s) : pour les autres le personnage n'existe plus (ni dessiné, ni entendu, ni touchable), ses paroles ne leur parviennent pas, et avec Simple Voice Chat sa voix non plus. Réservé aux maîtres du jeu par défaut (`voirPermission`). |
-| `/pseudos cacher` · `/pseudos afficher` | Les pseudos au-dessus des têtes sont **cachés par défaut** ; `/pseudos afficher` les réaffiche (et `/pseudos cacher` les recache), pour tout le monde : passe par une équipe du tableau des scores (« nom jamais visible »), que le jeu de base respecte sur chaque client, avec ou sans le mod (Essential compris, qui s'accroche au nom du jeu). Les joueurs sont alors dans l'équipe `eraphones_rp` (un joueur ne peut être que dans une équipe). Maîtres du jeu. |
-| `/rp` · `/rp qui` · `/rp nom joueur Prénom Nom` | Aide ; pour les maîtres du jeu : qui joue qui, nommer un personnage. |
-
-Réglages serveur (`serverconfig/eraphones-server.toml`) : chat local oui/non, portées (parole, actions, chuchotement,
-cri), permission de `/voir`, noms au-dessus des têtes, bulles au-dessus des têtes (désactivées par défaut), voix au téléphone.
-
-## Outils des maîtres du jeu (horreur)
+## Commandes des téléphones (maîtres du jeu)
 
 | Commande | Effet |
 | --- | --- |
@@ -204,40 +127,6 @@ cri), permission de `/voir`, noms au-dessus des têtes, bulles au-dessus des tê
 | `/telephone journal Titre \| texte` | Publie un article dans le Journal des smartphones et les Infos VOXA des téléphones à clapet. |
 | `/telephone numeros <joueur>` | Les numéros que porte un joueur. |
 | `/telephone recharger` | Recharge le téléphone en main. |
-
-### `/horreur` : ce que seules les victimes voient et entendent
-
-`joueurs` accepte un pseudo ou un sélecteur (`@a`, `@a[distance=..15]`…). Rien n'apparaît dans le chat des victimes.
-
-| Commande | Effet |
-| --- | --- |
-| `/horreur son <joueurs> <son> [ici]` | Un son qu'eux seuls entendent, placé autour d'eux (ou là où se tient le maître du jeu avec `ici`) : `pas` (des pas qui approchent dans leur dos), `toc` (on frappe), `porte` (une porte qui grince), `rire`, `enfants` (des rires d'enfants), `murmures`, `souffle` (une respiration dans la nuque), `coeur` (un cœur qui s'accélère), `cri`, `manege` (une boîte à musique qui se dérègle), `glas` (une cloche au loin), `gouttes`. |
-| `/horreur murmure <joueurs> <texte>` | Des mots chuchotés dans leur tête : ils s'écrivent lettre par lettre au milieu de l'écran, en rouge, en tremblant. |
-| `/horreur brouillard <joueurs> [secondes]` | Un brouillard épais se referme autour d'eux (60 s par défaut). |
-| `/horreur coupure <joueurs> [secondes]` | La lumière vacille puis s'éteint ; un éclair de lumière de temps en temps ; elle revient en clignotant. |
-| `/horreur sang <joueurs> [secondes]` | Un peu de sang au bord de la vue : un voile rouge qui bat comme un cœur, quelques coulures lentes, une éclaboussure dans un coin. |
-| `/horreur ballon <joueurs> [ici]` | Un ballon rouge flotte devant eux (ou là où se tient le maître du jeu), se balance au bout de sa ficelle pendant 20 s, s'envole puis éclate. Les autres joueurs ne le voient pas. |
-| `/horreur flotter <joueurs> [secondes]` | Ils s'élèvent lentement et flottent (6 s par défaut), puis redescendent doucement, sans dégâts. |
-| `/horreur vertige <joueurs> [secondes]` | Le monde tangue autour d'eux. |
-| `/horreur tremblement <joueurs> [secondes]` | Le sol tremble et gronde. |
-| `/horreur stop <joueurs>` | Arrête tout pour eux (sons à venir, visions, vertige ; ceux qui flottent redescendent doucement). |
-
-### `/voix` : changer de voix (Simple Voice Chat)
-
-Avec Simple Voice Chat sur le serveur (version 2.5.27 ou plus récente, de décembre 2024), la voix du micro est
-transformée **sur le serveur**, avant que quiconque l'entende : les joueurs n'ont rien à installer de plus, et la voix
-changée passe aussi par `/voir` et par le téléphone. Avec une version plus ancienne, la voix reste normale.
-
-| Commande | Effet |
-| --- | --- |
-| `/voix` | La liste des voix et la tienne. |
-| `/voix <voix> [joueurs]` | Prendre une voix (ou la donner à des joueurs : un personnage possédé…). La hauteur et le timbre (la forme de la bouche et de la gorge) sont changés séparément : une voix grave garde une vraie bouche au lieu de sonner « ralentie ». `masque` (voix d'homme beaucoup trop grave, rauque, métallique, façon appel masqué), `demon` (deux gorges énormes, salle de pierre), `clown` (aiguë et chantante, un grognement caché dessous), `possede` (tes mots chantés par un accord sombre, vocodeur), `legion` (plusieurs voix à la fois), `robot` (une note bourdonnante qui parle), `geant`, `grave`, `enfant`, `spectre` (un souffle sans gorge), `egouts` (tunnel de béton), `radio`, `glitch` (voix qui se dérègle : saute, bégaie, se désagrège). |
-| `/voix dose <10-100> [joueurs]` | Dose de l'effet en pourcentage (le reste est la vraie voix). 100 par défaut. |
-| `/voix normale [joueurs]` | Retrouver sa voix. |
-| `/voix ecoute` | S'entendre soi-même avec la voix changée, pour l'essayer (encore une fois pour arrêter). |
-
-Les voix durent jusqu'au redémarrage du serveur. Permissions : `horreurPermission` et `voixPermission` (2 par défaut)
-dans `serverconfig/eraphones-server.toml`.
 
 ## Développement
 

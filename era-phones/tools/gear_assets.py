@@ -557,16 +557,6 @@ def sounds():
     env = np.clip(t / .01, 0, 1) * np.clip((.3 - t) / .03, 0, 1)
     beep = np.sin(2 * np.pi * 1250 * t) * (t < .07) * .5
     ogg("talkie_squelch", (burst * .6 * env + beep) * .9)
-    # Fear: one heartbeat as heard from inside (a deep thud, its echo)
-    n = int(rate * .62)
-    t = np.arange(n) / rate
-
-    def thud(at, f, k):
-        tt = np.clip(t - at, 0, None)
-        return np.sin(2 * np.pi * f * tt * (1 - tt * .8)) * np.exp(-tt * 22) * (t >= at) * k
-
-    beat = thud(0, 52, 1) + thud(.21, 44, .7) + band(rng.normal(0, 1, n), 30, 160) * np.exp(-t * 18) * .25
-    ogg("coeur_peur", beat / np.abs(beat).max() * .95)
     import photo_assets
     ogg("photo_declic", photo_assets.shutter(rate))
     import bike_assets
@@ -580,7 +570,6 @@ def sounds():
     kit.write_json("sounds.json", {
         "radio_static": {"sounds": [{"name": "eraphones:radio_static"}], "subtitle": "subtitles.eraphones.radio_static"},
         "talkie_squelch": {"sounds": [{"name": "eraphones:talkie_squelch"}], "subtitle": "subtitles.eraphones.talkie_squelch"},
-        "coeur_peur": {"sounds": [{"name": "eraphones:coeur_peur"}]},
         "photo_declic": {"sounds": [{"name": "eraphones:photo_declic"}], "subtitle": "subtitles.eraphones.photo_declic"},
         "velo_sonnette": {"sounds": [{"name": "eraphones:velo_sonnette", "attenuation_distance": 24}], "subtitle": "subtitles.eraphones.velo_sonnette"},
         "lampadaire_bourdonnement": {"sounds": [{"name": "eraphones:lampadaire_bourdonnement", "attenuation_distance": 20}],

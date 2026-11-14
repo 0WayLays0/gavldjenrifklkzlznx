@@ -23,6 +23,7 @@ public final class ArcanesNetwork {
         MusicPackets.register(registrar);
         com.waylays.arcanes.editor.SpellEditorNet.register(registrar);
         com.waylays.arcanes.metier.MetierNet.register(registrar);
+        com.waylays.arcanes.rp.RpNet.register(registrar);
     }
 
     /** Plays the player animation {@code animation} on {@code player}, for them and everyone around. */

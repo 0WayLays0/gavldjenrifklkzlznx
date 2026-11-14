@@ -15,13 +15,6 @@
     ],
     "subtitle": "subtitles.eraphones.talkie_squelch"
   },
-  "coeur_peur": {
-    "sounds": [
-      {
-        "name": "eraphones:coeur_peur"
-      }
-    ]
-  },
   "photo_declic": {
     "sounds": [
       {

@@ -175,52 +175,16 @@ public final class SmokeTest {
     }
 
     private static void plan(Minecraft mc) {
-        // The role play: a character's name, an action, a roll of the dice (in the chat)
         STEPS.add(() -> {
             select(mc, 5);
             mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
-            command(mc, "setname Thomas Hale");
         });
-        STEPS.add(() -> command(mc, "me ouvre lentement la porte de la cave"));
-        STEPS.add(() -> command(mc, "roll 1d20"));
         // Two articles for the town's news (the smartphone's Journal, the flip phone's news)
         STEPS.add(() -> command(mc, "telephone journal Fête foraine : le cirque s'installe au parc | Les roulottes sont arrivées cette nuit. "
                 + "Personne ne les a vues entrer en ville, mais le chapiteau rouge et blanc se dresse déjà près de l'ancienne usine."));
         STEPS.add(() -> command(mc, "telephone journal Un enfant porté disparu près des égouts | Un garçon de six ans n'est pas rentré hier soir. "
                 + "Un voisin dit avoir vu un ballon rouge flotter au-dessus de la bouche d'égout de la rue des Saules. "
                 + "La police demande à toute personne ayant des informations de se manifester. Les enfants sont priés de ne pas sortir après la tombée de la nuit."));
-        STEPS.add(() -> {
-            shot(mc, "rp_chat");
-            if (!mc.player.getDisplayName().getString().equals("Thomas Hale")) {
-                fail("the character's name is not shown: {}", mc.player.getDisplayName().getString());
-            } else {
-                log("rp: the character's name is shown");
-            }
-            // Names over the heads are hidden by default, through a team whose names are never shown
-            var server = mc.getSingleplayerServer();
-            var team = server == null ? null : server.getScoreboard().getPlayersTeam(mc.player.getScoreboardName());
-            if (team == null || team.getNameTagVisibility() != net.minecraft.world.scores.Team.Visibility.NEVER) {
-                fail("the names over the heads are not hidden by default (team {})", team == null ? "none" : team.getName());
-            } else {
-                log("rp: the names over the heads are hidden by default");
-            }
-        });
-        // The game masters' tools of fear, on oneself: each shown, then stopped
-        STEPS.add(() -> {
-            mc.options.setCameraType(CameraType.FIRST_PERSON);
-            command(mc, "voix masque");
-            command(mc, "voix normale");
-            command(mc, "horreur son @s rire");
-            command(mc, "horreur murmure @s Tu flotteras aussi...");
-        });
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> shot(mc, "horror_whisper"));
-        horror(mc, "horror_blood", "horreur sang @s 12", 4);
-        horror(mc, "horror_blackout", "horreur coupure @s 8", 2);
-        horror(mc, "horror_fog", "horreur brouillard @s 30", 4);
-        horror(mc, "horror_balloon", "horreur ballon @s", 2);
-        STEPS.add(() -> command(mc, "horreur stop @s"));
         String[] names = {"smartphone", "clapet", "gsm", "radiotelephone"};
         // Held: first person, then from the front
         for (int k = 0; k < 4; k++) {
@@ -456,18 +420,8 @@ public final class SmokeTest {
             }
         });
         STEPS.add(() -> shot(mc, "horror_things"));
-        STEPS.add(() -> {
-            mc.setScreen(null);
-            com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("narration", 400,
-                    "La pluie tombait sur la ville depuis trois jours, et personne ne voyait les ballons qui remontaient le courant.", 0, 0, 0));
-        });
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> shot(mc, "narration"));
-        STEPS.add(() -> com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("stop", 0, "", 0, 0, 0)));
-        // Words on a wall in the four styles, and on the floor; then fear
+        STEPS.add(() -> mc.setScreen(null));
+        // A brick wall, for the photographs
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
             if (p == null) {
@@ -489,22 +443,6 @@ public final class SmokeTest {
                     }
                 }
             }
-            net.minecraft.world.phys.Vec3 front = net.minecraft.world.phys.Vec3.atCenterOf(base).add(net.minecraft.world.phys.Vec3.atLowerCornerOf(dir.getOpposite().getNormal()).scale(.512));
-            net.minecraft.world.phys.Vec3 sideV = net.minecraft.world.phys.Vec3.atLowerCornerOf(side.getNormal());
-            Object[][] texts = {{"sang", "IL EST REVENU", .7f, 0, 2.2}, {"noir", "Ne descends pas", .32f, -2.3, 1.1}, {"peinture", "PAS SEULS", .42f, 2.2, 1.0},
-                    {"craie", "1 + 1 = 3 ?|Il a menti", .3f, 0, .55}};
-            for (Object[] t : texts) {
-                com.waylays.eraphones.horror.WallWriting w = new com.waylays.eraphones.horror.WallWriting(com.waylays.eraphones.registry.GearRegistry.WRITING.get(), p.level());
-                net.minecraft.world.phys.Vec3 at = front.add(sideV.scale(((Number) t[3]).doubleValue())).add(0, ((Number) t[4]).doubleValue() - .5, 0);
-                w.setPos(at.x, at.y, at.z);
-                w.setup((String) t[1], (String) t[0], dir.getOpposite().get3DDataValue(), ((Number) t[2]).floatValue(), 0);
-                p.level().addFreshEntity(w);
-            }
-            com.waylays.eraphones.horror.WallWriting floor = new com.waylays.eraphones.horror.WallWriting(com.waylays.eraphones.registry.GearRegistry.WRITING.get(), p.level());
-            net.minecraft.world.phys.Vec3 fl = net.minecraft.world.phys.Vec3.atBottomCenterOf(base.relative(dir.getOpposite(), 2)).add(0, .012, 0);
-            floor.setPos(fl.x, fl.y, fl.z);
-            floor.setup("Viens jouer", "sang", net.minecraft.core.Direction.UP.get3DDataValue(), .5f, p.getYRot() + 180);
-            p.level().addFreshEntity(floor);
             p.teleportTo(p.serverLevel(), Vec3c(base.relative(dir.getOpposite(), 5)).x, base.getY(), Vec3c(base.relative(dir.getOpposite(), 5)).z, p.getYRot(), 12);
         }));
         STEPS.add(() -> mc.player.setXRot(12));
@@ -512,12 +450,7 @@ public final class SmokeTest {
             STEPS.add(() -> {
             });
         }
-        STEPS.add(() -> shot(mc, "writing_wall"));
-        STEPS.add(() -> com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("peur", 400, "", 0, 0, 0)));
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> shot(mc, "fear"));
-        STEPS.add(() -> com.waylays.eraphones.horror.client.HorrorClient.effect(new com.waylays.eraphones.horror.HorrorNet.Effect("stop", 0, "", 0, 0, 0)));
+        STEPS.add(() -> shot(mc, "brick_wall"));
         // An instant camera: a picture of the wall taken, printed, looked at once developed
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -652,47 +585,6 @@ public final class SmokeTest {
             }
         }));
         STEPS.add(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
-        // Closed eyes (/me ferme les yeux), on a platform high in the air
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null) {
-                return;
-            }
-            net.minecraft.server.level.ServerLevel lv = p.serverLevel();
-            net.minecraft.core.Direction dir = p.getDirection();
-            // On a platform high in the air: dry, lit, nothing in the way
-            net.minecraft.core.BlockPos base = new net.minecraft.core.BlockPos(p.getBlockX(), 150, p.getBlockZ()).relative(dir, 5);
-            for (int a = -3; a <= 3; a++) {
-                for (int b = -16; b <= 1; b++) {
-                    net.minecraft.core.BlockPos q = base.relative(dir.getClockWise(), a).relative(dir, b);
-                    lv.setBlockAndUpdate(q.below(), net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
-                    for (int y = 0; y < 4; y++) {
-                        lv.setBlockAndUpdate(q.above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
-                    }
-                }
-            }
-            net.minecraft.world.phys.Vec3 eye = net.minecraft.world.phys.Vec3.atBottomCenterOf(base.relative(dir.getOpposite(), 5));
-            p.teleportTo(lv, eye.x, eye.y, eye.z, dir.toYRot(), 8);
-        }));
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> {
-            mc.options.setCameraType(CameraType.FIRST_PERSON);
-            server.execute(() -> {
-                ServerPlayer p = server.getPlayerList().getPlayer(id);
-                if (p != null) {
-                    com.waylays.eraphones.rp.RpService.me(p, "ferme les yeux");
-                }
-            });
-        });
-        STEPS.add(() -> shot(mc, "event_eyes_closed"));
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> shot(mc, "event_eyes_open"));
         // Photographs pinned up: what the screen shows, printed, pinned on a brick pillar and laid on the floor
         STEPS.add(() -> {
             byte[] data;
@@ -741,40 +633,7 @@ public final class SmokeTest {
         STEPS.add(() -> {
         });
         STEPS.add(() -> shot(mc, "photos_pinned"));
-        // The fear gauge: the staff feel nothing; a player at 85 %: the heart, the dark edges, the trace low on the left
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null) {
-                return;
-            }
-            if (!com.waylays.eraphones.horror.Fear.exempt(p)) {
-                fail("the game master is not exempt from the fear gauge");
-            }
-            com.waylays.eraphones.horror.Fear.scare(p, 50);
-            if (com.waylays.eraphones.horror.Fear.get(p) != 0) {
-                fail("a game master was frightened ({})", com.waylays.eraphones.horror.Fear.get(p));
-            }
-        }));
-        STEPS.add(() -> com.waylays.eraphones.horror.client.HorrorClient.gauge(85));
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> shot(mc, "fear_gauge"));
-        STEPS.add(() -> {
-            if (com.waylays.eraphones.horror.client.HorrorClient.gaugeShown() < 40) {
-                fail("the fear gauge is not shown ({})", com.waylays.eraphones.horror.client.HorrorClient.gaugeShown());
-            }
-            com.waylays.eraphones.horror.client.HorrorClient.gauge(0);
-        });
-        STEPS.add(() -> {
-            if (!com.waylays.eraphones.rp.RpService.closesEyes("/me ferme lentement... non: Il ferme les yeux") || com.waylays.eraphones.rp.RpService.closesEyes("ferme la porte")) {
-                fail("closed eyes are not told apart in /me");
-            }
-        });
-        // The walkman, a cassette in it, the headphones on; then the heights: 100 cm, 300 cm (the hitbox with them)
+        // The walkman, a cassette in it, the headphones on
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
             if (p == null) {
@@ -793,85 +652,7 @@ public final class SmokeTest {
         STEPS.add(() -> {
             mc.options.setCameraType(CameraType.FIRST_PERSON);
             com.waylays.eraphones.walkman.client.WalkmanClient.listening(new com.waylays.eraphones.walkman.Walkmans.Listening(mc.player.getUUID(), false));
-            command(mc, "taille @s 100");
         });
-        STEPS.add(() -> {
-            if (Math.abs(mc.player.getBbHeight() - 1.0f) > .05f) {
-                fail("at 100 cm the player is {} blocks tall", mc.player.getBbHeight());
-            }
-            mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
-        });
-        STEPS.add(() -> shot(mc, "size_100"));
-        STEPS.add(() -> command(mc, "taille @s 300"));
-        STEPS.add(() -> {
-            if (Math.abs(mc.player.getBbHeight() - 3.0f) > .1f) {
-                fail("at 300 cm the player is {} blocks tall", mc.player.getBbHeight());
-            }
-        });
-        STEPS.add(() -> shot(mc, "size_300"));
-        STEPS.add(() -> {
-            command(mc, "taille @s normale");
-            mc.options.setCameraType(CameraType.FIRST_PERSON);
-        });
-        // The weapons' workshop on a sword; a card reader opening its door for a badge it knows; a padlock; /hp, /vitesse
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p != null) {
-                ItemStack sword = new ItemStack(net.minecraft.world.item.Items.IRON_SWORD);
-                sword.set(com.waylays.eraphones.arms.Arms.PROCS.get(), java.util.List.of(new com.waylays.eraphones.arms.Proc("*feu", 5, 1, 4, false, false),
-                        new com.waylays.eraphones.arms.Proc("minecraft:poison", 10, 2, 5, false, false)));
-                p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sword);
-            }
-        }));
-        STEPS.add(() -> mc.setScreen(new com.waylays.eraphones.arms.client.WorkshopScreen(mc.player.getMainHandItem())));
-        STEPS.add(() -> shot(mc, "arms_general"));
-        STEPS.add(() -> {
-            if (mc.screen != null) {
-                for (net.minecraft.client.gui.components.events.GuiEventListener w : mc.screen.children()) {
-                    if (w instanceof net.minecraft.client.gui.components.Button b && b.getMessage().getString().contains("%")) {
-                        b.onPress();
-                        break;
-                    }
-                }
-            }
-        });
-        STEPS.add(() -> shot(mc, "arms_effects"));
-        STEPS.add(() -> {
-            if (mc.screen != null) {
-                for (net.minecraft.client.gui.components.events.GuiEventListener w : mc.screen.children()) {
-                    if (w instanceof net.minecraft.client.gui.components.Button b && b.getMessage().getString().startsWith("+")) {
-                        b.onPress();
-                        break;
-                    }
-                }
-            }
-        });
-        STEPS.add(() -> shot(mc, "arms_picker"));
-        STEPS.add(() -> {
-            mc.setScreen(null);
-            server.execute(() -> {
-                ServerPlayer p = server.getPlayerList().getPlayer(id);
-                if (p == null) {
-                    return;
-                }
-                com.waylays.eraphones.size.Body.setHealth(p, 40);
-                com.waylays.eraphones.size.Body.setSpeed(p, 1.5f);
-                if (Math.abs(p.getMaxHealth() - 40) > .01f) {
-                    fail("/hp 40 gave {} health", p.getMaxHealth());
-                }
-            });
-        });
-        STEPS.add(() -> {
-            mc.options.setCameraType(CameraType.FIRST_PERSON);
-            mc.player.setXRot(15);
-        });
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p != null) {
-                com.waylays.eraphones.size.Body.setHealth(p, 20);
-                com.waylays.eraphones.size.Body.setSpeed(p, 1);
-            }
-        }));
         // The camcorder: a few seconds filmed on a blank cassette, which then holds a film the televisions can play
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -1072,18 +853,6 @@ public final class SmokeTest {
 
     /** Presses the keys of the retro phone open, then photographs it. */
     /** Ends the effects before, sends {@code cmd}, waits {@code steps}, takes the shot. */
-    private static void horror(Minecraft mc, String shot, String cmd, int steps) {
-        STEPS.add(() -> {
-            command(mc, "horreur stop @s");
-            command(mc, cmd);
-        });
-        for (int i = 1; i < steps; i++) {
-            STEPS.add(() -> {
-            });
-        }
-        STEPS.add(() -> shot(mc, shot));
-    }
-
     private static void keys(Minecraft mc, String shot, String... ids) {
         STEPS.add(() -> {
             if (!(mc.screen instanceof RetroScreen r)) {

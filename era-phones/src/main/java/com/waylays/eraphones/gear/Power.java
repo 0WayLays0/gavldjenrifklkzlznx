@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.waylays.eraphones.EraPhones;
 import com.waylays.eraphones.registry.GearRegistry;
-import com.waylays.eraphones.rp.RpConfig;
+import com.waylays.eraphones.EraConfig;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -91,7 +91,7 @@ public final class Power {
     }
 
     private static void register(CommandDispatcher<CommandSourceStack> d) {
-        d.register(Commands.literal("panne").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+        d.register(Commands.literal("panne").requires(s -> s.hasPermission(EraConfig.staffPermission()))
                 .then(Commands.literal("fin").executes(c -> stop(c)))
                 .then(Commands.literal("clignote").then(Commands.argument("rayon", IntegerArgumentType.integer(1, 256))
                         .executes(c -> cut(c, 10, true))

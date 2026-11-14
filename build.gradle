@@ -75,6 +75,13 @@ repositories {
         name = 'Player Animator'
         url = 'https://maven.kosmx.dev/'
     }
+    maven {
+        name = 'Simple Voice Chat'
+        url = 'https://maven.maxhenkel.de/repository/public'
+        content {
+            includeGroup 'de.maxhenkel.voicechat'
+        }
+    }
     mavenCentral()
 }
 
@@ -89,6 +96,8 @@ dependencies {
     implementation "top.theillusivec4.curios:curios-neoforge:${curios_version}"
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     implementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animator_version}"
+    // Simple Voice Chat's API: /voix and /voir with voice (only used when that mod is installed)
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     // MP3 decoding for the music player (JLayer, LGPL), carried inside the mod's jar
     jarJar(implementation("javazoom:jlayer")) {
         version {

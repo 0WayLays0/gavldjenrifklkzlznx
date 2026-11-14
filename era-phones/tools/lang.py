@@ -454,14 +454,16 @@ def all_texts():
     return t
 
 
-FRENCH_ALWAYS = tuple(p + ".eraphones." for p in ("rp", "event", "carry", "body", "power", "command", "size", "machine", "message",
-                                                   "walkman", "camcorder", "info", "gear", "arms"))
+FRENCH_ALWAYS = tuple(p + ".eraphones." for p in ("power", "command", "machine", "message", "walkman", "camcorder", "info", "gear"))
+# The role play and the game masters' tools moved to Arcanes Oubliés with their texts (kept in these tables, not written)
+MOVED = tuple(p + ".eraphones." for p in ("rp", "event", "carry", "body", "size", "arms")) + ("entity.eraphones.ecriture",)
 
 
 def main(extra=None):
     t = all_texts()
     if extra:
         t.update(extra)
+    t = {k: v for k, v in t.items() if not k.startswith(MOVED)}
     # What the commands and the server write in the chat is French whatever the game's language: the server turns
     # some of it into words itself, and a dedicated server only reads en_us
     kit.write_json("lang/en_us.json", {k: v[1] if k.startswith(FRENCH_ALWAYS) else v[0] for k, v in sorted(t.items())})

@@ -60,5 +60,12 @@
         "stream": true
       }
     ]
+  },
+  "coeur_peur": {
+    "sounds": [
+      {
+        "name": "arcanes_oublies:coeur_peur"
+      }
+    ]
   }
 }

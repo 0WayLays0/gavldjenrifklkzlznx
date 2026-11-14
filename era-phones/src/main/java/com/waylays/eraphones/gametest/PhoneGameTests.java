@@ -29,30 +29,6 @@ import java.util.Set;
 public final class PhoneGameTests {
     private PhoneGameTests() {}
 
-    /** A zone trigger goes off when a player in survival walks into it (its action: a gold block placed); not in creative. */
-    @GameTest(template = "platform", skyAccess = true, timeoutTicks = 40)
-    public static void aZoneTriggerGoesOff(GameTestHelper helper) {
-        net.minecraft.server.level.ServerPlayer p = net.neoforged.neoforge.common.util.FakePlayerFactory.get(helper.getLevel(),
-                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "zone_tester"));
-        BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
-        p.setPos(at.getX() + .5, at.getY(), at.getZ() + .5);
-        BlockPos mark = helper.absolutePos(new BlockPos(3, 2, 3));
-        String name = "test_zone_" + at.asLong();
-        com.waylays.eraphones.event.Triggers.putForTest(helper.getLevel(), name, at.offset(-1, 0, -1), at.offset(1, 2, 1),
-                "commande setblock " + mark.getX() + " " + mark.getY() + " " + mark.getZ() + " minecraft:gold_block");
-        // In creative: nothing
-        p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
-        com.waylays.eraphones.event.Triggers.watchForTest(p);
-        helper.assertBlockNotPresent(Blocks.GOLD_BLOCK, new BlockPos(3, 2, 3));
-        // In survival: it goes off
-        p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-        com.waylays.eraphones.event.Triggers.watchForTest(p);
-        helper.succeedWhen(() -> {
-            helper.assertBlockPresent(Blocks.GOLD_BLOCK, new BlockPos(3, 2, 3));
-            com.waylays.eraphones.event.Triggers.removeForTest(helper.getLevel().getServer(), name);
-        });
-    }
-
     @GameTest(template = "platform", skyAccess = true)
     public static void numbersAreRead(GameTestHelper helper) {
         helper.assertTrue("555-0142".equals(Numbers.normalize("5550142")), "seven digits");
@@ -118,24 +94,10 @@ public final class PhoneGameTests {
     }
 
     @GameTest(template = "platform", skyAccess = true)
-    public static void horrorSoundsExist(GameTestHelper helper) {
-        java.util.Set<String> ids = new java.util.TreeSet<>(com.waylays.eraphones.horror.HorrorService.soundIds());
-        // And the ones the victims' own screens play
-        ids.addAll(java.util.List.of("entity.vex.ambient", "ambient.cave", "block.beacon.deactivate", "block.lever.click", "entity.warden.heartbeat",
-                "entity.elder_guardian.curse", "entity.ghast.scream", "entity.warden.emerge", "entity.firework_rocket.blast"));
-        for (String id : ids) {
-            helper.assertTrue(net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.containsKey(net.minecraft.resources.ResourceLocation.withDefaultNamespace(id)),
-                    "no sound " + id);
-        }
-        helper.assertTrue(com.waylays.eraphones.horror.HorrorService.sounds().size() >= 12, "the sounds of fear");
-        helper.succeed();
-    }
-
-    @GameTest(template = "platform", skyAccess = true)
     public static void voicesStayClean(GameTestHelper helper) {
-        int rate = com.waylays.eraphones.horror.VoiceFx.RATE;
-        for (String v : com.waylays.eraphones.horror.VoiceFx.VOICES) {
-            com.waylays.eraphones.horror.VoiceFx.Chain chain = com.waylays.eraphones.horror.VoiceFx.chain(v);
+        int rate = com.waylays.eraphones.voice.VoiceFx.RATE;
+        for (String v : com.waylays.eraphones.voice.VoiceFx.VOICES) {
+            com.waylays.eraphones.voice.VoiceFx.Chain chain = com.waylays.eraphones.voice.VoiceFx.chain(v);
             helper.assertTrue(chain != null, "voice " + v);
             double energy = 0;
             int crossings = 0;
@@ -164,7 +126,7 @@ public final class PhoneGameTests {
                 helper.assertTrue(Math.abs(hz - 160) < 12, "the deep voice is lower: " + (int) hz + " Hz");
             }
         }
-        helper.assertTrue(com.waylays.eraphones.horror.VoiceFx.chain("nothing") == null, "no such voice");
+        helper.assertTrue(com.waylays.eraphones.voice.VoiceFx.chain("nothing") == null, "no such voice");
         helper.succeed();
     }
 

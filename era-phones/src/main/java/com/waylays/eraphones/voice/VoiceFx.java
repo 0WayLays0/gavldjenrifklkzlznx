@@ -1,4 +1,4 @@
-package com.waylays.eraphones.horror;
+package com.waylays.eraphones.voice;
 
 import java.util.Random;
 

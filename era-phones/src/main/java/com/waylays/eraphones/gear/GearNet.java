@@ -39,7 +39,6 @@ public final class GearNet {
         PhotoNet.register(r);
         CamNet.register(r);
         com.waylays.eraphones.walkman.Walkmans.register(r);
-        com.waylays.eraphones.arms.Arms.register(r);
         r.playToClient(Stations.TYPE, Stations.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.stations(p));
     }
 
@@ -170,7 +169,7 @@ public final class GearNet {
         sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_INK.get(), Math.floorMod(p.ink, 5));
         sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_TYPED.get(), p.typed);
         if (p.sign) {
-            sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_AUTHOR.get(), com.waylays.eraphones.rp.RpService.name(sp));
+            sheet.set(com.waylays.eraphones.registry.GearRegistry.NOTE_AUTHOR.get(), com.waylays.eraphones.EraConfig.name(sp));
             sp.level().playSound(null, sp.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, .7f, 1.1f);
         }
         if (sheet != held && !sp.getInventory().add(sheet)) {

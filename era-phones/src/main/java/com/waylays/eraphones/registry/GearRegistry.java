@@ -48,10 +48,6 @@ public final class GearRegistry {
             ENTITIES.register("velo", () -> net.minecraft.world.entity.EntityType.Builder.<com.waylays.eraphones.bike.BikeEntity>of(
                     com.waylays.eraphones.bike.BikeEntity::new, net.minecraft.world.entity.MobCategory.MISC).sized(.8f, 1.1f).clientTrackingRange(10)
                     .build("velo"));
-    public static final DeferredHolder<net.minecraft.world.entity.EntityType<?>, net.minecraft.world.entity.EntityType<com.waylays.eraphones.horror.WallWriting>> WRITING =
-            ENTITIES.register("ecriture", () -> net.minecraft.world.entity.EntityType.Builder.<com.waylays.eraphones.horror.WallWriting>of(
-                    com.waylays.eraphones.horror.WallWriting::new, net.minecraft.world.entity.MobCategory.MISC).sized(.5f, .5f).clientTrackingRange(8)
-                    .updateInterval(20).noSummon().build("ecriture"));
 
     private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> component(String name, Codec<T> codec,
             net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf, T> stream) {
@@ -91,7 +87,6 @@ public final class GearRegistry {
 
     public static final DeferredHolder<SoundEvent, SoundEvent> RADIO_STATIC = sound("radio_static");
     public static final DeferredHolder<SoundEvent, SoundEvent> TALKIE_SQUELCH = sound("talkie_squelch");
-    public static final DeferredHolder<SoundEvent, SoundEvent> HEARTBEAT = sound("coeur_peur");
     public static final DeferredHolder<SoundEvent, SoundEvent> SHUTTER = sound("photo_declic");
     public static final DeferredHolder<SoundEvent, SoundEvent> BIKE_BELL = sound("velo_sonnette");
     public static final DeferredHolder<SoundEvent, SoundEvent> LAMP_BUZZ = sound("lampadaire_bourdonnement");

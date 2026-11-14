@@ -10,21 +10,17 @@ import emote_assets  # noqa: E402
 import gear_assets  # noqa: E402
 import walkman_assets  # noqa: E402
 import held_fix  # noqa: E402
-import horror_assets  # noqa: E402
 import lang  # noqa: E402
 import models  # noqa: E402
 import retro_assets  # noqa: E402
 import smart_assets  # noqa: E402
-import writing_assets  # noqa: E402
 
 if __name__ == "__main__":
     smart_assets.main()
     retro_assets.main()
-    horror_assets.main()
     gear_assets.main()
     walkman_assets.main()
     held_fix.main()
     emote_assets.main()
-    writing_assets.main()
     models.main()
     lang.main()

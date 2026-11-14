@@ -30,6 +30,13 @@ public final class EraRegistry {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> NUMBER = COMPONENTS.register("number",
             () -> DataComponentType.<String>builder().persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8).build());
     /** The battery, in thousandths of a full charge. */
+    /**
+     * The chance effects the weapons' workshop used to put on items, when it was part of this mod (it is in Arcanes
+     * Oubliés now): still known, as it was saved, so that the items that carry them load; they do nothing here.
+     */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<com.mojang.serialization.Dynamic<?>>> OLD_CHANCE_EFFECTS =
+            COMPONENTS.register("effets_chance", () -> DataComponentType.<com.mojang.serialization.Dynamic<?>>builder().persistent(Codec.PASSTHROUGH).build());
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> BATTERY = COMPONENTS.register("battery",
             () -> DataComponentType.<Integer>builder().persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
 

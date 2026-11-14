@@ -1,6 +1,5 @@
 package com.waylays.eraphones.voice;
 
-import com.waylays.eraphones.horror.VoiceFx;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.opus.OpusEncoder;
@@ -15,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * keeps its state from one frame to the next), and encoded again.
  */
 final class VoiceStreams {
-    private static final Map<UUID, Stream> STREAMS = new ConcurrentHashMap<>();
     /** The voices as the other end of a phone call hears them, through the line. */
     private static final Map<UUID, Stream> LINES = new ConcurrentHashMap<>();
 
@@ -37,47 +35,6 @@ final class VoiceStreams {
         void close() {
             decoder.close();
             encoder.close();
-        }
-    }
-
-    /**
-     * The frame {@code data} of {@code speaker}, in the voice {@code voice}; null when it is to go as it is (their own
-     * voice, or the empty frame that ends a sentence).
-     */
-    @Nullable
-    static byte[] process(VoicechatApi api, UUID speaker, @Nullable String voice, byte[] data) {
-        voice = voice == null ? null : voice + "@" + com.waylays.eraphones.horror.Voices.strength(speaker);
-        Stream s = STREAMS.get(speaker);
-        if (voice == null) {
-            if (s != null) {
-                STREAMS.remove(speaker);
-                s.close();
-            }
-            return null;
-        }
-        if (s == null || !s.voice.equals(voice)) {
-            int at = voice.indexOf('@');
-            VoiceFx.Chain chain = VoiceFx.chain(voice.substring(0, at), Integer.parseInt(voice.substring(at + 1)));
-            if (chain == null) {
-                return null;
-            }
-            if (s != null) {
-                s.close();
-            }
-            s = new Stream(voice, api.createDecoder(), api.createEncoder(), chain);
-            STREAMS.put(speaker, s);
-        }
-        synchronized (s) {
-            if (data == null || data.length == 0) {
-                s.decoder.resetState();
-                s.encoder.resetState();
-                return null;
-            }
-            short[] pcm = s.decoder.decode(data);
-            if (pcm == null || pcm.length == 0) {
-                return null;
-            }
-            return s.encoder.encode(s.chain.process(pcm));
         }
     }
 
@@ -116,11 +73,9 @@ final class VoiceStreams {
 
     /** Forgets a speaker's streams (they left). */
     static void forget(UUID speaker) {
-        for (Map<UUID, Stream> m : java.util.List.of(STREAMS, LINES)) {
-            Stream s = m.remove(speaker);
-            if (s != null) {
-                s.close();
-            }
+        Stream s = LINES.remove(speaker);
+        if (s != null) {
+            s.close();
         }
     }
 }
