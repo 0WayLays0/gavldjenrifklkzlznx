@@ -368,7 +368,7 @@ public final class PhoneClient {
         if (p.state() == 3 && before != 3 && voiceChat()) {
             // Answered: the phone goes to the ear, the voice does the talking (the call goes on, shown at the top)
             Screen open = Minecraft.getInstance().screen;
-            if (phoneOpen() || open instanceof com.waylays.eraphones.gear.client.BoothScreen) {
+            if (phoneOpen()) {
                 Minecraft.getInstance().setScreen(null);
             }
         }

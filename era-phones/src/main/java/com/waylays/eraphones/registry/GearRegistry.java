@@ -98,9 +98,6 @@ public final class GearRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> MACHINE_BEEP = sound("repondeur_bip");
     public static final DeferredHolder<SoundEvent, SoundEvent> LAMP_CLICK = sound("lampadaire_claquement");
     public static final DeferredHolder<SoundEvent, SoundEvent> POWER_DOWN = sound("coupure_courant");
-    public static final DeferredHolder<SoundEvent, SoundEvent> BOOTH_RING = sound("cabine_sonnerie");
-    public static final DeferredHolder<SoundEvent, SoundEvent> BOOTH_COIN = sound("cabine_piece");
-    public static final DeferredHolder<SoundEvent, SoundEvent> BOOTH_KEY = sound("cabine_touche");
 
     private static DeferredHolder<SoundEvent, SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(EraPhones.id(name)));
@@ -115,10 +112,6 @@ public final class GearRegistry {
             () -> new com.waylays.eraphones.gear.block.TvBlock(BlockBehaviour.Properties.of().strength(1.5f).sound(SoundType.WOOD).noOcclusion()
                     .lightLevel(s -> s.getValue(com.waylays.eraphones.gear.block.TvBlock.LIT) ? 7 : 0)));
 
-    public static final DeferredBlock<com.waylays.eraphones.gear.block.BoothBlock> BOOTH = BLOCKS.register("cabine_telephonique",
-            () -> new com.waylays.eraphones.gear.block.BoothBlock(BlockBehaviour.Properties.of().strength(2.5f, 6f).sound(SoundType.METAL).noOcclusion()
-                    .lightLevel(s -> s.getValue(com.waylays.eraphones.gear.block.BoothBlock.PART) == 2
-                            && s.getValue(com.waylays.eraphones.gear.block.BoothBlock.POWERED) ? 13 : 0)));
     public static final DeferredBlock<com.waylays.eraphones.gear.block.AnswerMachineBlock> MACHINE = BLOCKS.register("repondeur",
             () -> new com.waylays.eraphones.gear.block.AnswerMachineBlock(BlockBehaviour.Properties.of().strength(1f).sound(SoundType.STONE).noOcclusion()
                     .lightLevel(s -> s.getValue(com.waylays.eraphones.gear.block.AnswerMachineBlock.NEW) ? 3 : 0)));
@@ -129,8 +122,6 @@ public final class GearRegistry {
                     .lightLevel(s -> s.getValue(com.waylays.eraphones.gear.block.LampPostBlock.LIT) ? 15 : 0)));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.waylays.eraphones.gear.block.LampPostBlockEntity>> LAMP_POST_BE = BLOCK_ENTITIES.register(
             "lampadaire", () -> BlockEntityType.Builder.of(com.waylays.eraphones.gear.block.LampPostBlockEntity::new, LAMP_POST.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.waylays.eraphones.gear.block.BoothBlockEntity>> BOOTH_BE = BLOCK_ENTITIES.register(
-            "cabine_telephonique", () -> BlockEntityType.Builder.of(com.waylays.eraphones.gear.block.BoothBlockEntity::new, BOOTH.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.waylays.eraphones.gear.block.TvBlockEntity>> TV_BE = BLOCK_ENTITIES.register("television",
             () -> BlockEntityType.Builder.of(com.waylays.eraphones.gear.block.TvBlockEntity::new, TV.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RadioBlockEntity>> RADIO_BE = BLOCK_ENTITIES.register("radio",
@@ -162,8 +153,6 @@ public final class GearRegistry {
     }
 
     public static final DeferredHolder<Item, Item> BIKE_ITEM = BIKE_ITEMS.get(0);
-    public static final DeferredHolder<Item, Item> BOOTH_ITEM = EraRegistry.ITEMS.register("cabine_telephonique",
-            () -> new BlockItem(BOOTH.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> TV_ITEM = EraRegistry.ITEMS.register("television", () -> new BlockItem(TV.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> CASSETTE = EraRegistry.ITEMS.register("cassette", () -> new CassetteItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<Item, Item> NOTE = EraRegistry.ITEMS.register("feuille",
@@ -205,7 +194,6 @@ public final class GearRegistry {
             .displayItems((p, out) -> {
                 out.accept(CAMERA.get());
                 out.accept(FILM_PACK.get());
-                out.accept(BOOTH_ITEM.get());
                 for (DeferredHolder<Item, Item> b : BIKE_ITEMS) {
                     out.accept(b.get());
                 }
@@ -213,10 +201,6 @@ public final class GearRegistry {
                 out.accept(MACHINE_ITEM.get());
                 out.accept(NOTE.get());
                 out.accept(NEWSPAPER.get());
-                out.accept(com.waylays.eraphones.lock.LockRegistry.PADLOCK.get());
-                out.accept(com.waylays.eraphones.lock.LockRegistry.KEY_ITEM.get());
-                out.accept(com.waylays.eraphones.lock.LockRegistry.READER_ITEM.get());
-                out.accept(com.waylays.eraphones.lock.LockRegistry.BADGE_ITEM.get());
             }).build());
 
     private GearRegistry() {}

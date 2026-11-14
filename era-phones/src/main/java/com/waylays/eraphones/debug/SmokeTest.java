@@ -574,93 +574,6 @@ public final class SmokeTest {
         });
         STEPS.add(() -> shot(mc, "photo_view"));
         STEPS.add(() -> mc.setScreen(null));
-        // A phone booth: seen from the street, from inside, called (it rings, picked up it answers), its payphone
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null) {
-                return;
-            }
-            net.minecraft.core.Direction dir = p.getDirection();
-            net.minecraft.core.BlockPos at = p.blockPosition().relative(dir, 4);
-            for (int a = -2; a <= 2; a++) {
-                for (int y = 0; y < 4; y++) {
-                    for (int b = -1; b <= 1; b++) {
-                        p.serverLevel().setBlockAndUpdate(at.relative(dir.getClockWise(), a).relative(dir, b).above(y), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
-                    }
-                }
-            }
-            net.minecraft.world.level.block.state.BlockState lower = com.waylays.eraphones.registry.GearRegistry.BOOTH.get().defaultBlockState()
-                    .setValue(com.waylays.eraphones.gear.block.BoothBlock.FACING, dir.getOpposite());
-            p.serverLevel().setBlockAndUpdate(at, lower);
-            p.serverLevel().setBlockAndUpdate(at.above(), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.PART, 1));
-            p.serverLevel().setBlockAndUpdate(at.above(2), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.PART, 2));
-            BOOTH = at;
-            p.teleportTo(p.serverLevel(), Vec3c(at.relative(dir.getOpposite(), 4)).x, at.getY(), Vec3c(at.relative(dir.getOpposite(), 4)).z, dir.toYRot(), 0);
-        }));
-        STEPS.add(() -> mc.player.setXRot(-8));
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> shot(mc, "booth"));
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null || !(p.level().getBlockEntity(BOOTH) instanceof com.waylays.eraphones.gear.block.BoothBlockEntity b)) {
-                fail("the phone booth was not placed");
-                return;
-            }
-            if (!com.waylays.eraphones.server.Booths.is(b.number())) {
-                fail("the phone booth %s is not on the network", b.number());
-            }
-            net.minecraft.world.phys.Vec3 in = net.minecraft.world.phys.Vec3.atBottomCenterOf(BOOTH);
-            p.teleportTo(p.serverLevel(), in.x, in.y + .07, in.z, p.getYRot(), 18);
-            if (!com.waylays.eraphones.server.CallService.hidden(server, b.number(), java.util.List.of("Tu es seul dans la cabine ?", "Retourne-toi."))) {
-                fail("the phone booth %s cannot be called", b.number());
-            }
-        }));
-        STEPS.add(() -> mc.player.setXRot(18));
-        STEPS.add(() -> shot(mc, "booth_inside"));
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p != null && p.level().getBlockEntity(BOOTH) instanceof com.waylays.eraphones.gear.block.BoothBlockEntity b) {
-                if (!com.waylays.eraphones.server.CallService.boothRinging(b.number())) {
-                    fail("the called phone booth does not ring");
-                }
-                com.waylays.eraphones.gear.BoothNet.use(p, b);
-            }
-        }));
-        for (int k = 0; k < 4; k++) {
-            STEPS.add(() -> {
-            });
-        }
-        STEPS.add(() -> {
-            if (!(mc.screen instanceof com.waylays.eraphones.gear.client.BoothScreen) && !com.waylays.eraphones.client.PhoneClient.voiceChat()) {
-                fail("picking up the booth's handset did not show its payphone");
-            }
-            if (com.waylays.eraphones.client.PhoneClient.callState != 3) {
-                fail("picking up the ringing booth did not answer it (state %s)", com.waylays.eraphones.client.PhoneClient.callState);
-            }
-        });
-        STEPS.add(() -> shot(mc, "booth_call"));
-        STEPS.add(() -> {
-            com.waylays.eraphones.client.PhoneClient.hangUp();
-            mc.setScreen(null);
-        });
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p != null && p.level().getBlockEntity(BOOTH) instanceof com.waylays.eraphones.gear.block.BoothBlockEntity b) {
-                com.waylays.eraphones.gear.BoothNet.use(p, b);
-            }
-        }));
-        STEPS.add(() -> {
-        });
-        STEPS.add(() -> {
-            if (mc.screen != null) {
-                for (char c : "5550142".toCharArray()) {
-                    mc.screen.charTyped(c, 0);
-                }
-            }
-        });
-        STEPS.add(() -> shot(mc, "booth_dial"));
-        STEPS.add(() -> mc.setScreen(null));
         // The bicycle: stood on the ground, seen from the side; ridden, pedalled forward (it must go), got off
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -861,56 +774,6 @@ public final class SmokeTest {
                 fail("closed eyes are not told apart in /me");
             }
         });
-        // The limited inventory: in survival, five hand slots; what lands further goes into a free one, else to the ground
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null) {
-                return;
-            }
-            p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-            // What the player carries is put aside, and given back after
-            SAVED.clear();
-            for (int i = 0; i < 36; i++) {
-                SAVED.add(p.getInventory().getItem(i).copy());
-            }
-            p.getInventory().clearContent();
-            p.getInventory().setItem(0, new ItemStack(com.waylays.eraphones.registry.GearRegistry.FLASHLIGHT.get()));
-            p.getInventory().setItem(1, new ItemStack(com.waylays.eraphones.registry.GearRegistry.NEWSPAPER.get(), 3));
-            p.getInventory().setItem(7, new ItemStack(com.waylays.eraphones.registry.GearRegistry.CASSETTE.get()));
-            p.getInventory().setItem(20, new ItemStack(net.minecraft.world.item.Items.APPLE, 5));
-        }));
-        STEPS.add(() -> server.execute(() -> {
-            ServerPlayer p = server.getPlayerList().getPlayer(id);
-            if (p == null) {
-                return;
-            }
-            if (!p.getInventory().getItem(7).isEmpty() || !p.getInventory().getItem(20).isEmpty()) {
-                fail("items stayed in the slots out of reach");
-            }
-        }));
-        STEPS.add(() -> {
-            mc.setScreen(null);
-            mc.options.setCameraType(CameraType.FIRST_PERSON);
-            mc.player.setXRot(10);
-        });
-        STEPS.add(() -> shot(mc, "pack_hotbar"));
-        STEPS.add(() -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)));
-        STEPS.add(() -> shot(mc, "pack_inventory"));
-        STEPS.add(() -> {
-            mc.setScreen(null);
-            mc.options.setCameraType(CameraType.FIRST_PERSON);
-            server.execute(() -> {
-                ServerPlayer p = server.getPlayerList().getPlayer(id);
-                if (p != null) {
-                    p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, ItemStack.EMPTY);
-                    p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
-                    p.getInventory().clearContent();
-                    for (int i = 0; i < SAVED.size(); i++) {
-                        p.getInventory().setItem(i, SAVED.get(i));
-                    }
-                }
-            });
-        });
         // The walkman, a cassette in it, the headphones on; then the heights: 100 cm, 300 cm (the hitbox with them)
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
@@ -991,48 +854,6 @@ public final class SmokeTest {
                 if (p == null) {
                     return;
                 }
-                net.minecraft.server.level.ServerLevel lv = p.serverLevel();
-                net.minecraft.core.Direction dir = p.getDirection();
-                net.minecraft.core.BlockPos door = p.blockPosition().relative(dir, 3);
-                lv.setBlockAndUpdate(door, net.minecraft.world.level.block.Blocks.IRON_DOOR.defaultBlockState()
-                        .setValue(net.minecraft.world.level.block.DoorBlock.FACING, dir.getOpposite()));
-                lv.setBlockAndUpdate(door.above(), net.minecraft.world.level.block.Blocks.IRON_DOOR.defaultBlockState()
-                        .setValue(net.minecraft.world.level.block.DoorBlock.FACING, dir.getOpposite())
-                        .setValue(net.minecraft.world.level.block.DoorBlock.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
-                net.minecraft.core.BlockPos wall = door.relative(dir.getClockWise());
-                lv.setBlockAndUpdate(wall, net.minecraft.world.level.block.Blocks.STONE_BRICKS.defaultBlockState());
-                net.minecraft.core.BlockPos reader = wall.relative(dir.getOpposite());
-                lv.setBlockAndUpdate(reader, com.waylays.eraphones.lock.LockRegistry.READER.get().defaultBlockState()
-                        .setValue(com.waylays.eraphones.lock.CardReaderBlock.FACING, dir.getOpposite()));
-                READER = reader;
-                DOOR = door;
-                ItemStack badge = new ItemStack(com.waylays.eraphones.lock.LockRegistry.BADGE_ITEM.get());
-                badge.set(com.waylays.eraphones.lock.LockRegistry.BADGE.get(), "TEST01");
-                if (lv.getBlockEntity(reader) instanceof com.waylays.eraphones.lock.CardReaderBlockEntity r) {
-                    try {
-                        java.lang.reflect.Method swipe = r.getClass().getDeclaredMethod("swipe", ServerPlayer.class, ItemStack.class);
-                        swipe.setAccessible(true);
-                        swipe.invoke(r, p, badge);
-                        p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-                        swipe.invoke(r, p, badge);
-                        p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
-                    } catch (ReflectiveOperationException e) {
-                        fail("swiping the badge: {}", e.toString());
-                    }
-                } else {
-                    fail("the card reader has no block entity");
-                }
-                if (!lv.getBlockState(door).getValue(net.minecraft.world.level.block.DoorBlock.OPEN)) {
-                    fail("the card reader did not open the door for a badge it knows");
-                }
-                // A padlock on a chest beside
-                net.minecraft.core.BlockPos chest = door.relative(dir.getCounterClockWise(), 2);
-                lv.setBlockAndUpdate(chest, net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState()
-                        .setValue(net.minecraft.world.level.block.ChestBlock.FACING, dir.getOpposite()));
-                com.waylays.eraphones.lock.Locks.lock(p, chest, null, new ItemStack(com.waylays.eraphones.lock.LockRegistry.PADLOCK.get()));
-                if (com.waylays.eraphones.lock.Locks.keyAt(lv, chest) == null) {
-                    fail("the padlock did not lock the chest");
-                }
                 com.waylays.eraphones.size.Body.setHealth(p, 40);
                 com.waylays.eraphones.size.Body.setSpeed(p, 1.5f);
                 if (Math.abs(p.getMaxHealth() - 40) > .01f) {
@@ -1044,7 +865,6 @@ public final class SmokeTest {
             mc.options.setCameraType(CameraType.FIRST_PERSON);
             mc.player.setXRot(15);
         });
-        STEPS.add(() -> shot(mc, "lock_reader_door"));
         STEPS.add(() -> server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayer(id);
             if (p != null) {
@@ -1230,10 +1050,7 @@ public final class SmokeTest {
         enc.finish();
     }
 
-    private static net.minecraft.core.BlockPos BOOTH = net.minecraft.core.BlockPos.ZERO;
     private static java.util.UUID BIKE;
-    private static net.minecraft.core.BlockPos READER = net.minecraft.core.BlockPos.ZERO, DOOR = net.minecraft.core.BlockPos.ZERO;
-    private static final java.util.List<ItemStack> SAVED = new java.util.ArrayList<>();
     private static net.minecraft.core.BlockPos LAMP = net.minecraft.core.BlockPos.ZERO;
     private static net.minecraft.world.phys.Vec3 BIKE_START;
 

@@ -29,29 +29,6 @@ import java.util.Set;
 public final class PhoneGameTests {
     private PhoneGameTests() {}
 
-    @GameTest(template = "platform", skyAccess = true, timeoutTicks = 100)
-    public static void aBoothHasItsNumberAndRings(GameTestHelper helper) {
-        net.minecraft.world.level.block.state.BlockState lower = com.waylays.eraphones.registry.GearRegistry.BOOTH.get().defaultBlockState();
-        helper.setBlock(new BlockPos(1, 2, 1), lower);
-        helper.setBlock(new BlockPos(1, 3, 1), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.PART, 1));
-        helper.setBlock(new BlockPos(1, 4, 1), lower.setValue(com.waylays.eraphones.gear.block.BoothBlock.PART, 2));
-        helper.succeedWhen(() -> {
-            if (!(helper.getBlockEntity(new BlockPos(1, 2, 1)) instanceof com.waylays.eraphones.gear.block.BoothBlockEntity booth)) {
-                throw new net.minecraft.gametest.framework.GameTestAssertException("no booth");
-            }
-            String n = booth.number();
-            helper.assertTrue(!n.isEmpty() && n.startsWith("555-9"), "the booth has a number 555-9xxx, got '" + n + "'");
-            helper.assertTrue(com.waylays.eraphones.server.Booths.is(n), "the network knows the booth " + n);
-            helper.assertTrue(LineData.get(helper.getLevel().getServer()).line(n) != null, "the booth's line exists");
-            if (!com.waylays.eraphones.server.CallService.boothRinging(n)) {
-                helper.assertTrue(com.waylays.eraphones.server.CallService.hidden(helper.getLevel().getServer(), n, java.util.List.of("...")),
-                        "the booth can be called");
-            }
-            helper.assertTrue(com.waylays.eraphones.server.CallService.boothRinging(n), "the called booth rings");
-            helper.assertTrue(helper.getBlockState(new BlockPos(1, 4, 1)).getLightEmission() > 0, "its sign is lit");
-        });
-    }
-
     /** A zone trigger goes off when a player in survival walks into it (its action: a gold block placed); not in creative. */
     @GameTest(template = "platform", skyAccess = true, timeoutTicks = 40)
     public static void aZoneTriggerGoesOff(GameTestHelper helper) {
@@ -236,7 +213,7 @@ public final class PhoneGameTests {
         helper.assertTrue(com.waylays.eraphones.gear.Stations.tuned(1003, 1004) && !com.waylays.eraphones.gear.Stations.tuned(1003, 1006), "tuning");
         // What was taken out of the role play is gone for good: money, identity cards, backpacks, the horror and event things
         for (String gone : new String[] {"piece_25c", "billet_10", "carte_identite", "sac_a_dos_rouge", "poupee", "boite_a_musique", "ballon_rouge",
-                "telecommande_mj", "boite_code", "fragment_etoile", "affiche_disparu_1"}) {
+                "telecommande_mj", "boite_code", "fragment_etoile", "affiche_disparu_1", "cadenas", "cle", "lecteur_carte", "badge", "cabine_telephonique"}) {
             helper.assertFalse(net.minecraft.core.registries.BuiltInRegistries.ITEM.containsKey(com.waylays.eraphones.EraPhones.id(gone)), gone + " is still there");
         }
         helper.succeed();

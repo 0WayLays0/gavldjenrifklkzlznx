@@ -30,30 +30,6 @@
     ],
     "subtitle": "subtitles.eraphones.photo_declic"
   },
-  "cabine_sonnerie": {
-    "sounds": [
-      {
-        "name": "eraphones:cabine_sonnerie",
-        "attenuation_distance": 32
-      }
-    ],
-    "subtitle": "subtitles.eraphones.cabine_sonnerie"
-  },
-  "cabine_piece": {
-    "sounds": [
-      {
-        "name": "eraphones:cabine_piece"
-      }
-    ],
-    "subtitle": "subtitles.eraphones.cabine_piece"
-  },
-  "cabine_touche": {
-    "sounds": [
-      {
-        "name": "eraphones:cabine_touche"
-      }
-    ]
-  },
   "velo_sonnette": {
     "sounds": [
       {

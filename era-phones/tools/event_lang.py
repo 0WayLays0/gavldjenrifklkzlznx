@@ -52,10 +52,6 @@ TEXTS = {
 }
 
 TEXTS.update({
-    "pack.eraphones.no_room": ("No more room: you put it down", "Plus de place : tu le poses par terre"),
-})
-
-TEXTS.update({
     "item.eraphones.baladeur": ("Personal Cassette Player", "Baladeur"),
     "walkman.eraphones.help": ("Use: play / pause · Cassette in the other hand + use: put it in · Crouch + use: take it out",
                                "Clic droit : lecture / pause · Cassette dans l'autre main + clic droit : la mettre · Accroupi + clic droit : l'enlever"),
@@ -73,36 +69,6 @@ TEXTS.update({
 })
 
 TEXTS.update({
-    # Padlocks, keys, badges, the card reader
-    "item.eraphones.cadenas": ("Padlock", "Cadenas"),
-    "item.eraphones.cle": ("Key", "Clé"),
-    "item.eraphones.badge": ("Access Badge", "Badge d'accès"),
-    "block.eraphones.lecteur_carte": ("Card Reader", "Lecteur de carte"),
-    "lock.eraphones.padlock_help": ("Use on a door, trapdoor, gate or chest: it is locked and you get its key (a key in the other hand: that key works it)",
-                                    "Clic droit sur une porte, trappe, portillon ou coffre : fermé à clé, tu reçois la clé (une clé dans l'autre main : c'est elle qui l'ouvrira)"),
-    "lock.eraphones.key_number": ("Key no. %s", "Clé n° %s"),
-    "lock.eraphones.key_blank": ("A blank key", "Une clé vierge"),
-    "lock.eraphones.key_help": ("Opens its padlocks · Crouch + use on one: take it off", "Ouvre ses cadenas · Accroupi + clic droit dessus : l'enlever"),
-    "lock.eraphones.badge_number": ("Badge no. %s", "Badge n° %s"),
-    "lock.eraphones.badge_blank": ("A badge with no number (/badge creer)", "Un badge sans numéro (/badge creer)"),
-    "lock.eraphones.badge_help": ("Swipe it on a card reader that knows it", "À passer sur un lecteur de carte qui le connaît"),
-    "lock.eraphones.not_lockable": ("A padlock goes on a door, a trapdoor, a gate or a chest", "Un cadenas se met sur une porte, une trappe, un portillon ou un coffre"),
-    "lock.eraphones.already": ("There is a padlock on it already", "Il y a déjà un cadenas"),
-    "lock.eraphones.locked": ("Locked (key no. %s)", "Fermé à clé (clé n° %s)"),
-    "lock.eraphones.unlocked": ("You take the padlock off", "Tu enlèves le cadenas"),
-    "lock.eraphones.is_locked": ("It is locked", "C'est fermé à clé"),
-    "lock.eraphones.key_made": ("New key no. %s", "Nouvelle clé n° %s"),
-    "lock.eraphones.badge_made": ("Badge \"%s\" (no. %s)", "Badge « %s » (n° %s)"),
-    "lock.eraphones.copied": ("Copied", "Copié"),
-    "lock.eraphones.hold_key": ("Hold a key", "Tiens une clé"),
-    "lock.eraphones.hold_badge": ("Hold a badge", "Tiens un badge"),
-    "lock.eraphones.reader_learned": ("The reader now knows %s", "Le lecteur connaît maintenant %s"),
-    "lock.eraphones.reader_forgot": ("The reader forgot %s", "Le lecteur a oublié %s"),
-    "lock.eraphones.reader_denied": ("Access refused", "Accès refusé"),
-    "lock.eraphones.reader_cleared": ("The reader knows no badge now", "Le lecteur ne connaît plus aucun badge"),
-    "lock.eraphones.reader_info": ("It knows %s badge(s). Swipe a badge (creative) to add or remove it; crouch: forget them all",
-                                   "Il connaît %s badge(s). Passe un badge (créatif) pour l'ajouter ou l'enlever ; accroupi : tout oublier"),
-    "lock.eraphones.reader_needs": ("It wants a badge", "Il faut un badge"),
     # Carrying someone
     "carry.eraphones.asked": ("%s wants to carry you in their arms.", "%s veut te porter dans ses bras."),
     "carry.eraphones.accept": ("[Accept]", "[Accepter]"),

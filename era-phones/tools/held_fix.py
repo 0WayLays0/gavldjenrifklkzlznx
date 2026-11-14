@@ -37,8 +37,7 @@ HELD = {
     "billet_20": ("flat", .3, "low"), "billet_50": ("flat", .3, "low"), "billet_100": ("flat", .3, "low"),
     "piece_10c": ("flat", .1, "mid"), "piece_25c": ("flat", .11, "mid"),
     "carte_identite": ("flat", .22, "low"), "feuille": ("flat", .3, "low"), "journal_papier": ("flat", .36, "low"),
-    "badge": ("flat", .22, "low"), "telecommande_mj": ("up", .28, "low"), "baladeur": ("up", .26, "low"),
-    "cadenas": ("up", .16, "top"), "cle": ("flat", .2, "mid"),
+    "telecommande_mj": ("up", .28, "low"), "baladeur": ("up", .26, "low"),
     "sac_a_dos_rouge": ("up", .5, "top"), "sac_a_dos_jean": ("up", .5, "top"), "sac_a_dos_militaire": ("up", .5, "top"),
     "sac_a_dos_cuir": ("up", .5, "top"), "sac_a_dos_jaune": ("up", .5, "top"), "sac_a_dos_violet": ("up", .5, "top"),
     "sac_a_dos_sport": ("up", .5, "top"), "sac_a_dos_rando": ("up", .55, "top"),
@@ -50,9 +49,6 @@ FLAT_FIRST = {
 }
 FIRST = {name: FLAT_FIRST for name, h in HELD.items() if h[0] == "flat"}
 FIRST.update({
-    "cabine_telephonique": {
-        "firstperson_righthand": {"rotation": [0, 160, 0], "translation": [1.5, 1, 0], "scale": [.16, .16, .16]},
-        "firstperson_lefthand": {"rotation": [0, 200, 0], "translation": [-1.5, 1, 0], "scale": [.16, .16, .16]}},
     "lampadaire": {
         "firstperson_righthand": {"rotation": [0, 45, 0], "translation": [2, 0, 0], "scale": [.16, .16, .16]},
         "firstperson_lefthand": {"rotation": [0, 45, 0], "translation": [-2, 0, 0], "scale": [.16, .16, .16]}},
@@ -62,7 +58,6 @@ FIRST.update({
 })
 # Big things that are not gripped: only brought down to a hand's size
 THIRD_BIG = {
-    "cabine_telephonique": {"rotation": [0, 135, 0], "translation": [0, 2, 1], "scale": [.14, .14, .14]},
     "lampadaire": {"rotation": [0, 45, 0], "translation": [0, 1, 1], "scale": [.16, .16, .16]},
 }
 

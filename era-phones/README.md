@@ -11,8 +11,8 @@ Contenu original (noms, modèles, sonneries, icônes) : aucune marque réelle ; 
 ## Le menu créatif
 
 Quatre onglets : **Époque RP · Téléphones**, **· Lumière & radio** (lampe torche, piles, talkie-walkie, poste de
-radio), **· Son & image** (magnétoscope, cassette, baladeur, caméscope) et **· Vie quotidienne** (appareil photo, cabine,
-vélos, lampadaire, répondeur, feuille de papier, journal, cadenas, clés, lecteur de carte, badge).
+radio), **· Son & image** (magnétoscope, cassette, baladeur, caméscope) et **· Vie quotidienne** (appareil photo,
+vélos, lampadaire, répondeur, feuille de papier, journal).
 
 ## Les objets des années 80
 
@@ -26,7 +26,6 @@ vélos, lampadaire, répondeur, feuille de papier, journal, cadenas, clés, lect
 | Télévision (bloc) | Lecteur intégré : clic droit avec une cassette pour l'insérer, elle se lance tout de suite. Clic droit pour allumer/éteindre (éteindre met en pause), accroupi + clic droit pour éjecter. Sans cassette, posée à 4 blocs ou moins d'un magnétoscope, elle montre ce qu'il lit. Image : image de vieux poste cathodique (lignes, couleurs qui bavent, image qui tremble et se déchire, bande d'interférence, bas de l'image abîmé par la bande), son de petit haut-parleur usé avec décrochages. Écran bleu sans cassette, neige et grésillement sans magnétoscope. Rembobiner ou avancer fait défiler l'image aussi. Le film est préparé une fois par le serveur (≈ 1 min pour 3 min de film), puis gardé. Sans Simple Voice Chat, l'image défile quand même, sans le son. |
 | Cassette vierge | Clic droit (staff) : le dossier des cassettes s'ouvre sur ton ordinateur et un écran liste les MP3 qui s'y trouvent ; choisis-en un, écris l'étiquette, « Graver ». Le fichier est envoyé au serveur (aucune limite de taille, environ 3 Mo par seconde) et gravé pour toujours sur la cassette tenue. Un joueur sans droits voit seulement qu'elle est vierge. |
 | Appareil photo instantané + pellicule | Clic droit : photographie ce que tu vois (sans la main ni l'interface), une photo sort de l'appareil. Pellicule de 10 photos ; pour recharger, une pellicule dans l'autre main. La photo se regarde (clic droit) dans son cadre blanc, signée du nom du photographe ; à peine sortie, elle se révèle en une minute (d'abord gris-bleu, puis les formes, puis les couleurs). |
-| Cabine téléphonique (bloc, 3 de haut) | Assez haute pour s'y tenir debout. Cadre alu, vitres fumées, enseigne lumineuse « TELEPHONE » qui éclaire la rue, publiphone en acier avec combiné. Chaque cabine a son numéro (555-9xxx, affiché sur l'écran du publiphone). Clic droit : le publiphone s'ouvre ; compose au clavier (souris ou clavier de l'ordinateur), « Appeler » : les appels sont gratuits. Appelée (par un joueur ou par un MJ avec un numéro masqué), elle sonne fort dans la rue : celui qui décroche (clic droit) répond. S'éloigner de la cabine coupe l'appel. |
 | Vélo des années 80 | Cadre rouge, selle banane avec sissy bar chromé, guidon haut avec mousses, garde-boues chromés, pneus à flancs blancs, lampe, sonnette (dessins originaux). Utilise-le sur le sol pour le poser, utilise-le pour monter. Avancer pédale (il accélère jusqu'à ~30 km/h), reculer freine, il va où tu regardes et penche dans les virages, sauter fait sonner la sonnette, s'accroupir pour descendre. Il monte une marche d'un bloc, roule en roue libre, ralentit dans l'eau. Les roues et le pédalier tournent, le guidon tourne dans les virages, le cycliste pédale. Frappe-le pour le ramasser. |
 | Vélos (4 modèles) | Chopper rouge (selle banane, sissy bar), vélo de course bleu (guidon de course, pneus fins, bidon), vélo de ville vert à cadre bas (panier en osier, porte-bagages, selle en cuir à ressorts), BMX chromé (plaque « 80 », mousses jaunes, pneus à crampons). Même conduite pour les quatre. |
 | Lampadaire (bloc, 4 de haut) | Poteau galvanisé, bras au-dessus de la rue, tête « cobra » au verre sodium orange. Les lampadaires s'allument un par un à la tombée de la nuit (ils grésillent et clignotent en chauffant) et s'éteignent à l'aube. |
@@ -39,7 +38,7 @@ vélos, lampadaire, répondeur, feuille de papier, journal, cadenas, clés, lect
 
 | Commande | Effet |
 |---|---|
-| `/panne <rayon> [secondes]` | Coupe le courant autour de toi (jusqu'à `/panne fin`, ou pendant le temps donné) : un bruit de coupure, les lampadaires grésillent et s'éteignent, les télés s'éteignent (et se rallument au retour du courant), les magnétoscopes s'arrêtent, les cabines téléphoniques s'éteignent et n'ont plus de tonalité (elles ne sonnent plus). La lampe torche, elle, marche toujours. |
+| `/panne <rayon> [secondes]` | Coupe le courant autour de toi (jusqu'à `/panne fin`, ou pendant le temps donné) : un bruit de coupure, les lampadaires grésillent et s'éteignent, les télés s'éteignent (et se rallument au retour du courant), les magnétoscopes s'arrêtent. La lampe torche, elle, marche toujours. |
 | `/panne clignote <rayon> [secondes]` | Le courant faiblit : la nuit, les lampadaires clignotent et grésillent (10 s par défaut). |
 | `/panne fin` | Rétablit le courant partout. |
 
@@ -88,12 +87,6 @@ Exemple : `/declencheur action ruelle son rire`, `/declencheur action ruelle att
 
 **Important :** les joueurs en **créatif** ou spectateur ne déclenchent rien (pour que le staff puisse circuler). Pour essayer une zone toi-même : `/declencheur moi` (tu la déclenches même en créatif ; à nouveau pour arrêter), ou `/declencheur tester <nom>`, ou passe en survie. En mode `une_fois`, la zone ne part qu'une fois : `reset <nom>` pour la réarmer. Quand une zone part, le staff le voit au-dessus de sa barre (« Déclencheur X lancé par Y »).
 
-## Inventaire limité
-
-Les joueurs (sauf en créatif ou en spectateur) n'ont **pas d'inventaire** : seulement les **5 premières cases** de leur barre, dessinée plus courte, centrée, plus la main secondaire. La molette fait le tour de ces 5 cases. Les autres cases sont grisées et fermées dans tous les écrans (inventaire, coffres…). Ce qui arrive dans une case fermée va dans une case libre de la main, sinon par terre. On ne ramasse rien s'il n'y a pas de place.
-
-Configuration serveur (`eraphones-server.toml`) : `limitedInventory` (true/false), `hotbarSlots` (1 à 9, 5 par défaut).
-
 ## Baladeur et casque
 
 Un **baladeur** à cassette (onglet Son & image) : une cassette dedans à la fois. Clic droit : lecture ou pause. La musique n'est entendue **que par celui qui l'écoute** (dans son casque, avec Simple Voice Chat), et elle continue tant que le baladeur est sur lui (en main ou dans sa barre). Pendant l'écoute, les autres voient un **casque à mousse orange** sur sa tête. Pour mettre une cassette : cassette dans l'autre main + clic droit (l'ancienne revient dans cette main), ou dans l'inventaire, clic droit avec la cassette sur le baladeur. Accroupi + clic droit (ou clic droit à vide sur lui dans l'inventaire) : la cassette sort. La cassette garde l'endroit où elle s'est arrêtée ; arrivée au bout, elle repart du début. On voit la cassette à travers la vitre du baladeur.
@@ -118,12 +111,6 @@ Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme`. L'atelie
 
 ### Porter quelqu'un
 Accroupi + clic droit main vide sur un joueur : il reçoit une demande dans le chat ([Accepter] ou `/porter accepter`). Il est alors porté dans les bras, allongé, devant le porteur, qui marche plus lentement. Accroupi + clic droit main vide (ou `/porter lacher`) : on le pose. Le porté descend en s'accroupissant. Staff : `/porter <porteur> <porté>` sans demander.
-
-### Cadenas et clés
-Un **cadenas** (clic droit sur une porte, trappe, portillon, coffre ou tonneau) le ferme à clé et donne sa **clé**. Avec une clé dans l'autre main, le cadenas prend le secret de cette clé (une seule clé pour plusieurs portes). Sans la bonne clé en main : « C'est fermé à clé ». Accroupi + clic droit avec la clé : on enlève le cadenas. Impossible à casser ou à faire exploser (sauf en créatif). On voit le cadenas accroché. Staff : `/cle nouvelle`, `/cle copier` (copie la clé en main).
-
-### Lecteur de carte et badges
-Un **lecteur de carte** se pose sur un mur à côté d'une porte (on ne peut pas le casser en survie). `/badge creer <nom>` donne un **badge**. En créatif, passe le badge sur le lecteur pour qu'il le connaisse (encore une fois : il l'oublie ; accroupi main vide : il oublie tout). Un joueur qui passe un badge connu : bip vert, les portes (même en fer), portillons et trappes à 2 blocs s'ouvrent 5 secondes. Badge inconnu : bip rouge, « Accès refusé ». `/badge copier` copie le badge en main.
 
 ### `/vitesse` et `/hp`
 `/vitesse <joueurs> <fois>` (1 = normal, 0.5 = moitié, 2 = double) ou `normale`. `/hp <joueurs> <points>` (20 = normal = 10 cœurs) ou `normal`. Gardés après la mort et la déconnexion. Les **effets** qu'un joueur a quand il meurt (donnés par `/effect` ou autrement) lui sont rendus quand il réapparaît, avec le temps qui leur restait.

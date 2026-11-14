@@ -37,10 +37,8 @@ public final class GearNet {
         TapeNet.register(r);
         TvNet.register(r);
         PhotoNet.register(r);
-        BoothNet.register(r);
         CamNet.register(r);
         com.waylays.eraphones.walkman.Walkmans.register(r);
-        com.waylays.eraphones.lock.Locks.register(r);
         com.waylays.eraphones.arms.Arms.register(r);
         r.playToClient(Stations.TYPE, Stations.CODEC, (p, c) -> com.waylays.eraphones.gear.client.GearClient.stations(p));
     }

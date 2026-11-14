@@ -569,10 +569,6 @@ def sounds():
     ogg("coeur_peur", beat / np.abs(beat).max() * .95)
     import photo_assets
     ogg("photo_declic", photo_assets.shutter(rate))
-    import booth_assets
-    ogg("cabine_sonnerie", booth_assets.bell(rate))
-    ogg("cabine_piece", booth_assets.coin(rate))
-    ogg("cabine_touche", booth_assets.key(rate))
     import bike_assets
     ogg("velo_sonnette", bike_assets.bell(rate))
     import machine_assets
@@ -586,10 +582,6 @@ def sounds():
         "talkie_squelch": {"sounds": [{"name": "eraphones:talkie_squelch"}], "subtitle": "subtitles.eraphones.talkie_squelch"},
         "coeur_peur": {"sounds": [{"name": "eraphones:coeur_peur"}]},
         "photo_declic": {"sounds": [{"name": "eraphones:photo_declic"}], "subtitle": "subtitles.eraphones.photo_declic"},
-        "cabine_sonnerie": {"sounds": [{"name": "eraphones:cabine_sonnerie", "attenuation_distance": 32}],
-                            "subtitle": "subtitles.eraphones.cabine_sonnerie"},
-        "cabine_piece": {"sounds": [{"name": "eraphones:cabine_piece"}], "subtitle": "subtitles.eraphones.cabine_piece"},
-        "cabine_touche": {"sounds": [{"name": "eraphones:cabine_touche"}]},
         "velo_sonnette": {"sounds": [{"name": "eraphones:velo_sonnette", "attenuation_distance": 24}], "subtitle": "subtitles.eraphones.velo_sonnette"},
         "lampadaire_bourdonnement": {"sounds": [{"name": "eraphones:lampadaire_bourdonnement", "attenuation_distance": 20}],
                                      "subtitle": "subtitles.eraphones.lampadaire_bourdonnement"},
@@ -628,8 +620,6 @@ def main():
     horror_items.main()
     import photo_assets
     photo_assets.main()
-    import booth_assets
-    booth_assets.main()
     import bike_assets
     bike_assets.main()
     import lamp_assets
