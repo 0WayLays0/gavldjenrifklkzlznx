@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'era-phones-forge/**'
+      - 'era-phones/emotes/**'
       - '.github/workflows/era-phones-forge.yml'
   workflow_dispatch:
 
@@ -54,7 +55,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: epoque-rp-forge-1.20.1-jar
-          path: era-phones-forge/build/libs/epoque-rp-*-forge-1.20.1.jar
+          # The jar, and the clown emotes for Emotecraft (to put in .minecraft/emotes)
+          path: |
+            era-phones-forge/build/libs/epoque-rp-*-forge-1.20.1.jar
+            era-phones/emotes/*.json
+            era-phones/emotes/*.png
           if-no-files-found: error
 
       - name: Report
