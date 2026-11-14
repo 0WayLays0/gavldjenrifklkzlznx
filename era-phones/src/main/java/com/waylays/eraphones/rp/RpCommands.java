@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * The role-play commands: /nom, /moi, /scene, /des, /tenter, /chuchoter, /crier, /hrp, /description, /examiner, /voir, and
+ * The role-play commands: /setname, /me, /do, /roll, /try, /chuchoter, /crier, /hrp, /desc, /examiner, /voir, and
  * /rp (the list, and for game masters who plays whom and naming someone else's character).
  */
 public final class RpCommands {
@@ -26,16 +26,17 @@ public final class RpCommands {
     private RpCommands() {}
 
     public static void register(CommandDispatcher<CommandSourceStack> d) {
-        d.register(Commands.literal("nom")
+        d.register(Commands.literal("setname")
                 .then(Commands.argument("prenom", StringArgumentType.word()).then(Commands.argument("nom", StringArgumentType.greedyString())
                         .executes(RpCommands::setName))));
-        // The game's own /me goes (it shows the account's name, and its name is English): /moi takes its place
-        remove(d, "me");
-        d.register(Commands.literal("moi").then(Commands.argument("action", StringArgumentType.greedyString())
-                .executes(c -> act(c, "action", RpService::me))));
-        d.register(Commands.literal("scene").then(Commands.argument("description", StringArgumentType.greedyString())
+        // The game's own /me is replaced (it shows the account's name)
+        if (remove(d, "me")) {
+            d.register(Commands.literal("me").then(Commands.argument("action", StringArgumentType.greedyString())
+                    .executes(c -> act(c, "action", RpService::me))));
+        }
+        d.register(Commands.literal("do").then(Commands.argument("description", StringArgumentType.greedyString())
                 .executes(c -> act(c, "description", RpService::doing))));
-        d.register(Commands.literal("tenter").then(Commands.argument("action", StringArgumentType.greedyString())
+        d.register(Commands.literal("try").then(Commands.argument("action", StringArgumentType.greedyString())
                 .executes(c -> act(c, "action", RpService::attempt))));
         d.register(Commands.literal("chuchoter").then(Commands.argument("message", StringArgumentType.greedyString())
                 .executes(c -> act(c, "message", RpService::whisper))));
@@ -43,9 +44,9 @@ public final class RpCommands {
                 .executes(c -> act(c, "message", RpService::shout))));
         d.register(Commands.literal("hrp").then(Commands.argument("message", StringArgumentType.greedyString())
                 .executes(c -> act(c, "message", RpService::ooc))));
-        d.register(Commands.literal("des").executes(c -> roll(c, "100"))
+        d.register(Commands.literal("roll").executes(c -> roll(c, "100"))
                 .then(Commands.argument("des", StringArgumentType.word()).executes(c -> roll(c, StringArgumentType.getString(c, "des")))));
-        d.register(Commands.literal("description").executes(RpCommands::clearDescription)
+        d.register(Commands.literal("desc").executes(RpCommands::clearDescription)
                 .then(Commands.argument("texte", StringArgumentType.greedyString()).executes(RpCommands::description)));
         d.register(Commands.literal("examiner").then(Commands.argument("cible", EntityArgument.player()).executes(RpCommands::examine)));
         d.register(Commands.literal("voir").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HIDE_PERMISSION, 2)))
@@ -223,7 +224,7 @@ public final class RpCommands {
     }
 
     private static int help(CommandContext<CommandSourceStack> c) {
-        for (String line : new String[] {"nom", "moi", "scene", "des", "tenter", "chuchoter", "crier", "hrp", "description", "examiner", "voir", "pseudos"}) {
+        for (String line : new String[] {"setname", "me", "do", "roll", "try", "chuchoter", "crier", "hrp", "desc", "examiner", "voir", "pseudos"}) {
             c.getSource().sendSuccess(() -> Component.empty().append(RpService.colored("/" + line + " ", RpService.NAME))
                     .append(Component.translatable("rp.eraphones.help." + line).withStyle(ChatFormatting.GRAY)), false);
         }

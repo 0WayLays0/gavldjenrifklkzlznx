@@ -1,17 +1,12 @@
 package com.waylays.eraphones.carry;
 
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.waylays.eraphones.EraPhones;
 import com.waylays.eraphones.rp.RpConfig;
 import com.waylays.eraphones.rp.RpService;
 import net.minecraft.ChatFormatting;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -28,23 +23,14 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
- * Carrying someone in one's arms: crouching with an empty hand, use another player: they are asked, and if they
- * accept (a click in the chat, or /porter accepter) they are lifted, lying across the carrier's arms. The carrier
- * walks more slowly; crouching with an empty hand again (or /porter lacher), they set them down; the one carried gets
+ * Carrying someone in one's arms: crouching with an empty hand, use another player: they are lifted at once, lying
+ * across the carrier's arms. The carrier walks more slowly; crouching with an empty hand again (or /porter lacher), they set them down; the one carried gets
  * down by crouching. A game master can lift anyone onto anyone: /porter &lt;carrier&gt; &lt;carried&gt;.
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class Carry {
     private static final ResourceLocation SLOW = EraPhones.id("porter");
-    /** Asked: the one asked, who asks, until when (game time). */
-    private static final Map<UUID, Ask> ASKED = new ConcurrentHashMap<>();
-
-    private record Ask(UUID carrier, long until) {}
 
     private Carry() {}
 
@@ -85,13 +71,8 @@ public final class Carry {
             return;
         }
         event.setCanceled(true);
-        ASKED.put(target.getUUID(), new Ask(p.getUUID(), p.level().getGameTime() + 400));
-        Component yes = Component.translatable("carry.eraphones.accept").withStyle(s -> s.withColor(ChatFormatting.GREEN).withBold(true)
-                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/porter accepter"))
-                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("/porter accepter"))));
-        target.sendSystemMessage(Component.translatable("carry.eraphones.asked", RpService.name(p)).withStyle(ChatFormatting.GOLD)
-                .append(" ").append(yes));
-        p.displayClientMessage(Component.translatable("carry.eraphones.asking", RpService.name(target)).withStyle(ChatFormatting.GRAY), true);
+        // No asking: the player is picked up at once
+        lift(p, target);
     }
 
     public static void lift(ServerPlayer carrier, ServerPlayer carried) {
@@ -140,7 +121,6 @@ public final class Carry {
     public static void onCommands(RegisterCommandsEvent event) {
         int level = RpConfig.get(RpConfig.HORROR_PERMISSION, 2);
         event.getDispatcher().register(Commands.literal("porter")
-                .then(Commands.literal("accepter").executes(Carry::accept))
                 .then(Commands.literal("lacher").executes(c -> {
                     setDown(c.getSource().getPlayerOrException());
                     return 1;
@@ -150,17 +130,5 @@ public final class Carry {
                             lift(EntityArgument.getPlayer(c, "porteur"), EntityArgument.getPlayer(c, "porte"));
                             return 1;
                         }))));
-    }
-
-    private static int accept(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
-        ServerPlayer me = c.getSource().getPlayerOrException();
-        Ask ask = ASKED.remove(me.getUUID());
-        ServerPlayer carrier = ask == null ? null : me.server.getPlayerList().getPlayer(ask.carrier);
-        if (carrier == null || me.level().getGameTime() > ask.until || carrier.distanceTo(me) > 4 || carrier.isVehicle()) {
-            c.getSource().sendFailure(Component.translatable("carry.eraphones.no_ask"));
-            return 0;
-        }
-        lift(carrier, me);
-        return 1;
     }
 }

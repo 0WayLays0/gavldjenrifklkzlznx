@@ -83,7 +83,7 @@ public final class RpService {
         }
     }
 
-    /** "/moi ferme les yeux" (or closes their eyes): the words that shut a player's eyes. */
+    /** "/me ferme les yeux" (or closes their eyes): the words that shut a player's eyes. */
     private static final java.util.regex.Pattern EYES = java.util.regex.Pattern.compile(
             "(ferm\\p{L}*|clos\\p{L}*)\\s+(les|ses|mes|leurs|their|his|her|my|the)?\\s*(yeux|paupi\\p{L}*|eyes|eyelids)",
             java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);

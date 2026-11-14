@@ -1,6 +1,7 @@
 package com.waylays.eraphones.event;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -66,7 +67,7 @@ import java.util.UUID;
  * their phone, a street's power cut, their torch breaking, any command...), with pauses in between if wanted; once
  * only, once for each player, or every time. Players in creative or spectator set nothing off. Kept with the world.
  *
- * <p>/declencheur pos1|pos2 [x y z], creer &lt;nom&gt;, action &lt;nom&gt; &lt;what&gt; ..., mode, actif, tester, rearmer,
+ * <p>/declencheur pos1|pos2 [x y z], creer &lt;nom&gt;, action &lt;nom&gt; &lt;what&gt; ..., mode, actif, tester, reset,
  * vider, supprimer, info, liste, montrer.
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
@@ -475,20 +476,16 @@ public final class Triggers extends SavedData {
             z.actions.clear();
             return "event.eraphones.trigger.cleared";
         }))));
-        root.then(Commands.literal("rearmer").then(named().executes(c -> edit(c, (t, z) -> {
+        root.then(Commands.literal("reset").then(named().executes(c -> edit(c, (t, z) -> {
             z.fired = false;
             z.firedFor.clear();
             z.last.clear();
             return "event.eraphones.trigger.reset";
         }))));
-        ArgumentBuilder<CommandSourceStack, ?> active = named();
-        for (boolean on : new boolean[] {true, false}) {
-            active.then(Commands.literal(on ? "oui" : "non").executes(c -> edit(c, (t, z) -> {
-                z.enabled = on;
-                return on ? "event.eraphones.trigger.on" : "event.eraphones.trigger.off";
-            })));
-        }
-        root.then(Commands.literal("actif").then(active));
+        root.then(Commands.literal("actif").then(named().then(Commands.argument("oui", BoolArgumentType.bool()).executes(c -> edit(c, (t, z) -> {
+            z.enabled = BoolArgumentType.getBool(c, "oui");
+            return z.enabled ? "event.eraphones.trigger.on" : "event.eraphones.trigger.off";
+        })))));
         LiteralArgumentBuilder<CommandSourceStack> mode = Commands.literal("mode");
         ArgumentBuilder<CommandSourceStack, ?> modeNamed = named();
         for (String m : MODES) {

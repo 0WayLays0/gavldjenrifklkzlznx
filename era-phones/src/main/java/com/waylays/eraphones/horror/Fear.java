@@ -29,7 +29,7 @@ import java.util.UUID;
  * out); it falls in the light and in company. The player feels it (see HorrorClient): from a third of the way up the
  * heart beats, then faster, the edges of the sight darken, the sight shakes and blurs.
  * The staff (who may use /horreur), and anyone in creative or spectator, feel nothing. A game master turns it on or
- * off for the whole server (/peur jauge activer|desactiver, kept with the world).
+ * off for the whole server (/peur jauge on|off, kept with the world).
  */
 @EventBusSubscriber(modid = EraPhones.MODID)
 public final class Fear extends SavedData {
@@ -72,7 +72,7 @@ public final class Fear extends SavedData {
         }
     }
 
-    /** The staff who asked to feel it, to try it (/peur jauge tester). */
+    /** The staff who asked to feel it, to try it (/peur jauge test). */
     private static final java.util.Set<UUID> TESTING = new java.util.HashSet<>();
 
     /** Staff, creative and spectators never feel it, unless they are trying it. */

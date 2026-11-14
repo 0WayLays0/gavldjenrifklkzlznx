@@ -25,7 +25,7 @@ import java.util.List;
  * a red balloon, floating, dizziness, the ground shaking, and stop) and /voix (a changed voice, with Simple Voice Chat).
  */
 public final class HorrorCommands {
-    private static final String[] TOOLS = {"son", "murmure", "brouillard", "coupure", "sang", "ballon", "flotter", "vertige", "tremblement", "arreter"};
+    private static final String[] TOOLS = {"son", "murmure", "brouillard", "coupure", "sang", "ballon", "flotter", "vertige", "tremblement", "stop"};
 
     private HorrorCommands() {}
 
@@ -63,7 +63,7 @@ public final class HorrorCommands {
                 .then(Commands.literal("ballon").then(Commands.argument("joueurs", EntityArgument.players())
                         .executes(c -> on(c, (cc, t) -> balloon(cc, t, null)))
                         .then(Commands.literal("ici").executes(c -> on(c, (cc, t) -> balloon(cc, t, cc.getSource().getPosition().add(0, 1.6, 0)))))))
-                .then(Commands.literal("arreter").then(Commands.argument("joueurs", EntityArgument.players()).executes(c -> on(c, (cc, t) -> {
+                .then(Commands.literal("stop").then(Commands.argument("joueurs", EntityArgument.players()).executes(c -> on(c, (cc, t) -> {
                     HorrorService.stop(t);
                     cc.getSource().sendSuccess(() -> Component.translatable("rp.eraphones.horror.stopped", t.size()).withStyle(ChatFormatting.GRAY), true);
                     return t.size();
@@ -73,7 +73,7 @@ public final class HorrorCommands {
         d.register(Commands.literal("narration").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.argument("texte", StringArgumentType.greedyString())
                         .executes(c -> narrate(c, c.getSource().getServer().getPlayerList().getPlayers()))));
-        d.register(Commands.literal("narrationseul").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+        d.register(Commands.literal("narrationalone").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.argument("joueurs", EntityArgument.players()).then(Commands.argument("texte", StringArgumentType.greedyString())
                         .executes(c -> narrate(c, EntityArgument.getPlayers(c, "joueurs"))))));
 
@@ -82,11 +82,11 @@ public final class HorrorCommands {
                 // The fear gauge: on or off for the whole server, how afraid each one is, set by hand
                 .then(Commands.literal("jauge")
                         .executes(HorrorCommands::gaugeInfo)
-                        .then(Commands.literal("activer").executes(c -> gaugeSwitch(c, true)))
-                        .then(Commands.literal("desactiver").executes(c -> gaugeSwitch(c, false)))
+                        .then(Commands.literal("on").executes(c -> gaugeSwitch(c, true)))
+                        .then(Commands.literal("off").executes(c -> gaugeSwitch(c, false)))
                         .then(Commands.literal("info").executes(HorrorCommands::gaugeInfo))
                         // A staff member feels it themselves, to try it (again: stops), and may set their own level
-                        .then(Commands.literal("tester").executes(c -> {
+                        .then(Commands.literal("test").executes(c -> {
                             ServerPlayer p = c.getSource().getPlayerOrException();
                             boolean on = Fear.toggleTest(p);
                             if (on && !Fear.enabled(c.getSource().getServer())) {
@@ -146,7 +146,7 @@ public final class HorrorCommands {
         d.register(Commands.literal("narrationchat").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.argument("texte", StringArgumentType.greedyString())
                         .executes(c -> narrateChat(c, c.getSource().getServer().getPlayerList().getPlayers()))));
-        d.register(Commands.literal("narrationchatseul").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
+        d.register(Commands.literal("narrationchatalone").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.argument("joueurs", EntityArgument.players()).then(Commands.argument("texte", StringArgumentType.greedyString())
                         .executes(c -> narrateChat(c, EntityArgument.getPlayers(c, "joueurs"))))));
 
