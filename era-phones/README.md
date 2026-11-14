@@ -49,9 +49,9 @@ Les coupures ne survivent pas à un redémarrage du serveur.
 | Commande | Effet |
 | --- | --- |
 | `/narration <texte>` | Narration sur l'écran de tous les joueurs (bandes noires de cinéma, texte qui s'écrit) et dans leur chat. |
-| `/narrationalone <joueurs> <texte>` | La même chose pour un seul joueur (ou ceux choisis). |
+| `/narrationseul <joueurs> <texte>` | La même chose pour un seul joueur (ou ceux choisis). |
 | `/narrationchat <texte>` | Narration seulement dans le chat de tous (rien à l'écran). |
-| `/narrationchatalone <joueurs> <texte>` | Pareil, pour un ou quelques joueurs. |
+| `/narrationchatseul <joueurs> <texte>` | Pareil, pour un ou quelques joueurs. |
 | `/cassette liste` | Les fichiers MP3 disponibles sur le serveur (`config/eraphones/cassettes/`, où arrivent aussi ceux gravés depuis le jeu). |
 | `/cassette graver <fichier> <titre>` | Donne une cassette de ce fichier, avec ce titre sur l'étiquette. Elle ne peut plus être modifiée. |
 | `/radio emettre <fréquence>` · `/radio arreter` | Passer à l'antenne sur une fréquence (ta voix sort des radios réglées dessus), ou s'arrêter. |
@@ -64,7 +64,7 @@ Des outils faits pour un grand événement d'horreur en ville, pensés pour un m
 
 | Chose | Comment ça marche |
 |---|---|
-| `/me ferme les yeux` | Dans un `/me`, « ferme les yeux » (ou « ferme ses yeux », « closes his eyes »…) ferme les yeux du joueur sur son écran : les paupières descendent, tout est noir pendant 6 s, puis elles se rouvrent avec un clignement. Les maîtres du jeu reçoivent « X ferme les yeux » dans le chat. |
+| `/moi ferme les yeux` | Dans un `/moi`, « ferme les yeux » (ou « ferme ses yeux », « closes his eyes »…) ferme les yeux du joueur sur son écran : les paupières descendent, tout est noir pendant 6 s, puis elles se rouvrent avec un clignement. Les maîtres du jeu reçoivent « X ferme les yeux » dans le chat. |
 
 ### Déclencheurs de zone : `/declencheur`
 
@@ -81,11 +81,11 @@ Une zone invisible ; quand un joueur y entre, ce qui a été prévu lui arrive t
    - `commande <commande>` (n'importe quelle commande ; `{joueur}` = son pseudo, `@s` = lui) ;
    - `attendre <secondes>` : une pause avant la suite.
 4. `/declencheur mode <nom> une_fois | chaque_joueur | toujours [secondes entre deux]` (par défaut : une seule fois).
-5. `/declencheur tester <nom> [joueur]`, `liste`, `info <nom>`, `montrer [secondes]` (voir les zones), `actif <nom> true|false`, `reset <nom>` (pour qu'il se relance), `vider <nom>`, `supprimer <nom>`.
+5. `/declencheur tester <nom> [joueur]`, `liste`, `info <nom>`, `montrer [secondes]` (voir les zones), `actif <nom> oui|non`, `rearmer <nom>` (pour qu'il se relance), `vider <nom>`, `supprimer <nom>`.
 
 Exemple : `/declencheur action ruelle son rire`, `/declencheur action ruelle attendre 3`, `/declencheur action ruelle ballon`.
 
-**Important :** les joueurs en **créatif** ou spectateur ne déclenchent rien (pour que le staff puisse circuler). Pour essayer une zone toi-même : `/declencheur moi` (tu la déclenches même en créatif ; à nouveau pour arrêter), ou `/declencheur tester <nom>`, ou passe en survie. En mode `une_fois`, la zone ne part qu'une fois : `reset <nom>` pour la réarmer. Quand une zone part, le staff le voit au-dessus de sa barre (« Déclencheur X lancé par Y »).
+**Important :** les joueurs en **créatif** ou spectateur ne déclenchent rien (pour que le staff puisse circuler). Pour essayer une zone toi-même : `/declencheur moi` (tu la déclenches même en créatif ; à nouveau pour arrêter), ou `/declencheur tester <nom>`, ou passe en survie. En mode `une_fois`, la zone ne part qu'une fois : `rearmer <nom>` pour la réarmer. Quand une zone part, le staff le voit au-dessus de sa barre (« Déclencheur X lancé par Y »).
 
 ## Baladeur et casque
 
@@ -112,18 +112,18 @@ Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme`. L'atelie
 ### Porter quelqu'un
 Accroupi + clic droit main vide sur un joueur : il reçoit une demande dans le chat ([Accepter] ou `/porter accepter`). Il est alors porté dans les bras, allongé, devant le porteur, qui marche plus lentement. Accroupi + clic droit main vide (ou `/porter lacher`) : on le pose. Le porté descend en s'accroupissant. Staff : `/porter <porteur> <porté>` sans demander.
 
-### `/vitesse` et `/hp`
-`/vitesse <joueurs> <fois>` (1 = normal, 0.5 = moitié, 2 = double) ou `normale`. `/hp <joueurs> <points>` (20 = normal = 10 cœurs) ou `normal`. Gardés après la mort et la déconnexion. Les **effets** qu'un joueur a quand il meurt (donnés par `/effect` ou autrement) lui sont rendus quand il réapparaît, avec le temps qui leur restait.
+### `/vitesse` et `/vie`
+`/vitesse <joueurs> <fois>` (1 = normal, 0.5 = moitié, 2 = double) ou `normale`. `/vie <joueurs> <points>` (20 = normal = 10 cœurs) ou `normal`. Gardés après la mort et la déconnexion. Les **effets** qu'un joueur a quand il meurt (donnés par `/effect` ou autrement) lui sont rendus quand il réapparaît, avec le temps qui leur restait.
 
 ## Jauge de peur, photos épinglées, emotes
 
 ### Jauge de peur : `/peur jauge`
 Chaque joueur a une peur de 0 à 100 %. Elle **monte** dans le noir (une lampe torche allumée, une torche ou une lanterne en main comptent comme de la lumière), seul, la nuit dehors, blessé, avec des monstres autour, et d'un coup quand le staff lui envoie quelque chose (`/horreur` sons, murmure, coupure, sang, ballon, `/peur`, coups reçus). Elle **descend** à la lumière et à plusieurs. À partir d'un tiers : le cœur bat, de plus en plus vite, les bords de l'écran s'assombrissent au rythme du cœur ; au-delà des deux tiers : la vue tremble et se brouille un peu. Un petit cœur et un tracé de moniteur en bas à gauche la montrent.
 **Le staff** (ceux qui peuvent utiliser `/horreur`), et les joueurs en créatif ou spectateur, **ne ressentent rien**.
-- `/peur jauge on` / `/peur jauge off` : l'active ou la coupe pour tout le serveur (gardé avec le monde) ;
+- `/peur jauge activer` / `/peur jauge desactiver` : l'active ou la coupe pour tout le serveur (gardé avec le monde) ;
 - `/peur jauge` ou `/peur jauge info` : l'état, et la peur de chaque joueur ;
 - `/peur jauge <joueurs> <0-100>` : la régler à la main.
-- `/peur jauge test` : **toi (staff), tu la ressens comme un joueur** pour l'essayer (à nouveau : arrêter) ; `/peur jauge test <0-100>` règle la tienne directement (même si la jauge est coupée).
+- `/peur jauge tester` : **toi (staff), tu la ressens comme un joueur** pour l'essayer (à nouveau : arrêter) ; `/peur jauge tester <0-100>` règle la tienne directement (même si la jauge est coupée).
 
 ### Photos épinglées (Polaroid)
 L'**appareil photo instantané** (onglet Objets) prend ce que tu vois ; la photo sort et se révèle en une minute. **Accroupi + clic droit** avec une photo sur un **mur** : elle y est épinglée (une punaise de couleur, un peu de travers) ; sur une **table ou le sol** : elle y est posée. On y voit l'image, et le nom de qui l'a prise. Clic droit dessus : on la regarde en grand. Un coup : on la reprend. Plusieurs côte à côte font un **tableau d'enquête**.
@@ -177,16 +177,16 @@ messages). Les messages attendent sur le serveur si le téléphone est éteint, 
 
 | Commande | Effet |
 | --- | --- |
-| `/setname Prénom Nom` | Le nom du personnage remplace le pseudo partout (au-dessus de la tête, liste des joueurs, tout ce qui est dit). |
+| `/nom Prénom Nom` | Le nom du personnage remplace le pseudo partout (au-dessus de la tête, liste des joueurs, tout ce qui est dit). |
 | *(chat normal)* | Parole entendue autour (20 blocs) : « Bill Denbrough dit : « … » ». |
-| `/me action` | Action en violet italique, dans le chat (rien au-dessus de la tête). |
-| `/do description` | Description de la scène (ambre). |
-| `/roll [100]` | « Bill Denbrough a lancé un dé sur 100 : 42 » (dé sur 100 par défaut ; aussi `1d20`, `2d6`…). |
-| `/try action` | Tente quelque chose : réussite ou échec. |
+| `/moi action` | Action en violet italique, dans le chat (rien au-dessus de la tête). |
+| `/scene description` | Description de la scène (ambre). |
+| `/des [100]` | « Bill Denbrough a lancé un dé sur 100 : 42 » (dé sur 100 par défaut ; aussi `1d20`, `2d6`…). |
+| `/tenter action` | Tente quelque chose : réussite ou échec. |
 | `/chuchoter message` | 4 blocs ; un peu plus loin on voit seulement que quelqu'un chuchote. |
 | `/crier message` | 48 blocs. |
 | `/hrp message` | Hors personnage, à tout le monde (seul endroit où le pseudo apparaît). |
-| `/desc texte` · `/examiner joueur` | Ce que les autres voient du personnage. |
+| `/description texte` · `/examiner joueur` | Ce que les autres voient du personnage. |
 | `/voir joueur` · `/voir tous` · `/voir personne` | N'être **vu et entendu que** par ce(s) joueur(s) : pour les autres le personnage n'existe plus (ni dessiné, ni entendu, ni touchable), ses paroles ne leur parviennent pas, et avec Simple Voice Chat sa voix non plus. Réservé aux maîtres du jeu par défaut (`voirPermission`). |
 | `/pseudos cacher` · `/pseudos afficher` | Les pseudos au-dessus des têtes sont **cachés par défaut** ; `/pseudos afficher` les réaffiche (et `/pseudos cacher` les recache), pour tout le monde : passe par une équipe du tableau des scores (« nom jamais visible »), que le jeu de base respecte sur chaque client, avec ou sans le mod (Essential compris, qui s'accroche au nom du jeu). Les joueurs sont alors dans l'équipe `eraphones_rp` (un joueur ne peut être que dans une équipe). Maîtres du jeu. |
 | `/rp` · `/rp qui` · `/rp nom joueur Prénom Nom` | Aide ; pour les maîtres du jeu : qui joue qui, nommer un personnage. |
@@ -220,7 +220,7 @@ cri), permission de `/voir`, noms au-dessus des têtes, bulles au-dessus des tê
 | `/horreur flotter <joueurs> [secondes]` | Ils s'élèvent lentement et flottent (6 s par défaut), puis redescendent doucement, sans dégâts. |
 | `/horreur vertige <joueurs> [secondes]` | Le monde tangue autour d'eux. |
 | `/horreur tremblement <joueurs> [secondes]` | Le sol tremble et gronde. |
-| `/horreur stop <joueurs>` | Arrête tout pour eux (sons à venir, visions, vertige ; ceux qui flottent redescendent doucement). |
+| `/horreur arreter <joueurs>` | Arrête tout pour eux (sons à venir, visions, vertige ; ceux qui flottent redescendent doucement). |
 
 ### `/voix` : changer de voix (Simple Voice Chat)
 

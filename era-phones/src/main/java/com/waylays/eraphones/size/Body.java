@@ -33,7 +33,7 @@ import java.util.Collection;
 
 /**
  * What a game master sets on a player's body and that stays through death: their speed (/vitesse &lt;players&gt;
- * &lt;times&gt;, 1 the usual, or normale), their health (/hp &lt;players&gt; &lt;points&gt;, 20 the usual, or normal), and
+ * &lt;times&gt;, 1 the usual, or normale), their health (/vie &lt;players&gt; &lt;points&gt;, 20 the usual, or normal), and
  * the effects they carry (given by /effect or otherwise) when they die, given back when they come back with what
  * was left of them.
  */
@@ -140,7 +140,7 @@ public final class Body {
         }
     }
 
-    // ---------------------------------------------------------------- /vitesse, /hp
+    // ---------------------------------------------------------------- /vitesse, /vie
 
     @SubscribeEvent
     public static void onCommands(RegisterCommandsEvent event) {
@@ -149,7 +149,7 @@ public final class Body {
                 .then(Commands.argument("joueurs", EntityArgument.players())
                         .then(Commands.literal("normale").executes(c -> speed(c, 1)))
                         .then(Commands.argument("fois", FloatArgumentType.floatArg(0, 10)).executes(c -> speed(c, FloatArgumentType.getFloat(c, "fois"))))));
-        event.getDispatcher().register(Commands.literal("hp").requires(s -> s.hasPermission(level))
+        event.getDispatcher().register(Commands.literal("vie").requires(s -> s.hasPermission(level))
                 .then(Commands.argument("joueurs", EntityArgument.players())
                         .then(Commands.literal("normal").executes(c -> health(c, 20)))
                         .then(Commands.argument("points", IntegerArgumentType.integer(1, 1024)).executes(c -> health(c, IntegerArgumentType.getInteger(c, "points"))))));

@@ -15,7 +15,7 @@ public final class RpConfig {
         LOCAL_CHAT = b.comment("The chat is speech: heard only around the one who speaks, under their character's name. /hrp stays global.")
                 .define("localChat", true);
         SAY_RANGE = b.comment("How far speech carries (blocks)").defineInRange("sayRange", 20, 2, 200);
-        ACTION_RANGE = b.comment("How far /me, /do, /roll and /try are seen (blocks)").defineInRange("actionRange", 20, 2, 200);
+        ACTION_RANGE = b.comment("How far /moi, /scene, /des and /tenter are seen (blocks)").defineInRange("actionRange", 20, 2, 200);
         WHISPER_RANGE = b.comment("How far a whisper is heard (blocks)").defineInRange("whisperRange", 4, 1, 20);
         SHOUT_RANGE = b.comment("How far a shout carries (blocks)").defineInRange("shoutRange", 48, 10, 400);
         HIDE_PERMISSION = b.comment("The permission level needed for /voir (2: game masters)").defineInRange("voirPermission", 2, 0, 4);

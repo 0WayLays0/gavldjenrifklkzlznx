@@ -3,7 +3,7 @@
 E = "event.eraphones."
 
 TEXTS = {
-    # The /me that closes the eyes
+    # The /moi that closes the eyes
     # (rp.eraphones.eyes.staff is with the role-play texts)
     # The zone triggers
     E + "trigger.corner": ("Corner %s: %s %s %s", "Coin %s : %s %s %s"),
@@ -46,9 +46,9 @@ TEXTS = {
     E + "trigger.me_off": ("You no longer set the zones off in creative", "Tu ne déclenches plus les zones en créatif"),
     E + "trigger.creative_hint": ("You are in creative: players in creative set nothing off. To try it: /declencheur moi, or /declencheur tester <name>, or survival", "Tu es en créatif : les joueurs en créatif ne déclenchent rien. Pour essayer : /declencheur moi, ou /declencheur tester <nom>, ou passe en survie"),
     E + "trigger.fired": ("Trigger %s set off by %s", "Déclencheur %s lancé par %s"),
-    E + "trigger.spent": ("Trigger %s already went off once: /declencheur reset %1$s to set it again (or mode chaque_joueur / toujours)", "Le déclencheur %s s'est déjà lancé une fois : /declencheur reset %1$s pour le réarmer (ou mode chaque_joueur / toujours)"),
-    E + "trigger.help.gerer": ("/declencheur liste | info | montrer [s] | actif <name> true|false | reset | vider | supprimer (creative players set nothing off)",
-                               "/declencheur liste | info | montrer [s] | actif <nom> true|false | reset | vider | supprimer (les joueurs en créatif ne déclenchent rien)"),
+    E + "trigger.spent": ("Trigger %s already went off once: /declencheur rearmer %1$s to set it again (or mode chaque_joueur / toujours)", "Le déclencheur %s s'est déjà lancé une fois : /declencheur rearmer %1$s pour le réarmer (ou mode chaque_joueur / toujours)"),
+    E + "trigger.help.gerer": ("/declencheur liste | info | montrer [s] | actif <name> oui|non | rearmer | vider | supprimer (creative players set nothing off)",
+                               "/declencheur liste | info | montrer [s] | actif <nom> oui|non | rearmer | vider | supprimer (les joueurs en créatif ne déclenchent rien)"),
 }
 
 TEXTS.update({
@@ -165,13 +165,13 @@ TEXTS.update({
     # The fear gauge
     "rp.eraphones.fear.on": ("Fear gauge on: players (not staff) now feel fear", "Jauge de peur activée : les joueurs (hors staff) ressentent la peur"),
     "rp.eraphones.fear.off": ("Fear gauge off: nobody feels it any more", "Jauge de peur désactivée : plus personne ne la ressent"),
-    "rp.eraphones.fear.state_on": ("Fear gauge: ON (/peur jauge off to turn it off)", "Jauge de peur : ACTIVÉE (/peur jauge off pour la couper)"),
-    "rp.eraphones.fear.state_off": ("Fear gauge: OFF (/peur jauge on to turn it on)", "Jauge de peur : DÉSACTIVÉE (/peur jauge on pour l'activer)"),
+    "rp.eraphones.fear.state_on": ("Fear gauge: ON (/peur jauge desactiver to turn it off)", "Jauge de peur : ACTIVÉE (/peur jauge desactiver pour la couper)"),
+    "rp.eraphones.fear.state_off": ("Fear gauge: OFF (/peur jauge activer to turn it on)", "Jauge de peur : DÉSACTIVÉE (/peur jauge activer pour l'activer)"),
     "rp.eraphones.fear.staff": ("staff, feels nothing", "staff, ne ressent rien"),
-    "rp.eraphones.fear.test_on": ("Test mode: you feel the fear gauge like a player (/peur jauge test again to stop; /peur jauge test <0-100> to set yours)", "Mode test : tu ressens la jauge de peur comme un joueur (/peur jauge test à nouveau pour arrêter ; /peur jauge test <0-100> pour régler la tienne)"),
+    "rp.eraphones.fear.test_on": ("Test mode: you feel the fear gauge like a player (/peur jauge tester again to stop; /peur jauge tester <0-100> to set yours)", "Mode test : tu ressens la jauge de peur comme un joueur (/peur jauge tester à nouveau pour arrêter ; /peur jauge tester <0-100> pour régler la tienne)"),
     "rp.eraphones.fear.test_off": ("Test mode off: you feel nothing any more", "Mode test coupé : tu ne ressens plus rien"),
     "rp.eraphones.fear.test_set": ("Test mode: your fear set to %s %%", "Mode test : ta peur réglée à %s %%"),
-    "rp.eraphones.fear.test_disabled": ("The gauge is off for the server: it does not move by itself (set yours by hand, or /peur jauge on)", "La jauge est coupée sur le serveur : elle ne bouge pas toute seule (règle la tienne à la main, ou /peur jauge on)"),
+    "rp.eraphones.fear.test_disabled": ("The gauge is off for the server: it does not move by itself (set yours by hand, or /peur jauge activer)", "La jauge est coupée sur le serveur : elle ne bouge pas toute seule (règle la tienne à la main, ou /peur jauge activer)"),
     "rp.eraphones.fear.set": ("Fear set for %s player(s): %s %%", "Peur réglée pour %s joueur(s) : %s %%"),
     # Photographs pinned up
     "block.eraphones.photo_epinglee": ("Pinned photograph", "Photo épinglée"),

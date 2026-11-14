@@ -179,10 +179,10 @@ public final class SmokeTest {
         STEPS.add(() -> {
             select(mc, 5);
             mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
-            command(mc, "setname Thomas Hale");
+            command(mc, "nom Thomas Hale");
         });
-        STEPS.add(() -> command(mc, "me ouvre lentement la porte de la cave"));
-        STEPS.add(() -> command(mc, "roll 1d20"));
+        STEPS.add(() -> command(mc, "moi ouvre lentement la porte de la cave"));
+        STEPS.add(() -> command(mc, "des 1d20"));
         // Two articles for the town's news (the smartphone's Journal, the flip phone's news)
         STEPS.add(() -> command(mc, "telephone journal Fête foraine : le cirque s'installe au parc | Les roulottes sont arrivées cette nuit. "
                 + "Personne ne les a vues entrer en ville, mais le chapiteau rouge et blanc se dresse déjà près de l'ancienne usine."));
@@ -220,7 +220,7 @@ public final class SmokeTest {
         horror(mc, "horror_blackout", "horreur coupure @s 8", 2);
         horror(mc, "horror_fog", "horreur brouillard @s 30", 4);
         horror(mc, "horror_balloon", "horreur ballon @s", 2);
-        STEPS.add(() -> command(mc, "horreur stop @s"));
+        STEPS.add(() -> command(mc, "horreur arreter @s"));
         String[] names = {"smartphone", "clapet", "gsm", "radiotelephone"};
         // Held: first person, then from the front
         for (int k = 0; k < 4; k++) {
@@ -770,8 +770,8 @@ public final class SmokeTest {
             com.waylays.eraphones.horror.client.HorrorClient.gauge(0);
         });
         STEPS.add(() -> {
-            if (!com.waylays.eraphones.rp.RpService.closesEyes("/me ferme lentement... non: Il ferme les yeux") || com.waylays.eraphones.rp.RpService.closesEyes("ferme la porte")) {
-                fail("closed eyes are not told apart in /me");
+            if (!com.waylays.eraphones.rp.RpService.closesEyes("/moi ferme lentement... non: Il ferme les yeux") || com.waylays.eraphones.rp.RpService.closesEyes("ferme la porte")) {
+                fail("closed eyes are not told apart in /moi");
             }
         });
         // The walkman, a cassette in it, the headphones on; then the heights: 100 cm, 300 cm (the hitbox with them)
@@ -857,7 +857,7 @@ public final class SmokeTest {
                 com.waylays.eraphones.size.Body.setHealth(p, 40);
                 com.waylays.eraphones.size.Body.setSpeed(p, 1.5f);
                 if (Math.abs(p.getMaxHealth() - 40) > .01f) {
-                    fail("/hp 40 gave {} health", p.getMaxHealth());
+                    fail("/vie 40 gave {} health", p.getMaxHealth());
                 }
             });
         });
@@ -1074,7 +1074,7 @@ public final class SmokeTest {
     /** Ends the effects before, sends {@code cmd}, waits {@code steps}, takes the shot. */
     private static void horror(Minecraft mc, String shot, String cmd, int steps) {
         STEPS.add(() -> {
-            command(mc, "horreur stop @s");
+            command(mc, "horreur arreter @s");
             command(mc, cmd);
         });
         for (int i = 1; i < steps; i++) {
