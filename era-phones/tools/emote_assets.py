@@ -16,6 +16,7 @@ it loops), with layers added on top (breath, sway, shakes). Every tick is writte
 import json
 import math
 import os
+import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "emotes")
@@ -23,6 +24,14 @@ AUTHOR = "Époque RP"
 PARTS = ("head", "torso", "rightArm", "leftArm", "rightLeg", "leftLeg", "body")
 AXES = ("x", "y", "z", "pitch", "yaw", "roll", "bend")
 MIRROR = {"rightArm": "leftArm", "leftArm": "rightArm", "rightLeg": "leftLeg", "leftLeg": "rightLeg"}
+
+
+def file_safe(title):
+    """A name that can also be a file's name on Windows (Emote Tweaks looks for a sound file named after the emote):
+    no < > : " / \\ | ? *, no dot or space at the end."""
+    t = title.replace(" : ", " - ")
+    t = re.sub(r'[<>:"/\\|?*]', "", t).replace("…", "").rstrip(" .")
+    return t
 
 
 def mirror(pose):
@@ -147,7 +156,7 @@ class Emote:
             moves.append(m)
         data = {
             "version": 3,
-            "name": self.title,
+            "name": file_safe(self.title),
             "description": self.description,
             "author": AUTHOR,
             "emote": {
