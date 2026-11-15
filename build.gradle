@@ -22,7 +22,7 @@ neoForge {
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             systemProperty 'forge.logging.console.level', 'info'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.findProperty('arcanes.testNamespaces') ?: project.mod_id
         }
 
         client {
@@ -75,6 +75,18 @@ repositories {
         name = 'Player Animator'
         url = 'https://maven.kosmx.dev/'
     }
+    // Epic Fight and Custom NPCs, from Modrinth's maven (only to compile against, and for the CI job that runs with them)
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter {
+            includeGroup 'maven.modrinth'
+        }
+    }
     maven {
         name = 'Simple Voice Chat'
         url = 'https://maven.maxhenkel.de/repository/public'
@@ -98,6 +110,13 @@ dependencies {
     implementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animator_version}"
     // Simple Voice Chat's API: /voix and /voir with voice (only used when that mod is installed)
     compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+    // Epic Fight: Custom NPCs' NPCs walk and fight with its animations (compat/epicnpc, only used when both mods are there)
+    compileOnly "maven.modrinth:epic-fight:${epicfight_version}"
+    if (project.hasProperty('arcanes.epicnpc')) {
+        // The CI job that checks that compatibility runs the game with both mods
+        runtimeOnly "maven.modrinth:epic-fight:${epicfight_version}"
+        runtimeOnly "maven.modrinth:customnpcs-unofficial:${customnpcs_version}"
+    }
     // MP3 decoding for the music player (JLayer, LGPL), carried inside the mod's jar
     jarJar(implementation("javazoom:jlayer")) {
         version {

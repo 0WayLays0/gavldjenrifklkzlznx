@@ -42,6 +42,8 @@ public class ArcanesOublies {
         com.waylays.arcanes.rp.RpRegistry.register(modBus);
         container.registerConfig(ModConfig.Type.SERVER, com.waylays.arcanes.rp.RpConfig.SPEC, MODID + "-roleplay-server.toml");
         modBus.addListener(ArcanesNetwork::register);
+        // Custom NPCs' NPCs with Epic Fight's animations (only when both mods are there)
+        com.waylays.arcanes.compat.epicnpc.EpicNpc.init(modBus);
     }
 
     public static ResourceLocation id(String path) {

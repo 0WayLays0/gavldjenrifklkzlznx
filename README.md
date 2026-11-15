@@ -799,3 +799,21 @@ changée passe aussi par `/voir` et par le téléphone. Avec une version plus an
 
 Les voix durent jusqu'au redémarrage du serveur. Permissions : `horreurPermission` et `voixPermission` (2 par défaut)
 dans `serverconfig/arcanes_oublies-roleplay-server.toml`.
+
+## Custom NPCs avec Epic Fight
+
+Si **Epic Fight** et **Custom NPCs** (NeoForge 1.21.1) sont installés avec Arcanes Oubliés, les PNJ humains de
+Custom NPCs (types `customnpc`, `customnpcalex`, `customnpcclassic`) prennent le corps d'Epic Fight :
+
+- **démarche** : attente, marche, course, chute, mort et réactions aux coups d'Epic Fight, avec la tenue des armes à
+  deux mains (épée à deux mains, lance, épée longue, tachi, uchigatana) ;
+- **attaques** : l'IA de Custom NPCs décide toujours qui le PNJ attaque, comment il se déplace et quand il frappe (tout
+  ce qui est réglé dans ses menus reste valable). Quand il frappe, l'animation d'attaque Epic Fight de son arme se joue
+  (enchaînement de coups) et le coup, avec les dégâts et effets de Custom NPCs, tombe au moment où la lame arrive.
+
+Rien n'est à installer en plus : c'est un pack de données intégré à Arcanes, activé tout seul. Sans l'un des deux mods,
+rien ne change.
+
+Limites connues : le PNJ est dessiné avec le corps humain d'Epic Fight et sa skin. Les parties ajoutées dans Custom NPCs
+(oreilles, queue, ailes, tailles de membres) ne s'affichent pas, et une skin « bras fins » est dessinée avec des bras
+normaux.
