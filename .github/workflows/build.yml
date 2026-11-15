@@ -76,8 +76,9 @@ jobs:
           fi
 
   epic-npc:
-    # With Epic Fight and Custom NPCs (from Modrinth) on the server: an NPC gets an Epic Fight body from the built-in
-    # data pack, and its blow is held back while its attack animation swings (gametest/EpicNpcGameTests)
+    # A dedicated server with Epic Fight and Custom NPCs (from Modrinth; Custom NPCs does not start on the GameTest
+    # server): an NPC gets an Epic Fight body from the built-in data pack, and its blow is held back while its attack
+    # animation swings (debug/EpicNpcServerCheck)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -100,19 +101,21 @@ jobs:
           restore-keys: |
             gradle121-${{ runner.os }}-
 
-      - name: GameTests with Epic Fight and Custom NPCs
+      - name: A dedicated server with Epic Fight and Custom NPCs
         timeout-minutes: 20
         run: |
           set -o pipefail
           chmod +x gradlew
-          ./gradlew runGameTestServer -Parcanes.epicnpc=true -Parcanes.testNamespaces=arcanes_epicnpc --console=plain 2>&1 | tee epicnpc.log
-          grep -q "required tests passed" epicnpc.log || { echo "::error::The Epic Fight x Custom NPCs GameTests did not all pass (or never ran)"; exit 1; }
+          mkdir -p run && echo "eula=true" > run/eula.txt
+          printf 'online-mode=false\nspawn-protection=0\nlevel-type=minecraft\\:flat\n' > run/server.properties
+          timeout 900 ./gradlew runServer -Parcanes.epicnpc=true -Parcanes.epicnpccheck=true --console=plain 2>&1 | tee epicnpc.log || true
+          grep -q "\[EpicNpcCheck\] PASS" epicnpc.log || { echo "::error::The Epic Fight x Custom NPCs check did not pass"; exit 1; }
 
       - name: Report
         if: always()
         run: |
           if [ -f epicnpc.log ]; then
-            grep -E "error:|What went wrong|Could not (find|resolve)|GameTest|required tests|failed|Exception|Caused by|ERROR|Epic Fight|epicfight|Mob Patch|mob capability|customnpc" epicnpc.log | head -n 300 || true
+            grep -E "EpicNpcCheck|error:|What went wrong|Could not (find|resolve)|Exception|Caused by|ERROR|Mob Patch|mob capability|Can.t deserialize" epicnpc.log | head -n 300 || true
           fi
 
   client-smoke:

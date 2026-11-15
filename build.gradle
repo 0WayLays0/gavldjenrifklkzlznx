@@ -22,7 +22,7 @@ neoForge {
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             systemProperty 'forge.logging.console.level', 'info'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.findProperty('arcanes.testNamespaces') ?: project.mod_id
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         client {
@@ -40,6 +40,10 @@ neoForge {
         server {
             server()
             programArgument '--nogui'
+            // The CI check of Custom NPCs with Epic Fight (debug/EpicNpcServerCheck), only with -Parcanes.epicnpccheck=true
+            if (project.hasProperty('arcanes.epicnpccheck')) {
+                systemProperty 'arcanes.epicnpccheck', 'true'
+            }
         }
 
         gameTestServer {
