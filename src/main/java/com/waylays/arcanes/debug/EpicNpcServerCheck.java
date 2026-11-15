@@ -37,6 +37,8 @@ public final class EpicNpcServerCheck {
     private static Husk target;
     private static float full;
     private static int tick = -1;
+    /** A blow on the husk that was not Epic Fight's and still went through. */
+    private static String plainBlow;
 
     private EpicNpcServerCheck() {}
 
@@ -92,11 +94,16 @@ public final class EpicNpcServerCheck {
                 }
                 ArcanesOublies.LOGGER.info("[EpicNpcCheck] the NPC's Epic Fight body: {}", patch.getClass().getName());
                 npc.setTarget(target);
+                float before = target.getHealth();
                 npc.doHurtTarget(target);
-                if (target.getHealth() != full) {
-                    fail(server, "Custom NPCs' own blow landed (" + target.getHealth() + " / " + full + ")");
+                if (target.getHealth() != before) {
+                    fail(server, "Custom NPCs' own blow landed (" + before + " -> " + target.getHealth() + ")");
                 }
             } else if (tick == 80) {
+                if (plainBlow != null) {
+                    fail(server, "a blow that is not Epic Fight's went through: " + plainBlow);
+                    return;
+                }
                 if (target.getHealth() >= full || EpicNpcBridge.animationHits == 0) {
                     fail(server, "the attack animation's hit never landed (" + target.getHealth() + " / " + full + ", "
                             + EpicNpcBridge.animationHits + " animation hits)");
@@ -122,6 +129,9 @@ public final class EpicNpcServerCheck {
             ArcanesOublies.LOGGER.info("[EpicNpcCheck] tick {}: blow {} ({}) from {} / {} for {}, dropped: {}", tick, source.getClass().getName(),
                     source.getMsgId(), source.getEntity() == null ? null : source.getEntity().getType(),
                     source.getDirectEntity() == null ? null : source.getDirectEntity().getType(), event.getAmount(), event.isCanceled());
+            if (!event.isCanceled() && !(source instanceof yesman.epicfight.world.damagesource.EpicFightDamageSource)) {
+                plainBlow = source.getMsgId() + " at tick " + tick;
+            }
         }
     }
 
