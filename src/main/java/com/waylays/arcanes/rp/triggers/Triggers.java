@@ -62,7 +62,6 @@ import java.util.UUID;
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID)
 public final class Triggers extends SavedData {
-    private static final String NAME = com.waylays.arcanes.rp.Legacy.PREFIX + "declencheurs";
     public static final String[] MODES = {"une_fois", "chaque_joueur", "toujours"};
     private static final String[] TIMED = {"brouillard", "coupure", "sang", "peur", "tremblement", "flotter"};
     private static final String[] TEXTS = {"murmure", "narration", "commande"};
@@ -100,7 +99,7 @@ public final class Triggers extends SavedData {
     private record Pending(String zone, UUID player, int from, long at) {}
 
     public static Triggers get(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(new Factory<>(Triggers::new, Triggers::load, null), NAME);
+        return com.waylays.arcanes.rp.Legacy.data(server, "declencheurs", Triggers::new, Triggers::load);
     }
 
     // ---------------------------------------------------------------- kept with the world

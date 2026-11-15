@@ -33,7 +33,6 @@ import java.util.UUID;
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID)
 public final class Fear extends SavedData {
-    private static final String NAME = com.waylays.arcanes.rp.Legacy.PREFIX + "peur";
     /** Each player's fear, 0 to 100, and what their screen was last told. */
     private static final Map<UUID, Float> LEVEL = new HashMap<>();
     private static final Map<UUID, Integer> SENT = new HashMap<>();
@@ -42,7 +41,7 @@ public final class Fear extends SavedData {
     private Fear() {}
 
     private static Fear data(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(new Factory<>(Fear::new, Fear::load, null), NAME);
+        return com.waylays.arcanes.rp.Legacy.data(server, "peur", Fear::new, Fear::load);
     }
 
     private static Fear load(CompoundTag tag, HolderLookup.Provider registries) {

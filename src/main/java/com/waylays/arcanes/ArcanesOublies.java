@@ -40,6 +40,7 @@ public class ArcanesOublies {
         container.registerConfig(ModConfig.Type.SERVER, ArcanesConfig.SPEC);
         // The role play and the game masters' tools (once part of Époque RP)
         com.waylays.arcanes.rp.RpRegistry.register(modBus);
+        com.waylays.arcanes.rp.Legacy.warnOldEpoqueRp();
         container.registerConfig(ModConfig.Type.SERVER, com.waylays.arcanes.rp.RpConfig.SPEC, MODID + "-roleplay-server.toml");
         modBus.addListener(ArcanesNetwork::register);
         // Custom NPCs' NPCs with Epic Fight's animations (only when both mods are there)

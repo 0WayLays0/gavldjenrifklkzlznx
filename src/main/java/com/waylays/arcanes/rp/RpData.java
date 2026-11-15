@@ -20,7 +20,6 @@ import java.util.UUID;
  * they look at them; and who, if anyone, is seen only by a chosen few.
  */
 public class RpData extends SavedData {
-    private static final String NAME = "eraphones_rp";
 
     public record Identity(String first, String last, String description) {
         public String full() {
@@ -35,7 +34,7 @@ public class RpData extends SavedData {
     boolean hideNames = true;
 
     public static RpData get(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(new Factory<>(RpData::new, RpData::load, null), NAME);
+        return Legacy.data(server, "rp", RpData::new, RpData::load);
     }
 
     @Nullable
