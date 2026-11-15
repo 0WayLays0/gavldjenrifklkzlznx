@@ -13,25 +13,12 @@ mkdir -p s && (cd s && unzip -q -o ../src/cn.jar 2>/dev/null || cp -r ../src/* .
 cd s
 show() { echo "=================== $1 (lines ${2:-all})"; if [ -f "$1" ]; then if [ -n "${2:-}" ]; then sed -n "$2" "$1"; else cat "$1"; fi; else echo MISSING; fi; }
 grepf() { echo "=================== grep $2 in $1"; grep -nE "$2" "$1" | head -${3:-80}; }
-echo "=== entity types"; grep -rhoE '"(customnpc|npc)[a-z0-9_]*"' noppes/npcs/CustomEntities.java | sort -u | head -60
-echo "=== renderer files"; find noppes/npcs/client/renderer noppes/npcs/client/layer -name '*.java' 2>/dev/null | head -80
-N=noppes/npcs/entity/EntityNPCInterface.java
-grepf $N 'getItemBySlot|setItemSlot|getMainHandItem|getOffhandItem|doHurtTarget|swing\(|ATTACK_DAMAGE|getAttribute|public .*inventory|getHandSlots|getArmorSlots|class EntityNPCInterface' 80
-for m in 'ItemStack getItemBySlot' 'boolean doHurtTarget' 'void swing' 'ItemStack getMainHandItem'; do
-  ln=$(grep -nF "$m" $N | head -1 | cut -d: -f1); [ -n "$ln" ] && show $N "${ln},$((ln+45))p"
-done
-show noppes/npcs/entity/EntityCustomNpc.java
-show noppes/npcs/entity/data/DataMelee.java 1,200p
-for f in noppes/npcs/ModelData.java noppes/npcs/client/model/ModelData.java $(grep -rl "class ModelData" noppes | head -2); do [ -f $f ] && { show $f 1,220p; break; }; done
-D=noppes/npcs/entity/data/DataDisplay.java
-grepf $D 'skinType|modelType|getSkinTexture|texture|public .*\(' 80
-I=noppes/npcs/entity/data/DataInventory.java
-grepf $I 'weapons|getRightHand|getLeftHand|getProjectile|armor|public .*\(' 60
-show noppes/npcs/client/renderer/RenderCustomNpc.java 1,200p
-R=noppes/npcs/client/renderer/RenderNPCInterface.java
-grepf $R 'class|getTextureLocation|addLayer|Layer|public .*\(' 60
-for f in $(grep -rlE 'class .*Layer' noppes/npcs/client | head -20); do grepf $f 'class |getMainHandItem|getItemBySlot|getRightHand|inventory|renderItem|weapons' 20; done
-show noppes/npcs/ai/EntityAIAttackTarget.java 1,200p
-echo "=== where swing( is called"; grep -rn "\.swing(" noppes | head -20
-echo "=== where getRightHand is synced"; grep -rn "getRightHand\|weapons.put\|weapons.get" noppes | grep -v "^noppes/npcs/client/gui" | head -40
+echo "=== lang simple/limited"; for f in $(find assets -name 'en_us*' | head -3); do grep -iE 'simple|limited|basic' $f | head -20; done
+show noppes/npcs/client/renderer/RenderCustomNpc.java 200,420p
+show noppes/npcs/client/renderer/RenderNPCInterface.java 140,260p
+F=$(grep -rl "class ModelDataShared" noppes | head -1); grepf $F 'simpleRender|hasEntity|getEntityName|entityName|public .*\(' 60
+echo "=== simpleRender uses"; grep -rn "simpleRender" noppes | head -30
+echo "=== client model classes"; find noppes/npcs/client/model -maxdepth 1 -name '*.java' | head -40
+echo "=== customnpc renderers registration"; grep -rn "RenderCustomNpc\|registerEntityRenderer\|EntityRenderers.register" noppes --include=*.java | grep -v "^noppes/npcs/client/renderer/RenderCustomNpc" | head -30
+echo "=== inventory sync"; grep -rn "inventory.save\|inventory.load\|\"Weapons\"\|getEntityData\|SyncData\|writeSpawnData\|readSpawnData" noppes/npcs/entity/EntityNPCInterface.java | head -20
 echo "=== done"
