@@ -115,7 +115,7 @@ jobs:
         if: always()
         run: |
           if [ -f epicnpc.log ]; then
-            grep -E "EpicNpcCheck|error:|What went wrong|Could not (find|resolve)|Exception|Caused by|ERROR|Mob Patch|mob capability|Can.t deserialize" epicnpc.log | head -n 300 || true
+            grep -E "EpicNpcCheck|could not|error:|What went wrong|Could not (find|resolve)|Exception|Caused by|ERROR|Mob Patch|mob capability|Can.t deserialize" epicnpc.log | head -n 300 || true
           fi
 
   client-smoke:

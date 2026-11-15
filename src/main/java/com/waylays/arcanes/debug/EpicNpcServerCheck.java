@@ -15,7 +15,9 @@ import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -109,6 +111,26 @@ public final class EpicNpcServerCheck {
             ArcanesOublies.LOGGER.error("[EpicNpcCheck] FAIL", t);
             tick = -1;
             server.halt(false);
+        }
+    }
+
+    /** Every blow the husk takes, as the bridge left it: what it is, from whom, and whether it was dropped. */
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    public static void onBlow(LivingIncomingDamageEvent event) {
+        if (ENABLED && tick >= 0 && event.getEntity() == target) {
+            var source = event.getSource();
+            ArcanesOublies.LOGGER.info("[EpicNpcCheck] tick {}: blow {} ({}) from {} / {} for {}, dropped: {}", tick, source.getClass().getName(),
+                    source.getMsgId(), source.getEntity() == null ? null : source.getEntity().getType(),
+                    source.getDirectEntity() == null ? null : source.getDirectEntity().getType(), event.getAmount(), event.isCanceled());
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onBlowFirst(LivingIncomingDamageEvent event) {
+        if (ENABLED && tick >= 0 && event.getEntity() == target) {
+            ArcanesOublies.LOGGER.info("[EpicNpcCheck] tick {}: blow seen first, {} for {}, the NPC's Epic Fight damage set: {}", tick,
+                    event.getSource().getClass().getName(), event.getAmount(),
+                    npc != null && EpicNpcBridge.patch(npc) != null && EpicNpcBridge.patch(npc).getEpicFightDamageSource() != null);
         }
     }
 
