@@ -15,6 +15,9 @@ file="META-INF/accesstransformer.cfg"
 [[mixins]]
 config="arcanes_oublies.mixins.json"
 
+[[mixins]]
+config="arcanes_oublies.epicfight.mixins.json"
+
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"

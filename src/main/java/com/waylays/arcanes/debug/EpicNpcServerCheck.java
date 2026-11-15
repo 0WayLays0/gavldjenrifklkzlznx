@@ -23,7 +23,8 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 /**
  * A check run by CI on a real dedicated server with Epic Fight and Custom NPCs (only with
  * {@code -Darcanes.epicnpccheck=true}; Custom NPCs does not start on Minecraft's test server): an NPC with a sword gets
- * an Epic Fight body; its blow is held back while its attack animation swings, then lands. It logs
+ * an Epic Fight body; Custom NPCs' own blow does nothing and starts the attack animation instead, whose hit is the one
+ * that lands (as Epic Fight's damage). It logs
  * {@code [EpicNpcCheck] PASS} or {@code [EpicNpcCheck] FAIL ...}, then stops the server.
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID)
@@ -58,10 +59,12 @@ public final class EpicNpcServerCheck {
             npc.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_SWORD));
             level.addFreshEntity(npc);
             target = EntityType.HUSK.create(level);
-            target.moveTo(at.getX() + 1.5, at.getY(), at.getZ() + .5, 0, 0);
+            // In front of the NPC (it faces south), within its sword's reach
+            target.moveTo(at.getX() + .5, at.getY(), at.getZ() + 1.8, 180, 0);
             target.setNoAi(true);
             target.setPersistenceRequired();
             level.addFreshEntity(target);
+            npc.setTarget(target);
             full = target.getHealth();
             tick = 0;
             ArcanesOublies.LOGGER.info("[EpicNpcCheck] an NPC with a sword and a husk (it does not burn in the sun) stand at {}", at);
@@ -86,17 +89,19 @@ public final class EpicNpcServerCheck {
                     return;
                 }
                 ArcanesOublies.LOGGER.info("[EpicNpcCheck] the NPC's Epic Fight body: {}", patch.getClass().getName());
+                npc.setTarget(target);
                 npc.doHurtTarget(target);
                 if (target.getHealth() != full) {
-                    fail(server, "the blow landed before the swing (" + target.getHealth() + " / " + full + ")");
+                    fail(server, "Custom NPCs' own blow landed (" + target.getHealth() + " / " + full + ")");
                 }
-            } else if (tick == 60) {
-                if (target.getHealth() >= full) {
-                    fail(server, "the blow never landed");
+            } else if (tick == 80) {
+                if (target.getHealth() >= full || EpicNpcBridge.animationHits == 0) {
+                    fail(server, "the attack animation's hit never landed (" + target.getHealth() + " / " + full + ", "
+                            + EpicNpcBridge.animationHits + " animation hits)");
                     return;
                 }
-                ArcanesOublies.LOGGER.info("[EpicNpcCheck] PASS: the NPC has an Epic Fight body and its blow landed with its swing ({} -> {})",
-                        full, target.getHealth());
+                ArcanesOublies.LOGGER.info("[EpicNpcCheck] PASS: the NPC has an Epic Fight body and only its attack animation hit ({} -> {}, {} hit(s))",
+                        full, target.getHealth(), EpicNpcBridge.animationHits);
                 tick = -1;
                 server.halt(false);
             }

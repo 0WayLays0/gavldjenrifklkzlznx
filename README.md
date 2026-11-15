@@ -803,17 +803,26 @@ dans `serverconfig/arcanes_oublies-roleplay-server.toml`.
 ## Custom NPCs avec Epic Fight
 
 Si **Epic Fight** et **Custom NPCs** (NeoForge 1.21.1) sont installés avec Arcanes Oubliés, les PNJ humains de
-Custom NPCs (types `customnpc`, `customnpcalex`, `customnpcclassic`) prennent le corps d'Epic Fight :
+Custom NPCs (types `customnpc`, `customnpc64x32`, `customnpcalex`, `customnpcclassic`) prennent le corps d'Epic Fight :
 
 - **démarche** : attente, marche, course, chute, mort et réactions aux coups d'Epic Fight, avec la tenue des armes à
   deux mains (épée à deux mains, lance, épée longue, tachi, uchigatana) ;
 - **attaques** : l'IA de Custom NPCs décide toujours qui le PNJ attaque, comment il se déplace et quand il frappe (tout
-  ce qui est réglé dans ses menus reste valable). Quand il frappe, l'animation d'attaque Epic Fight de son arme se joue
-  (enchaînement de coups) et le coup, avec les dégâts et effets de Custom NPCs, tombe au moment où la lame arrive.
+  ce qui est réglé dans ses menus reste valable). Quand il frappe, son coup Minecraft est supprimé (ni dégâts, ni geste
+  du bras) et l'animation d'attaque Epic Fight de son arme se joue (enchaînement de coups). Le seul coup porté est celui
+  de l'animation : c'est un coup Epic Fight, avec la force de mêlée et les effets réglés dans Custom NPCs, et il ne
+  touche que l'ennemi du PNJ ;
+- **apparence** : le corps suit la skin (bras normaux, bras fins « Alex », anciennes skins 64×32 et « classic »), les
+  calques cachés dans le menu du modèle restent cachés, la taille réglée dans Custom NPCs est gardée, et l'arme et
+  l'armure s'affichent ;
+- **PNJ déguisés en mob** (menu du modèle de Custom NPCs) : en zombie, husk, noyé, zombie-villageois, illageois
+  (vindicateur, pillard, évocateur, illusionniste) ou sorcière, le PNJ est dessiné avec le corps Epic Fight de ce mob,
+  donc avec sa vraie texture, ses animations et son arme. Déguisé en un autre mob (animal, araignée, squelette,
+  piglin…), il garde le rendu normal de Custom NPCs, avec son arme.
 
 Rien n'est à installer en plus : c'est un pack de données intégré à Arcanes, activé tout seul. Sans l'un des deux mods,
 rien ne change.
 
-Limites connues : le PNJ est dessiné avec le corps humain d'Epic Fight et sa skin. Les parties ajoutées dans Custom NPCs
-(oreilles, queue, ailes, tailles de membres) ne s'affichent pas, et une skin « bras fins » est dessinée avec des bras
-normaux.
+Limites connues : avec l'option **« Basic Limited Renderer »** de Custom NPCs, le PNJ déguisé est dessiné par Custom NPCs
+sans les animations d'Epic Fight (son arme s'affiche) ; laisse-la désactivée pour avoir les animations. Les parties
+ajoutées dans Custom NPCs (oreilles, queue, ailes, tailles de membres) ne s'affichent pas sur le corps Epic Fight.
