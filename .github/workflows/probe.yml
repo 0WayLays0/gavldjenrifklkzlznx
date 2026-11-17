@@ -1,0 +1,20 @@
+name: Probe (Custom NPCs source)
+
+on:
+  push:
+    paths:
+      - 'tools/probe/**'
+      - '.github/workflows/probe.yml'
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Decompile Custom NPCs
+        run: bash tools/probe/probe_cnpc.sh
