@@ -52,9 +52,10 @@ public class MetierEditorScreen extends Screen {
     private static final int GOLD = 0xFFDEB25C, GOLD_LIGHT = 0xFFFFE6A0, TEXT = 0xFFF2ECE0, DIM = 0xFFA89E8C, RED = 0xFFFF6A5A, GREEN = 0xFF8AE07A,
             BLUE = 0xFF8FD4FF, CARD = 0xC01C1714, CARD_EDGE = 0x605A4630;
     private static final int SIDE = 150, ROW = 22, CHIP_H = 20;
-    private static final int[] GAME_COLORS = {0xFFB09A80, 0xFF7ABA62, 0xFFC09060, 0xFFE07848, 0xFFA87AE0};
+    private static final int[] GAME_COLORS = {0xFFB09A80, 0xFF7ABA62, 0xFFC09060, 0xFFE07848, 0xFFA87AE0, 0xFF8AA0B8};
     private static final ItemStack[] GAME_ICONS = {new ItemStack(Items.IRON_PICKAXE), new ItemStack(Items.TORCHFLOWER),
-            new ItemStack(Items.CRAFTING_TABLE), new ItemStack(Items.SMITHING_TABLE), new ItemStack(Items.BREWING_STAND)};
+            new ItemStack(Items.CRAFTING_TABLE), new ItemStack(Items.SMITHING_TABLE), new ItemStack(Items.BREWING_STAND),
+            new ItemStack(Items.GRINDSTONE)};
 
     private enum Tab {SETTINGS, BLOCKS, REWARDS, RECIPES}
 

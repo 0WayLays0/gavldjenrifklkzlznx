@@ -168,4 +168,34 @@ public final class MetierGameTests {
         helper.assertTrue(MetierService.sessionOf(p) < 0, "a recipe started without its ingredients");
         helper.succeed();
     }
+
+    /**
+     * The grindstone: a critical success gives back 200 durability and keeps the weapon away for 12 hours; a failure
+     * takes 50 without breaking it; a weapon kept from the grindstone, and an unworn one, do not start it.
+     */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
+    public static void grindstoneRepairsAndRests(GameTestHelper helper) {
+        helper.setBlock(ORE, Blocks.GRINDSTONE);
+        BlockPos pos = helper.absolutePos(ORE);
+        ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
+        sword.setDamageValue(1000);
+        ServerPlayer p = player(helper, sword);
+        helper.assertTrue(MetierService.grindForTest(p, pos), "the grindstone's minigame did not start with a worn sword");
+        MetierService.finishForTest(p, .95f, false);
+        helper.assertTrue(p.getMainHandItem().getDamageValue() == 800, "a critical success gives back 200, left " + p.getMainHandItem().getDamageValue());
+        helper.assertTrue(!MetierService.grindForTest(p, pos), "the same sword went back to the grindstone before 12 hours");
+
+        ItemStack other = new ItemStack(Items.IRON_SWORD);
+        other.setDamageValue(other.getMaxDamage() - 10);
+        p.setItemInHand(InteractionHand.MAIN_HAND, other);
+        helper.assertTrue(MetierService.grindForTest(p, pos), "the grindstone's minigame did not start with another sword");
+        MetierService.finishForTest(p, .1f, false);
+        helper.assertTrue(p.getMainHandItem().getDamageValue() == p.getMainHandItem().getMaxDamage() - 1 && !p.getMainHandItem().isEmpty(),
+                "a failure wears the blade without breaking it");
+
+        ItemStack whole = new ItemStack(Items.IRON_SWORD);
+        p.setItemInHand(InteractionHand.MAIN_HAND, whole);
+        helper.assertTrue(!MetierService.grindForTest(p, pos), "an unworn sword started the grindstone");
+        helper.succeed();
+    }
 }

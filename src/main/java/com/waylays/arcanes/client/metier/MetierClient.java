@@ -24,6 +24,7 @@ public final class MetierClient {
             case ASSEMBLY -> new AssemblyGame(start, difficulty, seed, subject, tool, inputs, heading, sub, perfectAt, criticalBelow);
             case FORGE -> new ForgeGame(start, difficulty, seed, subject, tool, inputs, heading, sub, perfectAt, criticalBelow);
             case DISTILL -> new DistillGame(start, difficulty, seed, subject, tool, inputs, heading, sub, perfectAt, criticalBelow);
+            case GRIND -> new GrindGame(start, difficulty, seed, subject, tool, inputs, heading, sub, perfectAt, criticalBelow);
         };
     }
 

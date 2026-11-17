@@ -50,7 +50,9 @@ public final class MetierDefs {
         /** Keep the metal at forging heat with the bellows, strike in rhythm, quench at the right colour. */
         FORGE,
         /** Heat the still, add each ingredient at its colour, keep it steady while the drops condense. */
-        DISTILL
+        DISTILL,
+        /** Press a blade on the grindstone, the pressure kept in a wandering band, without blueing it (see {@code Grindstone}). */
+        GRIND
     }
 
     /** How an attempt ended. */

@@ -745,6 +745,22 @@ Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme`. L'atelie
 
 Les warps sont gardés avec le monde, dans toutes les dimensions.
 
+### Métiers : la meule
+
+Clic droit sur une **meule** avec une arme (ou tout objet qui a une durabilité) abîmée : le mini-jeu d'affûtage
+s'ouvre. Maintiens le clic gauche (ou Espace) pour appuyer la lame contre la pierre et garde la **pression dans la bande
+verte**, qui se déplace ; trop léger, rien ne se passe, trop fort, la lame chauffe et, si elle bleuit, c'est raté.
+
+- réussite critique : **+200** de durabilité ; réussite : **+100** ; échec : **−50** (l'arme ne se casse jamais) ;
+- chaque arme ne peut repasser à la meule que **12 heures** (temps réel) après, avec un message en jeu de rôle ;
+- une arme sans usure ne lance pas le mini-jeu.
+
+Maîtres du jeu (`repairPermission`) : `/meule interdire` (tous les objets du type tenu en main),
+`/meule interdire objet` (cet objet seulement), `/meule autoriser [objet]`, `/meule liste`, `/meule reset` (l'objet
+tenu peut repasser tout de suite). Une arme interdite affiche « *Cette arme ne semble pas réparable.* ».
+
+Minage sans pioche : « *Il semble qu'une pioche soit nécessaire pour récupérer ce minerai…* ».
+
 ### Métiers : stations
 
 Les stations (table de craft, forge, alambic…) n'ont plus de bouton « Utilisation classique » : on ne s'en sert que par

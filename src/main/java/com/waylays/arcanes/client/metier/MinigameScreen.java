@@ -432,6 +432,9 @@ public abstract class MinigameScreen extends Screen {
             }
             if (outcome.durability() > 0) {
                 Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.wear", outcome.durability()), cx, y + 38, 0xFFFF9A7A, .9f);
+            } else if (outcome.durability() < 0) {
+                // The grindstone: durability given back
+                Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.repaired", -outcome.durability()), cx, y + 38, 0xFF8AE07A, .9f);
             }
         } else {
             Draw.centered(g, Component.translatable("metier.arcanes_oublies.game.trial"), cx, y + 8, 0xFFA8DCFF, 1);

@@ -57,7 +57,7 @@ public final class MetierService {
     /** A minigame shorter than this is not believed. */
     private static final long MIN_MILLIS = 2500;
     private static final long MAX_MILLIS = 5 * 60 * 1000;
-    private static final double MAX_DISTANCE = 7;
+    static final double MAX_DISTANCE = 7;
 
     /** A minigame going on. */
     private record Session(int id, UUID player, String def, int recipe, ServerLevel level, BlockPos pos, BlockState state, Item tool, long started,
@@ -102,6 +102,13 @@ public final class MetierService {
         }
         Def def = MetierDefs.forBlock(state);
         if (def == null) {
+            // The grindstone, with a worn weapon or tool in hand: its sharpening minigame (see Grindstone)
+            if (Grindstone.wants(player, state) && !(player.isCreative() && player.isShiftKeyDown())) {
+                cancel(event);
+                if (event.getHand() == InteractionHand.MAIN_HAND && !SESSIONS.containsKey(player.getUUID())) {
+                    Grindstone.start(player, level, pos, state);
+                }
+            }
             return;
         }
         // A game master building in creative, crouching, uses the block as usual
@@ -122,7 +129,13 @@ public final class MetierService {
         ItemStack held = player.getMainHandItem();
         Tool tool = def.tool(held);
         if (!def.tools.isEmpty() && tool == null) {
-            player.displayClientMessage(Component.translatable("metier.arcanes_oublies.need_tool", toolNames(def)).withStyle(ChatFormatting.RED), true);
+            if (def.game == MetierDefs.Game.MINING) {
+                // In character: the ore will not come without a pick
+                player.displayClientMessage(Component.translatable("metier.arcanes_oublies.need_pickaxe").withStyle(ChatFormatting.GRAY,
+                        ChatFormatting.ITALIC), true);
+            } else {
+                player.displayClientMessage(Component.translatable("metier.arcanes_oublies.need_tool", toolNames(def)).withStyle(ChatFormatting.RED), true);
+            }
             return;
         }
         long wait = cooldownLeft(player, def.id, level);
@@ -142,11 +155,18 @@ public final class MetierService {
 
     private static void begin(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState state, Def def, int recipe, @Nullable Item tool,
                               double difficulty, ItemStack subject, ItemStack toolStack, List<ItemStack> inputs, String title, String subtitle) {
+        begin(player, level, pos, state, def.id, def.game, recipe, tool, difficulty, subject, toolStack, inputs, title, subtitle, (float) def.perfectAt,
+                (float) def.criticalBelow);
+    }
+
+    static void begin(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState state, String defId, MetierDefs.Game game, int recipe,
+                      @Nullable Item tool, double difficulty, ItemStack subject, ItemStack toolStack, List<ItemStack> inputs, String title, String subtitle,
+                      float perfectAt, float criticalBelow) {
         int id = nextSession++;
-        SESSIONS.put(player.getUUID(), new Session(id, player.getUUID(), def.id, recipe, level, pos.immutable(), state, tool, System.currentTimeMillis(),
+        SESSIONS.put(player.getUUID(), new Session(id, player.getUUID(), defId, recipe, level, pos.immutable(), state, tool, System.currentTimeMillis(),
                 difficulty));
-        PacketDistributor.sendToPlayer(player, new MetierNet.Start(id, def.game.ordinal(), difficulty, RANDOM.nextLong(), title, subtitle, subject,
-                toolStack, inputs, (float) def.perfectAt, (float) def.criticalBelow));
+        PacketDistributor.sendToPlayer(player, new MetierNet.Start(id, game.ordinal(), difficulty, RANDOM.nextLong(), title, subtitle, subject,
+                toolStack, inputs, perfectAt, criticalBelow));
     }
 
     private static Component toolNames(Def def) {
@@ -282,6 +302,11 @@ public final class MetierService {
             return;
         }
         SESSIONS.remove(player.getUUID());
+        if (Grindstone.ID.equals(s.def())) {
+            Grindstone.settle(player, s.id(), s.level(), s.pos(), s.state(), s.tool(), result.score(), result.critical(),
+                    System.currentTimeMillis() - s.started() < MIN_MILLIS);
+            return;
+        }
         Def def = MetierDefs.byId(s.def());
         ServerLevel level = s.level();
         if (def == null || player.level() != level || player.distanceToSqr(s.pos().getCenter()) > MAX_DISTANCE * MAX_DISTANCE
@@ -548,6 +573,17 @@ public final class MetierService {
     }
 
     /** The session going on for {@code player}, or -1. */
+    /** Right-clicks a grindstone with what the player holds (tests); true if its minigame started. */
+    public static boolean grindForTest(ServerPlayer player, BlockPos pos) {
+        ServerLevel level = player.serverLevel();
+        BlockState state = level.getBlockState(pos);
+        if (!Grindstone.wants(player, state)) {
+            return false;
+        }
+        Grindstone.start(player, level, pos, state);
+        return SESSIONS.containsKey(player.getUUID());
+    }
+
     public static int sessionOf(ServerPlayer player) {
         Session s = SESSIONS.get(player.getUUID());
         return s == null ? -1 : s.id();
