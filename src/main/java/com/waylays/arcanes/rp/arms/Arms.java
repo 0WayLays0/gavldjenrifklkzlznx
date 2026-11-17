@@ -166,6 +166,7 @@ public final class Arms {
         } else {
             stack.remove(DataComponents.ENCHANTMENT_GLINT_OVERRIDE);
         }
+        durability(stack, e.durability(), e.maxDurability());
         // The stats: set ones replace the item's, unset ones are left out
         EquipmentSlotGroup g = group(stack);
         ItemAttributeModifiers.Builder b = ItemAttributeModifiers.builder();
@@ -196,6 +197,27 @@ public final class Arms {
             stack.set(PROCS.get(), procs);
         }
         p.displayClientMessage(Component.translatable("arms.arcanes_oublies.saved").withStyle(ChatFormatting.GOLD), true);
+    }
+
+    /**
+     * The durability: {@code max} the most (an item that had none gets one, and then stacks no more), {@code left} what
+     * is left of it, from 1 to the most; -1 leaves either as it is.
+     */
+    private static void durability(ItemStack stack, int left, int max) {
+        if (max > 0 && max != stack.getMaxDamage()) {
+            if (stack.getCount() > 1) {
+                return;
+            }
+            stack.set(DataComponents.MAX_STACK_SIZE, 1);
+            stack.set(DataComponents.MAX_DAMAGE, Math.min(max, 1_000_000));
+            if (!stack.has(DataComponents.DAMAGE)) {
+                stack.set(DataComponents.DAMAGE, 0);
+            }
+        }
+        if (left > 0 && stack.isDamageableItem()) {
+            int most = stack.getMaxDamage();
+            stack.setDamageValue(most - Math.max(1, Math.min(most, left)));
+        }
     }
 
     /** "&c" and the like turned to colours. */
@@ -320,14 +342,27 @@ public final class Arms {
         }
     }
 
-    /** What the workshop made of the item in hand (a stat NaN: left unset). */
-    public record Edit(String name, List<String> lore, boolean unbreakable, boolean glint, List<Float> stats, List<Proc> procs)
-            implements CustomPacketPayload {
+    /**
+     * What the workshop made of the item in hand (a stat NaN: left unset; {@code durability} the durability left and
+     * {@code maxDurability} the most, -1: left as they are).
+     */
+    public record Edit(String name, List<String> lore, boolean unbreakable, boolean glint, List<Float> stats, List<Proc> procs,
+            int durability, int maxDurability) implements CustomPacketPayload {
         public static final Type<Edit> TYPE = new Type<>(ArcanesOublies.id("arms_edit"));
-        public static final StreamCodec<RegistryFriendlyByteBuf, Edit> CODEC = StreamCodec.composite(
-                ByteBufCodecs.stringUtf8(200), Edit::name, ByteBufCodecs.stringUtf8(300).apply(ByteBufCodecs.list(16)), Edit::lore,
-                ByteBufCodecs.BOOL, Edit::unbreakable, ByteBufCodecs.BOOL, Edit::glint, ByteBufCodecs.FLOAT.apply(ByteBufCodecs.list(16)), Edit::stats,
-                Proc.LIST_STREAM, Edit::procs, Edit::new);
+        private static final StreamCodec<io.netty.buffer.ByteBuf, String> NAME = ByteBufCodecs.stringUtf8(200);
+        private static final StreamCodec<io.netty.buffer.ByteBuf, List<String>> LORE = ByteBufCodecs.stringUtf8(300).apply(ByteBufCodecs.list(16));
+        private static final StreamCodec<io.netty.buffer.ByteBuf, List<Float>> STATS_CODEC = ByteBufCodecs.FLOAT.apply(ByteBufCodecs.list(16));
+        public static final StreamCodec<RegistryFriendlyByteBuf, Edit> CODEC = StreamCodec.of((b, e) -> {
+            NAME.encode(b, e.name());
+            LORE.encode(b, e.lore());
+            b.writeBoolean(e.unbreakable());
+            b.writeBoolean(e.glint());
+            STATS_CODEC.encode(b, e.stats());
+            Proc.LIST_STREAM.encode(b, e.procs());
+            b.writeVarInt(e.durability() + 1);
+            b.writeVarInt(e.maxDurability() + 1);
+        }, b -> new Edit(NAME.decode(b), LORE.decode(b), b.readBoolean(), b.readBoolean(), STATS_CODEC.decode(b), Proc.LIST_STREAM.decode(b),
+                b.readVarInt() - 1, b.readVarInt() - 1));
 
         @Override
         public Type<Edit> type() {

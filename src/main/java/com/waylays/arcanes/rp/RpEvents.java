@@ -80,5 +80,7 @@ public final class RpEvents {
     public static void onCommands(RegisterCommandsEvent event) {
         RpCommands.register(event.getDispatcher());
         com.waylays.arcanes.rp.horror.HorrorCommands.register(event.getDispatcher());
+        com.waylays.arcanes.rp.warp.Warps.register(event.getDispatcher());
+        com.waylays.arcanes.rp.admin.AdminCommands.register(event.getDispatcher());
     }
 }

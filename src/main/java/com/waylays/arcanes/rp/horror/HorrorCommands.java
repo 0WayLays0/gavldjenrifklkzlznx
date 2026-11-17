@@ -69,10 +69,10 @@ public final class HorrorCommands {
                     return t.size();
                 })))));
 
-        // The narrator: words over everyone's screen, or over one player's alone
+        // The narrator: words over everyone's screen and in their chat ("/narration 30 text": only within 30 blocks), or one player's alone
         d.register(Commands.literal("narration").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.argument("texte", StringArgumentType.greedyString())
-                        .executes(c -> narrate(c, c.getSource().getServer().getPlayerList().getPlayers()))));
+                        .executes(c -> narrate(c, null))));
         d.register(Commands.literal("narrationalone").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.argument("joueurs", EntityArgument.players()).then(Commands.argument("texte", StringArgumentType.greedyString())
                         .executes(c -> narrate(c, EntityArgument.getPlayers(c, "joueurs"))))));
@@ -145,7 +145,7 @@ public final class HorrorCommands {
         // The narrator in the chat alone: words, nothing on the screen
         d.register(Commands.literal("narrationchat").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.argument("texte", StringArgumentType.greedyString())
-                        .executes(c -> narrateChat(c, c.getSource().getServer().getPlayerList().getPlayers()))));
+                        .executes(c -> narrateChat(c, null))));
         d.register(Commands.literal("narrationchatalone").requires(s -> s.hasPermission(RpConfig.get(RpConfig.HORROR_PERMISSION, 2)))
                 .then(Commands.argument("joueurs", EntityArgument.players()).then(Commands.argument("texte", StringArgumentType.greedyString())
                         .executes(c -> narrateChat(c, EntityArgument.getPlayers(c, "joueurs"))))));
@@ -166,24 +166,62 @@ public final class HorrorCommands {
                         .then(Commands.argument("joueurs", EntityArgument.players()).executes(c -> voice(c, EntityArgument.getPlayers(c, "joueurs"))))));
     }
 
-    private static int narrate(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> targets) {
-        String text = StringArgumentType.getString(c, "texte");
-        HorrorService.show(targets, "narration", 80 + Math.min(500, text.length() * 4), text, null);
-        Component line = Component.literal("\u2726 " + text).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        for (ServerPlayer p : targets) {
-            p.sendSystemMessage(line);
-        }
-        c.getSource().sendSuccess(() -> Component.translatable("rp.arcanes_oublies.narration.sent", targets.size()).withStyle(ChatFormatting.DARK_GRAY), false);
-        return targets.size();
+    /** A narration in the chat: "[NARRATION] : the text", gold and parchment, so that it reads as the narrator's. */
+    public static Component narrationLine(String text) {
+        return Component.empty()
+                .append(Component.literal("✦ ").withStyle(s -> s.withColor(0xC9A24A)))
+                .append(Component.literal("[").withStyle(s -> s.withColor(0x8C7442)))
+                .append(Component.translatable("rp.arcanes_oublies.narration.tag").withStyle(s -> s.withColor(0xE8C677).withBold(true)))
+                .append(Component.literal("]").withStyle(s -> s.withColor(0x8C7442)))
+                .append(Component.literal(" : ").withStyle(s -> s.withColor(0x9A9AA8)))
+                .append(Component.literal(text).withStyle(s -> s.withColor(0xF2E6C8).withItalic(true)));
     }
 
-    private static int narrateChat(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> targets) {
-        Component line = Component.literal("\u2726 " + StringArgumentType.getString(c, "texte")).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        for (ServerPlayer p : targets) {
+    /**
+     * The narration's text and who reads it: the players given, else everyone, or, if the text starts with a range
+     * ("30 the text"), the players within that many blocks of where the command is run.
+     */
+    private record Narration(String text, Collection<ServerPlayer> targets) {}
+
+    private static Narration narration(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> given) {
+        String text = StringArgumentType.getString(c, "texte").strip();
+        if (given != null) {
+            return new Narration(text, given);
+        }
+        java.util.regex.Matcher m = com.waylays.arcanes.rp.RpCommands.ranged(text);
+        if (m == null) {
+            return new Narration(text, c.getSource().getServer().getPlayerList().getPlayers());
+        }
+        double range = Math.max(1, Integer.parseInt(m.group(1)));
+        Vec3 at = c.getSource().getPosition();
+        net.minecraft.server.level.ServerLevel level = c.getSource().getLevel();
+        List<ServerPlayer> near = new ArrayList<>();
+        for (ServerPlayer p : c.getSource().getServer().getPlayerList().getPlayers()) {
+            if (p.level() == level && p.position().distanceTo(at) <= range) {
+                near.add(p);
+            }
+        }
+        return new Narration(m.group(2).strip(), near);
+    }
+
+    private static int narrate(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> given) {
+        Narration n = narration(c, given);
+        HorrorService.show(n.targets(), "narration", 80 + Math.min(500, n.text().length() * 4), n.text(), null);
+        return send(c, n);
+    }
+
+    private static int narrateChat(CommandContext<CommandSourceStack> c, Collection<ServerPlayer> given) {
+        return send(c, narration(c, given));
+    }
+
+    private static int send(CommandContext<CommandSourceStack> c, Narration n) {
+        Component line = narrationLine(n.text());
+        for (ServerPlayer p : n.targets()) {
             p.sendSystemMessage(line);
         }
-        c.getSource().sendSuccess(() -> Component.translatable("rp.arcanes_oublies.narration.sent", targets.size()).withStyle(ChatFormatting.DARK_GRAY), false);
-        return targets.size();
+        int count = n.targets().size();
+        c.getSource().sendSuccess(() -> Component.translatable("rp.arcanes_oublies.narration.sent", count).withStyle(ChatFormatting.DARK_GRAY), false);
+        return count;
     }
 
     /** What the game master looks at, within 32 blocks: the face hit, or null. */

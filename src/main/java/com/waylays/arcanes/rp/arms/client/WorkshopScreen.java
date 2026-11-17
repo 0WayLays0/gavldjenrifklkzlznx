@@ -58,6 +58,8 @@ public class WorkshopScreen extends Screen {
     private String name;
     private String lore;
     private boolean unbreakable, glint;
+    /** The durability left and the most (empty: the item has none, or it is left as it is). */
+    private String durability = "", maxDurability = "";
     private final String[] stats = new String[Arms.STATS.size()];
     private final List<Row> rows = new ArrayList<>();
     private final List<int[]> fields = new ArrayList<>();
@@ -86,6 +88,10 @@ public class WorkshopScreen extends Screen {
         lore = b.toString();
         unbreakable = stack.has(DataComponents.UNBREAKABLE);
         glint = Boolean.TRUE.equals(stack.get(DataComponents.ENCHANTMENT_GLINT_OVERRIDE));
+        if (stack.isDamageableItem()) {
+            maxDurability = String.valueOf(stack.getMaxDamage());
+            durability = String.valueOf(stack.getMaxDamage() - stack.getDamageValue());
+        }
         double[] v = Arms.stats(stack);
         for (int i = 0; i < stats.length; i++) {
             stats[i] = Double.isNaN(v[i]) ? "" : trim(v[i]);
@@ -212,6 +218,13 @@ public class WorkshopScreen extends Screen {
             name = name + s;
             init();
         });
+        // The durability: what is left, the most, and a button that fills it up
+        EditBox left = field(x, y + 126, 70, durability, 7, s -> durability = s);
+        field(x + 86, y + 126, 70, maxDurability, 7, s -> maxDurability = s);
+        flat(x + 164, y + 125, 60, 18, Component.translatable("arms.arcanes_oublies.durability_full"), b -> {
+            durability = maxDurability;
+            left.setValue(maxDurability);
+        }, GOLD).setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable("arms.arcanes_oublies.durability_hint")));
     }
 
     private static Component toggle(String key, boolean on) {
@@ -410,6 +423,16 @@ public class WorkshopScreen extends Screen {
         }
     }
 
+    /** A whole number typed in a field, or -1 (empty, or not a number). */
+    private static int whole(String s) {
+        try {
+            int v = Integer.parseInt(s.trim());
+            return v > 0 ? v : -1;
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
     private List<String> loreLines() {
         List<String> out = new ArrayList<>();
         for (String l : lore.split("\n", -1)) {
@@ -436,7 +459,7 @@ public class WorkshopScreen extends Screen {
         for (String s : stats) {
             st.add(s.isBlank() ? Float.NaN : num(s, Float.NaN));
         }
-        PacketDistributor.sendToServer(new Arms.Edit(name, loreLines(), unbreakable, glint, st, procs()));
+        PacketDistributor.sendToServer(new Arms.Edit(name, loreLines(), unbreakable, glint, st, procs(), whole(durability), whole(maxDurability)));
         onClose();
     }
 
@@ -477,6 +500,8 @@ public class WorkshopScreen extends Screen {
             case 0 -> {
                 g.drawString(font, Component.translatable("arms.arcanes_oublies.name"), x, y, GOLD, false);
                 g.drawString(font, Component.translatable("arms.arcanes_oublies.colours_title"), x, y + 66, GOLD, false);
+                g.drawString(font, Component.translatable("arms.arcanes_oublies.durability"), x, y + 114, GOLD, false);
+                g.drawString(font, "/", x + 76, y + 130, DIM, false);
             }
             case 1 -> {
                 int lines = lore.isEmpty() ? 0 : lore.split("\n", -1).length;
@@ -531,6 +556,9 @@ public class WorkshopScreen extends Screen {
         }
         if (unbreakable) {
             lines.add(Component.translatable("item.unbreakable").withColor(0xFF5555FF));
+        } else if (whole(maxDurability) > 0) {
+            int most = whole(maxDurability), left = whole(durability) > 0 ? Math.min(most, whole(durability)) : most;
+            lines.add(Component.translatable("item.durability", left, most).withColor(0xFFAAAAAA));
         }
         for (Proc p : procs()) {
             lines.add(ArmsClient.line(p));

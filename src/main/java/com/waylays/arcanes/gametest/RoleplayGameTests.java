@@ -105,4 +105,42 @@ public final class RoleplayGameTests {
         com.waylays.arcanes.rp.RpData.get(helper.getLevel().getServer()).setName(p.getUUID(), "", "");
         helper.succeed();
     }
+
+    /**
+     * The new staff and role-play tools: a warp found whatever its capitals and taken; a range read before a text
+     * ("/me 40 ..."); the narration's chat line; /repair to full and to a value; the workshop's durability.
+     */
+    @GameTest(template = "platform", skyAccess = true)
+    public static void warpsRangesNarrationAndRepair(GameTestHelper helper) {
+        net.minecraft.server.MinecraftServer server = helper.getLevel().getServer();
+        com.waylays.arcanes.rp.warp.Warps warps = com.waylays.arcanes.rp.warp.Warps.get(server);
+        BlockPos at = helper.absolutePos(new BlockPos(2, 2, 2));
+        warps.put(new com.waylays.arcanes.rp.warp.Warps.Warp("Taverne_Test", helper.getLevel().dimension().location(), at.getX() + .5, at.getY(),
+                at.getZ() + .5, 90, 0));
+        helper.assertTrue(warps.find("taverne_test") != null && warps.find("TAVERNE_TEST") != null, "a warp is found whatever its capitals");
+        net.minecraft.server.level.ServerPlayer p = net.neoforged.neoforge.common.util.FakePlayerFactory.get(helper.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "warp_tester"));
+        com.waylays.arcanes.rp.warp.Warps.Warp w = warps.find("tAvErNe_TeSt");
+        p.teleportTo(helper.getLevel(), w.x(), w.y(), w.z(), w.yaw(), w.pitch());
+        helper.assertTrue(p.blockPosition().equals(at), "the warp takes there");
+        helper.assertTrue(warps.remove("taverne_TEST") != null && warps.find("Taverne_Test") == null, "a warp is deleted whatever its capitals");
+
+        java.util.regex.Matcher m = com.waylays.arcanes.rp.RpCommands.ranged("40 lève la main");
+        helper.assertTrue(m != null && m.group(1).equals("40") && m.group(2).equals("lève la main"), "a range before the text");
+        helper.assertTrue(com.waylays.arcanes.rp.RpCommands.ranged("lève 2 mains") == null, "no range: the text as it is");
+
+        String line = com.waylays.arcanes.rp.horror.HorrorCommands.narrationLine("La pluie tombe.").getString();
+        helper.assertTrue(line.contains("[NARRATION] : La pluie tombe."), "the narration reads [NARRATION] : text, not " + line);
+
+        net.minecraft.world.item.ItemStack sword = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD);
+        int max = sword.getMaxDamage();
+        sword.setDamageValue(max - 3);
+        p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sword);
+        net.minecraft.commands.CommandSourceStack source = p.createCommandSourceStack().withPermission(4).withSuppressedOutput();
+        server.getCommands().performPrefixedCommand(source, "repair 100");
+        helper.assertTrue(p.getMainHandItem().getMaxDamage() - p.getMainHandItem().getDamageValue() == 100, "/repair 100 leaves 100");
+        server.getCommands().performPrefixedCommand(source, "repair full");
+        helper.assertTrue(p.getMainHandItem().getDamageValue() == 0, "/repair full repairs it all");
+        helper.succeed();
+    }
 }

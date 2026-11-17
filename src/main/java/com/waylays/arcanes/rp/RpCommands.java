@@ -18,7 +18,8 @@ import java.util.UUID;
 
 /**
  * The role-play commands: /setname, /me, /do, /roll, /try, /chuchoter, /crier, /hrp, /desc, /examiner, /voir, and
- * /rp (the list, and for game masters who plays whom and naming someone else's character).
+ * /rp (the list, and for game masters who plays whom and naming someone else's character). /me, /do, /try,
+ * /chuchoter, /crier and /hrp take a range in blocks before their text ("/me 40 lève la main"), /roll before its dice.
  */
 public final class RpCommands {
     private static final int MAX_TEXT = 256;
@@ -44,8 +45,19 @@ public final class RpCommands {
                 .executes(c -> act(c, "message", RpService::shout))));
         d.register(Commands.literal("hrp").then(Commands.argument("message", StringArgumentType.greedyString())
                 .executes(c -> act(c, "message", RpService::ooc))));
-        d.register(Commands.literal("roll").executes(c -> roll(c, "100"))
-                .then(Commands.argument("des", StringArgumentType.word()).executes(c -> roll(c, StringArgumentType.getString(c, "des")))));
+        d.register(Commands.literal("roll").executes(c -> roll(c, "100", 0))
+                .then(Commands.argument("des", StringArgumentType.word()).executes(c -> roll(c, StringArgumentType.getString(c, "des"), 0))
+                        // "/roll 30 1d20": the range first, then the dice
+                        .then(Commands.argument("des2", StringArgumentType.word()).executes(c -> {
+                            int range;
+                            try {
+                                range = Integer.parseInt(StringArgumentType.getString(c, "des"));
+                            } catch (NumberFormatException e) {
+                                c.getSource().sendFailure(Component.translatable("rp.arcanes_oublies.bad_dice"));
+                                return 0;
+                            }
+                            return roll(c, StringArgumentType.getString(c, "des2"), Math.max(1, Math.min(RpConfig.get(RpConfig.MAX_RANGE, 200), range)));
+                        }))));
         d.register(Commands.literal("desc").executes(RpCommands::clearDescription)
                 .then(Commands.argument("texte", StringArgumentType.greedyString()).executes(RpCommands::description)));
         d.register(Commands.literal("examiner").then(Commands.argument("cible", EntityArgument.player()).executes(RpCommands::examine)));
@@ -85,21 +97,37 @@ public final class RpCommands {
     }
 
     private interface Action {
-        void run(ServerPlayer p, String text);
+        void run(ServerPlayer p, String text, int range);
     }
+
+    /** "12 text": a range in blocks put before the text; null if the text does not start with one. */
+    static final java.util.regex.Pattern RANGED = java.util.regex.Pattern.compile("^(\\d{1,6})\\s+(\\S.*)$", java.util.regex.Pattern.DOTALL);
 
     private static String text(CommandContext<CommandSourceStack> c, String arg) {
         String t = StringArgumentType.getString(c, arg).strip();
         return t.length() > MAX_TEXT ? t.substring(0, MAX_TEXT) : t;
     }
 
+    /** The range and the text of "30 the text", or null if the text does not start with a range. */
+    public static java.util.regex.Matcher ranged(String text) {
+        java.util.regex.Matcher m = RANGED.matcher(text);
+        return m.matches() ? m : null;
+    }
+
+    /** Runs {@code a} on the text; "/me 30 text" carries it 30 blocks (up to the server's limit) instead of the usual range. */
     private static int act(CommandContext<CommandSourceStack> c, String arg, Action a) throws CommandSyntaxException {
         ServerPlayer p = c.getSource().getPlayerOrException();
         String t = text(c, arg);
+        int range = 0;
+        java.util.regex.Matcher m = RANGED.matcher(t);
+        if (m.matches()) {
+            range = Math.max(1, Math.min(RpConfig.get(RpConfig.MAX_RANGE, 200), Integer.parseInt(m.group(1))));
+            t = m.group(2).strip();
+        }
         if (t.isEmpty()) {
             return 0;
         }
-        a.run(p, t);
+        a.run(p, t, range);
         return 1;
     }
 
@@ -137,7 +165,7 @@ public final class RpCommands {
         return 1;
     }
 
-    private static int roll(CommandContext<CommandSourceStack> c, String spec) throws CommandSyntaxException {
+    private static int roll(CommandContext<CommandSourceStack> c, String spec, int range) throws CommandSyntaxException {
         ServerPlayer p = c.getSource().getPlayerOrException();
         String s = spec.toLowerCase().replace(" ", "");
         int count = 1, sides;
@@ -157,7 +185,7 @@ public final class RpCommands {
             c.getSource().sendFailure(Component.translatable("rp.arcanes_oublies.bad_dice"));
             return 0;
         }
-        RpService.roll(p, count, sides);
+        RpService.roll(p, count, sides, range);
         return 1;
     }
 
@@ -224,7 +252,8 @@ public final class RpCommands {
     }
 
     private static int help(CommandContext<CommandSourceStack> c) {
-        for (String line : new String[] {"setname", "me", "do", "roll", "try", "chuchoter", "crier", "hrp", "desc", "examiner", "voir", "pseudos"}) {
+        for (String line : new String[] {"setname", "me", "do", "roll", "try", "chuchoter", "crier", "hrp", "desc", "examiner", "voir", "pseudos",
+                "warp", "warplist"}) {
             c.getSource().sendSuccess(() -> Component.empty().append(RpService.colored("/" + line + " ", RpService.NAME))
                     .append(Component.translatable("rp.arcanes_oublies.help." + line).withStyle(ChatFormatting.GRAY)), false);
         }

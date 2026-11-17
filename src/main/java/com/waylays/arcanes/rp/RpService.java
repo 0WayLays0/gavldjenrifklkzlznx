@@ -72,10 +72,19 @@ public final class RpService {
         tell(p, RpConfig.get(RpConfig.SAY_RANGE, 20), line, 0, null, "« " + text + " »", SAY);
     }
 
+    /** The range asked for ({@code range} > 0), else the server's own one. */
+    private static int range(int range, net.neoforged.neoforge.common.ModConfigSpec.IntValue fallback, int otherwise) {
+        return range > 0 ? range : RpConfig.get(fallback, otherwise);
+    }
+
     public static void me(ServerPlayer p, String text) {
+        me(p, text, 0);
+    }
+
+    public static void me(ServerPlayer p, String text, int range) {
         Component line = Component.empty().append(colored("✦ ", ME)).append(nameOf(p, ME))
                 .append(colored(" " + text, ME).withStyle(ChatFormatting.ITALIC));
-        tell(p, RpConfig.get(RpConfig.ACTION_RANGE, 20), line, 0, null, "* " + text, ME);
+        tell(p, range(range, RpConfig.ME_RANGE, 25), line, 0, null, "* " + text, ME);
         if (closesEyes(text)) {
             closeEyes(p);
         }
@@ -109,12 +118,20 @@ public final class RpService {
     public static final int EYES_TICKS = 120;
 
     public static void doing(ServerPlayer p, String text) {
+        doing(p, text, 0);
+    }
+
+    public static void doing(ServerPlayer p, String text, int range) {
         Component line = Component.empty().append(colored("◆ ", DO)).append(colored(text, DO).withStyle(ChatFormatting.ITALIC))
                 .append(colored("  (" + name(p) + ")", 0x8A8070));
-        tell(p, RpConfig.get(RpConfig.ACTION_RANGE, 20), line, 0, null, "◆ " + text, DO);
+        tell(p, range(range, RpConfig.ACTION_RANGE, 20), line, 0, null, "◆ " + text, DO);
     }
 
     public static void roll(ServerPlayer p, int count, int sides) {
+        roll(p, count, sides, 0);
+    }
+
+    public static void roll(ServerPlayer p, int count, int sides, int range) {
         int total = 0;
         StringBuilder each = new StringBuilder();
         for (int i = 0; i < count; i++) {
@@ -132,20 +149,28 @@ public final class RpService {
                 .append(colored(count > 1 ? "  (" + each + ")" : "", 0x8A8070));
         String bubble = "⚄ " + (count == 1 ? Component.translatable("rp.arcanes_oublies.die_one", sides).getString()
                 : Component.translatable("rp.arcanes_oublies.die_many", count, sides).getString()) + " " + total;
-        tell(p, RpConfig.get(RpConfig.ACTION_RANGE, 20), line, 0, null, bubble, ROLL);
+        tell(p, range(range, RpConfig.ACTION_RANGE, 20), line, 0, null, bubble, ROLL);
     }
 
     public static void attempt(ServerPlayer p, String text) {
+        attempt(p, text, 0);
+    }
+
+    public static void attempt(ServerPlayer p, String text, int range) {
         boolean ok = p.getRandom().nextBoolean();
         String verdict = Component.translatable(ok ? "rp.arcanes_oublies.success" : "rp.arcanes_oublies.failure").getString();
         Component line = Component.empty().append(colored("⚖ ", ok ? TRY_OK : TRY_KO)).append(nameOf(p, ME))
                 .append(colored(" " + Component.translatable("rp.arcanes_oublies.tries").getString() + " " + text + " — ", ME).withStyle(ChatFormatting.ITALIC))
                 .append(colored(verdict, ok ? TRY_OK : TRY_KO).withStyle(ChatFormatting.BOLD));
-        tell(p, RpConfig.get(RpConfig.ACTION_RANGE, 20), line, 0, null, "* " + text + " — " + verdict, ok ? TRY_OK : TRY_KO);
+        tell(p, range(range, RpConfig.ACTION_RANGE, 20), line, 0, null, "* " + text + " — " + verdict, ok ? TRY_OK : TRY_KO);
     }
 
     public static void whisper(ServerPlayer p, String text) {
-        int r = RpConfig.get(RpConfig.WHISPER_RANGE, 4);
+        whisper(p, text, 0);
+    }
+
+    public static void whisper(ServerPlayer p, String text, int range) {
+        int r = range(range, RpConfig.WHISPER_RANGE, 4);
         Component line = Component.empty().append(nameOf(p, WHISPER))
                 .append(colored(" " + Component.translatable("rp.arcanes_oublies.whispers").getString() + " ", 0x7A8490))
                 .append(colored("« " + text + " »", WHISPER).withStyle(ChatFormatting.ITALIC));
@@ -155,17 +180,27 @@ public final class RpService {
     }
 
     public static void shout(ServerPlayer p, String text) {
-        Component line = Component.empty().append(nameOf(p, 0xFF9A7A)).append(colored(" " + Component.translatable("rp.arcanes_oublies.shouts").getString() + " ", 0xB89080))
-                .append(colored("« " + text + " ! »", SHOUT).withStyle(ChatFormatting.BOLD));
-        tell(p, RpConfig.get(RpConfig.SHOUT_RANGE, 48), line, 0, null, "« " + text + " ! »", 0xFFB09A);
+        shout(p, text, 0);
     }
 
-    /** Out of character: everyone, under the account's name (and marked as such). */
+    public static void shout(ServerPlayer p, String text, int range) {
+        Component line = Component.empty().append(nameOf(p, 0xFF9A7A)).append(colored(" " + Component.translatable("rp.arcanes_oublies.shouts").getString() + " ", 0xB89080))
+                .append(colored("« " + text + " ! »", SHOUT).withStyle(ChatFormatting.BOLD));
+        tell(p, range(range, RpConfig.SHOUT_RANGE, 48), line, 0, null, "« " + text + " ! »", 0xFFB09A);
+    }
+
+    /** Out of character: everyone (or those within {@code range}, if given), under the account's name (and marked as such). */
     public static void ooc(ServerPlayer p, String text) {
+        ooc(p, text, 0);
+    }
+
+    public static void ooc(ServerPlayer p, String text, int range) {
         Component line = Component.empty().append(colored("[HRP] ", 0x6A6A78)).append(colored(p.getGameProfile().getName(), 0x9A9AA8))
                 .append(colored(" : " + text, 0x9A9AA8));
         for (ServerPlayer o : p.server.getPlayerList().getPlayers()) {
-            o.sendSystemMessage(line);
+            if (range <= 0 || o == p || o.level() == p.level() && o.distanceTo(p) <= range) {
+                o.sendSystemMessage(line);
+            }
         }
     }
 

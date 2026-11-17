@@ -679,9 +679,9 @@ lui, ces actions ne font rien.
 
 | Commande | Effet |
 | --- | --- |
-| `/narration <texte>` | Narration sur l'écran de tous les joueurs (bandes noires de cinéma, texte qui s'écrit) et dans leur chat. |
+| `/narration [portée] <texte>` | Narration sur l'écran (bandes noires de cinéma, texte qui s'écrit) et dans le chat, sous la forme **`✦ [NARRATION] : texte`** (doré et parchemin). Sans portée : tout le serveur ; avec une portée (`/narration 30 La pluie redouble.`) : les joueurs à 30 blocs ou moins. |
 | `/narrationalone <joueurs> <texte>` | La même chose pour un seul joueur (ou ceux choisis). |
-| `/narrationchat <texte>` | Narration seulement dans le chat de tous (rien à l'écran). |
+| `/narrationchat [portée] <texte>` | Narration seulement dans le chat (rien à l'écran), à tous ou dans la portée. |
 | `/narrationchatalone <joueurs> <texte>` | Pareil, pour un ou quelques joueurs. |
 
 ### Outils d'événement
@@ -721,7 +721,7 @@ Exemple : `/declencheur action ruelle son rire`, `/declencheur action ruelle att
 
 ### Atelier d'armes : `/arme`
 Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme`. L'atelier s'ouvre : l'objet en haut, quatre onglets, et à droite l'**aperçu** de l'objet tel qu'il sera (nom, lore, stats, effets), mis à jour pendant que tu écris.
-- **Général** : son nom, incassable, brillance. Pastilles de couleur : un clic ajoute le code (`&c` rouge, `&6` or…), plus `&l` gras, `&o` italique, `&n` souligné, `&r` normal.
+- **Général** : son nom, incassable, brillance. Pastilles de couleur : un clic ajoute le code (`&c` rouge, `&6` or…), plus `&l` gras, `&o` italique, `&n` souligné, `&r` normal. **Durabilité** : restante et maximum (le bouton *Max* la remplit) ; un objet sans durabilité en reçoit une si on lui met un maximum (il ne s'empile plus). Cases vides : on n'y touche pas.
 - **Lore** : une grande zone de texte, jusqu'à **16 lignes** (Entrée pour changer de ligne), avec les mêmes pastilles de couleur.
 - **Stats** : dégâts, vitesse d'attaque (comme affichés sous l'objet : une main nue = 1 et 4), armure, robustesse, résistance au recul, vitesse (%), PV max (+), portée (+). Une case vide = rien.
 - **Effets %** : jusqu'à 8 lignes. Pour chacune :
@@ -730,6 +730,25 @@ Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme`. L'atelie
   - **Sur** : *Autre* (celui qu'on frappe, ou celui qui nous frappe) ou *Soi* ;
   - la **chance en %**, la **force** (niveau de l'effet, ou points, ou % pour le vol de vie), les **secondes**.
   - Sous l'objet : « ✦ 5 % en frappant → l'autre : Poison II (5 s) ».
+
+### Warps
+
+| Commande | Effet |
+| --- | --- |
+| `/warp <nom>` | Aller au warp (les majuscules ne comptent pas : `Taverne`, `taverne`, `TAVERNE`). Tout le monde (`warpPermission`, 0). |
+| `/warplist` | La liste des warps ; un clic sur un nom y emmène. Tout le monde. |
+| `/setwarp <nom>` | Crée le warp là où tu es (même direction du regard), ou le déplace. Maîtres du jeu (`setwarpPermission`, 2). |
+| `/delwarp <nom>` | Supprime le warp. Maîtres du jeu. |
+
+Les warps sont gardés avec le monde, dans toutes les dimensions.
+
+### `/invsee` et `/repair`
+
+- `/invsee <joueur>` : ouvre l'inventaire du joueur (en ligne) dans un coffre. Lignes 1 à 3 : son sac ; ligne 4 : sa
+  barre d'objets ; ligne 5 : casque, plastron, jambières, bottes, main gauche. On peut prendre et mettre des objets :
+  son inventaire change tout de suite. `invseePermission` (2).
+- `/repair full` : la durabilité de l'objet en main remise au maximum ; `/repair <n>` : remise à *n* (de 1 au maximum de
+  l'objet). `repairPermission` (2).
 
 ### Porter quelqu'un
 Accroupi + clic droit main vide sur un joueur : il est tout de suite porté dans les bras (sans demande), allongé, devant le porteur, qui marche plus lentement. Accroupi + clic droit main vide (ou `/porter lacher`) : on le pose. Le porté descend en s'accroupissant. Staff : `/porter <porteur> <porté>`.
@@ -751,20 +770,24 @@ Chaque joueur a une peur de 0 à 100 %. Elle **monte** dans le noir (une lampe t
 | --- | --- |
 | `/setname Prénom Nom` | Le nom du personnage remplace le pseudo partout (au-dessus de la tête, liste des joueurs, tout ce qui est dit). |
 | *(chat normal)* | Parole entendue autour (20 blocs) : « Bill Denbrough dit : « … » ». |
-| `/me action` | Action en violet italique, dans le chat (rien au-dessus de la tête). |
-| `/do description` | Description de la scène (ambre). |
-| `/roll [100]` | « Bill Denbrough a lancé un dé sur 100 : 42 » (dé sur 100 par défaut ; aussi `1d20`, `2d6`…). |
-| `/try action` | Tente quelque chose : réussite ou échec. |
-| `/chuchoter message` | 4 blocs ; un peu plus loin on voit seulement que quelqu'un chuchote. |
-| `/crier message` | 48 blocs. |
-| `/hrp message` | Hors personnage, à tout le monde (seul endroit où le pseudo apparaît). |
+| `/me [portée] action` | Action en violet italique, dans le chat (rien au-dessus de la tête). 25 blocs par défaut. |
+| `/do [portée] description` | Description de la scène (ambre). 20 blocs par défaut. |
+| `/roll [portée] [100]` | « Bill Denbrough a lancé un dé sur 100 : 42 » (dé sur 100 par défaut ; aussi `1d20`, `2d6`…). Avec une portée : `/roll 30 1d20`. |
+| `/try [portée] action` | Tente quelque chose : réussite ou échec. |
+| `/chuchoter [portée] message` | 4 blocs ; un peu plus loin on voit seulement que quelqu'un chuchote. |
+| `/crier [portée] message` | 48 blocs. |
+| `/hrp [portée] message` | Hors personnage, à tout le monde (ou dans la portée) ; seul endroit où le pseudo apparaît. |
+
+La **portée** est un nombre de blocs mis avant le texte : `/me 40 lève la main` est vu à 40 blocs (200 au plus,
+`maxRange`). Un texte qui commence par un nombre est donc lu comme une portée (`/me 3 pommes…` : écrire `/me trois pommes…`).
 | `/desc texte` · `/examiner joueur` | Ce que les autres voient du personnage. |
 | `/voir joueur` · `/voir tous` · `/voir personne` | N'être **vu et entendu que** par ce(s) joueur(s) : pour les autres le personnage n'existe plus (ni dessiné, ni entendu, ni touchable), ses paroles ne leur parviennent pas, et avec Simple Voice Chat sa voix non plus. Réservé aux maîtres du jeu par défaut (`voirPermission`). |
 | `/pseudos cacher` · `/pseudos afficher` | Les pseudos au-dessus des têtes sont **cachés par défaut** ; `/pseudos afficher` les réaffiche (et `/pseudos cacher` les recache), pour tout le monde : passe par une équipe du tableau des scores (« nom jamais visible »), que le jeu de base respecte sur chaque client, avec ou sans le mod (Essential compris, qui s'accroche au nom du jeu). Les joueurs sont alors dans l'équipe `eraphones_rp` (un joueur ne peut être que dans une équipe). Maîtres du jeu. |
 | `/rp` · `/rp qui` · `/rp nom joueur Prénom Nom` | Aide ; pour les maîtres du jeu : qui joue qui, nommer un personnage. |
 
-Réglages serveur (`serverconfig/arcanes_oublies-roleplay-server.toml`) : chat local oui/non, portées (parole, actions, chuchotement,
-cri), permission de `/voir`, noms au-dessus des têtes, bulles au-dessus des têtes (désactivées par défaut).
+Réglages serveur (`serverconfig/arcanes_oublies-roleplay-server.toml`) : chat local oui/non, portées (parole, `/me`, actions,
+chuchotement, cri, portée maximale choisie par un joueur), permissions de `/voir`, des warps, de `/invsee` et de
+`/repair`, noms au-dessus des têtes, bulles au-dessus des têtes (désactivées par défaut).
 
 ### `/horreur` : ce que seules les victimes voient et entendent
 
