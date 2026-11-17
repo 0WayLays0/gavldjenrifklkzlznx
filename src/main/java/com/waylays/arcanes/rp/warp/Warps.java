@@ -34,7 +34,7 @@ import java.util.TreeMap;
 
 /**
  * Warps: named places of the world one goes back to. /setwarp and /delwarp for game masters, /warp and /warplist for
- * everyone (both levels in the server's role-play settings). A warp's name is written as one likes and looked up
+ * everyone (both levels in the server's role-play settings); game masters also send players there (/warp name players). A warp's name is written as one likes and looked up
  * whatever its capitals ("Taverne", "taverne" and "TAVERNE" are the same warp).
  */
 public final class Warps extends SavedData {
@@ -126,7 +126,11 @@ public final class Warps extends SavedData {
 
     public static void register(CommandDispatcher<CommandSourceStack> d) {
         d.register(Commands.literal("warp").requires(s -> s.hasPermission(RpConfig.get(RpConfig.WARP_PERMISSION, 0)))
-                .then(Commands.argument("nom", StringArgumentType.word()).suggests(NAMES).executes(Warps::warp)));
+                .then(Commands.argument("nom", StringArgumentType.word()).suggests(NAMES).executes(Warps::warp)
+                        // Game masters send others there: /warp <name> <players>
+                        .then(Commands.argument("joueurs", net.minecraft.commands.arguments.EntityArgument.players())
+                                .requires(s -> s.hasPermission(RpConfig.get(RpConfig.SETWARP_PERMISSION, 2)))
+                                .executes(Warps::warpOthers))));
         d.register(Commands.literal("warplist").requires(s -> s.hasPermission(RpConfig.get(RpConfig.WARP_PERMISSION, 0)))
                 .executes(Warps::list));
         d.register(Commands.literal("setwarp").requires(s -> s.hasPermission(RpConfig.get(RpConfig.SETWARP_PERMISSION, 2)))
@@ -137,21 +141,54 @@ public final class Warps extends SavedData {
 
     private static int warp(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
         ServerPlayer p = c.getSource().getPlayerOrException();
-        String name = StringArgumentType.getString(c, "nom");
-        Warp w = get(p.server).find(name);
-        if (w == null) {
-            c.getSource().sendFailure(Component.translatable("rp.arcanes_oublies.warp.unknown", name));
-            return 0;
-        }
-        ServerLevel level = p.server.getLevel(ResourceKey.create(Registries.DIMENSION, w.world()));
+        Warp w = target(c);
+        ServerLevel level = w == null ? null : world(c, w);
         if (level == null) {
-            c.getSource().sendFailure(Component.translatable("rp.arcanes_oublies.warp.no_world", w.name()));
             return 0;
         }
-        p.teleportTo(level, w.x(), w.y(), w.z(), w.yaw(), w.pitch());
-        level.playSound(null, w.x(), w.y(), w.z(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, .6f, 1.2f);
+        send(p, level, w);
         c.getSource().sendSuccess(() -> Component.translatable("rp.arcanes_oublies.warp.done", gold(w.name())).withStyle(ChatFormatting.GRAY), false);
         return 1;
+    }
+
+    private static int warpOthers(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
+        java.util.Collection<ServerPlayer> players = net.minecraft.commands.arguments.EntityArgument.getPlayers(c, "joueurs");
+        Warp w = target(c);
+        ServerLevel level = w == null ? null : world(c, w);
+        if (level == null) {
+            return 0;
+        }
+        for (ServerPlayer p : players) {
+            send(p, level, w);
+            p.sendSystemMessage(Component.translatable("rp.arcanes_oublies.warp.done", gold(w.name())).withStyle(ChatFormatting.GRAY));
+        }
+        int n = players.size();
+        c.getSource().sendSuccess(() -> Component.translatable("rp.arcanes_oublies.warp.sent", n, gold(w.name())).withStyle(ChatFormatting.GRAY), true);
+        return n;
+    }
+
+    /** The warp named in the command, or null (and the player told). */
+    private static Warp target(CommandContext<CommandSourceStack> c) {
+        String name = StringArgumentType.getString(c, "nom");
+        Warp w = get(c.getSource().getServer()).find(name);
+        if (w == null) {
+            c.getSource().sendFailure(Component.translatable("rp.arcanes_oublies.warp.unknown", name));
+        }
+        return w;
+    }
+
+    /** The warp's world, or null (and the player told). */
+    private static ServerLevel world(CommandContext<CommandSourceStack> c, Warp w) {
+        ServerLevel level = c.getSource().getServer().getLevel(ResourceKey.create(Registries.DIMENSION, w.world()));
+        if (level == null) {
+            c.getSource().sendFailure(Component.translatable("rp.arcanes_oublies.warp.no_world", w.name()));
+        }
+        return level;
+    }
+
+    private static void send(ServerPlayer p, ServerLevel level, Warp w) {
+        p.teleportTo(level, w.x(), w.y(), w.z(), w.yaw(), w.pitch());
+        level.playSound(null, w.x(), w.y(), w.z(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, .6f, 1.2f);
     }
 
     private static int list(CommandContext<CommandSourceStack> c) {

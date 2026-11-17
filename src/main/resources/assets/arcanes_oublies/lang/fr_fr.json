@@ -2415,5 +2415,6 @@
   "rp.arcanes_oublies.repair.done": "%s : durabilité %s / %s",
   "arms.arcanes_oublies.durability": "Durabilité (restante / maximum)",
   "arms.arcanes_oublies.durability_full": "Max",
-  "arms.arcanes_oublies.durability_hint": "Remet la durabilité restante au maximum. Laisse les cases vides pour ne pas toucher à la durabilité. Un objet sans durabilité en reçoit une si tu mets un maximum (il ne s'empile plus)."
+  "arms.arcanes_oublies.durability_hint": "Remet la durabilité restante au maximum. Laisse les cases vides pour ne pas toucher à la durabilité. Un objet sans durabilité en reçoit une si tu mets un maximum (il ne s'empile plus).",
+  "rp.arcanes_oublies.warp.sent": "%s joueur(s) envoyé(s) au warp %s."
 }

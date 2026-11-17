@@ -736,6 +736,7 @@ Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme`. L'atelie
 | Commande | Effet |
 | --- | --- |
 | `/warp <nom>` | Aller au warp (les majuscules ne comptent pas : `Taverne`, `taverne`, `TAVERNE`). Tout le monde (`warpPermission`, 0). |
+| `/warp <nom> <joueurs>` | Envoie ces joueurs au warp (un pseudo ou un sélecteur : `@a`, `@a[distance=..10]`…). Maîtres du jeu (`setwarpPermission`). |
 | `/warplist` | La liste des warps ; un clic sur un nom y emmène. Tout le monde. |
 | `/setwarp <nom>` | Crée le warp là où tu es (même direction du regard), ou le déplace. Maîtres du jeu (`setwarpPermission`, 2). |
 | `/delwarp <nom>` | Supprime le warp. Maîtres du jeu. |
