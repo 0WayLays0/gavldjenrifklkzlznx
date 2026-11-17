@@ -738,10 +738,17 @@ Tiens un objet (épée, hache, armure, n'importe quoi) et tape `/arme`. L'atelie
 | `/warp <nom>` | Aller au warp (les majuscules ne comptent pas : `Taverne`, `taverne`, `TAVERNE`). Tout le monde (`warpPermission`, 0). |
 | `/warp <nom> <joueurs>` | Envoie ces joueurs au warp (un pseudo ou un sélecteur : `@a`, `@a[distance=..10]`…). Maîtres du jeu (`setwarpPermission`). |
 | `/warplist` | La liste des warps ; un clic sur un nom y emmène. Tout le monde. |
+| `/warpgrp <portée> <nom>` | Envoie au warp **tous les joueurs** à moins de *portée* blocs de toi (toi compris) : `/warpgrp 15 taverne`. Maîtres du jeu. |
+| `/back [joueurs]` | Ramène le joueur là où il était **avant sa dernière téléportation** (`/tp`, warp, `/warpgrp`, `/back` : deux `/back` font l'aller-retour). Gardé même après une mort ou une déconnexion. Maîtres du jeu (`backPermission`, 2). |
 | `/setwarp <nom>` | Crée le warp là où tu es (même direction du regard), ou le déplace. Maîtres du jeu (`setwarpPermission`, 2). |
 | `/delwarp <nom>` | Supprime le warp. Maîtres du jeu. |
 
 Les warps sont gardés avec le monde, dans toutes les dimensions.
+
+### Métiers : stations
+
+Les stations (table de craft, forge, alambic…) n'ont plus de bouton « Utilisation classique » : on ne s'en sert que par
+les recettes du métier. Les cartes de recettes sont plus compactes (jusqu'à six visibles d'un coup).
 
 ### `/invsee` et `/repair`
 

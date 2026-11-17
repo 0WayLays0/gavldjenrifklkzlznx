@@ -131,6 +131,10 @@ public final class Warps extends SavedData {
                         .then(Commands.argument("joueurs", net.minecraft.commands.arguments.EntityArgument.players())
                                 .requires(s -> s.hasPermission(RpConfig.get(RpConfig.SETWARP_PERMISSION, 2)))
                                 .executes(Warps::warpOthers))));
+        // A whole group at once: everyone within the range of where it is run (game masters)
+        d.register(Commands.literal("warpgrp").requires(s -> s.hasPermission(RpConfig.get(RpConfig.SETWARP_PERMISSION, 2)))
+                .then(Commands.argument("portee", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, 100000))
+                        .then(Commands.argument("nom", StringArgumentType.word()).suggests(NAMES).executes(Warps::warpGroup))));
         d.register(Commands.literal("warplist").requires(s -> s.hasPermission(RpConfig.get(RpConfig.WARP_PERMISSION, 0)))
                 .executes(Warps::list));
         d.register(Commands.literal("setwarp").requires(s -> s.hasPermission(RpConfig.get(RpConfig.SETWARP_PERMISSION, 2)))
@@ -167,6 +171,30 @@ public final class Warps extends SavedData {
         return n;
     }
 
+    private static int warpGroup(CommandContext<CommandSourceStack> c) {
+        int range = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "portee");
+        Warp w = target(c);
+        ServerLevel level = w == null ? null : world(c, w);
+        if (level == null) {
+            return 0;
+        }
+        net.minecraft.world.phys.Vec3 at = c.getSource().getPosition();
+        ServerLevel here = c.getSource().getLevel();
+        java.util.List<ServerPlayer> group = new java.util.ArrayList<>();
+        for (ServerPlayer p : c.getSource().getServer().getPlayerList().getPlayers()) {
+            if (p.level() == here && p.position().distanceTo(at) <= range) {
+                group.add(p);
+            }
+        }
+        for (ServerPlayer p : group) {
+            send(p, level, w);
+            p.sendSystemMessage(Component.translatable("rp.arcanes_oublies.warp.done", gold(w.name())).withStyle(ChatFormatting.GRAY));
+        }
+        int n = group.size();
+        c.getSource().sendSuccess(() -> Component.translatable("rp.arcanes_oublies.warp.sent", n, gold(w.name())).withStyle(ChatFormatting.GRAY), true);
+        return n;
+    }
+
     /** The warp named in the command, or null (and the player told). */
     private static Warp target(CommandContext<CommandSourceStack> c) {
         String name = StringArgumentType.getString(c, "nom");
@@ -187,6 +215,7 @@ public final class Warps extends SavedData {
     }
 
     private static void send(ServerPlayer p, ServerLevel level, Warp w) {
+        Back.remember(p);
         p.teleportTo(level, w.x(), w.y(), w.z(), w.yaw(), w.pitch());
         level.playSound(null, w.x(), w.y(), w.z(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, .6f, 1.2f);
     }

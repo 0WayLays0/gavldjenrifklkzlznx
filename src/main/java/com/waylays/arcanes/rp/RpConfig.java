@@ -7,7 +7,8 @@ public final class RpConfig {
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.BooleanValue LOCAL_CHAT;
     public static final ModConfigSpec.IntValue SAY_RANGE, ACTION_RANGE, WHISPER_RANGE, SHOUT_RANGE, HIDE_PERMISSION, HORROR_PERMISSION, VOICE_PERMISSION;
-    public static final ModConfigSpec.IntValue ME_RANGE, MAX_RANGE, WARP_PERMISSION, SETWARP_PERMISSION, INVSEE_PERMISSION, REPAIR_PERMISSION;
+    public static final ModConfigSpec.IntValue ME_RANGE, MAX_RANGE, WARP_PERMISSION, SETWARP_PERMISSION, INVSEE_PERMISSION, REPAIR_PERMISSION,
+            BACK_PERMISSION;
     public static final ModConfigSpec.BooleanValue NAMEPLATES, BUBBLES;
 
     static {
@@ -28,6 +29,7 @@ public final class RpConfig {
         HORROR_PERMISSION = b.comment("The permission level needed for /horreur (sounds, visions, fog, a red balloon...)").defineInRange("horreurPermission", 2, 0, 4);
         WARP_PERMISSION = b.comment("The permission level needed for /warp and /warplist (0: everyone)").defineInRange("warpPermission", 0, 0, 4);
         SETWARP_PERMISSION = b.comment("The permission level needed for /setwarp and /delwarp").defineInRange("setwarpPermission", 2, 0, 4);
+        BACK_PERMISSION = b.comment("The permission level needed for /back").defineInRange("backPermission", 2, 0, 4);
         INVSEE_PERMISSION = b.comment("The permission level needed for /invsee").defineInRange("invseePermission", 2, 0, 4);
         REPAIR_PERMISSION = b.comment("The permission level needed for /repair").defineInRange("repairPermission", 2, 0, 4);
         VOICE_PERMISSION = b.comment("The permission level needed for /voix (with Simple Voice Chat: a changed voice)").defineInRange("voixPermission", 2, 0, 4);

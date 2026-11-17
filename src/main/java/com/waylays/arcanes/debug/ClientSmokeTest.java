@@ -918,7 +918,7 @@ public final class ClientSmokeTest {
                                     new com.waylays.arcanes.metier.MetierNet.RecipeView("Coffre", List.of(new net.minecraft.world.item.ItemStack(
                                             net.minecraft.world.item.Items.OAK_PLANKS, 8)), List.of(true),
                                             new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST),
-                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST), .8, 0)), true, 0)));
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST), .8, 0)), 0)));
                             metierTick = ticks;
                             metierTrial++;
                             return false;

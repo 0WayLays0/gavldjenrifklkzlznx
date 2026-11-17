@@ -495,12 +495,6 @@ public class MetierEditorScreen extends Screen {
             toggle(cardX0 + 10, y, 230, tr("protect"), () -> d.protectBlocks, v -> d.protectBlocks = v, tr("protect.tip"));
         }
         y += ROW;
-        if (d.isStation()) {
-            if (visible(y, 18)) {
-                toggle(cardX0 + 10, y, 260, tr("vanilla"), () -> d.vanillaButton, v -> d.vanillaButton = v, tr("vanilla.tip"));
-            }
-            y += ROW;
-        }
         if (visible(y, 18)) {
             labels.add(new Label(cardX0 + 10, y + 5, tr("id"), TEXT, 1));
             field(fieldX(), y, Math.min(170, cardX1 - fieldX() - 10), d.id, s -> d.id = s, s -> s.matches("[a-z0-9_]+")).setTooltip(Tooltip.create(tr("id.tip")));

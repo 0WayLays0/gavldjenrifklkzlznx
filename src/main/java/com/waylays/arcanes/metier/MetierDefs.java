@@ -143,8 +143,6 @@ public final class MetierDefs {
         public boolean protectBlocks = true;
         // Stations (with recipes)
         public List<Recipe> recipes = new ArrayList<>();
-        /** Whether the station's own screen (the vanilla crafting table…) can still be opened from its recipe list. */
-        public boolean vanillaButton = true;
         /** Seconds between two attempts by the same player (0: none). */
         public int playerCooldown = 0;
 

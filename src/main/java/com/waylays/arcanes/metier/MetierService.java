@@ -20,7 +20,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
@@ -204,9 +203,8 @@ public final class MetierService {
             views.add(new MetierNet.RecipeView(r.name, inputs, have, partial, perfect, def.difficulty * r.difficulty, wait));
         }
         BlockState state = level.getBlockState(pos);
-        boolean vanilla = def.vanillaButton && state.getMenuProvider(level, pos) != null;
         PacketDistributor.sendToPlayer(player, new MetierNet.Station(def.id, pos, def.name, def.game.ordinal(), new ItemStack(state.getBlock().asItem()),
-                views, vanilla, (int) (cooldownLeft(player, def.id, level) / 20)));
+                views, (int) (cooldownLeft(player, def.id, level) / 20)));
     }
 
     static void pick(ServerPlayer player, MetierNet.Pick pick) {
@@ -220,14 +218,8 @@ public final class MetierService {
         if (!def.matches(state) || SESSIONS.containsKey(player.getUUID())) {
             return;
         }
-        if (pick.recipe() < 0) {
-            MenuProvider menu = state.getMenuProvider(level, pos);
-            if (def.vanillaButton && menu != null) {
-                player.openMenu(menu);
-            }
-            return;
-        }
-        if (pick.recipe() >= def.recipes.size()) {
+        // A station is only used through its trade's recipes (its own screen is never opened)
+        if (pick.recipe() < 0 || pick.recipe() >= def.recipes.size()) {
             return;
         }
         Recipe r = def.recipes.get(pick.recipe());

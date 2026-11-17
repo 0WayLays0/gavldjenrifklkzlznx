@@ -174,15 +174,15 @@ public final class MetierNet {
         }
     }
 
-    /** A station's recipes, for the player to choose one ({@code vanilla}: its own screen can still be opened). */
-    public record Station(String def, BlockPos pos, String title, int game, ItemStack icon, List<RecipeView> recipes, boolean vanilla, int cooldown)
+    /** A station's recipes, for the player to choose one. */
+    public record Station(String def, BlockPos pos, String title, int game, ItemStack icon, List<RecipeView> recipes, int cooldown)
             implements CustomPacketPayload {
         public static final Type<Station> TYPE = payload("station");
         public static final StreamCodec<RegistryFriendlyByteBuf, Station> CODEC = CustomPacketPayload.codec(Station::write, Station::new);
 
         Station(RegistryFriendlyByteBuf buf) {
             this(buf.readUtf(64), buf.readBlockPos(), buf.readUtf(128), buf.readVarInt(), ItemStack.OPTIONAL_STREAM_CODEC.decode(buf), readRecipes(buf),
-                    buf.readBoolean(), buf.readVarInt());
+                    buf.readVarInt());
         }
 
         private static List<RecipeView> readRecipes(RegistryFriendlyByteBuf buf) {
@@ -202,7 +202,6 @@ public final class MetierNet {
             ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, icon);
             buf.writeVarInt(recipes.size());
             recipes.forEach(r -> r.write(buf));
-            buf.writeBoolean(vanilla);
             buf.writeVarInt(cooldown);
         }
 

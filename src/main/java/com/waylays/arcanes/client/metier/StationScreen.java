@@ -18,10 +18,10 @@ import java.util.List;
 /**
  * A station's recipes (the crafting table, the smithing table, the still), as cards over the station's scene: what
  * each makes, what it takes (green: in the bag, red: missing), what a good and a perfect job give, how hard it is.
- * Choosing one starts its minigame; the station's own screen can still be opened when the trade allows it.
+ * Choosing one starts its minigame. The cards are compact, so that up to six show at once.
  */
 public class StationScreen extends Screen {
-    private static final int W = 380, CARD = 58, GAP = 6, LIST_Y = 52;
+    private static final int W = 330, CARD = 38, GAP = 4, LIST_Y = 52;
     private static final int[] THEMES = {0xFF8A7458, 0xFF5A8A48, 0xFF8A6438, 0xFFB0502A, 0xFF7A4AA8};
     private static final String[] SCENES = {"bg_mining", "bg_harvest", "bg_assembly", "bg_forge", "bg_distill"};
     private static final ResourceLocation SLOT = Draw.tex("slot");
@@ -32,7 +32,6 @@ public class StationScreen extends Screen {
     private float left, top, k = 1;
     private int h, scroll, visible;
     private int hovered = -1;
-    private boolean hoverVanilla;
     private long opened = net.minecraft.Util.getMillis();
 
     public StationScreen(MetierNet.Station station) {
@@ -46,8 +45,8 @@ public class StationScreen extends Screen {
     @Override
     protected void init() {
         int n = Math.max(1, station.recipes().size());
-        visible = Math.max(1, Math.min(n, 4));
-        h = LIST_Y + visible * (CARD + GAP) + (station.vanilla() ? 34 : 12);
+        visible = Math.max(1, Math.min(n, 6));
+        h = LIST_Y + visible * (CARD + GAP) + 10;
         k = Mth.clamp(Math.min((width - 16) / (float) W, (height - 12) / (float) h), .5f, 2.6f);
         left = (width - W * k) / 2;
         top = (height - h * k) / 2;
@@ -120,32 +119,32 @@ public class StationScreen extends Screen {
             Draw.rect(g, 10, y + CARD + lift - 1, W - 10, y + CARD + lift, Draw.argb(90, edge));
             // What it makes
             ItemStack shown = r.perfect().isEmpty() ? r.partial() : r.perfect();
-            Draw.picture(g, SLOT, 16, y + 7 + lift, 60, y + 51 + lift, 72, 72, 0xFFFFFFFF);
+            Draw.picture(g, SLOT, 14, y + 4 + lift, 44, y + 34 + lift, 72, 72, 0xFFFFFFFF);
             if (over && ready) {
-                Draw.glow(g, 38, y + 29 + lift, 26, Draw.argb(90, 0xFFFFE0A0));
+                Draw.glow(g, 29, y + 19 + lift, 18, Draw.argb(90, 0xFFFFE0A0));
             }
-            Draw.itemAt(g, shown, 38, y + 29 + lift, 30);
-            Draw.text(g, Component.literal(r.name()), 68, y + 8 + lift, ready ? 0xFFFFF6E6 : 0xFFB8AA9A, 1.1f);
+            Draw.itemAt(g, shown, 29, y + 19 + lift, 20);
+            Draw.text(g, Component.literal(r.name()), 50, y + 4 + lift, ready ? 0xFFFFF6E6 : 0xFFB8AA9A, .95f);
             int pips = (int) Mth.clamp(Math.round(r.difficulty() * 2), 1, 6);
             int pc = r.difficulty() > 1.25 ? 0xFFFF6A50 : r.difficulty() < .9 ? 0xFF8AE07A : 0xFFFFC850;
             for (int p = 0; p < 6; p++) {
-                Draw.disc(g, 70 + Draw.width(Component.literal(r.name()), 1.1f) + 8 + p * 7, y + 12 + lift, 2.4f, p < pips ? pc : 0x38FFFFFF);
+                Draw.disc(g, 52 + Draw.width(Component.literal(r.name()), .95f) + 6 + p * 6, y + 8 + lift, 2f, p < pips ? pc : 0x38FFFFFF);
             }
             // What it takes: green in the bag, red missing
-            float x = 68;
+            float x = 50;
             for (int q = 0; q < r.inputs().size(); q++) {
                 ItemStack in = r.inputs().get(q);
                 boolean have = q < r.have().size() && r.have().get(q);
-                float ix = x + q * 24, iy = y + 26 + lift;
-                Draw.rect(g, ix - 1, iy - 1, ix + 21, iy + 21, have ? 0x5040C050 : 0x70D04030);
-                Draw.rect(g, ix - 1, iy + 20, ix + 21, iy + 21, have ? 0xFF60D060 : 0xFFE05040);
-                Draw.itemAt(g, in, ix + 10, iy + 10, 18);
+                float ix = x + q * 19, iy = y + 17 + lift;
+                Draw.rect(g, ix - 1, iy - 1, ix + 17, iy + 17, have ? 0x5040C050 : 0x70D04030);
+                Draw.rect(g, ix - 1, iy + 16, ix + 17, iy + 17, have ? 0xFF60D060 : 0xFFE05040);
+                Draw.itemAt(g, in, ix + 8, iy + 8, 14);
                 g.pose().pushPose();
                 g.pose().translate(0, 0, 250);
                 Component n = Component.literal(String.valueOf(in.getCount()));
-                Draw.text(g, n, ix + 21 - Draw.width(n, .8f), iy + 13, 0xFFFFFFFF, .8f);
+                Draw.text(g, n, ix + 17 - Draw.width(n, .7f), iy + 10, 0xFFFFFFFF, .7f);
                 g.pose().popPose();
-                if (mx >= ix && mx < ix + 20 && my >= iy && my < iy + 20) {
+                if (mx >= ix && mx < ix + 16 && my >= iy && my < iy + 16) {
                     tip = in;
                 }
             }
@@ -157,27 +156,27 @@ public class StationScreen extends Screen {
                 if (out.isEmpty()) {
                     continue;
                 }
-                float ix = W - 74 + q * 32, iy = y + 22 + lift;
-                Draw.glow(g, ix + 11, iy + 11, 16, Draw.argb(60, colors[q]));
-                Draw.rect(g, ix - 1, iy + 22, ix + 23, iy + 23, colors[q]);
-                Draw.itemAt(g, out, ix + 11, iy + 11, 20);
+                float ix = W - 58 + q * 24, iy = y + 15 + lift;
+                Draw.glow(g, ix + 8, iy + 8, 12, Draw.argb(60, colors[q]));
+                Draw.rect(g, ix - 1, iy + 17, ix + 17, iy + 18, colors[q]);
+                Draw.itemAt(g, out, ix + 8, iy + 8, 16);
                 if (q == 1) {
-                    Draw.star(g, ix + 22, iy, 5, 0xFFFFE070);
+                    Draw.star(g, ix + 17, iy, 4, 0xFFFFE070);
                 }
                 g.pose().pushPose();
                 g.pose().translate(0, 0, 250);
                 if (out.getCount() > 1) {
                     Component n = Component.literal(String.valueOf(out.getCount()));
-                    Draw.text(g, n, ix + 22 - Draw.width(n, .8f), iy + 14, 0xFFFFFFFF, .8f);
+                    Draw.text(g, n, ix + 17 - Draw.width(n, .7f), iy + 10, 0xFFFFFFFF, .7f);
                 }
                 g.pose().popPose();
-                if (mx >= ix && mx < ix + 22 && my >= iy && my < iy + 22) {
+                if (mx >= ix && mx < ix + 16 && my >= iy && my < iy + 16) {
                     tip = out;
                 }
             }
             if (r.cooldown() > 0) {
                 Component c = Component.translatable("metier.arcanes_oublies.station.wait", seconds(r.cooldown()));
-                Draw.text(g, c, W - 16 - Draw.width(c, .8f), y + 8 + lift, 0xFFFFC060, .8f);
+                Draw.text(g, c, W - 16 - Draw.width(c, .7f), y + 4 + lift, 0xFFFFC060, .7f);
             }
         }
         if (scroll > 0) {
@@ -185,15 +184,6 @@ public class StationScreen extends Screen {
         }
         if (scroll + visible < recipes.size()) {
             Draw.centered(g, Component.literal("▼"), W / 2f, LIST_Y + visible * (CARD + GAP) - 4, 0xFFFFFFFF, .8f);
-        }
-        hoverVanilla = false;
-        if (station.vanilla()) {
-            float by = h - 26;
-            Component label = Component.translatable("metier.arcanes_oublies.station.vanilla");
-            float bw = Draw.width(label, .9f) + 30;
-            hoverVanilla = mx >= W / 2f - bw / 2 && mx < W / 2f + bw / 2 && my >= by && my < by + 18;
-            Draw.pill(g, W / 2f - bw / 2, by, W / 2f + bw / 2, by + 18, hoverVanilla ? 0xFF4A4036 : 0xFF241E1A);
-            Draw.centered(g, label, W / 2f, by + 5, hoverVanilla ? 0xFFFFF0D0 : 0xFFC8BCA8, .9f);
         }
         g.pose().popPose();
         if (!tip.isEmpty()) {
@@ -211,12 +201,6 @@ public class StationScreen extends Screen {
             }
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 1, .6f));
             PacketDistributor.sendToServer(new MetierNet.Pick(station.def(), station.pos(), hovered));
-            onClose();
-            return true;
-        }
-        if (button == 0 && hoverVanilla) {
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 1, .6f));
-            PacketDistributor.sendToServer(new MetierNet.Pick(station.def(), station.pos(), -1));
             onClose();
             return true;
         }
