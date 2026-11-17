@@ -8,6 +8,8 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
@@ -23,6 +25,7 @@ import java.util.Set;
  * fall, die, take a blow, hold a two-handed weapon), {@link EpicNpcBridge} turns each of their melee blows into the
  * attack animation of the weapon they hold, whose own hit is the only one, and on the client
  * {@code client.EpicNpcClient} draws them with the body that fits their skin or the mob they are disguised as.
+ * Each NPC can be switched back to Custom NPCs' plain combat in its edit screen ({@link EpicNpcNet}).
  */
 public final class EpicNpc {
     /** Custom NPCs' human-shaped NPCs: the ones given an Epic Fight body. */
@@ -30,7 +33,29 @@ public final class EpicNpc {
             ResourceLocation.fromNamespaceAndPath("customnpcs", "customnpc64x32"), ResourceLocation.fromNamespaceAndPath("customnpcs", "customnpcalex"),
             ResourceLocation.fromNamespaceAndPath("customnpcs", "customnpcclassic"));
 
+    /** Set on an NPC (entity tag) that fights the way Custom NPCs does, without Epic Fight. */
+    public static final String CLASSIC_TAG = "arcanes_sans_epicfight";
+    /** Mobs built like a person on Epic Fight's human skeleton: an NPC disguised as one keeps Epic Fight's animations. */
+    public static final Set<EntityType<?>> HUMAN_SHAPED = Set.of(EntityType.ZOMBIE, EntityType.HUSK, EntityType.DROWNED, EntityType.ZOMBIE_VILLAGER,
+            EntityType.VINDICATOR, EntityType.PILLAGER, EntityType.EVOKER, EntityType.ILLUSIONER, EntityType.WITCH);
+
     private EpicNpc() {}
+
+    /**
+     * Whether the NPC fights and is drawn with Epic Fight: not switched off in its edit screen, and shaped so that Epic
+     * Fight can show its animations (as a person, or disguised as a mob built like one, without Custom NPCs' "Basic
+     * Limited Renderer"). Any other NPC fights the way Custom NPCs does, with its own swing, so no blow is unseen.
+     */
+    public static boolean fightsWithEpicFight(Entity npc) {
+        if (!isNpc(npc) || npc.getTags().contains(CLASSIC_TAG)) {
+            return false;
+        }
+        LivingEntity standIn = Cnpc.disguise(npc);
+        if (standIn == null) {
+            return true;
+        }
+        return !Cnpc.simpleRender(npc) && (isNpc(standIn) || HUMAN_SHAPED.contains(standIn.getType()));
+    }
 
     public static boolean isNpc(Entity e) {
         return e instanceof Mob && NPC_TYPES.contains(BuiltInRegistries.ENTITY_TYPE.getKey(e.getType()));
@@ -48,6 +73,7 @@ public final class EpicNpc {
         ArcanesOublies.LOGGER.info("Epic Fight and Custom NPCs are both here: the NPCs walk and fight with Epic Fight's animations");
         modBus.addListener(EpicNpc::onPackFinders);
         NeoForge.EVENT_BUS.register(EpicNpcBridge.class);
+        NeoForge.EVENT_BUS.register(EpicNpcNet.class);
         if (FMLEnvironment.dist.isClient()) {
             com.waylays.arcanes.compat.epicnpc.client.EpicNpcClient.init();
         }

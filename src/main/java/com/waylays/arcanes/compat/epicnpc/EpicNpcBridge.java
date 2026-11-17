@@ -34,7 +34,8 @@ import java.util.WeakHashMap;
  * still holds; Epic Fight shows the strike and deals it. When Custom NPCs makes the NPC strike, its own blow is
  * dropped and the attack animation of the weapon in its hand plays instead (one move after the other, as a combo).
  * The animation's own hit is then the NPC's only blow: Epic Fight's hit, with Custom NPCs' melee strength and effects,
- * and only on whom the NPC is fighting. Epic Fight's own attack and chase goals are taken off the NPCs.
+ * and only on whom the NPC is fighting. Epic Fight's own attack and chase goals are taken off the NPCs. An NPC that
+ * does not fight with Epic Fight ({@link EpicNpc#fightsWithEpicFight}) keeps Custom NPCs' own blow and swing.
  */
 public final class EpicNpcBridge {
     private static final Map<Mob, Integer> COMBO = new WeakHashMap<>();
@@ -67,7 +68,9 @@ public final class EpicNpcBridge {
         DamageSource source = event.getSource();
         Entity attacker = source.getEntity();
         if (attacker == null || attacker.level().isClientSide() || STRIKING.get() || !isNpc(attacker)
-                || source instanceof EpicFightDamageSource || source.getDirectEntity() != attacker) {
+                || source instanceof EpicFightDamageSource || source.getDirectEntity() != attacker
+                // Switched to Custom NPCs' plain combat, or drawn by Custom NPCs (Epic Fight's swing would not show)
+                || !EpicNpc.fightsWithEpicFight(attacker)) {
             return;
         }
         Mob npc = (Mob) attacker;

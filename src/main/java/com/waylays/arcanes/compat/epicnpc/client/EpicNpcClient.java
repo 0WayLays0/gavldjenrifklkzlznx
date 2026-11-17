@@ -1,9 +1,16 @@
 package com.waylays.arcanes.compat.epicnpc.client;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.waylays.arcanes.compat.epicnpc.Cnpc;
 import com.waylays.arcanes.compat.epicnpc.EpicNpc;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -18,31 +25,40 @@ import yesman.epicfight.api.client.event.types.registry.RegisterPatchedRenderers
 import yesman.epicfight.api.client.model.Meshes;
 import yesman.epicfight.client.mesh.HumanoidMesh;
 
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * How Custom NPCs' NPCs look with Epic Fight (client only, and only when both mods are there).
  * <ul>
- * <li>A person-shaped NPC is drawn by {@link NpcRenderer} with the Epic Fight body that fits its skin: wide arms,
- * slim arms ("Alex") or the old 64x32 skins.</li>
+ * <li>A person-shaped NPC is drawn by {@link NpcRenderer} with the Epic Fight body that fits its skin, read from the
+ * skin itself: the old 64x32 layout, slim arms ("Alex" NPCs) or wide arms.</li>
  * <li>An NPC disguised as a mob built like a person (zombie, husk, drowned, zombie villager, illagers, witch) is drawn
  * with that mob's Epic Fight body, so the mob's texture fits it, and keeps its animations and its weapon.</li>
- * <li>An NPC disguised as any other mob (animals, spiders, skeletons, piglins...), and the stand-in mob Custom NPCs draws
- * with "Basic Limited Renderer", keep Custom NPCs' own look, with the weapon and armour the NPC has now.</li>
+ * <li>Every other NPC (switched to Custom NPCs' combat in its edit screen, disguised as another mob, or drawn with
+ * "Basic Limited Renderer"), and the stand-in mobs Custom NPCs draws disguised NPCs with, keep Custom NPCs' own look
+ * and swing, with the weapon and armour the NPC has now (see {@link EpicNpc#fightsWithEpicFight}).</li>
  * </ul>
- * Custom NPCs' arm swing is also hidden on NPCs Epic Fight draws: the attack animation is their swing.
+ * Custom NPCs' arm swing is hidden on NPCs Epic Fight draws: the attack animation is their swing.
  */
 public final class EpicNpcClient {
     /** The stand-in mobs Custom NPCs draws disguised NPCs with (held weakly: Custom NPCs owns them). */
     private static final Set<Entity> STAND_INS = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
+    /** Skins known to be in the old 64x32 layout (true) or not (false). */
+    private static final Map<ResourceLocation, Boolean> OLD_LAYOUT = new ConcurrentHashMap<>();
 
     private EpicNpcClient() {}
 
     public static void init() {
         EpicFightClientEventHooks.Registry.ADD_PATCHED_ENTITY.registerEvent(EpicNpcClient::addRenderers);
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, EpicNpcClient::onTick);
+        NpcScreenSwitch.init();
     }
 
     private static void addRenderers(RegisterPatchedRenderersEvent.AddEntity event) {
@@ -80,15 +96,7 @@ public final class EpicNpcClient {
         if (STAND_INS.contains(e)) {
             return true;
         }
-        if (!EpicNpc.isNpc(e)) {
-            return false;
-        }
-        if (Cnpc.simpleRender(e)) {
-            // Custom NPCs draws the stand-in mob itself and never asks for the NPC's own look
-            return Cnpc.disguise(e) != null;
-        }
-        LivingEntity standIn = Cnpc.disguise(e);
-        return standIn != null && disguiseMesh(standIn) == null;
+        return EpicNpc.isNpc(e) && !EpicNpc.fightsWithEpicFight(e);
     }
 
     /** The Epic Fight body the NPC is drawn with. */
@@ -100,17 +108,76 @@ public final class EpicNpcClient {
                 return mesh;
             }
         }
-        return skinMesh(npc.getType());
+        return skinMesh(npc);
     }
 
-    /** The body for the NPC's skin: slim arms for "Alex" NPCs, the old layout for 64x32 and classic skins. */
-    static AssetAccessor<HumanoidMesh> skinMesh(EntityType<?> type) {
-        String path = BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath();
-        return switch (path) {
-            case "customnpcalex" -> Meshes.ALEX;
-            case "customnpc64x32", "customnpcclassic" -> Meshes.BIPED_OLD_TEX;
-            default -> Meshes.BIPED;
-        };
+    /**
+     * The body for the NPC's skin. The skin's own size decides when it can be read (a 64x32 skin is in the old layout,
+     * whatever kind of NPC wears it); otherwise the kind of NPC does: slim arms for "Alex" NPCs, the old layout for the
+     * 64x32 and classic ones.
+     */
+    static AssetAccessor<HumanoidMesh> skinMesh(LivingEntity npc) {
+        Boolean old = oldLayout(npc);
+        if (Boolean.TRUE.equals(old)) {
+            return Meshes.BIPED_OLD_TEX;
+        }
+        String path = BuiltInRegistries.ENTITY_TYPE.getKey(npc.getType()).getPath();
+        if (path.equals("customnpcalex")) {
+            return Meshes.ALEX;
+        }
+        if (old == null && (path.equals("customnpc64x32") || path.equals("customnpcclassic"))) {
+            return Meshes.BIPED_OLD_TEX;
+        }
+        return Meshes.BIPED;
+    }
+
+    /** Whether the NPC's skin is in the old 64x32 layout (half as tall as wide), or null if it cannot be read yet. */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    static Boolean oldLayout(LivingEntity npc) {
+        ResourceLocation skin;
+        try {
+            EntityRenderer<?> renderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(npc);
+            if (!(renderer instanceof LivingEntityRenderer living)) {
+                return null;
+            }
+            skin = living.getTextureLocation(npc);
+        } catch (RuntimeException ex) {
+            return null;
+        }
+        if (skin == null) {
+            return null;
+        }
+        Boolean known = OLD_LAYOUT.get(skin);
+        if (known != null) {
+            return known;
+        }
+        // A player's skin: Minecraft always turns it into the 64x64 layout
+        if (skin.getNamespace().equals("minecraft") && skin.getPath().startsWith("skins/")) {
+            return false;
+        }
+        AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(skin, null);
+        if (texture instanceof DynamicTexture dynamic) {
+            NativeImage pixels = dynamic.getPixels();
+            // A downloaded skin may still change: not remembered
+            return pixels == null ? null : pixels.getHeight() * 2 == pixels.getWidth();
+        }
+        Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(skin);
+        if (resource.isEmpty()) {
+            return null;
+        }
+        try (InputStream in = resource.get().open()) {
+            byte[] head = in.readNBytes(24);
+            if (head.length < 24 || head[1] != 'P' || head[2] != 'N' || head[3] != 'G') {
+                return null;
+            }
+            int width = ByteBuffer.wrap(head, 16, 4).getInt();
+            int height = ByteBuffer.wrap(head, 20, 4).getInt();
+            boolean old = height * 2 == width;
+            OLD_LAYOUT.put(skin, old);
+            return old;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     /**
@@ -121,7 +188,7 @@ public final class EpicNpcClient {
     static AssetAccessor<HumanoidMesh> disguiseMesh(LivingEntity standIn) {
         EntityType<?> type = standIn.getType();
         if (EpicNpc.isNpc(standIn)) {
-            return skinMesh(type);
+            return skinMesh(standIn);
         }
         if (type == EntityType.ZOMBIE || type == EntityType.HUSK || type == EntityType.DROWNED) {
             return Meshes.BIPED_OLD_TEX;

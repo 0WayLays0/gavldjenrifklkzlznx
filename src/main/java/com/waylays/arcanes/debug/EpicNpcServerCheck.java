@@ -3,6 +3,7 @@ package com.waylays.arcanes.debug;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.compat.epicnpc.EpicNpc;
 import com.waylays.arcanes.compat.epicnpc.EpicNpcBridge;
+import com.waylays.arcanes.compat.epicnpc.EpicNpcNet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -11,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -68,6 +70,9 @@ public final class EpicNpcServerCheck {
             target.setNoAi(true);
             target.setPersistenceRequired();
             level.addFreshEntity(target);
+            // Enough health for every blow of the check (the NPC also strikes on its own)
+            target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200);
+            target.setHealth(200);
             npc.setTarget(target);
             full = target.getHealth();
             tick = 0;
@@ -109,8 +114,19 @@ public final class EpicNpcServerCheck {
                             + EpicNpcBridge.animationHits + " animation hits)");
                     return;
                 }
-                ArcanesOublies.LOGGER.info("[EpicNpcCheck] PASS: the NPC has an Epic Fight body and only its attack animation hit ({} -> {}, {} hit(s))",
+                ArcanesOublies.LOGGER.info("[EpicNpcCheck] only the attack animation hit ({} -> {}, {} hit(s)); now the NPC is switched to Custom NPCs' combat",
                         full, target.getHealth(), EpicNpcBridge.animationHits);
+                EpicNpcNet.setClassic(npc, true);
+            } else if (tick == 100) {
+                float before = target.getHealth();
+                target.invulnerableTime = 0;
+                npc.doHurtTarget(target);
+                if (target.getHealth() >= before) {
+                    fail(server, "switched to Custom NPCs' combat, the NPC's own blow did not land (" + before + " -> " + target.getHealth() + ")");
+                    return;
+                }
+                ArcanesOublies.LOGGER.info("[EpicNpcCheck] PASS: Epic Fight's hit only, and Custom NPCs' own blow once switched off ({} -> {})",
+                        before, target.getHealth());
                 tick = -1;
                 server.halt(false);
             }
@@ -129,7 +145,7 @@ public final class EpicNpcServerCheck {
             ArcanesOublies.LOGGER.info("[EpicNpcCheck] tick {}: blow {} ({}) from {} / {} for {}, dropped: {}", tick, source.getClass().getName(),
                     source.getMsgId(), source.getEntity() == null ? null : source.getEntity().getType(),
                     source.getDirectEntity() == null ? null : source.getDirectEntity().getType(), event.getAmount(), event.isCanceled());
-            if (!event.isCanceled() && !(source instanceof yesman.epicfight.world.damagesource.EpicFightDamageSource)) {
+            if (tick <= 80 && !event.isCanceled() && !(source instanceof yesman.epicfight.world.damagesource.EpicFightDamageSource)) {
                 plainBlow = source.getMsgId() + " at tick " + tick;
             }
         }

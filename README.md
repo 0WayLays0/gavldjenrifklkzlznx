@@ -820,9 +820,20 @@ Custom NPCs (types `customnpc`, `customnpc64x32`, `customnpcalex`, `customnpccla
   donc avec sa vraie texture, ses animations et son arme. Déguisé en un autre mob (animal, araignée, squelette,
   piglin…), il garde le rendu normal de Custom NPCs, avec son arme.
 
+- **réglage par PNJ** : dans le menu d'édition du PNJ (houe NPC), un bouton **« Combat Epic Fight : Oui / Non »** à côté
+  du panneau de Custom NPCs. « Non » : le PNJ se bat comme dans Custom NPCs (coup et geste Minecraft classiques, rendu de
+  Custom NPCs). Réservé aux opérateurs et aux joueurs en créatif. Le choix est gardé avec le PNJ (c'est le tag
+  `arcanes_sans_epicfight`, qu'on peut aussi poser avec `/tag`).
+
+Un PNJ qu'Epic Fight ne peut pas animer (déguisé en animal, araignée, squelette, piglin…, ou avec « Basic Limited
+Renderer ») se bat toujours comme dans Custom NPCs : ainsi aucun coup n'est porté sans animation visible. Le corps
+Epic Fight d'un PNJ humain est choisi d'après la taille de sa skin (une skin 64×32 prend le corps à l'ancienne mise en
+page, quel que soit le type de PNJ).
+
 Rien n'est à installer en plus : c'est un pack de données intégré à Arcanes, activé tout seul. Sans l'un des deux mods,
 rien ne change.
 
 Limites connues : avec l'option **« Basic Limited Renderer »** de Custom NPCs, le PNJ déguisé est dessiné par Custom NPCs
-sans les animations d'Epic Fight (son arme s'affiche) ; laisse-la désactivée pour avoir les animations. Les parties
+sans les animations d'Epic Fight, et il se bat comme dans Custom NPCs (son arme s'affiche) ; laisse-la désactivée pour
+avoir les animations. Les parties
 ajoutées dans Custom NPCs (oreilles, queue, ailes, tailles de membres) ne s'affichent pas sur le corps Epic Fight.

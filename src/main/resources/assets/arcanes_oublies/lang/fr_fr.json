@@ -2390,5 +2390,9 @@
   "rp.arcanes_oublies.writing.nowhere": "Regarde un mur, un sol ou un plafond (32 blocs au plus)",
   "rp.arcanes_oublies.writing.written": "Écrit",
   "size.arcanes_oublies.own": "Tu mesures %s cm",
-  "size.arcanes_oublies.set": "%s mesure maintenant %s cm"
+  "size.arcanes_oublies.set": "%s mesure maintenant %s cm",
+  "gui.arcanes_oublies.epicnpc.switch": "Combat Epic Fight : %s",
+  "gui.arcanes_oublies.epicnpc.on": "Oui",
+  "gui.arcanes_oublies.epicnpc.off": "Non",
+  "gui.arcanes_oublies.epicnpc.tooltip": "Oui : le PNJ se bat et bouge avec les animations d'Epic Fight. Non : il se bat comme dans Custom NPCs (combat Minecraft classique). Un PNJ déguisé en animal ou en un mob qu'Epic Fight ne sait pas animer se bat toujours comme dans Custom NPCs."
 }
