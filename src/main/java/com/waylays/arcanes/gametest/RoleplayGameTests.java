@@ -120,9 +120,10 @@ public final class RoleplayGameTests {
         helper.assertTrue(warps.find("taverne_test") != null && warps.find("TAVERNE_TEST") != null, "a warp is found whatever its capitals");
         net.minecraft.server.level.ServerPlayer p = net.neoforged.neoforge.common.util.FakePlayerFactory.get(helper.getLevel(),
                 new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "warp_tester"));
+        // Where the warp leads (a test's fake player cannot be teleported: its connection does nothing)
         com.waylays.arcanes.rp.warp.Warps.Warp w = warps.find("tAvErNe_TeSt");
-        p.teleportTo(helper.getLevel(), w.x(), w.y(), w.z(), w.yaw(), w.pitch());
-        helper.assertTrue(p.blockPosition().equals(at), "the warp takes there");
+        helper.assertTrue(BlockPos.containing(w.x(), w.y(), w.z()).equals(at) && w.yaw() == 90
+                && w.world().equals(helper.getLevel().dimension().location()), "the warp keeps where it leads");
         helper.assertTrue(warps.remove("taverne_TEST") != null && warps.find("Taverne_Test") == null, "a warp is deleted whatever its capitals");
 
         java.util.regex.Matcher m = com.waylays.arcanes.rp.RpCommands.ranged("40 lève la main");
