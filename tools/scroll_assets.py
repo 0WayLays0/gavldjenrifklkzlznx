@@ -70,6 +70,8 @@ PALETTES = {
     "mend": ["f0ecdc", "f6f2e6", "fffcf2", "d6ceb2", "e6dfc8", "52d68e", "1f9a5a", "0c5030", "ffe8a0", "e0b050", "8a6018"],
     # Dark hide-brown paper, the writing in poison green, brass rod ends
     "trap": ["5a4640", "66504a", "745e56", "463630", "503e38", "a0ff60", "4ec040", "1e6a1e", "f0d890", "d6aa50", "785624"],
+    # Frost-white paper, the writing in deep ice blue, silver rod ends
+    "snow": ["e4f0fa", "eef6fc", "fafdff", "c4d8ea", "d4e4f2", "8ccfff", "3a86d0", "1a4078", "f4f8fc", "c8d4e2", "7a8aa0"],
 }
 
 

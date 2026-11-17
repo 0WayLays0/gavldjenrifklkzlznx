@@ -489,6 +489,22 @@ public final class ModSchools {
             TRAP_MAGIC
     ));
 
+    /** Snow Magic: snow and ice that chill, slow and freeze, then shatter the frozen. */
+    public static final ResourceLocation SNOW_RESOURCE = ArcanesOublies.id("snow");
+    public static final TagKey<Item> SNOW_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("snow_focus"));
+    public static final ResourceKey<DamageType> SNOW_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("snow_magic"));
+    public static final int SNOW_COLOR = 0xBFE6FF;
+
+    public static final DeferredHolder<SchoolType, SchoolType> SNOW = SCHOOLS.register(SNOW_RESOURCE.getPath(), () -> new SchoolType(
+            SNOW_RESOURCE,
+            SNOW_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".snow").withStyle(Style.EMPTY.withColor(SNOW_COLOR)),
+            ModAttributes.SNOW_SPELL_POWER,
+            ModAttributes.SNOW_MAGIC_RESIST,
+            sound(SoundEvents.POWDER_SNOW_STEP),
+            SNOW_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

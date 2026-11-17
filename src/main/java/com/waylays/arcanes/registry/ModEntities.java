@@ -716,6 +716,11 @@ public final class ModEntities {
             EntityType.Builder.<com.waylays.arcanes.entity.trap.TrapScene>of(com.waylays.arcanes.entity.trap.TrapScene::new, MobCategory.MISC)
                     .sized(1f, .2f).clientTrackingRange(12).updateInterval(1).fireImmune());
 
+    // The elemental schools: Snow Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<com.waylays.arcanes.entity.snow.SnowScene>> SNOW_SCENE = register("snow_scene",
+            EntityType.Builder.<com.waylays.arcanes.entity.snow.SnowScene>of(com.waylays.arcanes.entity.snow.SnowScene::new, MobCategory.MISC)
+                    .sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
+
     // Lotus Magic
     public static final DeferredHolder<EntityType<?>, EntityType<LotusScene>> LOTUS_SCENE = register("lotus_scene",
             EntityType.Builder.<LotusScene>of(LotusScene::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());

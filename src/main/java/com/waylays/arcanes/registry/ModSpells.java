@@ -714,6 +714,13 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MINEFIELD = register(new MinefieldSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> CURSED_WEB = register(new CursedWebSpell());
 
+    // Snow Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> AVALANCHE_BALL = register(new com.waylays.arcanes.spells.snow.AvalancheBallSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SNOW_GLOBE = register(new com.waylays.arcanes.spells.snow.SnowGlobeSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> FROST_GLIDE = register(new com.waylays.arcanes.spells.snow.FrostGlideSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> HOARFROST_CROWN = register(new com.waylays.arcanes.spells.snow.HoarfrostCrownSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> WHITEOUT = register(new com.waylays.arcanes.spells.snow.WhiteoutSpell());
+
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_HEART = register(new RubyHeartSpell());
