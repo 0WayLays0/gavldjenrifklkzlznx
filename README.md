@@ -571,6 +571,59 @@ allonge les malédictions.
 | **Champ de mines** (Minefield, épique) | Sept mines autour du point visé, chacune une malédiction différente. |
 | **Toile maudite** (Cursed Web, ultime) | Une toile de 10 blocs : toutes les 2 s, chaque ennemi dedans subit une nouvelle malédiction, à tour de rôle. |
 
+### Magie de la Neige
+
+Cinq sorts de neige et de glace, aucune invocation. Livre : **Codex du Premier Givre** (First Frost Codex) ; focus : boule
+de neige, seau de neige poudreuse, glace compactée, glace bleue.
+
+| Sort | Effet |
+|---|---|
+| **Boule d'avalanche** (Avalanche Ball, commun) | Une boule de neige roule devant vous en grossissant, renverse et refroidit tout ce qu'elle croise, puis éclate en poudreuse. |
+| **Globe de neige** (Snow Globe, peu commun) | Un dôme de verre se referme sur l'ennemi visé ; la neige tourbillonne et gèle dedans, personne ne sort, puis le verre se brise sur eux. |
+| **Glissade de givre** (Frost Glide, peu commun) | Vous glissez en avant sur un ruban de glace qui reste derrière vous et ralentit, gèle et blesse ceux qui le traversent. |
+| **Couronne de givre** (Hoarfrost Crown, rare) | Une couronne de cristaux tourne au-dessus de votre tête et tire des stalactites sur l'ennemi visible le plus proche. |
+| **Voile blanc** (Whiteout, ultime) | Un mur de blizzard autour de vous : les ennemis dedans sont aveuglés, ralentis et gèlent un peu plus chaque seconde ; à la fin, ceux gelés de part en part volent en éclats. |
+
+### Magie de la Lave
+
+Cinq sorts de roche en fusion, aucune invocation. Livre : **Codex de Magma** (Magma Codex) ; focus : bloc de magma, crème de
+magma, seau de lave, obsidienne.
+
+| Sort | Effet |
+|---|---|
+| **Crachat de magma** (Magma Spit, commun) | Une boule de magma lobée là où vous visez : elle éclabousse et laisse une flaque bouillonnante qui brûle. |
+| **Geyser de lave** (Lava Geyser, peu commun) | Le sol se fend et rougeoie, puis une colonne de lave jaillit, projette et brûle ceux qui sont dessus. |
+| **Carapace d'obsidienne** (Obsidian Carapace, rare) | Des plaques d'obsidienne veinées de lave flottent autour de vous : moins de dégâts, pas de feu, et qui vous frappe au corps à corps prend feu. |
+| **Rivière de lave** (Lava River, rare) | Une rivière de lave coule devant vous, ralentit et brûle ceux qui y entrent, puis refroidit en croûte noire. |
+| **Caldeira** (Caldera, ultime) | Le sol tremble et se fissure tout autour de vous, puis s'effondre en lac de magma qui projette les ennemis en l'air et les brûle. |
+
+### Magie des Plantes
+
+Cinq sorts de fleurs, de pollen et de soleil, aucune invocation. Livre : **Codex Herbier** (Herbarium Codex) ; focus :
+poudre d'os, bloc de mousse, azalée fleurie, sporophore.
+
+| Sort | Effet |
+|---|---|
+| **Floraison d'épines** (Thorn Bloom, commun) | Un bouton sort du sol, s'ouvre en grande fleur et projette ses épines tout autour : saignement. |
+| **Nuage de pollen** (Pollen Cloud, peu commun) | Un nuage de pollen doré : les ennemis éternuent, titubent et faiblissent ; vous et vos alliés dedans êtes soignés. |
+| **Salve de graines** (Seed Volley, peu commun) | Un éventail de graines qui se plantent, germent en vesses-de-loup et éclatent en spores empoisonnées. |
+| **Photosynthèse** (Photosynthesis, rare) | Un rayon de soleil tombe sur vous : vous et vos alliés proches êtes soignés chaque seconde, deux fois plus à ciel ouvert le jour. |
+| **Gueule verdoyante** (Verdant Maw, ultime) | Une immense fleur carnivore jaillit du sol, referme ses mâchoires sur les ennemis, les mâche, et chaque bouchée vous soigne. |
+
+### Magie de l'Acide
+
+Cinq sorts d'acide qui brûlent la chair et rongent les armures, aucune invocation. L'acide brise l'armure (effet
+« armure brisée ») et use la durabilité des pièces portées. Livre : **Codex Corrosif** (Corrosive Codex) ; focus : boule de
+slime, œil d'araignée, œil d'araignée fermenté, pomme de terre empoisonnée.
+
+| Sort | Effet |
+|---|---|
+| **Jet d'acide** (Acid Spray, commun) | Un éventail d'acide projeté de la main (6,5 blocs) : dégâts, armure brisée, armure portée rongée. |
+| **Flaque corrosive** (Corrosive Pool, peu commun) | Une flaque d'acide fumante là où vous visez : dégâts chaque seconde et armure rongée pour qui reste dedans. |
+| **Pluie acide** (Acid Rain, rare) | Un nuage verdâtre pleut de l'acide sur la zone : dégâts, faiblesse, armure rongée. |
+| **Dissolution** (Dissolve, épique) | Une bulle d'acide se referme sur l'ennemi visé, ronge son armure quelques secondes puis éclate et le fait fondre. |
+| **Marée corrosive** (Corroding Tide, ultime) | Une vague d'acide déferle en anneau autour de vous (12 blocs) : repousse, faiblesse, armure brisée et rongée. |
+
 ### Téléphones (mod à part)
 
 Les téléphones ne font plus partie d'Arcanes Oubliés : ils sont dans le mod séparé **Téléphones d'Époque & RP**

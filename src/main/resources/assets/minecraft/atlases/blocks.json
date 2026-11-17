@@ -33,7 +33,10 @@
         "arcanes_melody": "arcanes_oublies:item/scroll_palettes/melody",
         "arcanes_mend": "arcanes_oublies:item/scroll_palettes/mend",
         "arcanes_trap": "arcanes_oublies:item/scroll_palettes/trap",
-        "arcanes_snow": "arcanes_oublies:item/scroll_palettes/snow"
+        "arcanes_snow": "arcanes_oublies:item/scroll_palettes/snow",
+        "arcanes_lava": "arcanes_oublies:item/scroll_palettes/lava",
+        "arcanes_plant": "arcanes_oublies:item/scroll_palettes/plant",
+        "arcanes_acid": "arcanes_oublies:item/scroll_palettes/acid"
       }
     }
   ]

@@ -72,6 +72,11 @@ PALETTES = {
     "trap": ["5a4640", "66504a", "745e56", "463630", "503e38", "a0ff60", "4ec040", "1e6a1e", "f0d890", "d6aa50", "785624"],
     # Frost-white paper, the writing in deep ice blue, silver rod ends
     "snow": ["e4f0fa", "eef6fc", "fafdff", "c4d8ea", "d4e4f2", "8ccfff", "3a86d0", "1a4078", "f4f8fc", "c8d4e2", "7a8aa0"],
+    # Charred black paper, the writing glowing like lava, obsidian rod ends
+    "lava": ["3a2a26", "46322c", "564036", "281c1a", "302220", "ffe070", "ff7a1e", "c83018", "6a4a9a", "3e2a5e", "1e1430"],
+    # Pale green paper, the writing in deep leaf green, bronze rod ends
+    "plant": ["dcecc8", "e8f4d8", "f6fcee", "bcd2a4", "ccdeb4", "7ad860", "2e8a2a", "164a16", "f0c890", "c48c46", "6a4418"],
+    "acid": ["dce8c0", "e8f2d0", "f4fae6", "bccc9a", "ccdcac", "d8ff4a", "8cf02a", "3c9a14", "a0b0a8", "60aa82", "28543e"],
 }
 
 

@@ -72,6 +72,12 @@ public final class ModAttributes {
     public static final DeferredHolder<Attribute, Attribute> TRAP_MAGIC_RESIST = resistanceAttribute("trap");
     public static final DeferredHolder<Attribute, Attribute> SNOW_SPELL_POWER = powerAttribute("snow");
     public static final DeferredHolder<Attribute, Attribute> SNOW_MAGIC_RESIST = resistanceAttribute("snow");
+    public static final DeferredHolder<Attribute, Attribute> LAVA_SPELL_POWER = powerAttribute("lava");
+    public static final DeferredHolder<Attribute, Attribute> LAVA_MAGIC_RESIST = resistanceAttribute("lava");
+    public static final DeferredHolder<Attribute, Attribute> PLANT_SPELL_POWER = powerAttribute("plant");
+    public static final DeferredHolder<Attribute, Attribute> PLANT_MAGIC_RESIST = resistanceAttribute("plant");
+    public static final DeferredHolder<Attribute, Attribute> ACID_SPELL_POWER = powerAttribute("acid");
+    public static final DeferredHolder<Attribute, Attribute> ACID_MAGIC_RESIST = resistanceAttribute("acid");
 
     private ModAttributes() {}
 

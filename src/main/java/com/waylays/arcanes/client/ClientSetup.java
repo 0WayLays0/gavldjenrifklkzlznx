@@ -335,6 +335,9 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.MEND_SCENE.get(), com.waylays.arcanes.client.render.MendSceneRenderer::new);
         event.registerEntityRenderer(ModEntities.TRAP_SCENE.get(), com.waylays.arcanes.client.render.TrapSceneRenderer::new);
         event.registerEntityRenderer(ModEntities.SNOW_SCENE.get(), com.waylays.arcanes.client.render.SnowSceneRenderer::new);
+        event.registerEntityRenderer(ModEntities.LAVA_SCENE.get(), com.waylays.arcanes.client.render.LavaSceneRenderer::new);
+        event.registerEntityRenderer(ModEntities.PLANT_SCENE.get(), com.waylays.arcanes.client.render.PlantSceneRenderer::new);
+        event.registerEntityRenderer(ModEntities.ACID_SCENE.get(), com.waylays.arcanes.client.render.AcidSceneRenderer::new);
         event.registerEntityRenderer(ModEntities.AMETHYST_BRIDGE.get(), com.waylays.arcanes.client.render.AmethystBridgeRenderer::new);
 
         event.registerEntityRenderer(ModEntities.MANA_RAT.get(),
@@ -445,6 +448,9 @@ public final class ClientSetup {
             CuriosRendererRegistry.register(ModItems.CODEX_OF_MENDING.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.TRAPPERS_CODEX.get(), SpellBookCurioRenderer::new);
             CuriosRendererRegistry.register(ModItems.FIRST_FROST_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.MAGMA_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.HERBARIUM_CODEX.get(), SpellBookCurioRenderer::new);
+            CuriosRendererRegistry.register(ModItems.CORROSIVE_CODEX.get(), SpellBookCurioRenderer::new);
         });
     }
 }

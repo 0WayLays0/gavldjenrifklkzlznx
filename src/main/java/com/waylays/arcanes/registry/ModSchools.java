@@ -505,6 +505,54 @@ public final class ModSchools {
             SNOW_MAGIC
     ));
 
+    /** Lava Magic: molten rock that splashes, erupts, flows and burns; obsidian that guards. */
+    public static final ResourceLocation LAVA_RESOURCE = ArcanesOublies.id("lava");
+    public static final TagKey<Item> LAVA_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("lava_focus"));
+    public static final ResourceKey<DamageType> LAVA_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("lava_magic"));
+    public static final int LAVA_COLOR = 0xFF6A1E;
+
+    public static final DeferredHolder<SchoolType, SchoolType> LAVA = SCHOOLS.register(LAVA_RESOURCE.getPath(), () -> new SchoolType(
+            LAVA_RESOURCE,
+            LAVA_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".lava").withStyle(Style.EMPTY.withColor(LAVA_COLOR)),
+            ModAttributes.LAVA_SPELL_POWER,
+            ModAttributes.LAVA_MAGIC_RESIST,
+            sound(SoundEvents.LAVA_POP),
+            LAVA_MAGIC
+    ));
+
+    /** Plant Magic: flowers, pollen, seeds and sunlight; thorns that bleed, spores that poison, light that heals. */
+    public static final ResourceLocation PLANT_RESOURCE = ArcanesOublies.id("plant");
+    public static final TagKey<Item> PLANT_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("plant_focus"));
+    public static final ResourceKey<DamageType> PLANT_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("plant_magic"));
+    public static final int PLANT_COLOR = 0x6ED85A;
+
+    public static final DeferredHolder<SchoolType, SchoolType> PLANT = SCHOOLS.register(PLANT_RESOURCE.getPath(), () -> new SchoolType(
+            PLANT_RESOURCE,
+            PLANT_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".plant").withStyle(Style.EMPTY.withColor(PLANT_COLOR)),
+            ModAttributes.PLANT_SPELL_POWER,
+            ModAttributes.PLANT_MAGIC_RESIST,
+            sound(SoundEvents.AZALEA_LEAVES_PLACE),
+            PLANT_MAGIC
+    ));
+
+    /** Acid Magic: sprays, pools, rain and tides of acid that burn flesh and eat armour away. */
+    public static final ResourceLocation ACID_RESOURCE = ArcanesOublies.id("acid");
+    public static final TagKey<Item> ACID_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("acid_focus"));
+    public static final ResourceKey<DamageType> ACID_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("acid_magic"));
+    public static final int ACID_COLOR = 0xB4F03A;
+
+    public static final DeferredHolder<SchoolType, SchoolType> ACID = SCHOOLS.register(ACID_RESOURCE.getPath(), () -> new SchoolType(
+            ACID_RESOURCE,
+            ACID_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".acid").withStyle(Style.EMPTY.withColor(ACID_COLOR)),
+            ModAttributes.ACID_SPELL_POWER,
+            ModAttributes.ACID_MAGIC_RESIST,
+            sound(SoundEvents.BREWING_STAND_BREW),
+            ACID_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

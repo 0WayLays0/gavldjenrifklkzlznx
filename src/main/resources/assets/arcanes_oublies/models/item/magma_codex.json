@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:item/handheld",
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "arcanes_oublies:item/magma_codex_3d"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "arcanes_oublies:item/magma_codex_gui"
+    }
+  }
+}

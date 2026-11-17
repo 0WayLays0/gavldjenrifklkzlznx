@@ -86,7 +86,10 @@ public final class ModCreativeTabs {
             new Section(ModSchools.MELODY, () -> new ItemStack(ModItems.SYMPHONY_CODEX.get()), List.of(ModItems.SYMPHONY_CODEX)),
             new Section(ModSchools.MEND, () -> new ItemStack(ModItems.CODEX_OF_MENDING.get()), List.of(ModItems.CODEX_OF_MENDING)),
             new Section(ModSchools.TRAP, () -> new ItemStack(ModItems.TRAPPERS_CODEX.get()), List.of(ModItems.TRAPPERS_CODEX)),
-            new Section(ModSchools.SNOW, () -> new ItemStack(ModItems.FIRST_FROST_CODEX.get()), List.of(ModItems.FIRST_FROST_CODEX)));
+            new Section(ModSchools.SNOW, () -> new ItemStack(ModItems.FIRST_FROST_CODEX.get()), List.of(ModItems.FIRST_FROST_CODEX)),
+            new Section(ModSchools.LAVA, () -> new ItemStack(ModItems.MAGMA_CODEX.get()), List.of(ModItems.MAGMA_CODEX)),
+            new Section(ModSchools.PLANT, () -> new ItemStack(ModItems.HERBARIUM_CODEX.get()), List.of(ModItems.HERBARIUM_CODEX)),
+            new Section(ModSchools.ACID, () -> new ItemStack(ModItems.CORROSIVE_CODEX.get()), List.of(ModItems.CORROSIVE_CODEX)));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup." + ArcanesOublies.MODID))

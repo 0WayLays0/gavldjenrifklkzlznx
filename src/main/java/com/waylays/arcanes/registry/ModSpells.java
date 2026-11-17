@@ -721,6 +721,27 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> HOARFROST_CROWN = register(new com.waylays.arcanes.spells.snow.HoarfrostCrownSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> WHITEOUT = register(new com.waylays.arcanes.spells.snow.WhiteoutSpell());
 
+    // Lava Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> MAGMA_SPIT = register(new com.waylays.arcanes.spells.lava.MagmaSpitSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LAVA_GEYSER = register(new com.waylays.arcanes.spells.lava.LavaGeyserSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> OBSIDIAN_CARAPACE = register(new com.waylays.arcanes.spells.lava.ObsidianCarapaceSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> LAVA_RIVER = register(new com.waylays.arcanes.spells.lava.LavaRiverSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CALDERA = register(new com.waylays.arcanes.spells.lava.CalderaSpell());
+
+    // Plant Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> THORN_BLOOM = register(new com.waylays.arcanes.spells.plant.ThornBloomSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> POLLEN_CLOUD = register(new com.waylays.arcanes.spells.plant.PollenCloudSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SEED_VOLLEY = register(new com.waylays.arcanes.spells.plant.SeedVolleySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> PHOTOSYNTHESIS = register(new com.waylays.arcanes.spells.plant.PhotosynthesisSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> VERDANT_MAW = register(new com.waylays.arcanes.spells.plant.VerdantMawSpell());
+
+    // Acid Magic
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ACID_SPRAY = register(new com.waylays.arcanes.spells.acid.AcidSpraySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CORROSIVE_POOL = register(new com.waylays.arcanes.spells.acid.CorrosivePoolSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> ACID_RAIN = register(new com.waylays.arcanes.spells.acid.AcidRainSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> DISSOLVE = register(new com.waylays.arcanes.spells.acid.DissolveSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CORRODING_TIDE = register(new com.waylays.arcanes.spells.acid.CorrodingTideSpell());
+
     // Gem Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_RAY = register(new RubyRaySpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> RUBY_HEART = register(new RubyHeartSpell());

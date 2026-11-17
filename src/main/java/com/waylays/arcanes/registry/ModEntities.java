@@ -721,6 +721,21 @@ public final class ModEntities {
             EntityType.Builder.<com.waylays.arcanes.entity.snow.SnowScene>of(com.waylays.arcanes.entity.snow.SnowScene::new, MobCategory.MISC)
                     .sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
 
+    // Lava Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<com.waylays.arcanes.entity.lava.LavaScene>> LAVA_SCENE = register("lava_scene",
+            EntityType.Builder.<com.waylays.arcanes.entity.lava.LavaScene>of(com.waylays.arcanes.entity.lava.LavaScene::new, MobCategory.MISC)
+                    .sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
+
+    // Plant Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<com.waylays.arcanes.entity.plant.PlantScene>> PLANT_SCENE = register("plant_scene",
+            EntityType.Builder.<com.waylays.arcanes.entity.plant.PlantScene>of(com.waylays.arcanes.entity.plant.PlantScene::new, MobCategory.MISC)
+                    .sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
+
+    // Acid Magic
+    public static final DeferredHolder<EntityType<?>, EntityType<com.waylays.arcanes.entity.acid.AcidScene>> ACID_SCENE = register("acid_scene",
+            EntityType.Builder.<com.waylays.arcanes.entity.acid.AcidScene>of(com.waylays.arcanes.entity.acid.AcidScene::new, MobCategory.MISC)
+                    .sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
+
     // Lotus Magic
     public static final DeferredHolder<EntityType<?>, EntityType<LotusScene>> LOTUS_SCENE = register("lotus_scene",
             EntityType.Builder.<LotusScene>of(LotusScene::new, MobCategory.MISC).sized(1f, 1f).clientTrackingRange(12).updateInterval(1).fireImmune());
