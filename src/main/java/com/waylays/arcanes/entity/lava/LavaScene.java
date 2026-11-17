@@ -97,13 +97,14 @@ public class LavaScene extends SpellEffectEntity {
         s.entityData.set(DATA_KIND, kind.ordinal());
         s.entityData.set(DATA_LIFE, life);
         s.entityData.set(DATA_DIR, dir);
-        s.entityData.set(DATA_SIZE, switch (kind) {
+        float size = switch (kind) {
             case SPIT -> POOL_R;
             case GEYSER -> GEYSER_R;
             case CARAPACE -> 1;
             case RIVER -> RIVER_LENGTH;
             case CALDERA -> CALDERA_R;
-        });
+        };
+        s.entityData.set(DATA_SIZE, size);
         s.moveTo(at.x, at.y, at.z, dir, 0);
         level.addFreshEntity(s);
         if (kind == Kind.CARAPACE && caster != null && !level.isClientSide) {

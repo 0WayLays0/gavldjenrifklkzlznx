@@ -89,13 +89,14 @@ public class PlantScene extends SpellEffectEntity {
         s.entityData.set(DATA_KIND, kind.ordinal());
         s.entityData.set(DATA_LIFE, life);
         s.entityData.set(DATA_DIR, dir);
-        s.entityData.set(DATA_SIZE, switch (kind) {
+        float size = switch (kind) {
             case BLOOM -> BLOOM_R;
             case POLLEN -> POLLEN_R;
             case SEEDS -> SEED_RANGE;
             case SUN -> SUN_R;
             case MAW -> MAW_R;
-        });
+        };
+        s.entityData.set(DATA_SIZE, size);
         s.moveTo(at.x, at.y, at.z, dir, 0);
         level.addFreshEntity(s);
         return s;

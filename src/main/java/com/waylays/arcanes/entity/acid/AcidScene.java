@@ -96,13 +96,14 @@ public class AcidScene extends SpellEffectEntity {
         s.entityData.set(DATA_DIR, dir);
         s.entityData.set(DATA_PITCH, pitch);
         s.entityData.set(DATA_VICTIM, victim == null ? -1 : victim.getId());
-        s.entityData.set(DATA_SIZE, switch (kind) {
+        float size = switch (kind) {
             case SPRAY -> SPRAY_REACH;
             case POOL -> POOL_R;
             case RAIN -> RAIN_R;
             case DISSOLVE -> victim == null ? 1 : victim.getBbWidth() * .6f + .4f;
             case TIDE -> TIDE_R;
-        });
+        };
+        s.entityData.set(DATA_SIZE, size);
         s.moveTo(at.x, at.y, at.z, dir, 0);
         level.addFreshEntity(s);
         return s;
