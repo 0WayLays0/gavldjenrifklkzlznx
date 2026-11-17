@@ -38,7 +38,9 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
     }
 
     @Override
-    public void render(AcidScene e, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    public void render(AcidScene e, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource out, int packedLight) {
+        // Recorded per render type, then written out one type after another (see SceneBuffers)
+        SceneBuffers buffer = SceneBuffers.begin();
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 37;
@@ -49,7 +51,8 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             case DISSOLVE -> dissolve(e, poseStack, buffer, view, age, partialTicks, seed, packedLight);
             case TIDE -> tide(e, poseStack, buffer, view, age, seed, packedLight);
         }
-        super.render(e, entityYaw, partialTicks, poseStack, buffer, packedLight);
+        buffer.flush(out);
+        super.render(e, entityYaw, partialTicks, poseStack, out, packedLight);
     }
 
     private static Vector3f v(Vec3 d) {

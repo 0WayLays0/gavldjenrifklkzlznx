@@ -37,7 +37,9 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
     }
 
     @Override
-    public void render(LavaScene e, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    public void render(LavaScene e, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource out, int packedLight) {
+        // Recorded per render type, then written out one type after another (see SceneBuffers)
+        SceneBuffers buffer = SceneBuffers.begin();
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 31;
@@ -48,7 +50,8 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             case RIVER -> river(e, poseStack, buffer, view, age, seed, packedLight);
             case CALDERA -> caldera(e, poseStack, buffer, view, age, partialTicks, seed, packedLight);
         }
-        super.render(e, entityYaw, partialTicks, poseStack, buffer, packedLight);
+        buffer.flush(out);
+        super.render(e, entityYaw, partialTicks, poseStack, out, packedLight);
     }
 
     private static Vector3f v(Vec3 d) {

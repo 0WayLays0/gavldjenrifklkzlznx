@@ -39,7 +39,9 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
     }
 
     @Override
-    public void render(PlantScene e, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    public void render(PlantScene e, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource out, int packedLight) {
+        // Recorded per render type, then written out one type after another (see SceneBuffers)
+        SceneBuffers buffer = SceneBuffers.begin();
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 31;
@@ -50,7 +52,8 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             case SUN -> sun(e, poseStack, buffer, view, age, seed, packedLight);
             case MAW -> maw(e, poseStack, buffer, view, age, seed, packedLight);
         }
-        super.render(e, entityYaw, partialTicks, poseStack, buffer, packedLight);
+        buffer.flush(out);
+        super.render(e, entityYaw, partialTicks, poseStack, out, packedLight);
     }
 
     /** A petal (or leaf) from {@code base} out along {@code dir} (unit), {@code length} long and {@code width} wide, seen from both sides. */
