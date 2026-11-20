@@ -9,7 +9,9 @@ import com.waylays.arcanes.entity.snow.SnowScene;
 import com.waylays.arcanes.registry.ModItems;
 import com.waylays.arcanes.registry.ModSchools;
 import com.waylays.arcanes.registry.ModSpells;
+import com.waylays.arcanes.spells.CastTimeFloor;
 import com.waylays.arcanes.spells.ElementSpell;
+import com.waylays.arcanes.ArcanesConfig;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
@@ -21,6 +23,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.entity.monster.Vindicator;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.item.ItemStack;
@@ -332,5 +336,25 @@ public final class ElementGameTests {
             helper.assertTrue(swept.hasEffect(MobEffects.WEAKNESS) && swept.hasEffect(ModEffects.SUNDERED) && worn(swept), "the tide did not corrode the enemy");
             done(helper);
         });
+    }
+
+    /** A player's spells take at least the minimum cast time (instant ones are charged); a mob's are left alone. */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
+    public static void playersChargeEverySpell(GameTestHelper helper) {
+        int min = ArcanesConfig.minCastTicks();
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Witch witch = caster(helper, 1.5, 1.5);
+        AbstractSpell spray = ModSpells.ACID_SPRAY.get();
+        helper.assertTrue(CastTimeFloor.apply(spray, player, 0) == min, "an instant spell is not charged for " + min + " ticks");
+        helper.assertTrue(CastTimeFloor.apply(spray, witch, 0) == 0, "a mob's instant spell was slowed");
+        AbstractSpell tide = ModSpells.CORRODING_TIDE.get();
+        helper.assertTrue(CastTimeFloor.apply(tide, player, min + 5) == min + 5, "a long cast was changed");
+        helper.assertTrue(CastTimeFloor.apply(tide, player, 1) == Math.max(1, min), "a short charged cast was not drawn out");
+        AbstractSpell firebolt = SpellRegistry.getSpell(ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "firebolt"));
+        if (firebolt != null && firebolt != SpellRegistry.none()) {
+            helper.assertTrue(CastTimeFloor.apply(firebolt, player, 0) == min, "Iron's own instant spell is not charged");
+        }
+        GameTestSetup.clearLeftovers(helper);
+        helper.succeed();
     }
 }

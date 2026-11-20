@@ -18,6 +18,9 @@ config="arcanes_oublies.mixins.json"
 [[mixins]]
 config="arcanes_oublies.epicfight.mixins.json"
 
+[[mixins]]
+config="arcanes_oublies.irons.mixins.json"
+
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"

@@ -9,6 +9,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import yesman.epicfight.api.animation.AnimationManager.AnimationAccessor;
@@ -42,8 +43,13 @@ public final class EpicNpcBridge {
     private static final Map<Mob, Integer> LAST_SWING = new WeakHashMap<>();
     /** Whom Custom NPCs last made each NPC strike. */
     private static final Map<Mob, LivingEntity> STRUCK = new WeakHashMap<>();
-    /** A swing on its way: whom it is for, its move, the tick by which it must have hit, how far it may still reach. */
-    private record Swing(LivingEntity target, AnimationAccessor<? extends StaticAnimation> move, int dueAt, double reach) {}
+    /**
+     * A swing on its way: whom it is for, its move, the earliest tick its hit may be given if its blade passed beside,
+     * the tick after which it is given whatever the animation does, how far it may still reach, and the target's own
+     * tick count when the swing began (to tell whether the NPC struck it since).
+     */
+    private record Swing(LivingEntity target, AnimationAccessor<? extends StaticAnimation> move, int dueAt, int giveUpAt, double reach,
+                         int targetTick) {}
 
     private static final Map<Mob, Swing> SWINGS = new WeakHashMap<>();
     /** Set while the animation's hit is dealt again with Epic Fight's damage, so that it is let through. */
@@ -116,7 +122,8 @@ public final class EpicNpcBridge {
             STRUCK.put(npc, target);
             // Custom NPCs judged the target within reach: the swing will hit it, even if the animation's blade passes
             // beside (a target a little further than the move reaches, or one Epic Fight would spare)
-            SWINGS.put(npc, new Swing(target, move.animation(), npc.tickCount + move.contact() + 4, Math.max(3.5, npc.distanceTo(target) + 1.5)));
+            SWINGS.put(npc, new Swing(target, move.animation(), npc.tickCount + move.contact() + 6, npc.tickCount + 40,
+                    Math.max(3.5, npc.distanceTo(target) + 1.5), target.tickCount));
             event.setCanceled(true);
         } catch (RuntimeException ex) {
             // An animation that could not be played: the blow lands as it would without Epic Fight
@@ -134,19 +141,50 @@ public final class EpicNpcBridge {
             Mob npc = (Mob) e;
             dropEpicFightGoals(npc);
             Swing swing = SWINGS.get(npc);
-            if (swing != null && npc.tickCount >= swing.dueAt()) {
+            // Only once the swing is over (its hit, if its blade reached the target, has come by then)
+            if (swing != null && npc.tickCount >= swing.dueAt() && (npc.tickCount >= swing.giveUpAt() || !attacking(patch(npc)))) {
                 SWINGS.remove(npc);
                 sureHit(npc, swing);
             }
         }
     }
 
-    /** The swing passed beside its target: it is struck all the same, with the move's Epic Fight hit. */
+    /** A blow of the NPC's landed: the swing it belonged to has hit, it needs no hit of its own. */
+    @SubscribeEvent
+    public static void onDamageDealt(LivingDamageEvent.Post event) {
+        Entity attacker = event.getSource().getEntity();
+        if (attacker instanceof Mob npc && !attacker.level().isClientSide() && isNpc(attacker)) {
+            Swing swing = SWINGS.get(npc);
+            if (swing != null && swing.target() == event.getEntity()) {
+                SWINGS.remove(npc);
+            }
+        }
+    }
+
+    private static boolean attacking(LivingEntityPatch<?> patch) {
+        if (patch == null) {
+            return false;
+        }
+        try {
+            return patch.getEntityState().attacking();
+        } catch (RuntimeException ex) {
+            return false;
+        }
+    }
+
+    /**
+     * The swing is over and its blade passed beside its target: it is struck all the same, once, with the move's Epic
+     * Fight hit. Never as well as the animation's own hit (that was the stray small blow after each strike).
+     */
     private static void sureHit(Mob npc, Swing swing) {
         LivingEntity target = swing.target();
         LivingEntityPatch<?> patch = patch(npc);
         if (patch == null || !npc.isAlive() || !target.isAlive() || target.level() != npc.level() || npc.distanceTo(target) > swing.reach()
                 || !EpicNpc.fightsWithEpicFight(npc)) {
+            return;
+        }
+        // Struck by the NPC since the swing began (its animation's hit): no second blow
+        if (target.getLastHurtByMob() == npc && target.getLastHurtByMobTimestamp() >= swing.targetTick()) {
             return;
         }
         STRIKING.set(true);

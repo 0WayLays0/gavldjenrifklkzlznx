@@ -41,6 +41,9 @@ public final class EpicNpcServerCheck {
     private static int tick = -1;
     /** A blow on the husk that was not Epic Fight's and still went through. */
     private static String plainBlow;
+    /** The tick the husk last took a blow from the NPC, and a second blow landed right after one (the stray blow). */
+    private static int lastLanded = -100;
+    private static String doubleBlow;
 
     private EpicNpcServerCheck() {}
 
@@ -109,6 +112,10 @@ public final class EpicNpcServerCheck {
                     fail(server, "a blow that is not Epic Fight's went through: " + plainBlow);
                     return;
                 }
+                if (doubleBlow != null) {
+                    fail(server, "one swing struck twice: " + doubleBlow);
+                    return;
+                }
                 if (target.getHealth() >= full || EpicNpcBridge.animationHits == 0) {
                     fail(server, "the attack animation's hit never landed (" + target.getHealth() + " / " + full + ", "
                             + EpicNpcBridge.animationHits + " animation hits)");
@@ -148,6 +155,18 @@ public final class EpicNpcServerCheck {
             if (tick <= 80 && !event.isCanceled() && !(source instanceof yesman.epicfight.world.damagesource.EpicFightDamageSource)) {
                 plainBlow = source.getMsgId() + " at tick " + tick;
             }
+        }
+    }
+
+    /** Every blow the NPC lands on the husk: two within a few ticks are one swing striking twice. */
+    @SubscribeEvent
+    public static void onLanded(net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post event) {
+        if (ENABLED && tick >= 0 && tick <= 80 && event.getEntity() == target && event.getSource().getEntity() == npc) {
+            ArcanesOublies.LOGGER.info("[EpicNpcCheck] tick {}: landed {} ({})", tick, event.getNewDamage(), event.getSource().getClass().getSimpleName());
+            if (tick - lastLanded < 6 && doubleBlow == null) {
+                doubleBlow = "ticks " + lastLanded + " and " + tick;
+            }
+            lastLanded = tick;
         }
     }
 

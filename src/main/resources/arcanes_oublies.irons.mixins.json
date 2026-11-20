@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.waylays.arcanes.spells.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AbstractSpellMixin"
+  ],
+  "client": [
+    "CastBarOverlayMixin",
+    "ClientSpellCastHelperMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
