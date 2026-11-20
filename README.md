@@ -691,6 +691,14 @@ pour Errethys, `tools/physical_assets.py` et `tools/physical_weapon_icons.py` po
 pour la Magie de Glyphe, `tools/token_assets.py` pour la Magie des Jetons à partir de `tools/models/soul_token.bbmodel`,
 `tools/verdigris_assets.py` pour la Magie de Mousse, Cuivre et Rouille, `tools/wall_assets.py` pour la Magie des Murs, `tools/gem_assets.py` pour la Magie des Pierres Précieuses).
 
+## Temps d'incantation minimum
+
+Tout sort lancé par un joueur prend au moins **1 seconde** : ceux d'Iron's Spells, ceux de ce mod et ceux de tous les
+addons. Un sort instantané est chargé une seconde (barre d'incantation et posture de charge d'Iron's) puis part avec son
+propre geste ; un sort à charger plus court qu'une seconde est allongé à une seconde. Les sorts canalisés, les relances
+d'un sort (renvoyer ses invocations, second lancer…) et les sorts des monstres ne changent pas. Réglable dans la config
+serveur (`world/serverconfig/arcanes_oublies-server.toml`, `spells.minCastTicks`, en ticks : 20 = 1 s, 0 = désactivé).
+
 ## Récupérer le mod
 
 Chaque push lance le workflow GitHub Actions **Build & Test** :
@@ -819,6 +827,33 @@ Minage sans pioche : « *Il semble qu'une pioche soit nécessaire pour récupér
 Les stations (table de craft, forge, alambic…) n'ont plus de bouton « Utilisation classique » : on ne s'en sert que par
 les recettes du métier. Les cartes de recettes sont plus compactes (jusqu'à six visibles d'un coup).
 
+### Métiers : dossiers de recettes
+
+Dans une station (artisanat, forge, alchimie, menuiserie, médecine…), les recettes peuvent être rangées dans des
+dossiers, affichés en premier ; un clic ouvre un dossier, « ◀ Retour » (ou Échap) revient à la liste. Un maître du jeu
+(permission 2) voit le bouton **Organiser** : créer un dossier (« + Dossier »), le renommer (✎), le monter ou le
+descendre (▲ ▼), le supprimer (✕ : ses recettes reviennent hors dossier) ; monter ou descendre une recette (▲ ▼) et la
+ranger dans un autre dossier (⇄). Chaque changement est enregistré tout de suite sur le serveur, dans
+`config/arcanes_oublies/metiers.json`. Le dossier d'une recette se règle aussi dans l'éditeur des métiers.
+
+### Métiers : menuiserie et médecine
+
+- **Menuiserie** (sur le tailleur de pierre, la « scie ») : une planche posée sur deux tréteaux, un trait de crayon
+  dessus. On scie en faisant glisser la souris de gauche à droite (ou A puis D), et on guide la lame en montant ou
+  descendant la souris (ou W / S) pour rester sur le trait ; le trait de scie laissé derrière montre si la coupe est
+  droite. Trop loin du trait, le bois se fend : trois mauvais coups et la planche est perdue (échec critique). Recettes de
+  départ : planches de chêne, porte en chêne, tonneau.
+- **Médecine** (sur la **Table de soins**, un bloc du mod : une table sous un drap blanc à croix rouge, un rouleau de
+  bandage, un pot d'onguent et une fiole) : recoudre une plaie au bras. Chaque point est à piquer quand l'anneau le
+  rejoint (clic ou Espace) ; trop tôt, trop tard ou à côté, le patient a mal. La plaie saigne tant qu'elle n'est pas
+  refermée : trop de sang perdu ou trop de douleur, et le patient s'évanouit (échec critique). Recettes de départ :
+  cataplasme de soin (régénération), élixir de régénération, pomme de vie (pomme dorée). Recette de la table :
+  laine blanche, colorant rouge, planches et bâtons.
+
+Un serveur qui avait déjà son fichier des métiers reçoit ces deux métiers en plus au démarrage, sans rien perdre du
+reste. Les fonds des mini-jeux de minage (une galerie de mine sous une lanterne) et de cueillette (une prairie au soleil
+couchant au-dessus de la terre en coupe) ont été repeints.
+
 ### `/invsee` et `/repair`
 
 - `/invsee <joueur>` : ouvre l'inventaire du joueur (en ligne) dans un coffre. Lignes 1 à 3 : son sac ; ligne 4 : sa
@@ -911,7 +946,8 @@ Custom NPCs (types `customnpc`, `customnpc64x32`, `customnpcalex`, `customnpccla
   ce qui est réglé dans ses menus reste valable). Quand il frappe, son coup Minecraft est supprimé (ni dégâts, ni geste
   du bras) et l'animation d'attaque Epic Fight de son arme se joue (enchaînement de coups). Le seul coup porté est celui
   de l'animation : c'est un coup Epic Fight, avec la force de mêlée et les effets réglés dans Custom NPCs, et il ne
-  touche que l'ennemi du PNJ ;
+  touche que l'ennemi du PNJ. Si la lame passe à côté, le coup est quand même donné, une seule fois, à la fin de
+  l'animation (jamais en plus du coup de l'animation) ;
 - **apparence** : le corps suit la skin (bras normaux, bras fins « Alex », anciennes skins 64×32 et « classic »), les
   calques cachés dans le menu du modèle restent cachés, la taille réglée dans Custom NPCs est gardée, et l'arme et
   l'armure s'affichent ;

@@ -20,6 +20,7 @@ import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -67,6 +68,21 @@ public final class MetierGameTests {
         helper.assertTrue(MetierDefs.forBlock(Blocks.SMITHING_TABLE.defaultBlockState()).game == MetierDefs.Game.FORGE, "the smithing table does not forge");
         MetierDefs.Def still = MetierDefs.forBlock(ModBlocks.ALEMBIC.get().defaultBlockState());
         helper.assertTrue(still != null && still.game == MetierDefs.Game.DISTILL, "the alembic does not distill");
+        MetierDefs.Def saw = MetierDefs.forBlock(Blocks.STONECUTTER.defaultBlockState());
+        helper.assertTrue(saw != null && saw.isStation() && saw.game == MetierDefs.Game.CARPENTRY, "the stonecutter is not the carpenter's saw");
+        MetierDefs.Def medic = MetierDefs.forBlock(ModBlocks.MEDICAL_TABLE.get().defaultBlockState());
+        helper.assertTrue(medic != null && medic.isStation() && medic.game == MetierDefs.Game.MEDICINE, "the medical table is not the healers' station");
+        ItemStack poultice = MetierDefs.stack(medic.recipes.get(0).partial.get(0), 1, helper.getLevel().registryAccess());
+        helper.assertTrue(poultice.is(Items.SUSPICIOUS_STEW) && poultice.has(DataComponents.SUSPICIOUS_STEW_EFFECTS), "the poultice lost its effect: " + poultice);
+        // A file from before the two new trades gets them, and keeps its own
+        MetierDefs.Config old = new MetierDefs.Config();
+        old.version = 1;
+        MetierDefs.Def mine = new MetierDefs.Def();
+        mine.id = "ma_mine";
+        old.metiers.add(mine);
+        MetierDefs.upgrade(old);
+        helper.assertTrue(old.metiers.size() == 3 && old.metiers.get(0).id.equals("ma_mine") && old.version == MetierDefs.VERSION,
+                "an old file was not brought up to date: " + old.metiers.stream().map(d -> d.id).toList());
         // The file's round trip, and an item with data
         MetierDefs.Config again = MetierDefs.fromJson(MetierDefs.toJson(MetierDefs.get()));
         helper.assertTrue(again.metiers.size() == MetierDefs.all().size(), "the trades do not survive their JSON");
@@ -196,6 +212,48 @@ public final class MetierGameTests {
         ItemStack whole = new ItemStack(Items.IRON_SWORD);
         p.setItemInHand(InteractionHand.MAIN_HAND, whole);
         helper.assertTrue(!MetierService.grindForTest(p, pos), "an unworn sword started the grindstone");
+        helper.succeed();
+    }
+
+    /**
+     * A station organised in its screen: a folder made, the two recipes swapped and one put in it; an organisation that
+     * no longer fits the recipes is refused. Put back as it was at once (other tests use the station).
+     */
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "metier_folders")
+    public static void stationRecipesGoInFolders(GameTestHelper helper) {
+        MetierDefs.Def craft = MetierDefs.byId("artisanat");
+        helper.assertTrue(craft != null && craft.recipes.size() >= 2, "no crafting station with two recipes");
+        List<String> names = new java.util.ArrayList<>();
+        craft.recipes.forEach(r -> names.add(r.name));
+        String first = names.get(0), second = names.get(1);
+        List<Integer> swap = new java.util.ArrayList<>();
+        List<String> where = new java.util.ArrayList<>();
+        for (int i = 0; i < names.size(); i++) {
+            swap.add(i == 0 ? 1 : i == 1 ? 0 : i);
+            where.add(i == 1 ? "  Éclairage " : "");
+        }
+        BlockPos pos = helper.absolutePos(ORE);
+        boolean done = MetierService.organize(craft, new com.waylays.arcanes.metier.MetierNet.Organize("artisanat", pos, List.of("Éclairage", "Vide"), swap, where));
+        try {
+            helper.assertTrue(done, "the organisation was refused");
+            helper.assertTrue(craft.recipes.get(0).name.equals(second) && craft.recipes.get(1).name.equals(first), "the recipes were not swapped");
+            helper.assertTrue(craft.recipes.get(1).folder.equals("Éclairage") && craft.recipes.get(0).folder.isEmpty(), "the recipe is not in its folder");
+            helper.assertTrue(craft.folders.equals(List.of("Éclairage", "Vide")), "the folders are " + craft.folders);
+            MetierDefs.Def again = MetierDefs.fromJson(MetierDefs.toJson(MetierDefs.get())).metiers.stream().filter(d -> d.id.equals("artisanat")).findFirst()
+                    .orElseThrow();
+            helper.assertTrue(again.folders.contains("Vide") && again.recipes.get(1).folder.equals("Éclairage"), "the folders do not survive the file");
+            helper.assertTrue(!MetierService.organize(craft, new com.waylays.arcanes.metier.MetierNet.Organize("artisanat", pos, List.of(), List.of(0), List.of(""))),
+                    "an organisation that no longer fits was taken");
+        } finally {
+            List<Integer> back = new java.util.ArrayList<>();
+            List<String> none = new java.util.ArrayList<>();
+            for (int i = 0; i < craft.recipes.size(); i++) {
+                back.add(i == 0 ? 1 : i == 1 ? 0 : i);
+                none.add("");
+            }
+            MetierService.organize(craft, new com.waylays.arcanes.metier.MetierNet.Organize("artisanat", pos, List.of(), back, none));
+        }
+        helper.assertTrue(craft.recipes.get(0).name.equals(first) && craft.folders.isEmpty(), "the station was not put back");
         helper.succeed();
     }
 }

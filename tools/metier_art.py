@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Trades' minigame art: the five scenes painted behind the minigames (a mine gallery, a garden in cross-section, a
-workbench, a smithy, an alchemist's bench), the pieces drawn over them (the boulder and its ore veins, the anvil, the
+"""Trades' minigame art: three of the scenes painted behind the minigames (a workbench, a smithy, an alchemist's bench;
+the mine, the meadow, the carpenter's workshop and the infirmary are in metier_scenes.py), the pieces drawn over them (the boulder and its ore veins, the anvil, the
 bellows, the flask, the crafting slot) and the soft sprites the effects are made of (glow, disc, ring, flame, star).
 
 Called by metier_assets.py. Scenes are 784 x 360 (drawn at half size in game, so they stay sharp). Original art,
@@ -22,11 +22,6 @@ OUT = "textures/gui/metier/"
 def _grid(w, h):
     ys, xs = np.mgrid[0:h, 0:w].astype(float)
     return xs, ys
-
-
-def _blur(a, r):
-    img = Image.fromarray(np.clip(a * 255, 0, 255).astype(np.uint8))
-    return np.asarray(img.filter(ImageFilter.GaussianBlur(r)), dtype=float) / 255
 
 
 def _mask(w, h, draw, blur=0):
@@ -108,34 +103,6 @@ def star():
 
 # ---------------------------------------------------------------- mining
 
-def mine_scene():
-    xs, ys = _grid(W, H)
-    f1, f2 = worley(W, H, 90, 501)
-    facets = emboss(np.clip(f1, 0, 1), .8)
-    base = fbm(W, H, 4, 6, 502)
-    t = base * .75 + facets * .12 + noise(W, H, (160, 80), 503) * .12
-    rgb = ramp(t, [(0, (22, 20, 24)), (.4, (52, 48, 50)), (.7, (84, 78, 76)), (1, (122, 114, 106))])
-    cracks = smooth(.035, .0, f2 - f1) * smooth(.35, .6, fbm(W, H, 3, 3, 507))
-    rgb = mix(rgb, (12, 10, 12), cracks * .55)
-    # Specks of ore in the wall
-    speck = smooth(.86, .93, noise(W, H, (260, 120), 504)) * smooth(.5, .7, fbm(W, H, 3, 3, 505))
-    rgb = mix(rgb, (196, 112, 70), speck * .7)
-    # Timbering: two posts and a beam
-    for x0 in (14, W - 46):
-        post = _wood(32, H, 506 + x0, along_x=False)
-        shade = np.linspace(.75, 1.1, 32)[None, :, None]
-        rgb[:, x0:x0 + 32] = post * shade
-        rgb[:, x0 - 3:x0] *= .45
-        rgb[:, x0 + 32:x0 + 36] *= .5
-    beam = _wood(W, 30, 510)
-    rgb[0:30] = beam * np.linspace(1.1, .75, 30)[:, None, None]
-    rgb[30:36] *= .45
-    # A lantern's warm light at the top left, the cold dark further in
-    light = _glow(xs, ys, 120, 60, 220)
-    rgb = rgb * (.55 + .75 * light[..., None]) + np.array([60, 30, 6]) * light[..., None] * .6
-    return image(_vignette(rgb, .7))
-
-
 def boulder():
     """The boulder (rock) and its ore veins (white, tinted in game), 512 x 288."""
     w, h = 512, 288
@@ -167,52 +134,6 @@ def boulder():
     shade = np.clip(.45 + lit * .5 + emboss(veins, 2.2) * .35, 0, 1.2)
     ore = image(np.dstack([shade * 230] * 3), veins * 255)
     return rock, ore
-
-
-# ---------------------------------------------------------------- gathering
-
-GROUND = 160
-
-
-def garden_scene():
-    xs, ys = _grid(W, H)
-    # Sky, warm at the horizon
-    sky = ramp(ys / GROUND, [(0, (110, 168, 222)), (.7, (176, 214, 236)), (1, (246, 226, 186))])
-    clouds = smooth(.55, .75, fbm(W, H, 3, 5, 530, stretch=3)) * smooth(GROUND, 20, ys)
-    sky = mix(sky, (252, 252, 255), clouds * .85)
-    # Hills far off
-    hill = GROUND - 34 - 18 * np.sin(xs / 90 + 1) - 10 * np.sin(xs / 37) - fbm(W, H, 8, 3, 531)[0][None, :] * 10
-    sky = mix(sky, (120, 164, 108), smooth(hill, hill + 2, ys) * .9)
-    hill2 = GROUND - 14 - 9 * np.sin(xs / 60 + 3)
-    sky = mix(sky, (86, 138, 74), smooth(hill2, hill2 + 2, ys))
-    # Soil in layers, pebbles
-    soil_t = (ys - GROUND) / (H - GROUND) * .6 + fbm(W, H, 6, 5, 532) * .4
-    soil = ramp(soil_t, [(0, (122, 84, 52)), (.4, (96, 64, 40)), (.7, (72, 48, 30)), (1, (48, 32, 22))])
-    layers = .5 + .5 * np.sin((ys - GROUND) / 18 + fbm(W, H, 4, 3, 533) * 6)
-    soil *= (.88 + .12 * layers)[..., None]
-    rgb = np.where((ys >= GROUND)[..., None], soil, sky)
-    img = image(rgb)
-    d = ImageDraw.Draw(img)
-    rnd = random.Random(534)
-    for _ in range(70):
-        x, y = rnd.uniform(0, W), rnd.uniform(GROUND + 18, H)
-        rx, ry = rnd.uniform(3, 9), rnd.uniform(2, 6)
-        c = rnd.randint(110, 160)
-        d.ellipse((x - rx, y - ry, x + rx, y + ry), fill=(c, c - 8, c - 16))
-        d.ellipse((x - rx * .6, y - ry * .8, x + rx * .2, y - ry * .1), fill=(c + 30, c + 24, c + 14))
-    # Grass: a band and blades
-    d.rectangle((0, GROUND - 4, W, GROUND + 8), fill=(76, 132, 52))
-    for _ in range(900):
-        x = rnd.uniform(0, W)
-        hgt = rnd.uniform(6, 22)
-        lean = rnd.uniform(-5, 5)
-        c = (rnd.randint(60, 110), rnd.randint(130, 180), rnd.randint(50, 80))
-        d.line([(x, GROUND + 6), (x + lean, GROUND + 6 - hgt)], fill=c, width=2)
-    rgb = np.asarray(img, dtype=float)[..., :3]
-    # A soft shadow under the grass
-    sh = smooth(GROUND + 30, GROUND + 6, ys) * (ys > GROUND + 6)
-    rgb = rgb * (1 - sh[..., None] * .35)
-    return image(_vignette(rgb, .45))
 
 
 # ---------------------------------------------------------------- crafting
@@ -467,11 +388,14 @@ def main():
     g.save(ring(), OUT + "ring.png")
     g.save(flame(), OUT + "flame.png")
     g.save(star(), OUT + "star.png")
-    g.save(mine_scene(), OUT + "bg_mining.png")
+    import metier_scenes
+    g.save(metier_scenes.mine(), OUT + "bg_mining.png")
     rock, ore = boulder()
     g.save(rock, OUT + "boulder.png")
     g.save(ore, OUT + "boulder_ore.png")
-    g.save(garden_scene(), OUT + "bg_harvest.png")
+    g.save(metier_scenes.meadow(), OUT + "bg_harvest.png")
+    g.save(metier_scenes.workshop(), OUT + "bg_carpentry.png")
+    g.save(metier_scenes.infirmary(), OUT + "bg_medicine.png")
     g.save(bench_scene(), OUT + "bg_assembly.png")
     g.save(slot(), OUT + "slot.png")
     g.save(smithy_scene(), OUT + "bg_forge.png")

@@ -52,7 +52,11 @@ public final class MetierDefs {
         /** Heat the still, add each ingredient at its colour, keep it steady while the drops condense. */
         DISTILL,
         /** Press a blade on the grindstone, the pressure kept in a wandering band, without blueing it (see {@code Grindstone}). */
-        GRIND
+        GRIND,
+        /** Saw a plank along its pencil line: stroke after stroke, the blade kept on the line. */
+        CARPENTRY,
+        /** Stitch a wound: each stitch where and when its ring closes, before the bleeding or the pain is too much. */
+        MEDICINE
     }
 
     /** How an attempt ended. */
@@ -112,6 +116,8 @@ public final class MetierDefs {
         public boolean loseInputsOnFail = true;
         /** Seconds before the same player may make it again (0: none). */
         public int cooldown = 0;
+        /** The station's folder it is listed in ("": at the top, outside any folder). */
+        public String folder = "";
     }
 
     /** A trade. */
@@ -145,6 +151,8 @@ public final class MetierDefs {
         public boolean protectBlocks = true;
         // Stations (with recipes)
         public List<Recipe> recipes = new ArrayList<>();
+        /** The station's folders, in the order they are listed (recipes name theirs, see {@link Recipe#folder}). */
+        public List<String> folders = new ArrayList<>();
         /** Seconds between two attempts by the same player (0: none). */
         public int playerCooldown = 0;
 
@@ -169,9 +177,12 @@ public final class MetierDefs {
         }
     }
 
+    /** The version of the file the mod writes: trades it brought in since are added to an older file (see {@link #load}). */
+    public static final int VERSION = 2;
+
     /** The whole file. */
     public static final class Config {
-        public int version = 1;
+        public int version = VERSION;
         public List<Def> metiers = new ArrayList<>();
     }
 
@@ -225,6 +236,10 @@ public final class MetierDefs {
         try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             Config read = GSON.fromJson(reader, Config.class);
             config = sanitize(read == null ? new Config() : read);
+            if (config.version < VERSION) {
+                upgrade(config);
+                save();
+            }
         } catch (IOException | RuntimeException e) {
             ArcanesOublies.LOGGER.error("Trades: could not read {} ({}); the defaults are used", path, e.toString());
             config = defaults();
@@ -296,7 +311,20 @@ public final class MetierDefs {
                 sanitizeRewards(list);
             }
             d.recipes.removeIf(r -> r == null);
+            if (d.folders == null) d.folders = new ArrayList<>();
+            List<String> folders = new ArrayList<>();
+            for (String f : d.folders) {
+                String name = folderName(f);
+                if (!name.isEmpty() && !folders.contains(name)) {
+                    folders.add(name);
+                }
+            }
+            d.folders = folders;
             for (Recipe r : d.recipes) {
+                r.folder = folderName(r.folder);
+                if (!r.folder.isEmpty() && !d.folders.contains(r.folder)) {
+                    d.folders.add(r.folder);
+                }
                 if (r.name == null) r.name = "Recette";
                 if (r.inputs == null) r.inputs = new ArrayList<>();
                 if (r.partial == null) r.partial = new ArrayList<>();
@@ -312,6 +340,15 @@ public final class MetierDefs {
             }
         }
         return c;
+    }
+
+    /** A folder's name as kept: trimmed, at most 40 characters ("" for none). */
+    public static String folderName(@Nullable String name) {
+        if (name == null) {
+            return "";
+        }
+        String t = name.strip();
+        return t.length() > 40 ? t.substring(0, 40).strip() : t;
     }
 
     private static void sanitizeRewards(List<Reward> list) {
@@ -405,9 +442,38 @@ public final class MetierDefs {
         return JsonParser.parseString(json).getAsJsonObject();
     }
 
+    /**
+     * A file written by an older version: the trades the mod brought in since (carpentry and medicine in version 2) are
+     * added, unless a trade with the same id is already there; nothing else changes.
+     */
+    public static void upgrade(Config c) {
+        if (c.version < 2) {
+            for (Def d : defaults().metiers) {
+                if ((d.id.equals("menuiserie") || d.id.equals("medecine")) && byIdIn(c, d.id) == null) {
+                    c.metiers.add(d);
+                }
+            }
+        }
+        c.version = VERSION;
+        sanitize(c);
+    }
+
+    @Nullable
+    private static Def byIdIn(Config c, String id) {
+        for (Def d : c.metiers) {
+            if (d.id.equals(id)) {
+                return d;
+            }
+        }
+        return null;
+    }
+
     // ---------------------------------------------------------------- what comes with the mod
 
-    /** The five trades the mod starts with: copper, torchflowers, the crafting table, the smithing table, the still. */
+    /**
+     * The trades the mod starts with: copper, torchflowers, the crafting table, the smithing table, the still, the saw
+     * (the stonecutter) and the medical table.
+     */
     public static Config defaults() {
         Config c = new Config();
         Def copper = new Def();
@@ -488,7 +554,7 @@ public final class MetierDefs {
 
         Def still = new Def();
         still.id = "alchimie";
-        still.name = "Alchimie et médecine";
+        still.name = "Alchimie";
         still.game = Game.DISTILL;
         still.blocks = new ArrayList<>(List.of(ArcanesOublies.MODID + ":alembic"));
         Recipe heal = new Recipe();
@@ -510,6 +576,74 @@ public final class MetierDefs {
         still.durability = 0;
         still.durabilityCritical = 0;
         c.metiers.add(still);
+
+        Def saw = new Def();
+        saw.id = "menuiserie";
+        saw.name = "Menuiserie";
+        saw.game = Game.CARPENTRY;
+        saw.blocks = new ArrayList<>(List.of("minecraft:stonecutter"));
+        Recipe planks = new Recipe();
+        planks.name = "Planches de chêne";
+        planks.difficulty = .8;
+        planks.inputs = new ArrayList<>(List.of(new Ingredient("minecraft:oak_log", 1)));
+        planks.partial = new ArrayList<>(List.of(new Reward("minecraft:oak_planks", 4, 4)));
+        planks.perfect = new ArrayList<>(List.of(new Reward("minecraft:oak_planks", 6, 6)));
+        planks.critical = new ArrayList<>(List.of(new Reward("minecraft:stick", 2, 3)));
+        Recipe door = new Recipe();
+        door.name = "Porte en chêne";
+        door.inputs = new ArrayList<>(List.of(new Ingredient("minecraft:oak_planks", 6)));
+        door.partial = new ArrayList<>(List.of(new Reward("minecraft:oak_door", 2, 2)));
+        door.perfect = new ArrayList<>(List.of(new Reward("minecraft:oak_door", 3, 3)));
+        Recipe barrel = new Recipe();
+        barrel.name = "Tonneau";
+        barrel.difficulty = 1.2;
+        barrel.inputs = new ArrayList<>(List.of(new Ingredient("minecraft:oak_planks", 6), new Ingredient("minecraft:oak_slab", 2)));
+        barrel.partial = new ArrayList<>(List.of(new Reward("minecraft:barrel", 1, 1)));
+        barrel.perfect = new ArrayList<>(List.of(new Reward("minecraft:barrel", 1, 1), new Reward("minecraft:oak_slab", 1, 1)));
+        saw.recipes = new ArrayList<>(List.of(planks, door, barrel));
+        saw.durability = 0;
+        saw.durabilityCritical = 0;
+        c.metiers.add(saw);
+
+        Def medic = new Def();
+        medic.id = "medecine";
+        medic.name = "Médecine";
+        medic.game = Game.MEDICINE;
+        medic.blocks = new ArrayList<>(List.of(ArcanesOublies.MODID + ":medical_table"));
+        Recipe poultice = new Recipe();
+        poultice.name = "Cataplasme de soin";
+        poultice.difficulty = .8;
+        poultice.inputs = new ArrayList<>(List.of(new Ingredient("minecraft:bowl", 1), new Ingredient("minecraft:brown_mushroom", 1),
+                new Ingredient("minecraft:red_mushroom", 1), new Ingredient("minecraft:oxeye_daisy", 1)));
+        Reward stew = new Reward("minecraft:suspicious_stew", 1, 1);
+        stew.components = parseObject("{\"minecraft:suspicious_stew_effects\":[{\"id\":\"minecraft:regeneration\",\"duration\":160}],"
+                + "\"minecraft:custom_name\":\"{\\\"text\\\":\\\"Cataplasme de soin\\\",\\\"italic\\\":false}\"}");
+        Reward strongStew = new Reward("minecraft:suspicious_stew", 1, 1);
+        strongStew.components = parseObject("{\"minecraft:suspicious_stew_effects\":[{\"id\":\"minecraft:regeneration\",\"duration\":320}],"
+                + "\"minecraft:custom_name\":\"{\\\"text\\\":\\\"Cataplasme du médecin\\\",\\\"italic\\\":false,\\\"color\\\":\\\"gold\\\"}\"}");
+        poultice.partial = new ArrayList<>(List.of(stew));
+        poultice.perfect = new ArrayList<>(List.of(strongStew));
+        Recipe elixir = new Recipe();
+        elixir.name = "Élixir de régénération";
+        elixir.inputs = new ArrayList<>(List.of(new Ingredient("minecraft:glass_bottle", 1), new Ingredient("minecraft:glistering_melon_slice", 1),
+                new Ingredient("minecraft:honey_bottle", 1)));
+        Reward regen = new Reward("minecraft:potion", 1, 1);
+        regen.components = parseObject("{\"minecraft:potion_contents\":{\"potion\":\"minecraft:regeneration\"}}");
+        Reward longRegen = new Reward("minecraft:potion", 1, 1);
+        longRegen.components = parseObject("{\"minecraft:potion_contents\":{\"potion\":\"minecraft:long_regeneration\"}}");
+        elixir.partial = new ArrayList<>(List.of(regen));
+        elixir.perfect = new ArrayList<>(List.of(longRegen, new Reward("minecraft:glass_bottle", 1, 1)));
+        Recipe apple = new Recipe();
+        apple.name = "Pomme de vie";
+        apple.difficulty = 1.25;
+        apple.inputs = new ArrayList<>(List.of(new Ingredient("minecraft:apple", 1), new Ingredient("minecraft:gold_ingot", 6)));
+        apple.partial = new ArrayList<>(List.of(new Reward("minecraft:golden_apple", 1, 1)));
+        apple.perfect = new ArrayList<>(List.of(new Reward("minecraft:golden_apple", 1, 1), new Reward("minecraft:gold_nugget", 9, 18)));
+        apple.critical = new ArrayList<>(List.of(new Reward("minecraft:gold_nugget", 9, 27)));
+        medic.recipes = new ArrayList<>(List.of(poultice, elixir, apple));
+        medic.durability = 0;
+        medic.durabilityCritical = 0;
+        c.metiers.add(medic);
         return sanitize(c);
     }
 

@@ -339,7 +339,7 @@ public final class ElementGameTests {
     }
 
     /** A player's spells take at least the minimum cast time (instant ones are charged); a mob's are left alone. */
-    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "cast_time")
     public static void playersChargeEverySpell(GameTestHelper helper) {
         int min = ArcanesConfig.minCastTicks();
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -354,7 +354,8 @@ public final class ElementGameTests {
         if (firebolt != null && firebolt != SpellRegistry.none()) {
             helper.assertTrue(CastTimeFloor.apply(firebolt, player, 0) == min, "Iron's own instant spell is not charged");
         }
-        GameTestSetup.clearLeftovers(helper);
+        // Only its own witch: the creatures of tests running beside this one stay
+        witch.discard();
         helper.succeed();
     }
 }

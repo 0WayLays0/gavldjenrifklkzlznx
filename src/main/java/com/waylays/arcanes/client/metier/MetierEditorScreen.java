@@ -52,10 +52,10 @@ public class MetierEditorScreen extends Screen {
     private static final int GOLD = 0xFFDEB25C, GOLD_LIGHT = 0xFFFFE6A0, TEXT = 0xFFF2ECE0, DIM = 0xFFA89E8C, RED = 0xFFFF6A5A, GREEN = 0xFF8AE07A,
             BLUE = 0xFF8FD4FF, CARD = 0xC01C1714, CARD_EDGE = 0x605A4630;
     private static final int SIDE = 150, ROW = 22, CHIP_H = 20;
-    private static final int[] GAME_COLORS = {0xFFB09A80, 0xFF7ABA62, 0xFFC09060, 0xFFE07848, 0xFFA87AE0, 0xFF8AA0B8};
+    private static final int[] GAME_COLORS = {0xFFB09A80, 0xFF7ABA62, 0xFFC09060, 0xFFE07848, 0xFFA87AE0, 0xFF8AA0B8, 0xFFD0A060, 0xFF60C8B0};
     private static final ItemStack[] GAME_ICONS = {new ItemStack(Items.IRON_PICKAXE), new ItemStack(Items.TORCHFLOWER),
             new ItemStack(Items.CRAFTING_TABLE), new ItemStack(Items.SMITHING_TABLE), new ItemStack(Items.BREWING_STAND),
-            new ItemStack(Items.GRINDSTONE)};
+            new ItemStack(Items.GRINDSTONE), new ItemStack(Items.STONECUTTER), new ItemStack(com.waylays.arcanes.registry.ModItems.MEDICAL_TABLE.get())};
 
     private enum Tab {SETTINGS, BLOCKS, REWARDS, RECIPES}
 
@@ -643,6 +643,10 @@ public class MetierEditorScreen extends Screen {
             ry = card(split, mx1, ry, tr("card.recipe"), GOLD);
             if (visible(ry, 18)) {
                 field(cardX0 + 10, ry, Math.min(180, cardX1 - cardX0 - 20), r.name, s -> r.name = s, null).setTooltip(Tooltip.create(tr("recipe_name")));
+            }
+            ry += ROW + 2;
+            if (visible(ry, 18)) {
+                field(cardX0 + 10, ry, Math.min(180, cardX1 - cardX0 - 20), r.folder, s -> r.folder = s, null).setTooltip(Tooltip.create(tr("recipe_folder")));
             }
             ry += ROW + 2;
             ry = numberRow(ry, tr("recipe_difficulty"), () -> r.difficulty, v -> r.difficulty = v, .05, .2, 5, false, tr("recipe_difficulty.tip"));

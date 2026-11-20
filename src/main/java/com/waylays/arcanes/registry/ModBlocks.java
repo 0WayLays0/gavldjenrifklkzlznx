@@ -24,5 +24,10 @@ public final class ModBlocks {
             () -> new com.waylays.arcanes.metier.AlembicBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2.5f, 6)
                     .sound(SoundType.COPPER).lightLevel(state -> 5).noOcclusion()));
 
+    /** The Medical Table: the healers' station (its recipes set in the trades' editor). */
+    public static final DeferredHolder<Block, Block> MEDICAL_TABLE = BLOCKS.register("medical_table",
+            () -> new com.waylays.arcanes.metier.MedicalTableBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2f, 3)
+                    .sound(SoundType.WOOD).noOcclusion().ignitedByLava()));
+
     private ModBlocks() {}
 }

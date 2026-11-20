@@ -118,6 +118,8 @@ public final class ModItems {
             () -> new net.minecraft.world.item.BlockItem(ModBlocks.ALTAR_OF_RITES.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final DeferredHolder<Item, Item> ALEMBIC = ITEMS.register("alembic",
             () -> new net.minecraft.world.item.BlockItem(ModBlocks.ALEMBIC.get(), new Item.Properties()));
+    public static final DeferredHolder<Item, Item> MEDICAL_TABLE = ITEMS.register("medical_table",
+            () -> new net.minecraft.world.item.BlockItem(ModBlocks.MEDICAL_TABLE.get(), new Item.Properties()));
 
     private ModItems() {}
 

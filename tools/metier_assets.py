@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Trades' art: the Alembic (a copper still on a small brick furnace: the furnace with its fire mouth, the riveted
+"""Trades' art: the Medical Table (a low oak table under a linen cloth marked with a red cross, a roll of bandage, a
+jar of salve and a phial on it), its models, blockstate, loot table and recipe; the Alembic (a copper still on a small brick furnace: the furnace with its fire mouth, the riveted
 copper pot and dome, the swan-neck pipe down to a glass receiver holding a violet distillate), its block and item
 models, blockstate, loot table and recipe; and the minigames' art (metier_art.py).
 
@@ -162,6 +163,149 @@ def alembic_model():
     }
 
 
+# ---------------------------------------------------------------- the medical table
+
+WOOD = [(70, 44, 26), (98, 64, 38), (128, 86, 52), (154, 108, 66), (178, 132, 84)]
+LINEN = [(176, 172, 162), (206, 202, 192), (230, 228, 220), (246, 245, 240)]
+CROSS = [(150, 24, 30), (196, 40, 44), (226, 70, 70)]
+
+
+def oak_texture():
+    """16 x 16: the table's oak, its grain running along, a knot, the planks' seam darker."""
+    rnd = random.Random(4300)
+    img = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        band = 2 + (1 if (y // 2) % 3 == 0 else 0) - (1 if y in (7, 15) else 0)
+        for x in range(16):
+            level = band + (1 if rnd.random() < .12 else 0) - (1 if rnd.random() < .1 else 0)
+            img.putpixel((x, y), WOOD[max(0, min(4, level))] + (255,))
+    for x in range(16):
+        img.putpixel((x, 7), WOOD[0] + (255,))
+        img.putpixel((x, 15), WOOD[0] + (255,))
+    for (x, y) in ((11, 3), (12, 3), (11, 4)):
+        img.putpixel((x, y), WOOD[0] + (255,))
+    return img
+
+
+def cloth_texture(top=True):
+    """16 x 16: white linen, a fine weave and soft folds; {top}: a red cross in its middle; else its hanging hem."""
+    rnd = random.Random(4400 if top else 4401)
+    img = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            fold = 2 + (1 if (x + y // 3) % 7 == 0 else 0) - (1 if (x * 3 + y) % 11 == 0 else 0)
+            if (x + y) % 2 == 0 and rnd.random() < .3:
+                fold -= 1
+            img.putpixel((x, y), LINEN[max(0, min(3, fold))] + (255,))
+    if top:
+        for y in range(3, 13):
+            for x in range(6, 10):
+                img.putpixel((x, y), CROSS[1 if x < 9 else 0] + (255,))
+        for y in range(6, 10):
+            for x in range(3, 13):
+                img.putpixel((x, y), CROSS[1 if y < 9 else 0] + (255,))
+        for x in range(6, 9):
+            img.putpixel((x, 3), CROSS[2] + (255,))
+        for x in range(3, 6):
+            img.putpixel((x, 6), CROSS[2] + (255,))
+    else:
+        for x in range(16):
+            img.putpixel((x, 13), LINEN[0] + (255,))
+            img.putpixel((x, 14), LINEN[3] + (255,))
+            img.putpixel((x, 15), LINEN[1] + (255,))
+    return img
+
+
+def bandage_texture():
+    """16 x 16: a roll of bandage: cream turns wound round, their edges shaded, the loose end hanging."""
+    img = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            ring = int(((x - 7.5) ** 2 + (y - 7.5) ** 2) ** .5)
+            c = LINEN[3] if ring % 3 == 0 else LINEN[2] if ring % 3 == 1 else LINEN[1]
+            img.putpixel((x, y), c + (255,))
+    return img
+
+
+def salve_texture():
+    """16 x 16: a glazed earthenware jar of salve: its body dark brown, a cream glaze band, the cork lid."""
+    img = Image.new("RGBA", (16, 16))
+    body = [(84, 52, 34), (112, 72, 46), (140, 94, 60)]
+    for y in range(16):
+        for x in range(16):
+            c = body[2] if x < 4 else body[1] if x < 12 else body[0]
+            if 5 <= y <= 7:
+                c = (226, 214, 180) if x < 12 else (196, 184, 150)
+            if y < 3:
+                c = (176, 140, 90) if x < 10 else (150, 116, 72)
+            img.putpixel((x, y), c + (255,))
+    return img
+
+
+def phial_texture():
+    """16 x 16: a phial of green tincture: clear glass at the neck, the liquid below, a highlight."""
+    img = Image.new("RGBA", (16, 16))
+    tincture = [(40, 110, 70), (70, 160, 100), (130, 210, 150)]
+    for y in range(16):
+        for x in range(16):
+            if y < 5:
+                c = GLASS[0] if x > 11 else GLASS[1]
+            else:
+                c = tincture[2] if y == 5 else tincture[1] if x < 11 else tincture[0]
+            img.putpixel((x, y), c + (255,))
+    for y in range(1, 15):
+        img.putpixel((3, y), GLASS[2] + (255,))
+    return img
+
+
+def medical_table_model():
+    def el(frm, to, faces, rot=None):
+        out = {"from": frm, "to": to, "faces": {side: {"texture": tex, **({"uv": uv} if uv else {})} for side, (tex, uv) in faces.items()}}
+        if rot:
+            out["rotation"] = rot
+        return out
+
+    def all6(tex, uv=None, top=None):
+        f = {side: (tex, uv) for side in ("north", "south", "east", "west", "down", "up")}
+        if top:
+            f["up"] = (top, None)
+        return f
+
+    legs = [el([x, 0, z], [x + 2, 9.5, z + 2], all6("#oak", [0, 0, 2, 9.5])) for x, z in ((1, 1), (13, 1), (1, 13), (13, 13))]
+    return {
+        "parent": "block/block",
+        "render_type": "minecraft:cutout",
+        "textures": {"particle": "arcanes_oublies:block/medical_oak", "oak": "arcanes_oublies:block/medical_oak",
+                     "cloth": "arcanes_oublies:block/medical_cloth", "hem": "arcanes_oublies:block/medical_cloth_side",
+                     "bandage": "arcanes_oublies:block/medical_bandage", "salve": "arcanes_oublies:block/medical_salve",
+                     "phial": "arcanes_oublies:block/medical_phial"},
+        "elements": legs + [
+            # A stretcher between the legs, the top board
+            el([2, 3, 1.5], [14, 4.5, 2.5], all6("#oak", [0, 0, 12, 1.5])),
+            el([2, 3, 13.5], [14, 4.5, 14.5], all6("#oak", [0, 0, 12, 1.5])),
+            el([0, 9.5, 0], [16, 11, 16], all6("#oak")),
+            # The linen over it, hanging down the front and back
+            el([0.5, 11, 0.5], [15.5, 11.5, 15.5], all6("#cloth", top="#cloth")),
+            el([0.5, 7, 0], [15.5, 11.5, 0.5], all6("#hem", [0, 7, 15, 11.5])),
+            el([0.5, 7, 15.5], [15.5, 11.5, 16], all6("#hem", [0, 7, 15, 11.5])),
+            # A roll of bandage, a jar of salve, a phial with its cork
+            el([2, 11.5, 9.5], [6.5, 14.5, 12.5], {"north": ("#bandage", None), "south": ("#bandage", None), "east": ("#hem", [0, 4, 3, 7]),
+                                                     "west": ("#hem", [0, 4, 3, 7]), "up": ("#hem", [0, 0, 4.5, 3]), "down": ("#hem", None)}),
+            el([10, 11.5, 2.5], [13, 14.5, 5.5], all6("#salve")),
+            el([10.5, 11.5, 9], [12.5, 15, 11], all6("#phial")),
+            el([11, 15, 9.5], [12, 16, 10.5], all6("#oak", [0, 0, 1, 1])),
+        ],
+        "display": {
+            "gui": {"rotation": [30, 225, 0], "scale": [0.625, 0.625, 0.625]},
+            "ground": {"translation": [0, 3, 0], "scale": [0.25, 0.25, 0.25]},
+            "fixed": {"scale": [0.5, 0.5, 0.5]},
+            "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.375, 0.375, 0.375]},
+            "firstperson_righthand": {"rotation": [0, 45, 0], "scale": [0.4, 0.4, 0.4]},
+            "firstperson_lefthand": {"rotation": [0, 225, 0], "scale": [0.4, 0.4, 0.4]},
+        },
+    }
+
+
 def main():
     import metier_art
     metier_art.main()
@@ -182,6 +326,25 @@ def main():
         "key": {"C": {"item": "minecraft:copper_ingot"}, "G": {"item": "minecraft:glass_bottle"}, "B": {"item": "minecraft:bricks"},
                 "F": {"item": "minecraft:furnace"}},
         "result": {"id": "arcanes_oublies:alembic", "count": 1}})
+    g.save(oak_texture(), "textures/block/medical_oak.png")
+    g.save(cloth_texture(), "textures/block/medical_cloth.png")
+    g.save(cloth_texture(top=False), "textures/block/medical_cloth_side.png")
+    g.save(bandage_texture(), "textures/block/medical_bandage.png")
+    g.save(salve_texture(), "textures/block/medical_salve.png")
+    g.save(phial_texture(), "textures/block/medical_phial.png")
+    g.write_json("models/block/medical_table.json", medical_table_model())
+    g.write_json("models/item/medical_table.json", {"parent": "arcanes_oublies:block/medical_table"})
+    g.write_json("blockstates/medical_table.json", {"variants": {
+        f"facing={f}": {"model": "arcanes_oublies:block/medical_table", "y": y} for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}})
+    write_data("loot_table/blocks/medical_table.json", {"type": "minecraft:block", "pools": [{
+        "rolls": 1, "entries": [{"type": "minecraft:item", "name": "arcanes_oublies:medical_table"}],
+        "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+    write_data("recipe/medical_table.json", {
+        "type": "minecraft:crafting_shaped", "category": "misc",
+        "pattern": ["WRW", "PPP", "S S"],
+        "key": {"W": {"item": "minecraft:white_wool"}, "R": {"item": "minecraft:red_dye"}, "P": {"tag": "minecraft:planks"},
+                "S": {"item": "minecraft:stick"}},
+        "result": {"id": "arcanes_oublies:medical_table", "count": 1}})
 
 
 if __name__ == "__main__":

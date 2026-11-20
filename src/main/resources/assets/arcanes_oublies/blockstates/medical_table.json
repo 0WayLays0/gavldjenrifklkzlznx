@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "arcanes_oublies:block/medical_table",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "arcanes_oublies:block/medical_table",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "arcanes_oublies:block/medical_table",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "arcanes_oublies:block/medical_table",
+      "y": 270
+    }
+  }
+}

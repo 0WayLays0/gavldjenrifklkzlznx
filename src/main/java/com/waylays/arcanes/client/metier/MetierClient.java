@@ -25,6 +25,8 @@ public final class MetierClient {
             case FORGE -> new ForgeGame(start, difficulty, seed, subject, tool, inputs, heading, sub, perfectAt, criticalBelow);
             case DISTILL -> new DistillGame(start, difficulty, seed, subject, tool, inputs, heading, sub, perfectAt, criticalBelow);
             case GRIND -> new GrindGame(start, difficulty, seed, subject, tool, inputs, heading, sub, perfectAt, criticalBelow);
+            case CARPENTRY -> new CarpentryGame(start, difficulty, seed, subject, tool, inputs, heading, sub, perfectAt, criticalBelow);
+            case MEDICINE -> new MedicineGame(start, difficulty, seed, subject, tool, inputs, heading, sub, perfectAt, criticalBelow);
         };
     }
 
@@ -59,6 +61,11 @@ public final class MetierClient {
     }
 
     public static void station(MetierNet.Station s) {
+        // The same station again (organised by a game master): refreshed in place, the folder open kept
+        if (Minecraft.getInstance().screen instanceof StationScreen open && open.sameStation(s)) {
+            open.update(s);
+            return;
+        }
         Minecraft.getInstance().setScreen(new StationScreen(s));
     }
 

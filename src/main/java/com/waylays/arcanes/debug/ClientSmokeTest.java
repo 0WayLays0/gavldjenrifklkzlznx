@@ -906,7 +906,8 @@ public final class ClientSmokeTest {
                     // The other minigames, as trials: steps 7, 8 (each opened, played a moment, photographed)
                     com.waylays.arcanes.metier.MetierDefs.Game[] others = {com.waylays.arcanes.metier.MetierDefs.Game.HARVEST,
                             com.waylays.arcanes.metier.MetierDefs.Game.ASSEMBLY, com.waylays.arcanes.metier.MetierDefs.Game.FORGE,
-                            com.waylays.arcanes.metier.MetierDefs.Game.DISTILL};
+                            com.waylays.arcanes.metier.MetierDefs.Game.DISTILL, com.waylays.arcanes.metier.MetierDefs.Game.CARPENTRY,
+                            com.waylays.arcanes.metier.MetierDefs.Game.MEDICINE};
                     int index = metierTrial;
                     if (index >= others.length) {
                         // Last, a station's recipe list (built here: no station block is right-clicked)
@@ -918,11 +919,11 @@ public final class ClientSmokeTest {
                                     new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CRAFTING_TABLE), List.of(
                                     new com.waylays.arcanes.metier.MetierNet.RecipeView("Lanterne", in, List.of(true, false),
                                             new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN),
-                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN, 2), 1, 0),
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN, 2), 1, 0, "Éclairage"),
                                     new com.waylays.arcanes.metier.MetierNet.RecipeView("Coffre", List.of(new net.minecraft.world.item.ItemStack(
                                             net.minecraft.world.item.Items.OAK_PLANKS, 8)), List.of(true),
                                             new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST),
-                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST), .8, 0)), 0)));
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST), .8, 0)), 0, List.of("Éclairage"), true)));
                             metierTick = ticks;
                             metierTrial++;
                             return false;
@@ -930,8 +931,18 @@ public final class ClientSmokeTest {
                         if (ticks - metierTick < 20) {
                             return false;
                         }
-                        if (shots) {
+                        if (shots && index == others.length + 1) {
                             screenshot(mc, "metier_station");
+                        }
+                        if (mc.screen instanceof com.waylays.arcanes.client.metier.StationScreen station && index == others.length + 1) {
+                            // The folder opened: the lantern inside it
+                            station.showFolder("Éclairage");
+                            metierTrial++;
+                            metierTick = ticks;
+                            return false;
+                        }
+                        if (shots) {
+                            screenshot(mc, "metier_station_folder");
                         }
                         mc.setScreen(null);
                         metierStep = 10;
@@ -941,7 +952,9 @@ public final class ClientSmokeTest {
                         net.minecraft.world.item.ItemStack[] subjects = {new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TORCHFLOWER),
                                 new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN),
                                 new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD),
-                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.POTION)};
+                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.POTION),
+                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_DOOR),
+                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.GOLDEN_APPLE)};
                         List<net.minecraft.world.item.ItemStack> inputs = List.of(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_NUGGET, 8),
                                 new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TORCH));
                         mc.setScreen(com.waylays.arcanes.client.metier.MetierClient.create(others[index], null, 1, 42L + index, subjects[index],
