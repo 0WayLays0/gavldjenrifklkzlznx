@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Trades' minigame art: three of the scenes painted behind the minigames (a workbench, a smithy, an alchemist's bench;
-the mine, the meadow, the carpenter's workshop and the infirmary are in metier_scenes.py), the pieces drawn over them (the boulder and its ore veins, the anvil, the
+the rock face, the meadow, the carpenter's workshop and the infirmary are in metier_scenes.py), the pieces drawn over them (the boulder and its ore veins, the anvil, the
 bellows, the flask, the crafting slot) and the soft sprites the effects are made of (glow, disc, ring, flame, star).
 
 Called by metier_assets.py. Scenes are 784 x 360 (drawn at half size in game, so they stay sharp). Original art,
@@ -389,7 +389,7 @@ def main():
     g.save(flame(), OUT + "flame.png")
     g.save(star(), OUT + "star.png")
     import metier_scenes
-    g.save(metier_scenes.mine(), OUT + "bg_mining.png")
+    g.save(metier_scenes.rock_face(), OUT + "bg_mining.png")
     rock, ore = boulder()
     g.save(rock, OUT + "boulder.png")
     g.save(ore, OUT + "boulder_ore.png")

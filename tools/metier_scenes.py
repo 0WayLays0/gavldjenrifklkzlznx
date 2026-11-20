@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Scenes painted behind the trades' minigames, 784 x 360 each (drawn at about half size in game): a mine gallery
-running into the dark under a lantern, a meadow at golden hour over its soil in cross-section, a carpenter's workshop in
+"""Scenes painted behind the trades' minigames, 784 x 360 each (drawn at about half size in game): a face of bare rock
+(wherever the ore is), a meadow at golden hour over its soil in cross-section, a carpenter's workshop in
 the sun and an infirmary. (The workbench, smithy and laboratory are painted in metier_art.py.)
 
 Called by metier_art.py. Each scene keeps clear the places its minigame draws on (see the minigames' constants, in
@@ -89,114 +89,70 @@ def finish(rgb, vig=.5, seed=9):
     return image(grain(vignette(rgb, vig), 5, seed))
 
 
-# ---------------------------------------------------------------- the mine
+# ---------------------------------------------------------------- the rock face
 
-def mine():
+def rock_face():
+    """A face of bare rock seen up close, wherever the ore is: in a cave, a cliff or a quarry. Layers of stone, their
+    ledges catching the light, cracks, flecks of ore, a little moss, loose stones at its foot."""
     xs, ys = grid()
-    vx, vy = 392, 176
-    # Rock walls: strata, facets and cracks, deeper and colder toward the gallery's end
-    f1, f2 = worley(W, H, 110, 601)
-    facets = emboss(np.clip(f1, 0, 1), .9)
-    strata = .5 + .5 * np.sin((ys + 26 * fbm(W, H, 3, 3, 602)) / 17)
-    t = fbm(W, H, 4, 6, 603) * .55 + facets * .14 + strata * .14 + noise(W, H, (150, 70), 604) * .12
-    rgb = ramp(t, [(0, (26, 22, 24)), (.35, (58, 50, 48)), (.6, (92, 80, 70)), (.85, (128, 112, 96)), (1, (150, 134, 116))])
-    bands = smooth(.55, .8, strata) * smooth(.4, .7, fbm(W, H, 2, 3, 605))
-    rgb = mix(rgb, (120, 84, 56), bands * .25)
-    cracks = smooth(.03, 0, f2 - f1) * smooth(.3, .6, fbm(W, H, 3, 3, 606))
-    rgb = mix(rgb, (14, 12, 12), cracks * .65)
-    # The gallery running away: a dark mouth, frames shrinking into it
-    depth = np.hypot((xs - vx) / 1.35, ys - vy)
-    mouth = smooth(150, 120, depth + 18 * (fbm(W, H, 5, 3, 607) - .5))
-    inner = ramp(np.clip(depth / 140, 0, 1), [(0, (4, 3, 4)), (.5, (14, 11, 12)), (1, (34, 28, 28))])
-    rgb = mix(rgb, inner, mouth)
-    rgb = mix(rgb, (255, 190, 110), glow(vx, vy + 6, 5) * .8)
-    rgb = rgb + np.array([60, 34, 10]) * glow(vx, vy + 4, 22)[..., None] * .4
-
-    def frames(d, s):
-        for k, z in enumerate((.72, .48, .31, .2)):
-            w2, h2 = 150 * z, 128 * z
-            col = int(70 * (1 - k * .22))
-            c = (col, int(col * .66), int(col * .42), 255)
-            th = max(2, 10 * z)
-            for x in (vx - w2, vx + w2 - th):
-                d.rectangle((x * s, (vy - h2) * s, (x + th) * s, (vy + h2 * .95) * s), fill=c)
-            d.rectangle(((vx - w2 - th * .4) * s, (vy - h2) * s, (vx + w2 + th * .4) * s, (vy - h2 + th) * s), fill=c)
-    rgb = over(rgb, rgba_layer(frames))
-    # Rails and sleepers, converging on the end of the gallery
-    def track(d, s):
-        for k in range(12):
-            t = (k + .5) / 12
-            z = t ** 2.2
-            y = vy + 6 + (H - vy) * (1 - z) * 1.02
-            half = 30 + 230 * (1 - z)
-            th = 2 + 9 * (1 - z)
-            col = int(44 + 62 * (1 - z))
-            d.rectangle(((vx - half) * s, (y - th / 2) * s, (vx + half) * s, (y + th / 2) * s), fill=(col, int(col * .7), int(col * .45), 255))
-        for side in (-1, 1):
-            d.line(((vx + side * 14) * s, (vy + 8) * s, (vx + side * 170) * s, (H + 4) * s), fill=(62, 58, 58, 255), width=int(5 * s))
-            d.line(((vx + side * 14 - 1) * s, (vy + 8) * s, (vx + side * 170 - 2) * s, (H + 4) * s), fill=(176, 168, 160, 255), width=int(1.4 * s))
-    rgb = over(rgb, rgba_layer(track))
-    # Ore in the walls: veins of copper and iron, each nugget lit on its top
-    rnd = random.Random(608)
+    # Layers of stone, tilted a little and warped, each its own shade
+    tilt = ys + xs * .08 + 30 * fbm(W, H, 3, 4, 701)
+    layer = np.floor(tilt / 46)
+    tone = (np.sin(layer * 12.9898) * 43758.5453) % 1
+    within = (tilt % 46) / 46
+    f1, f2 = worley(W, H, 46, 702)
+    facets = emboss(np.clip(f1, 0, 1), 1.4)
+    tex = fbm(W, H, 6, 6, 703)
+    t = .25 + tone * .42 + facets * .12 + (tex - .5) * .6
+    rgb = ramp(t, [(0, (62, 58, 60)), (.3, (98, 92, 90)), (.55, (134, 126, 118)), (.8, (170, 160, 146)), (1, (198, 188, 172))])
+    rgb = mix(rgb, (128, 100, 76), smooth(.6, .9, tone) * .22)
+    # Each layer's top edge is a ledge, lit; its underside in shadow
+    ledge = smooth(.1, 0, within) * smooth(.3, .6, fbm(W, H, 5, 3, 704))
+    under = smooth(.86, 1, within) * smooth(.3, .6, fbm(W, H, 5, 3, 704))
+    rgb = rgb * (1 + .28 * ledge[..., None] - .3 * under[..., None])
+    # Cracks running through it
+    cracks = smooth(.012, 0, f2 - f1) * smooth(.5, .7, fbm(W, H, 3, 3, 705))
+    rgb = mix(rgb, (30, 26, 28), cracks * .6)
+    # Moss in the hollows near the top, damp darker streaks below it
+    moss = smooth(.62, .78, fbm(W, H, 5, 4, 706)) * smooth(160, 0, ys) * (under + cracks * .5 + .2)
+    rgb = mix(rgb, (74, 104, 52), np.clip(moss, 0, 1) * .55)
+    damp = smooth(.55, .75, fbm(W, H, 12, 3, 707, stretch=.15)) * smooth(0, H, ys)
+    rgb = mix(rgb, (36, 34, 36), damp * .25)
+    rnd = random.Random(708)
 
     def ore(d, s):
-        for _ in range(60):
-            x, y = rnd.uniform(0, W), rnd.uniform(40, H)
-            if abs(x - vx) < 170 and abs(y - vy) < 135:
+        # Flecks of ore along the cracks and layers, near the edges (the boulder hides the middle)
+        for _ in range(55):
+            x, y = rnd.uniform(0, W), rnd.uniform(0, H)
+            if abs(x - 392) < 230 and abs(y - 188) < 140:
                 continue
-            c = rnd.choice([(236, 132, 66), (236, 132, 66), (214, 186, 150), (40, 36, 38), (110, 230, 180)])
-            if c[1] > 190 and rnd.random() < .7:
-                c = (200, 112, 60)
+            c = rnd.choice([(236, 132, 66), (236, 132, 66), (214, 186, 150), (44, 40, 42), (110, 230, 180)])
             for _ in range(rnd.randint(4, 9)):
                 ox, oy, r = x + rnd.gauss(0, 9), y + rnd.gauss(0, 6), rnd.uniform(2.8, 6.5)
                 a = rnd.uniform(0, math.tau)
                 pts = [((ox + r * math.cos(a + k * 2.1 + rnd.uniform(-.4, .4))) * s, (oy + r * .8 * math.sin(a + k * 2.1)) * s) for k in range(3)]
                 d.polygon(pts, fill=tuple(int(v * .6) for v in c) + (255,))
-                lit_pts = [pts[0], pts[1], ((ox) * s, (oy) * s)]
-                d.polygon(lit_pts, fill=c + (255,))
+                d.polygon([pts[0], pts[1], (ox * s, oy * s)], fill=c + (255,))
                 if rnd.random() < .35:
                     d.point(pts[0], fill=(255, 240, 210, 255))
+        # Loose stones and grit at the foot of the face
+        for _ in range(90):
+            x, y = rnd.uniform(0, W), rnd.uniform(H - 46, H + 6)
+            r = rnd.uniform(2, 9)
+            c = rnd.randint(80, 140)
+            d.ellipse(((x - r) * s, (y - r * .7) * s, (x + r) * s, (y + r * .7) * s), fill=(c - 36, c - 38, c - 40, 255))
+            d.ellipse(((x - r * .85) * s, (y - r * .7) * s, (x + r * .55) * s, (y + r * .15) * s), fill=(c, c - 4, c - 10, 255))
+            d.ellipse(((x - r * .5) * s, (y - r * .6) * s, (x - r * .1) * s, (y - r * .3) * s), fill=(c + 46, c + 42, c + 36, 255))
+        for _ in range(500):
+            x, y = rnd.uniform(0, W), rnd.uniform(H - 40, H)
+            c = rnd.randint(70, 150)
+            d.point((x * s, y * s), fill=(c, c - 4, c - 8, 220))
     rgb = over(rgb, rgba_layer(ore))
-    # Timbering in front: two posts, the cap beam, braces at the corners
-    for x0 in (14, W - 50):
-        post = wood(36, H, 609 + x0, along_x=False)
-        shade = np.linspace(.7, 1.15, 36)[None, :, None] if x0 < W / 2 else np.linspace(1.1, .7, 36)[None, :, None]
-        rgb[:, x0:x0 + 36] = post * shade
-        rgb[:, max(0, x0 - 4):x0] *= .45
-        rgb[:, x0 + 36:x0 + 41] *= .5
-    beam = wood(W, 34, 610)
-    rgb[0:34] = beam * np.linspace(1.15, .72, 34)[:, None, None]
-    rgb[34:40] *= .42
-
-    def braces(d, s):
-        for (x0, x1) in ((50, 120), (W - 50, W - 120)):
-            d.polygon([(x0 * s, 34 * s), (x0 * s, 50 * s), (x1 * s, 34 * s)], fill=(92, 60, 36, 255))
-            d.line((x0 * s, 50 * s, x1 * s, 34 * s), fill=(140, 96, 58, 255), width=int(2 * s))
-        for x in (32, W - 32):
-            for y in (60, 180, 300):
-                d.ellipse(((x - 3) * s, (y - 3) * s, (x + 3) * s, (y + 3) * s), fill=(40, 38, 40, 255))
-                d.ellipse(((x - 2) * s, (y - 2) * s, (x) * s, (y) * s), fill=(150, 146, 140, 255))
-        # The lantern on its chain
-        lx, ly = 108, 98
-        for k in range(8):
-            d.ellipse(((lx - 2) * s, (40 + k * 6) * s, (lx + 2) * s, (45 + k * 6) * s), outline=(70, 64, 60, 255), width=int(1.4 * s))
-        d.rectangle(((lx - 12) * s, (ly - 4) * s, (lx + 12) * s, (ly) * s), fill=(76, 60, 40, 255))
-        d.rectangle(((lx - 10) * s, (ly) * s, (lx + 10) * s, (ly + 26) * s), fill=(255, 214, 140, 255))
-        for bx in (lx - 10, lx - 3, lx + 4):
-            d.rectangle((bx * s, ly * s, (bx + 2) * s, (ly + 26) * s), fill=(70, 56, 38, 255))
-        d.rectangle(((lx - 12) * s, (ly + 26) * s, (lx + 12) * s, (ly + 31) * s), fill=(76, 60, 40, 255))
-    rgb = over(rgb, rgba_layer(braces))
-    # The lantern's warm light on the left, the cold dark further in
-    light = np.clip(glow(108, 110, 170) * 1.1 + glow(108, 110, 40) * .6, 0, 1.4)
-    rgb = lit(rgb, light, .42, (90, 46, 8), .55)
-    rgb = mix(rgb, (255, 236, 190), glow(108, 110, 14) * .7)
-    # Dust in the light
-    rnd2 = np.random.default_rng(611)
-    for _ in range(90):
-        x, y = rnd2.normal(108, 70), rnd2.normal(130, 60)
-        if 0 <= x < W and 0 <= y < H:
-            rgb = rgb + np.array([255, 220, 160]) * (glow(x, y, rnd2.uniform(.6, 1.4)) * rnd2.uniform(.1, .35))[..., None]
-    return finish(rgb, .65, 612)
+    rgb = mix(rgb, (30, 26, 26), smooth(H - 60, H - 30, ys) * .25)
+    # Soft light from the top left, the face falling into shade toward the bottom right
+    light = np.clip(glow(150, 40, 420) * 1.1, 0, 1.1)
+    rgb = lit(rgb, light, .62, (40, 32, 18), .2)
+    return finish(rgb, .45, 709)
 
 
 # ---------------------------------------------------------------- the meadow
