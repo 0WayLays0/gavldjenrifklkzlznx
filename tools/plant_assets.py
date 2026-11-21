@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw, ImageFilter
 
 import codex_kit as ck
 import gen_assets as g
+from boss_materials import fbm, image, mix, ramp, smooth, worley
 from water_assets import _tnoise
 
 GREEN = (90, 207, 72)
@@ -27,67 +28,82 @@ NIGHT = (8, 18, 8)
 BG = (24, 52, 26)
 
 
+def _norm(a):
+    return (a - a.min()) / max(1e-6, a.max() - a.min())
+
+
 def leaf_texture():
-    """64 x 64: a leaf, white-green (tinted in game), its midrib and veins, pointed at the top, its stalk at the bottom."""
-    n = 256
-    img = Image.new("RGBA", (n, n), (0, 0, 0, 0))
+    """128 x 128: a leaf, pale (tinted in game): lighter along its midrib and veins, darker toward its serrated edge,
+    a waxy sheen down one side, pointed at the top, its stalk at the bottom."""
+    n = 512
+    ys, xs = np.mgrid[0:n, 0:n].astype(np.float32) / n
+    t = 1 - (ys - .02) / .94
+    width = np.clip(np.sin(np.pi * np.clip(t, 0, 1) ** 1.3), 0, 1) ** .8 * .3
+    serr = 1 + .02 * np.abs(np.sin(t * 70)) * (t < .95)
+    dx = np.abs(xs - .5) / np.maximum(width * serr, 1e-3)
+    inside = (dx < 1) & (t > 0) & (t < 1)
+    # Veins: the midrib, and side veins sweeping up from it
+    mid = np.exp(-(np.abs(xs - .5) / .008) ** 2)
+    side = np.abs(xs - .5)
+    vein_phase = (t - side * 1.3) * 9
+    veins = np.exp(-((vein_phase - np.round(vein_phase)) / .05) ** 2) * (side > .01) * (dx < .92)
+    shade = .78 + .22 * (1 - dx ** 2)
+    sheen = np.exp(-((xs - .38) / .06) ** 2) * (dx < .9) * .18
+    v = np.clip(shade + mid * .28 + veins * .07 + sheen, 0, 1.2)
+    rgba = np.zeros((n, n, 4), np.float32)
+    rgba[..., 0] = 214 * v
+    rgba[..., 1] = 250 * v
+    rgba[..., 2] = 196 * v
+    rgba[..., 3] = inside * 255
+    img = Image.fromarray(np.clip(rgba, 0, 255).astype(np.uint8), "RGBA")
     d = ImageDraw.Draw(img)
-    pts = []
-    for i in range(41):
-        t = i / 40
-        y = n * (.96 - .9 * t)
-        w = math.sin(math.pi * t) ** .8 * n * .36
-        pts.append((n / 2 + w, y))
-    pts += [(n - x, y) for x, y in reversed(pts)]
-    d.polygon(pts, fill=(235, 255, 225, 255))
-    d.line((n / 2, n * .98, n / 2, n * .08), fill=(190, 225, 170, 255), width=6)
-    for k in range(6):
-        y = n * (.85 - k * .12)
-        for s in (-1, 1):
-            d.line((n / 2, y, n / 2 + s * n * .26, y - n * .1), fill=(200, 235, 185, 255), width=3)
-    return img.resize((64, 64), Image.LANCZOS)
+    d.line((n / 2, n * .96, n / 2, n * 1.0), fill=(190, 230, 170, 255), width=10)
+    return img.filter(ImageFilter.GaussianBlur(.8)).resize((128, 128), Image.LANCZOS)
 
 
 def petal_texture():
-    """64 x 64: a petal, white with a blush toward its base (tinted in game), rounded at the tip."""
-    n = 256
-    img = Image.new("RGBA", (n, n), (0, 0, 0, 0))
+    """128 x 128: a petal, white blushing toward its base (tinted in game), fine veins fanning out, its tip rounded with a
+    little notch, its edge a touch see-through."""
+    n = 512
     ys, xs = np.mgrid[0:n, 0:n].astype(np.float32) / n
     t = 1 - ys
-    w = np.clip(np.sin(np.pi * np.clip(t, 0, 1)), 0, 1) ** .6 * .42 + .02
-    inside = np.abs(xs - .5) < w * (t > .02)
-    shade = .75 + .25 * t
+    w = np.clip(np.sin(np.pi * np.clip(t, 0, 1) ** .8), 0, 1) ** .5 * .44 + .005
+    notch = 1 - .08 * np.exp(-((xs - .5) / .03) ** 2) * (t > .9)
+    dx = np.abs(xs - .5) / w
+    inside = (dx < 1) & (t > .02) & (t < notch)
+    fan = np.arctan2(xs - .5, t + .1)
+    veins = np.exp(-((np.sin(fan * 22)) / .25) ** 2) * .035 * (t < .85)
+    v = .86 + .14 * t - veins
     rgba = np.zeros((n, n, 4), np.float32)
-    rgba[..., 0] = 255
-    rgba[..., 1] = 255 * shade
-    rgba[..., 2] = 255 * (.85 + .15 * t)
-    rgba[..., 3] = inside * 255
-    img = Image.fromarray(rgba.astype(np.uint8), "RGBA").filter(ImageFilter.GaussianBlur(1.5))
-    return img.resize((64, 64), Image.LANCZOS)
+    rgba[..., 0] = 255 * v
+    rgba[..., 1] = 255 * (v - .12 * (1 - t))
+    rgba[..., 2] = 255 * (v - .02)
+    rgba[..., 3] = inside * (255 - 70 * smooth(.85, 1, dx))
+    img = Image.fromarray(np.clip(rgba, 0, 255).astype(np.uint8), "RGBA")
+    return img.filter(ImageFilter.GaussianBlur(1)).resize((128, 128), Image.LANCZOS)
 
 
 def stem_texture():
-    """32 x 32, tiling: the green fibre of a stem, streaked along its length."""
-    n = 32
-    t = _tnoise(n, n, (2, 8), 6101) * .6 + _tnoise(n, n, (4, 16), 6102) * .4
-    rgb = np.zeros((n, n, 3), np.float32)
-    for i, (a, b) in enumerate(zip(DARK_GREEN, LEAF)):
-        rgb[..., i] = a + (b - a) * t
-    return Image.fromarray(np.concatenate([rgb, np.full((n, n, 1), 255, np.float32)], 2).astype(np.uint8), "RGBA")
+    """64 x 64, tiling: the green fibre of a stem, streaked along its length, lighter ridges and darker grooves."""
+    n = 64
+    fib = _norm(fbm(n, n, 2, 5, 6101, stretch=.12))
+    t = .6 * fib + .4 * _norm(fbm(n, n, 6, 3, 6102))
+    rgb = ramp(t, [(0, (30, 74, 26)), (.5, (70, 140, 52)), (1, (140, 200, 96))])
+    return image(rgb)
 
 
 def flesh_texture():
-    """64 x 64: the inside of the carnivorous flower's mouth: wet red flesh with darker veins and pale glistening."""
-    n = 64
-    t = _tnoise(n, n, (6, 6), 6201)
-    cell = _tnoise(n, n, (4, 4), 6202)
-    vein = np.exp(-((cell - .5) / .05) ** 2)
-    rgb = np.zeros((n, n, 3), np.float32)
-    for i, (a, b) in enumerate(zip((120, 16, 30), (230, 70, 90))):
-        rgb[..., i] = a + (b - a) * t
-    rgb *= (1 - .45 * vein)[..., None]
-    rgb = np.clip(rgb + (t > .85)[..., None] * 50, 0, 255)
-    return Image.fromarray(np.concatenate([rgb, np.full((n, n, 1), 255, np.float32)], 2).astype(np.uint8), "RGBA")
+    """128 x 128, tiling: the inside of the carnivorous flower's mouth: wet red flesh in folds, a net of darker veins,
+    glistening where the light catches it."""
+    n = 128
+    fold = _norm(fbm(n, n, 4, 5, 6201))
+    f1, f2 = worley(n, n, 16, 6202)
+    vein = smooth(.06, 0, f2 - f1) * smooth(.3, .6, _norm(fbm(n, n, 3, 3, 6204)))
+    rgb = ramp(fold, [(0, (90, 8, 22)), (.5, (176, 34, 52)), (1, (236, 92, 104))])
+    rgb = mix(rgb, (96, 10, 26), vein * .45)
+    wet = smooth(.75, .9, _norm(fbm(n, n, 8, 3, 6203))) * fold
+    rgb = mix(rgb, (255, 220, 224), wet * .5)
+    return image(rgb)
 
 
 def _icon(draw, bg=BG):

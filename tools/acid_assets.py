@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw
 
 import codex_kit as ck
 import gen_assets as g
+from boss_materials import fbm, image, mix, ramp, smooth, worley
 from water_assets import _tnoise
 
 ACID = (180, 240, 58)
@@ -25,47 +26,52 @@ NIGHT = (10, 16, 6)
 BG = (30, 42, 18)
 
 
+def _norm(a):
+    return (a - a.min()) / max(1e-6, a.max() - a.min())
+
+
 def acid_texture():
-    """64 x 64, tiling: acid, pale (tinted in game): a swirling liquid, brighter where it catches the light, with
-    bubbles of every size in it."""
-    n = 64
-    t = _tnoise(n, n, (4, 4), 7101) * .6 + _tnoise(n, n, (8, 8), 7102) * .4
-    swirl = np.sin((t * 6 + _tnoise(n, n, (2, 2), 7103) * 4) * math.pi) * .5 + .5
-    rgb = np.zeros((n, n, 3), np.float32)
-    lo, hi = (120, 200, 60), (235, 255, 200)
-    for i in range(3):
-        rgb[..., i] = lo[i] + (hi[i] - lo[i]) * (.55 * t + .45 * swirl)
+    """256 x 256, tiling: acid, pale (tinted in game): a glossy liquid swirling, caustic lights rippling across it, deeper
+    pools darker, bubbles of every size rising, each with its rim and a glint."""
+    n = 256
+    swirl = _norm(fbm(n, n, 3, 6, 7101))
+    warp = _norm(fbm(n, n, 2, 4, 7102))
+    f1, f2 = worley(n, n, 34, 7103)
+    caustic = np.exp(-((f2 - f1) / .05) ** 2)
+    t = .55 * swirl + .25 * warp
+    rgb = ramp(t, [(0, (110, 176, 60)), (.5, (176, 226, 120)), (1, (226, 250, 196))])
+    rgb = mix(rgb, (250, 255, 230), caustic * .3 * smooth(.3, .7, _norm(fbm(n, n, 3, 3, 7105))))
+    img = image(rgb)
+    d = ImageDraw.Draw(img)
     rng = np.random.default_rng(7104)
-    ys, xs = np.mgrid[0:n, 0:n].astype(np.float32)
-    for _ in range(26):
-        cx, cy, r = rng.uniform(0, n), rng.uniform(0, n), rng.uniform(1.2, 4.5)
-        dx = np.minimum(np.abs(xs - cx), n - np.abs(xs - cx))
-        dy = np.minimum(np.abs(ys - cy), n - np.abs(ys - cy))
-        d = np.sqrt(dx * dx + dy * dy) / r
-        rim = np.exp(-((d - 1) / .18) ** 2)
-        rgb += rim[..., None] * 60
-        rgb += (np.exp(-((dx + r * .35) ** 2 + (dy + r * .35) ** 2) / (r * .25) ** 2))[..., None] * 90
-    rgb = np.clip(rgb, 0, 255)
-    return Image.fromarray(np.concatenate([rgb, np.full((n, n, 1), 255, np.float32)], 2).astype(np.uint8), "RGBA")
+    for _ in range(46):
+        x, y = rng.uniform(0, n, 2)
+        r = rng.uniform(2, 11) if rng.random() < .8 else rng.uniform(12, 18)
+        for ox in (-n, 0, n):
+            for oy in (-n, 0, n):
+                cx, cy = x + ox, y + oy
+                d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(200, 240, 150, 255), outline=(250, 255, 236, 255), width=max(1, int(r / 5)))
+                d.ellipse((cx - r * .55, cy - r * .6, cx - r * .1, cy - r * .2), fill=(255, 255, 255, 255))
+                d.arc((cx - r * .8, cy - r * .8, cx + r * .8, cy + r * .8), 20, 110, fill=(120, 180, 70, 255), width=max(1, int(r / 6)))
+    return img
 
 
 def froth_texture():
-    """64 x 64, tiling: froth, white bubbles crowded together, thinning to clear between them."""
-    n = 64
-    img = np.zeros((n, n, 4), np.float32)
+    """128 x 128, tiling: froth: white bubbles crowded together, large and small, each a thin rim with a glint, clear
+    between them."""
+    n = 128
+    img = Image.new("RGBA", (n * 2, n * 2), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
     rng = np.random.default_rng(7201)
-    ys, xs = np.mgrid[0:n, 0:n].astype(np.float32)
-    for _ in range(70):
-        cx, cy, r = rng.uniform(0, n), rng.uniform(0, n), rng.uniform(1.5, 5)
-        dx = np.minimum(np.abs(xs - cx), n - np.abs(xs - cx))
-        dy = np.minimum(np.abs(ys - cy), n - np.abs(ys - cy))
-        d = np.sqrt(dx * dx + dy * dy) / r
-        a = np.clip(1 - d, 0, 1) ** .4 * .55 + np.exp(-((d - .9) / .15) ** 2) * .6
-        img[..., 3] = np.maximum(img[..., 3], np.clip(a, 0, 1) * 255)
-    img[..., 0] = 250
-    img[..., 1] = 255
-    img[..., 2] = 225
-    return Image.fromarray(img.astype(np.uint8), "RGBA")
+    for _ in range(140):
+        x, y = rng.uniform(0, n * 2, 2)
+        r = rng.uniform(3, 14)
+        for ox in (-n * 2, 0, n * 2):
+            for oy in (-n * 2, 0, n * 2):
+                cx, cy = x + ox, y + oy
+                d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(250, 255, 236, 70), outline=(250, 255, 236, 235), width=max(1, int(r / 4)))
+                d.ellipse((cx - r * .55, cy - r * .6, cx - r * .15, cy - r * .2), fill=(255, 255, 255, 255))
+    return img.resize((n, n), Image.LANCZOS)
 
 
 def _icon(draw, bg=BG):

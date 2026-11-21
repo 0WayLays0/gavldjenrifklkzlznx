@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw, ImageFilter
 
 import codex_kit as ck
 import gen_assets as g
+from boss_materials import fbm, image, mix, ramp, smooth, worley
 from water_assets import _tnoise
 
 WHITE = (244, 250, 255)
@@ -23,65 +24,88 @@ NIGHT = (8, 14, 26)
 BG = (26, 44, 72)
 
 
+def _norm(a):
+    return (a - a.min()) / max(1e-6, a.max() - a.min())
+
+
 def snow_texture():
-    """64 x 64: packed snow, white with soft blue hollows and a few glints (it wraps a snowball)."""
-    n = 64
-    t = _tnoise(n, n, (8, 8), 4101) * .6 + _tnoise(n, n, (16, 16), 4102) * .4
-    img = np.zeros((n, n, 4), np.float32)
-    for i, c in enumerate(WHITE):
-        img[..., i] = c * (.82 + .18 * t)
-    img[..., 2] = np.minimum(255, img[..., 2] + 10 * (1 - t))
-    img[..., 3] = 255
-    out = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGBA")
+    """256 x 256, tiling: packed snow: soft drifts, cool blue hollows, crystals glinting here and there."""
+    n = 256
+    drift = _norm(fbm(n, n, 3, 6, 4101))
+    grain = _norm(fbm(n, n, 24, 3, 4102))
+    t = .65 * drift + .35 * grain
+    rgb = ramp(t, [(0, (170, 196, 230)), (.35, (208, 226, 246)), (.7, (238, 246, 255)), (1, (255, 255, 255))])
     rng = np.random.default_rng(4103)
+    img = image(rgb)
+    d = ImageDraw.Draw(img)
+    for _ in range(260):
+        x, y = rng.uniform(0, n, 2)
+        r = rng.uniform(.4, 1.3)
+        d.ellipse((x - r, y - r, x + r, y + r), fill=(255, 255, 255, 255))
     for _ in range(40):
-        x, y = rng.integers(0, n, 2)
-        out.putpixel((int(x), int(y)), (255, 255, 255, 255))
-    return out
+        x, y = rng.uniform(0, n, 2)
+        d.line((x - 2, y, x + 2, y), fill=(220, 240, 255, 255))
+        d.line((x, y - 2, x, y + 2), fill=(220, 240, 255, 255))
+    return img
 
 
 def ice_texture():
-    """64 x 64: clear ice, pale blue and see-through, white cracks and frost across it."""
-    n = 64
-    t = _tnoise(n, n, (6, 6), 4201)
-    img = np.zeros((n, n, 4), np.float32)
-    for i, c in enumerate((200, 232, 255)):
-        img[..., i] = c * (.88 + .12 * t)
-    img[..., 3] = 150 + 70 * t
-    out = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGBA")
-    d = ImageDraw.Draw(out)
-    rng = np.random.default_rng(4202)
-    for _ in range(9):
+    """256 x 256, tiling: clear ice: pale blue, deeper where it is thick, fractures running through it white and
+    glowing at their edges, bubbles caught inside, frost feathering at its surface."""
+    n = 256
+    depth = _norm(fbm(n, n, 3, 5, 4201))
+    rgb = ramp(depth, [(0, (120, 186, 236)), (.5, (176, 222, 250)), (1, (226, 246, 255))])
+    alpha = 150 + 80 * depth
+    f1, f2 = worley(n, n, 14, 4202)
+    fracture = smooth(.03, 0, f2 - f1) * smooth(.35, .6, _norm(fbm(n, n, 3, 3, 4203)))
+    glow = smooth(.12, 0, f2 - f1) * smooth(.35, .6, _norm(fbm(n, n, 3, 3, 4203)))
+    rgb = mix(rgb, (255, 255, 255), fracture * .9)
+    rgb = mix(rgb, (236, 250, 255), glow * .35)
+    alpha = np.clip(alpha + fracture * 90, 0, 255)
+    frost = smooth(.62, .8, _norm(fbm(n, n, 10, 4, 4204)))
+    rgb = mix(rgb, (250, 253, 255), frost * .45)
+    alpha = np.clip(alpha + frost * 40, 0, 255)
+    img = image(rgb, alpha)
+    d = ImageDraw.Draw(img)
+    rng = np.random.default_rng(4205)
+    for _ in range(36):
         x, y = rng.uniform(0, n, 2)
-        pts = [(x, y)]
-        a = rng.uniform(0, math.tau)
-        for _ in range(5):
-            a += rng.uniform(-.6, .6)
-            x, y = x + math.cos(a) * 6, y + math.sin(a) * 6
-            pts.append((x, y))
-        d.line(pts, fill=(255, 255, 255, 235), width=1)
-    return out
+        r = rng.uniform(1.2, 4)
+        d.ellipse((x - r, y - r, x + r, y + r), outline=(255, 255, 255, 200))
+        d.ellipse((x - r * .5, y - r * .6, x - r * .1, y - r * .2), fill=(255, 255, 255, 230))
+    return img
 
 
 def flake_texture():
-    """64 x 64, white (tinted in game): a six-armed snowflake with its branches, in a soft glow."""
-    n = 256
+    """128 x 128, white (tinted in game): a six-armed dendrite snowflake, its arms feathered with branches and side
+    plates, in a soft glow."""
+    n = 512
     img = Image.new("RGBA", (n, n), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     c = n / 2
+    arm = c * .86
     for k in range(6):
         a = k * math.pi / 3
-        x1, y1 = c + math.cos(a) * c * .86, c + math.sin(a) * c * .86
-        d.line((c, c, x1, y1), fill=(255, 255, 255, 255), width=9)
-        for f, length in ((.38, .22), (.62, .17), (.8, .1)):
-            bx, by = c + math.cos(a) * c * .86 * f, c + math.sin(a) * c * .86 * f
-            for s in (-1, 1):
-                b = a + s * math.pi / 3.2
-                d.line((bx, by, bx + math.cos(b) * c * length, by + math.sin(b) * c * length), fill=(255, 255, 255, 255), width=7)
-    d.ellipse((c - 16, c - 16, c + 16, c + 16), fill=(255, 255, 255, 255))
-    halo = img.filter(ImageFilter.GaussianBlur(10))
+        x1, y1 = c + math.cos(a) * arm, c + math.sin(a) * arm
+        d.line((c, c, x1, y1), fill=(255, 255, 255, 255), width=14)
+        for f, length, w in ((.28, .16, 9), (.46, .27, 10), (.64, .21, 9), (.8, .13, 7), (.9, .07, 5)):
+            bx, by = c + math.cos(a) * arm * f, c + math.sin(a) * arm * f
+            for side in (-1, 1):
+                b = a + side * math.pi / 3
+                ex, ey = bx + math.cos(b) * c * length, by + math.sin(b) * c * length
+                d.line((bx, by, ex, ey), fill=(255, 255, 255, 255), width=w)
+                # Little barbs on the branches
+                for g2 in (.45, .75):
+                    px, py = bx + (ex - bx) * g2, by + (ey - by) * g2
+                    d.line((px, py, px + math.cos(a) * c * length * .3, py + math.sin(a) * c * length * .3), fill=(255, 255, 255, 255), width=4)
+        # A hexagonal plate at the tip
+        tx, ty = c + math.cos(a) * arm, c + math.sin(a) * arm
+        d.regular_polygon((tx, ty, 13), 6, rotation=math.degrees(a), fill=(255, 255, 255, 255))
+    d.regular_polygon((c, c, 34), 6, fill=(255, 255, 255, 255))
+    d.regular_polygon((c, c, 20), 6, fill=(220, 235, 255, 255))
+    halo = img.filter(ImageFilter.GaussianBlur(18))
     out = Image.alpha_composite(halo, img)
-    return out.resize((64, 64), Image.LANCZOS)
+    return out.resize((128, 128), Image.LANCZOS)
 
 
 def _icon(draw, bg=BG):

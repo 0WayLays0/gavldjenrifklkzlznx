@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw
 
 import codex_kit as ck
 import gen_assets as g
+from boss_materials import fbm, image, mix, noise, ramp, smooth, worley
 from water_assets import _tnoise
 
 HOT = (255, 230, 120)
@@ -36,38 +37,64 @@ def _ramp(t, stops):
     return out
 
 
+def _norm(a):
+    return (a - a.min()) / max(1e-6, a.max() - a.min())
+
+
 def lava_texture():
-    """64 x 64, tiling: molten lava, yellow-white where it is hottest, orange, and red-dark skins drifting on it."""
-    n = 64
-    t = _tnoise(n, n, (4, 4), 5101) * .55 + _tnoise(n, n, (8, 8), 5102) * .3 + _tnoise(n, n, (16, 16), 5103) * .15
-    rgb = _ramp(t, [DARK, RED, ORANGE, (255, 180, 60), HOT, (255, 250, 210)])
-    a = np.full((n, n, 1), 255, np.float32)
-    return Image.fromarray(np.concatenate([rgb, a], 2).astype(np.uint8), "RGBA")
+    """256 x 256, tiling: molten lava: rivers of white-yellow heat swirling between drifting skins of darker red, the
+    skins split by bright seams where they part."""
+    n = 256
+    warp = fbm(n, n, 2, 4, 5105)
+    flow = _norm(fbm(n, n, 3, 6, 5101, stretch=2.5))
+    swirl = _norm(fbm(n, n, 4, 5, 5102))
+    heat = _norm(.6 * flow + .4 * swirl + .5 * np.sin((flow + warp) * 9) * .25)
+    f1, f2 = worley(n, n, 18, 5103)
+    skin = smooth(.42, .25, heat) * smooth(.05, .14, f2 - f1)
+    heat = np.clip(heat - .35 * skin + .35 * smooth(.05, 0, f2 - f1) * smooth(.35, .2, heat), 0, 1)
+    rgb = ramp(heat, [(0, (64, 12, 8)), (.22, (140, 26, 10)), (.42, (222, 70, 14)), (.62, (255, 144, 34)), (.8, (255, 210, 86)),
+                      (1, (255, 250, 210))])
+    return image(rgb)
 
 
 def crust_texture():
-    """64 x 64, tiling: black crust of cooled lava, split by cracks still glowing."""
-    n = 64
-    t = _tnoise(n, n, (6, 6), 5201)
-    cell = _tnoise(n, n, (5, 5), 5202)
-    crack = np.exp(-((cell - .5) / .035) ** 2)
-    base = _ramp(t, [(22, 18, 18), ROCK, (70, 58, 52)])
-    hot = _ramp(np.clip(crack * 1.2, 0, 1), [(0, 0, 0), RED, ORANGE, HOT])
-    rgb = np.clip(base * (1 - crack[..., None] * .8) + hot * crack[..., None], 0, 255)
-    a = np.full((n, n, 1), 255, np.float32)
-    return Image.fromarray(np.concatenate([rgb, a], 2).astype(np.uint8), "RGBA")
+    """256 x 256, tiling: crust of cooled lava, black and rough, split into plates by cracks still glowing: white-hot in
+    their depth, orange, then red where the crust closes over them."""
+    n = 256
+    f1, f2 = worley(n, n, 22, 5201)
+    gap = f2 - f1
+    crack = smooth(.07, 0, gap)
+    halo = smooth(.2, 0, gap)
+    rough = _norm(fbm(n, n, 8, 5, 5202))
+    plate = _norm(f1)
+    base = ramp(.25 + rough * .5 - plate * .2, [(0, (14, 11, 11)), (.5, (40, 32, 30)), (1, (82, 68, 60))])
+    # Each plate a little raised in its middle, catching light on its top left
+    lit = np.clip(.5 + (np.roll(plate, 2, 0) - plate) * 6 + (np.roll(plate, 2, 1) - plate) * 4, 0, 1)
+    base = base * (.75 + .5 * lit)[..., None]
+    base = mix(base, (120, 30, 10), halo * .55)
+    hot = ramp(np.clip(crack * 1.15, 0, 1), [(0, (150, 24, 8)), (.4, (240, 90, 16)), (.75, (255, 190, 60)), (1, (255, 248, 200))])
+    rgb = mix(base, hot, np.clip(crack * 1.3, 0, 1))
+    return image(rgb)
 
 
 def obsidian_texture():
-    """64 x 64: obsidian, near black with a violet glassy sheen, a thin vein of lava across it."""
-    n = 64
-    t = _tnoise(n, n, (5, 5), 5301)
-    rgb = _ramp(t, [(10, 6, 16), (30, 18, 48), (70, 44, 110), (120, 90, 170)])
-    img = Image.fromarray(np.concatenate([rgb, np.full((n, n, 1), 255, np.float32)], 2).astype(np.uint8), "RGBA")
+    """256 x 256: obsidian, glassy black with violet depths, curved sheens where it broke, a vein of lava across."""
+    n = 256
+    t = _norm(fbm(n, n, 3, 5, 5301))
+    rgb = ramp(t, [(0, (6, 4, 10)), (.5, (24, 14, 38)), (.8, (58, 34, 92)), (1, (110, 80, 160))])
+    xs, ys = np.mgrid[0:n, 0:n][1].astype(float), np.mgrid[0:n, 0:n][0].astype(float)
+    # Conchoidal sheens: soft curved bands of light, as glass breaks
+    for cx, cy, r, w in ((60, 70, 70, 7), (190, 160, 90, 9), (120, 220, 60, 6)):
+        d = np.hypot(xs - cx, ys - cy)
+        side = .5 + .5 * np.cos(np.arctan2(ys - cy, xs - cx) + 2.2)
+        band = np.exp(-((d - r) / w) ** 2) * side ** 2
+        rgb = mix(rgb, (190, 170, 230), band * .5)
+    img = image(rgb)
     d = ImageDraw.Draw(img)
-    pts = [(0, 40), (14, 34), (26, 38), (40, 26), (52, 30), (63, 20)]
-    d.line(pts, fill=ORANGE + (255,), width=2)
-    d.line(pts, fill=HOT + (255,), width=1)
+    pts = [(-8, 128), (40, 140), (80, 150), (120, 110), (170, 120), (210, 100), (264, 128)]
+    d.line(pts, fill=(140, 30, 10, 255), width=9, joint="curve")
+    d.line(pts, fill=ORANGE + (255,), width=5, joint="curve")
+    d.line(pts, fill=HOT + (255,), width=2, joint="curve")
     return img
 
 
