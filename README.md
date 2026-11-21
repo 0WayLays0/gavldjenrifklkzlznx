@@ -624,6 +624,16 @@ slime, œil d'araignée, œil d'araignée fermenté, pomme de terre empoisonnée
 | **Dissolution** (Dissolve, épique) | Une bulle d'acide se referme sur l'ennemi visé, ronge son armure quelques secondes puis éclate et le fait fondre. |
 | **Marée corrosive** (Corroding Tide, ultime) | Une vague d'acide déferle en anneau autour de vous (12 blocs) : repousse, faiblesse, armure brisée et rongée. |
 
+**Rendu des quatre écoles (1.9.1)** : les sorts de Neige, Lave, Plante et Acide sont redessinés. Les nuages, fumées et
+poudreuses prennent la lumière de l'air au-dessus du sort (avant : celle du sol, d'où des nuages gris sale) ; les rubans
+posés au sol (glace de Glissade givrée, rivière de lave, sillon de la boule) sont enfin visibles d'en haut. Neige : boule
+plus grosse avec sillon et poudreuse, globe en verre avec sapins et givre, couronne de neuf cristaux, blizzard en mur
+tourbillonnant. Lave : jets de lave tubulaires (geyser, caldeira) au lieu de piles de boules, gerbes de gouttes, éclats
+d'obsidienne veinés de feu. Plante : vraie fleur à pétales courbés et cœur doré, pollen doré, vesses-de-loup qui
+gonflent, rayons de soleil avec herbe et fleurs qui poussent, dionée à deux lobes plats frangés de longues dents. Acide :
+jet épais et lumineux, nuage vert qui s'éclaire de l'intérieur, bulle de dissolution translucide, vague plus basse et
+transparente.
+
 ### Téléphones (mod à part)
 
 Les téléphones ne font plus partie d'Arcanes Oubliés : ils sont dans le mod séparé **Téléphones d'Époque & RP**

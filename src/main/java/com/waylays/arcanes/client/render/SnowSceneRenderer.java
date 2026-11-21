@@ -8,7 +8,6 @@ import com.waylays.arcanes.client.render.clockwork.ClockMesh;
 import com.waylays.arcanes.client.render.ritual.RitualMesh;
 import com.waylays.arcanes.client.render.water.WaterMesh;
 import com.waylays.arcanes.entity.snow.SnowScene;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -20,18 +19,21 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import static com.waylays.arcanes.client.render.ElementFx.FULL;
+
 /**
- * Snow Magic's spells, drawn: a packed snowball rolling and growing, puffs of powder in its wake, bursting into a cloud;
- * a snow globe (a brass base, a snowy floor, a dome of glass with snow whirling and falling inside) that shatters into
- * shards; a ribbon of ice laid on the ground, crystals growing along its edges and frost twinkling on it; a crown of ice
- * crystals turning over the caster's head, its icicles streaking to their mark; a wall of blizzard whirling round,
- * flurries racing inside it over a frosted ground, and the frozen bursting into ice.
+ * Snow Magic's spells, drawn: a great snowball rolling and growing, ploughing a furrow, powder flying off it, bursting
+ * into a cloud and chunks; a snow globe (a brass base, a little snowy wood of pines under a dome of glass, frost on the
+ * glass, snow falling) that shatters; a ribbon of ice laid on the ground, clusters of crystals along it, cold mist
+ * drifting over it; a crown of ice crystals turning over the caster's head, snowflakes circling it, its icicles streaking
+ * to their mark; a blizzard whirling round in a white wall, snow driving through it, the frozen bursting into spikes of
+ * ice.
  */
 public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
     public static final ResourceLocation SNOW = ArcanesOublies.id("textures/entity/snow/snow.png");
     public static final ResourceLocation ICE = ArcanesOublies.id("textures/entity/snow/ice.png");
     public static final ResourceLocation FLAKE = ArcanesOublies.id("textures/entity/snow/flake.png");
-    private static final int WHITE = 0xF4FAFF, FROST = 0xCFEFFF, BLUE = 0x8CC8FF, DEEP = 0x4A90D8;
+    private static final int WHITE = 0xF4FAFF, FROST = 0xCFEFFF, BLUE = 0x8CC8FF, DEEP = 0x4A90D8, PINE = 0x2E6A44;
 
     public SnowSceneRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -44,76 +46,93 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 31;
+        int light = ElementFx.light(e, 11);
         switch (e.getKind()) {
-            case ROLL -> roll(e, poseStack, buffer, view, age, partialTicks, seed, packedLight);
-            case GLOBE -> globe(e, poseStack, buffer, view, age, partialTicks, seed, packedLight);
-            case TRAIL -> trail(e, poseStack, buffer, view, age, seed, packedLight);
-            case CROWN -> crown(e, poseStack, buffer, view, age, partialTicks, seed);
-            case WHITEOUT -> whiteout(e, poseStack, buffer, view, age, partialTicks, seed, packedLight);
+            case ROLL -> roll(e, poseStack, buffer, view, age, partialTicks, seed, light);
+            case GLOBE -> globe(e, poseStack, buffer, view, age, partialTicks, seed, light);
+            case TRAIL -> trail(e, poseStack, buffer, view, age, seed, light);
+            case CROWN -> crown(e, poseStack, buffer, view, age, partialTicks, seed, light);
+            case WHITEOUT -> whiteout(e, poseStack, buffer, view, age, partialTicks, seed, light);
         }
         buffer.flush(out);
         super.render(e, entityYaw, partialTicks, poseStack, out, packedLight);
     }
 
-    private static Vector3f v(Vec3 d) {
-        return new Vector3f((float) d.x, (float) d.y, (float) d.z);
-    }
-
-    /** Puffs of powder bursting out from {@code at}, {@code t} (0 to 1) of the way, {@code size} big. */
-    private static void powder(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f at, float size, float t, int count, int seed, int light) {
+    /** A burst of powder: a white cloud swelling out, chunks of snow thrown and falling, flakes glittering. */
+    private static void powder(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f at, float size, float t, int seed, int light) {
         if (t >= 1) {
             return;
         }
-        VertexConsumer cloud = BossMesh.see(buffer, BossMesh.CLOUD);
-        VertexConsumer flakes = BossMesh.light(buffer, FLAKE);
         float out = 1 - (1 - t) * (1 - t);
-        for (int k = 0; k < count; k++) {
-            float a = k * Mth.TWO_PI / count + BossMesh.hash(seed + k) * .6f, up = BossMesh.hash(seed + k * 3);
-            Vector3f p = new Vector3f(Mth.cos(a) * size * 2.2f * out, (up * 1.4f - out * .4f) * size * out, Mth.sin(a) * size * 2.2f * out).add(at);
-            RitualMesh.billboard(cloud, poseStack, view, p, size * (1.1f + 1.4f * t), a + t, -1, BossMesh.argb(WHITE, .75f * (1 - t)), light);
-            RitualMesh.billboard(flakes, poseStack, view, new Vector3f(p).mul(1.2f), .25f, t * 4 + k, -1, BossMesh.glow(FROST, 1 - t), LightTexture.FULL_BRIGHT);
+        VertexConsumer cloud = BossMesh.see(buffer, BossMesh.CLOUD);
+        for (int k = 0; k < 22; k++) {
+            float a = k * Mth.TWO_PI / 22 + BossMesh.hash(seed + k) * .5f, up = BossMesh.hash(seed + k * 3);
+            Vector3f p = new Vector3f(Mth.cos(a) * size * 1.8f * out, (up * 1.5f + .2f) * size * out, Mth.sin(a) * size * 1.8f * out).add(at);
+            RitualMesh.billboard(cloud, poseStack, view, p, size * (1 + 1.6f * t), a + t, -1, BossMesh.argb(WHITE, .9f * (1 - t)), light);
         }
+        // Chunks of packed snow thrown out and falling
+        VertexConsumer snow = BossMesh.see(buffer, SNOW);
+        for (int k = 0; k < 14; k++) {
+            float a = BossMesh.hash(seed + k * 7) * Mth.TWO_PI, s = .5f + .5f * BossMesh.hash(seed + k * 11);
+            Vector3f p = new Vector3f(Mth.cos(a) * size * 2.4f * s * out, size * (2.6f * t - 3.2f * t * t) * (1 + s), Mth.sin(a) * size * 2.4f * s * out).add(at);
+            BossMesh.sphere(snow, poseStack.last(), p, size * (.14f + .1f * s) * (1 - t * .5f), 4, 7, t * 3, 0, 1, BossMesh.argb(0xFFFFFF, 1), light);
+        }
+        ElementFx.burst(poseStack, buffer, view, FLAKE, at, size * 3, size * 2, .3f, 16, t, FROST, 1, seed + 5, true, FULL);
     }
 
     // ---------------------------------------------------------------- Avalanche Ball
 
     private void roll(SnowScene e, PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, float age, float pt, int seed, int light) {
-        float r = e.getSize();
+        float r = e.getSize() * 1.15f;
         if (e.hasBurst()) {
-            float t = e.sinceBurst(pt) / 18f;
-            powder(poseStack, buffer, view, new Vector3f(0, r, 0), r * 1.2f, t, 14, seed, light);
-            ClockMesh.ring(poseStack.last(), buffer, .06f, r * 3 * t, r * 3 * t + .5f, FROST, (1 - t) * .8f, LightTexture.FULL_BRIGHT);
+            float t = e.sinceBurst(pt) / 24f;
+            powder(poseStack, buffer, view, new Vector3f(0, r, 0), r * 1.3f, t, seed, light);
+            ElementFx.groundRing(poseStack, buffer, .07f, r * 3.5f * t, r * 3.5f * t + .7f, FROST, (1 - t) * .9f);
+            ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, r, 0), r * 1.5f, BLUE, .6f * (1 - t));
             return;
         }
-        Vec3 f = e.forward();
-        // Rolling over: turned about the axis square to its way, as far as it has gone
+        Vec3 fw = e.forward();
+        Vector3f f = ElementFx.v(fw), side = new Vector3f(f.z, 0, -f.x);
+        // The furrow it ploughs behind it: packed snow, darker at its edges
+        float behind = Math.min(age * SnowScene.ROLL_SPEED, 7);
+        VertexConsumer furrow = BossMesh.ground(buffer, SNOW);
+        int segs = 14;
+        for (int i = 0; i < segs; i++) {
+            float t0 = (float) i / segs, t1 = (float) (i + 1) / segs;
+            float w0 = r * (.85f - .35f * t0), w1 = r * (.85f - .35f * t1);
+            Vector3f c0 = new Vector3f(f).mul(-behind * t0).add(0, .06f, 0), c1 = new Vector3f(f).mul(-behind * t1).add(0, .06f, 0);
+            float a0 = .85f * (1 - t0), a1 = .85f * (1 - t1);
+            ElementFx.flat(furrow, poseStack.last(), new Vector3f(c0).sub(new Vector3f(side).mul(w0)), new Vector3f(c0).add(new Vector3f(side).mul(w0)),
+                    new Vector3f(c1).add(new Vector3f(side).mul(w1)), new Vector3f(c1).sub(new Vector3f(side).mul(w1)), 0, t0 * 3, 1, t0 * 3, 1, t1 * 3, 0, t1 * 3,
+                    BossMesh.argb(0xB8D0EA, a0), BossMesh.argb(0xB8D0EA, a1), light);
+        }
+        // The ball, turned over as far as it has rolled, lumps of snow packed onto it
         float turn = age * SnowScene.ROLL_SPEED / Math.max(.2f, r);
         poseStack.pushPose();
         poseStack.translate(0, r, 0);
-        poseStack.mulPose(new Quaternionf().rotateAxis(turn, (float) f.z, 0, (float) -f.x));
+        poseStack.mulPose(new Quaternionf().rotateAxis(turn, (float) fw.z, 0, (float) -fw.x));
         VertexConsumer snow = BossMesh.see(buffer, SNOW);
-        BossMesh.sphere(snow, poseStack.last(), new Vector3f(), r, 10, 16, 0, 0, 1, BossMesh.argb(WHITE, 1), light);
-        // Clumps of snow packed on as it rolled
-        for (int k = 0; k < 7; k++) {
+        BossMesh.sphere(snow, poseStack.last(), new Vector3f(), r, 16, 24, 0, 0, 1, BossMesh.argb(0xFFFFFF, 1), light);
+        for (int k = 0; k < 11; k++) {
             float a = BossMesh.hash(seed + k) * Mth.TWO_PI, b = BossMesh.hash(seed + k * 5) * Mth.PI;
-            Vector3f at = new Vector3f(Mth.sin(b) * Mth.cos(a), Mth.cos(b), Mth.sin(b) * Mth.sin(a)).mul(r * .92f);
-            BossMesh.sphere(snow, poseStack.last(), at, r * (.22f + .1f * BossMesh.hash(seed + k * 7)), 5, 8, 0, 0, 1, BossMesh.argb(0xE8F2FF, 1), light);
+            Vector3f at = new Vector3f(Mth.sin(b) * Mth.cos(a), Mth.cos(b), Mth.sin(b) * Mth.sin(a)).mul(r * .9f);
+            BossMesh.sphere(snow, poseStack.last(), at, r * (.2f + .12f * BossMesh.hash(seed + k * 7)), 6, 9, 0, 0, 1, BossMesh.argb(0xEEF6FF, 1), light);
         }
+        BossMesh.sphere(BossMesh.light(buffer, BossMesh.SHEEN), poseStack.last(), new Vector3f(), r * 1.03f, 10, 18, age * .01f, 0, 1,
+                BossMesh.glow(FROST, .22f), FULL);
         poseStack.popPose();
-        // A cold glow under it, powder thrown up in its wake, frost glittering round it
-        ClockMesh.glow(poseStack, buffer, view, new Vector3f(0, .1f, 0), r * 3, BLUE, .3f, LightTexture.FULL_BRIGHT);
+        // Powder thrown up off its front and blown back over it; flakes glittering round it; a cold glow under it
+        ElementFx.puffs(poseStack, buffer, view, BossMesh.CLOUD, new Vector3f(f).mul(r * .6f).add(0, r * .3f, 0), r * 1.4f, r * 1.8f, r * .7f, 10, age, .06f,
+                WHITE, .7f, seed + 3, light);
         VertexConsumer cloud = BossMesh.see(buffer, BossMesh.CLOUD);
-        for (int k = 0; k < 8; k++) {
-            float back = k * .55f + (age * .2f) % .55f;
-            Vector3f p = v(f.scale(-back - r * .8f)).add((BossMesh.hash(seed + k) - .5f) * r, r * (.3f + .15f * k / 8f), (BossMesh.hash(seed + k * 3) - .5f) * r);
-            RitualMesh.billboard(cloud, poseStack, view, p, r * (1.3f - k * .08f) + .3f, k + age * .02f, -1, BossMesh.argb(WHITE, .45f * (1 - k / 8f)), light);
+        for (int k = 0; k < 9; k++) {
+            float back = k * .5f + (age * .25f) % .5f;
+            Vector3f p = new Vector3f(f).mul(-back - r * .7f).add((BossMesh.hash(seed + k) - .5f) * r * 1.4f, r * (.4f + .25f * k / 9f),
+                    (BossMesh.hash(seed + k * 3) - .5f) * r * 1.4f);
+            RitualMesh.billboard(cloud, poseStack, view, p, r * (1.4f - k * .08f) + .3f, k + age * .02f, -1, BossMesh.argb(WHITE, .6f * (1 - k / 9f)), light);
         }
-        VertexConsumer flakes = BossMesh.light(buffer, FLAKE);
-        for (int k = 0; k < 10; k++) {
-            float a = BossMesh.hash(seed + k * 11) * Mth.TWO_PI + age * .1f, tw = .5f + .5f * Mth.sin(age * .4f + k * 2);
-            Vector3f p = new Vector3f(Mth.cos(a) * r * 1.3f, r + Mth.sin(age * .1f + k) * r * .8f, Mth.sin(a) * r * 1.3f);
-            RitualMesh.billboard(flakes, poseStack, view, p, .18f + .1f * tw, age * .05f + k, -1, BossMesh.glow(FROST, .8f * tw), LightTexture.FULL_BRIGHT);
-        }
+        ElementFx.motes(poseStack, buffer, view, FLAKE, new Vector3f(0, .2f, 0), r * 1.8f, r * 2.4f, .22f, 16, age, FROST, .9f, seed + 7);
+        ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .3f, 0), r * 1.2f, BLUE, .3f);
     }
 
     // ---------------------------------------------------------------- Snow Globe
@@ -123,47 +142,76 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
         float appear = BossMesh.ramp(age, 0, 8);
         float fade = 1 - BossMesh.ramp(age, e.getLife() - 6, e.getLife());
         boolean shattered = e.hasBurst();
-        float st = shattered ? e.sinceBurst(pt) / 14f : 0;
-        float floor = .36f;
-        // The brass base, a band of darker brass round it
-        ClockMesh.cylinder(poseStack.last(), buffer, ClockMesh.BRASS, r * 1.02f * appear, -.02f, floor, 40, BossMesh.argb(0xFFFFFF, 1), light);
-        ClockMesh.cylinder(poseStack.last(), buffer, ClockMesh.BRASS, r * 1.07f * appear, -.02f, .1f, 40, BossMesh.argb(0x9A7A50, 1), light);
-        // The snowy floor inside
+        float st = shattered ? e.sinceBurst(pt) / 16f : 0;
+        float floor = .42f;
+        float R = r * appear;
+        // The brass base: a plinth, a band, a lip, rivets glinting
+        ClockMesh.cylinder(poseStack.last(), buffer, ClockMesh.BRASS, R * 1.1f, -.02f, .14f, 48, BossMesh.argb(0x9A7A50, 1), light);
+        ClockMesh.cylinder(poseStack.last(), buffer, ClockMesh.BRASS, R * 1.03f, .14f, floor - .06f, 48, BossMesh.argb(0xFFFFFF, 1), light);
+        ClockMesh.cylinder(poseStack.last(), buffer, ClockMesh.BRASS, R * 1.07f, floor - .06f, floor, 48, BossMesh.argb(0xD8B070, 1), light);
+        for (int k = 0; k < 12; k++) {
+            float a = k * Mth.TWO_PI / 12;
+            ClockMesh.glow(poseStack, buffer, view, new Vector3f(Mth.cos(a) * R * 1.05f, .28f, Mth.sin(a) * R * 1.05f), .25f, 0xFFE0A0, .5f * fade, FULL);
+        }
+        // The snowy floor inside, a little wood of pines on it
         BossMesh.annulus(BossMesh.ground(buffer, SNOW), poseStack.last(), new Vector3f(0, floor + .01f, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, -1), .01f,
-                r * appear, 32, 2, 0, 0, BossMesh.argb(WHITE, fade), BossMesh.argb(0xE0ECF8, fade), light, false);
+                R, 40, 2, 0, 0, BossMesh.argb(0xFFFFFF, fade), BossMesh.argb(0xE0ECF8, fade), light, false);
+        VertexConsumer needles = BossMesh.solid(buffer, SNOW);
+        for (int k = 0; k < 5; k++) {
+            float a = BossMesh.hash(seed + k * 3) * Mth.TWO_PI, rr = R * (.25f + .45f * BossMesh.hash(seed + k * 5));
+            float h = (.7f + .6f * BossMesh.hash(seed + k * 7)) * appear;
+            Vector3f base = new Vector3f(Mth.cos(a) * rr, floor, Mth.sin(a) * rr);
+            for (int tier = 0; tier < 3; tier++) {
+                Vector3f at = new Vector3f(base).add(0, h * (.15f + tier * .26f), 0);
+                BossMesh.horn(needles, poseStack.last(), at, new Vector3f(0, 1, 0), new Vector3f(), h * (.5f - tier * .1f), h * (.34f - tier * .08f), 7, 2,
+                        BossMesh.argb(PINE, 1), BossMesh.argb(tier == 2 ? 0xF4FAFF : 0x4A8A5E, 1), light);
+            }
+        }
         Vector3f centre = new Vector3f(0, floor, 0);
         if (!shattered) {
-            // The glass dome: faint, its sheen turning, a bright rim where it meets the base
-            BossMesh.sphere(BossMesh.see(buffer, BossMesh.SHEEN), poseStack.last(), centre, r * appear, 12, 28, age * .002f, 0, .5f,
-                    BossMesh.argb(0xD8F0FF, .28f), LightTexture.FULL_BRIGHT);
-            BossMesh.sphere(BossMesh.light(buffer, BossMesh.GLOW), poseStack.last(), centre, r * appear * 1.01f, 8, 24, 0, 0, .5f, BossMesh.glow(BLUE, .08f),
-                    LightTexture.FULL_BRIGHT);
-            ClockMesh.ring(poseStack.last(), buffer, floor + .02f, r * .9f * appear, r * appear, FROST, .6f, LightTexture.FULL_BRIGHT);
-            // Snow whirling round and falling inside it
+            // The glass: a clear dome, frost on its lower part, bright arcs of reflection, a bright rim at the base
+            BossMesh.sphere(BossMesh.see(buffer, BossMesh.SHEEN), poseStack.last(), centre, R, 14, 32, age * .002f, 0, .5f, BossMesh.argb(0xE0F4FF, .38f),
+                    FULL);
+            BossMesh.sphere(BossMesh.see(buffer, ICE), poseStack.last(), centre, R * 1.005f, 4, 32, 0, .36f, .5f, BossMesh.argb(0xFFFFFF, .55f), FULL);
+            VertexConsumer gleam = BossMesh.light(buffer, BossMesh.GLOW);
+            for (float a0 : new float[]{-.9f, -.55f, 2.1f}) {
+                Vector3f[] arc = new Vector3f[10];
+                int[] cols = new int[10];
+                for (int i = 0; i < 10; i++) {
+                    float th = .25f + i * .11f;
+                    arc[i] = new Vector3f(Mth.sin(th) * Mth.cos(a0) * R * 1.01f, Mth.cos(th) * R * 1.01f, Mth.sin(th) * Mth.sin(a0) * R * 1.01f).add(centre);
+                    cols[i] = BossMesh.glow(0xFFFFFF, .55f * Mth.sin(Mth.PI * i / 9f) * fade);
+                }
+                RitualMesh.thread(gleam, poseStack.last(), view.eye(), arc, .12f, cols, FULL);
+            }
+            ElementFx.groundRing(poseStack, buffer, floor + .02f, R * .93f, R * 1.02f, FROST, .7f * fade);
+            // Snow falling and whirling inside
             VertexConsumer flakes = BossMesh.light(buffer, FLAKE);
-            for (int k = 0; k < 46; k++) {
+            for (int k = 0; k < 70; k++) {
                 float h1 = BossMesh.hash(seed + k), h2 = BossMesh.hash(seed + k * 3), h3 = BossMesh.hash(seed + k * 7);
                 float a = h1 * Mth.TWO_PI + age * (.04f + .05f * h2);
-                float rr = r * .82f * Mth.sqrt(h2);
+                float rr = R * .85f * Mth.sqrt(h2);
+                float top = Mth.sqrt(Math.max(0, R * R * .8f - rr * rr));
                 float fall = 1 - ((h3 + age * (.008f + .006f * h1)) % 1);
-                float top = Mth.sqrt(Math.max(0, r * r * .7f - rr * rr));
                 Vector3f p = new Vector3f(Mth.cos(a) * rr, floor + .1f + fall * top, Mth.sin(a) * rr);
-                RitualMesh.billboard(flakes, poseStack, view, p, .12f + .1f * h3, age * .06f + k, -1, BossMesh.glow(WHITE, .85f * appear * fade),
-                        LightTexture.FULL_BRIGHT);
+                RitualMesh.billboard(flakes, poseStack, view, p, .14f + .12f * h3, age * .06f + k, -1, BossMesh.glow(WHITE, .9f * appear * fade), FULL);
             }
-            ClockMesh.glow(poseStack, buffer, view, new Vector3f(0, floor + r * .4f, 0), r * 2.2f, FROST, .18f * appear, LightTexture.FULL_BRIGHT);
+            ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, floor + R * .45f, 0), R * .9f, FROST, .25f * appear);
         } else if (st < 1) {
-            // Shattered: shards of glass flung out, powder bursting
-            VertexConsumer shards = BossMesh.light(buffer, BossMesh.SHEEN);
+            // Shattered: shards of glass flung out, flashing, and the snow inside bursting
+            VertexConsumer shards = BossMesh.see(buffer, BossMesh.SHEEN);
+            VertexConsumer flash = BossMesh.light(buffer, BossMesh.SHEEN);
             float out = 1 - (1 - st) * (1 - st);
-            for (int k = 0; k < 26; k++) {
+            for (int k = 0; k < 34; k++) {
                 float a = BossMesh.hash(seed + k) * Mth.TWO_PI, b = BossMesh.hash(seed + k * 5) * Mth.HALF_PI;
                 Vector3f dir = new Vector3f(Mth.cos(b) * Mth.cos(a), Mth.sin(b), Mth.cos(b) * Mth.sin(a));
-                Vector3f p = new Vector3f(dir).mul(r * (1 + 1.6f * out)).add(centre).add(0, -2.5f * st * st, 0);
-                RitualMesh.crystal(shards, poseStack.last(), p, new Vector3f(dir.z, dir.y + .3f, -dir.x).normalize(), .45f, .1f, st * 6 + k,
-                        BossMesh.glow(FROST, 1 - st), LightTexture.FULL_BRIGHT);
+                Vector3f p = new Vector3f(dir).mul(R * (1 + 1.8f * out)).add(centre).add(0, -3f * st * st, 0);
+                Vector3f d = new Vector3f(dir.z, dir.y + .3f, -dir.x).normalize();
+                RitualMesh.crystal(shards, poseStack.last(), p, d, .6f, .14f, st * 6 + k, BossMesh.argb(0xE8F6FF, .8f * (1 - st)), FULL);
+                RitualMesh.crystal(flash, poseStack.last(), p, d, .62f, .15f, st * 6 + k, BossMesh.glow(FROST, .5f * (1 - st)), FULL);
             }
-            powder(poseStack, buffer, view, new Vector3f(0, floor + r * .5f, 0), r * .6f, st, 12, seed, light);
+            powder(poseStack, buffer, view, new Vector3f(0, floor + R * .5f, 0), R * .6f, st, seed, light);
+            ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, floor + R * .5f, 0), R * 1.2f, BLUE, .8f * (1 - st));
         }
     }
 
@@ -175,51 +223,77 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
         if (length < .05f || fade <= 0) {
             return;
         }
-        Vec3 fw = e.forward();
-        Vector3f f = v(fw), side = new Vector3f(f.z, 0, -f.x);
-        float w = .8f;
-        int segs = 24;
+        Vector3f f = ElementFx.v(e.forward()), side = new Vector3f(f.z, 0, -f.x);
+        float w = .95f;
+        int segs = 28;
+        VertexConsumer under = BossMesh.ground(buffer, SNOW);
         VertexConsumer ice = BossMesh.ground(buffer, ICE);
+        VertexConsumer edge = BossMesh.light(buffer, BossMesh.GLOW);
+        Vector3f[] left = new Vector3f[segs + 1], right = new Vector3f[segs + 1];
+        for (int i = 0; i <= segs; i++) {
+            float t = (float) i / segs;
+            float wi = w * (.8f + .3f * BossMesh.hash(seed + i));
+            Vector3f c = new Vector3f(f).mul(t * length).add(0, .05f, 0);
+            left[i] = new Vector3f(c).sub(new Vector3f(side).mul(wi));
+            right[i] = new Vector3f(c).add(new Vector3f(side).mul(wi));
+        }
         for (int i = 0; i < segs; i++) {
             float t0 = (float) i / segs, t1 = (float) (i + 1) / segs;
-            // Its edges waver a little, like ice grown, not cut
-            float w0 = w * (.85f + .25f * BossMesh.hash(seed + i)), w1 = w * (.85f + .25f * BossMesh.hash(seed + i + 1));
-            Vector3f c0 = new Vector3f(f).mul(t0 * length).add(0, .04f, 0), c1 = new Vector3f(f).mul(t1 * length).add(0, .04f, 0);
-            float a0 = fade * (i == 0 ? .5f : .82f), a1 = fade * .82f;
-            BossMesh.quad(ice, poseStack.last(), new Vector3f(c0).sub(new Vector3f(side).mul(w0)), new Vector3f(c0).add(new Vector3f(side).mul(w0)),
-                    new Vector3f(c1).add(new Vector3f(side).mul(w1)), new Vector3f(c1).sub(new Vector3f(side).mul(w1)), 0, t0 * length * .5f, 1, t0 * length * .5f,
-                    1, t1 * length * .5f, 0, t1 * length * .5f, BossMesh.argb(0xE0F4FF, a0), BossMesh.argb(0xE0F4FF, a1), light, BossMesh.UP);
+            // A blue shadow under the ice (it shows on snow too), the ice over it
+            Vector3f l0 = new Vector3f(left[i]).sub(new Vector3f(side).mul(.15f)), r0 = new Vector3f(right[i]).add(new Vector3f(side).mul(.15f));
+            Vector3f l1 = new Vector3f(left[i + 1]).sub(new Vector3f(side).mul(.15f)), r1 = new Vector3f(right[i + 1]).add(new Vector3f(side).mul(.15f));
+            ElementFx.flat(under, poseStack.last(), l0, r0, r1, l1, 0, 0, 1, 0, 1, 1, 0, 1, BossMesh.argb(0x4A86C8, .55f * fade), BossMesh.argb(0x4A86C8, .55f * fade),
+                    light);
+            Vector3f a0 = new Vector3f(left[i]).add(0, .02f, 0), b0 = new Vector3f(right[i]).add(0, .02f, 0);
+            Vector3f a1 = new Vector3f(left[i + 1]).add(0, .02f, 0), b1 = new Vector3f(right[i + 1]).add(0, .02f, 0);
+            ElementFx.flat(ice, poseStack.last(), a0, b0, b1, a1, 0, t0 * length * .4f, 1, t0 * length * .4f, 1, t1 * length * .4f, 0, t1 * length * .4f,
+                    BossMesh.argb(0xB4E0FF, .9f * fade), BossMesh.argb(0xB4E0FF, .9f * fade), light);
         }
-        // Crystals grown along both edges, tilted out
+        // Its edges glowing cold
+        for (Vector3f[] line : new Vector3f[][]{left, right}) {
+            int[] cols = new int[line.length];
+            Vector3f[] raised = new Vector3f[line.length];
+            for (int i = 0; i < line.length; i++) {
+                raised[i] = new Vector3f(line[i]).add(0, .09f, 0);
+                cols[i] = BossMesh.glow(BLUE, .7f * fade);
+            }
+            RitualMesh.thread(edge, poseStack.last(), view.eye(), raised, .16f, cols, FULL);
+        }
+        // Clusters of crystals grown along both edges, tilted out
         VertexConsumer crystals = BossMesh.see(buffer, ICE);
-        int n = Math.max(1, (int) (length / .7f));
+        VertexConsumer gleam = BossMesh.light(buffer, BossMesh.SHEEN);
+        int n = Math.max(1, (int) (length / .8f));
         for (int k = 0; k < n; k++) {
             for (int s = -1; s <= 1; s += 2) {
                 float t = (k + .5f) / n;
-                float h = BossMesh.hash(seed + k * 13 + s);
-                Vector3f base = new Vector3f(f).mul(t * length).add(new Vector3f(side).mul(s * w * (.9f + .2f * h))).add(0, .02f, 0);
-                Vector3f dir = new Vector3f(side).mul(s * .45f).add(new Vector3f(f).mul((h - .5f) * .4f)).add(0, 1, 0).normalize();
-                float grow = BossMesh.ramp(age, t * SnowScene.GLIDE_TIME, t * SnowScene.GLIDE_TIME + 6);
-                RitualMesh.crystal(crystals, poseStack.last(), base, dir, (.22f + .3f * h) * grow, .06f + .04f * h, h * 3, BossMesh.argb(0xD8F0FF, .9f * fade), light);
+                float grow = BossMesh.ramp(age, t * SnowScene.GLIDE_TIME, t * SnowScene.GLIDE_TIME + 6) * fade;
+                for (int c = 0; c < 3; c++) {
+                    float h = BossMesh.hash(seed + k * 13 + s * 3 + c * 7);
+                    Vector3f base = new Vector3f(f).mul(t * length + (h - .5f) * .4f).add(new Vector3f(side).mul(s * w * (.85f + .3f * h))).add(0, .03f, 0);
+                    Vector3f dir = new Vector3f(side).mul(s * (.35f + .3f * h)).add(new Vector3f(f).mul((h - .5f) * .5f)).add(0, 1, 0).normalize();
+                    float len = (.35f + .65f * h) * grow;
+                    RitualMesh.crystal(crystals, poseStack.last(), base, dir, len, .07f + .06f * h, h * 3, BossMesh.argb(0xE6F6FF, .92f), light);
+                    RitualMesh.crystal(gleam, poseStack.last(), base, dir, len * 1.04f, .08f + .06f * h, h * 3, BossMesh.glow(BLUE, .3f), FULL);
+                }
             }
         }
-        // Frost twinkling on it, a cold glow along it
+        // Cold mist creeping low over it, frost glinting
+        for (int k = 0; k < 4; k++) {
+            ElementFx.puffs(poseStack, buffer, view, BossMesh.CLOUD, new Vector3f(f).mul(length * (k + .5f) / 4).add(0, .15f, 0), 1.2f, .5f, .7f, 4, age, .03f,
+                    WHITE, .45f * fade, seed + k * 17, light);
+        }
         VertexConsumer flakes = BossMesh.light(buffer, FLAKE);
-        for (int k = 0; k < 18; k++) {
+        for (int k = 0; k < 24; k++) {
             float t = BossMesh.hash(seed + k * 17), across = BossMesh.hash(seed + k * 19) * 2 - 1;
             float tw = Math.max(0, Mth.sin(age * .25f + k * 1.7f));
-            Vector3f p = new Vector3f(f).mul(t * length).add(new Vector3f(side).mul(across * w * .8f)).add(0, .15f, 0);
-            RitualMesh.billboard(flakes, poseStack, view, p, .22f * tw + .05f, age * .03f + k, -1, BossMesh.glow(WHITE, tw * fade), LightTexture.FULL_BRIGHT);
-        }
-        for (int k = 0; k <= 4; k++) {
-            ClockMesh.glow(poseStack, buffer, view, new Vector3f(f).mul(length * k / 4f).add(0, .1f, 0), 2.2f, BLUE, .12f * fade, LightTexture.FULL_BRIGHT);
+            Vector3f p = new Vector3f(f).mul(t * length).add(new Vector3f(side).mul(across * w * .8f)).add(0, .2f, 0);
+            RitualMesh.billboard(flakes, poseStack, view, p, .26f * tw + .05f, age * .03f + k, -1, BossMesh.glow(WHITE, tw * fade), FULL);
         }
     }
 
     // ---------------------------------------------------------------- Hoarfrost Crown
 
-    private void crown(SnowScene e, PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, float age, float pt, int seed) {
-        int full = LightTexture.FULL_BRIGHT;
+    private void crown(SnowScene e, PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, float age, float pt, int seed, int light) {
         float appear = BossMesh.ramp(age, 0, 10);
         float fade = 1 - BossMesh.ramp(age, e.getLife() - 15, e.getLife());
         float shown = appear * fade;
@@ -228,39 +302,53 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
         }
         VertexConsumer ice = BossMesh.see(buffer, ICE);
         VertexConsumer gleam = BossMesh.light(buffer, BossMesh.SHEEN);
-        int points = 7;
         float spin = age * .045f;
+        // A circlet of ice, then the great crystals standing on it, small ones leaning out between them
+        ClockMesh.ring(poseStack.last(), buffer, .02f, .44f, .6f, FROST, .7f * shown, FULL);
+        int points = 9;
         for (int k = 0; k < points; k++) {
             float a = spin + k * Mth.TWO_PI / points;
             float bob = .05f * Mth.sin(age * .12f + k);
-            Vector3f base = new Vector3f(Mth.cos(a) * .42f, bob, Mth.sin(a) * .42f);
-            Vector3f dir = new Vector3f(Mth.cos(a) * .3f, 1, Mth.sin(a) * .3f).normalize();
-            float len = (k % 2 == 0 ? .5f : .34f) * shown;
-            RitualMesh.crystal(ice, poseStack.last(), base, dir, len, .075f, a, BossMesh.argb(0xE6F6FF, .95f), full);
-            RitualMesh.crystal(gleam, poseStack.last(), base, dir, len * 1.05f, .08f, a, BossMesh.glow(BLUE, .35f), full);
+            Vector3f base = new Vector3f(Mth.cos(a) * .52f, bob, Mth.sin(a) * .52f);
+            Vector3f dir = new Vector3f(Mth.cos(a) * .25f, 1, Mth.sin(a) * .25f).normalize();
+            float len = (k % 3 == 0 ? .95f : k % 3 == 1 ? .55f : .7f) * shown;
+            RitualMesh.crystal(ice, poseStack.last(), base, dir, len, .1f, a, BossMesh.argb(0xEAF8FF, .95f), FULL);
+            RitualMesh.crystal(gleam, poseStack.last(), base, dir, len * 1.05f, .11f, a, BossMesh.glow(BLUE, .4f), FULL);
+            float b = a + Mth.PI / points;
+            Vector3f lean = new Vector3f(Mth.cos(b) * .7f, .6f, Mth.sin(b) * .7f).normalize();
+            RitualMesh.crystal(ice, poseStack.last(), new Vector3f(Mth.cos(b) * .5f, bob, Mth.sin(b) * .5f), lean, .32f * shown, .06f, b,
+                    BossMesh.argb(0xEAF8FF, .9f), FULL);
         }
-        ClockMesh.ring(poseStack.last(), buffer, 0, .3f, .5f, FROST, .45f * shown, full);
-        ClockMesh.glow(poseStack, buffer, view, new Vector3f(0, .2f, 0), 1.4f, BLUE, .3f * shown, full);
-        // An icicle loosed: it streaks to its mark, then bursts there
+        // Snowflakes circling it, a cold halo
+        VertexConsumer flakes = BossMesh.light(buffer, FLAKE);
+        for (int k = 0; k < 8; k++) {
+            float a = -age * .06f + k * Mth.TWO_PI / 8;
+            Vector3f p = new Vector3f(Mth.cos(a) * .95f, .35f + .15f * Mth.sin(age * .1f + k), Mth.sin(a) * .95f);
+            RitualMesh.billboard(flakes, poseStack, view, p, .28f, age * .05f + k, -1, BossMesh.glow(WHITE, .9f * shown), FULL);
+        }
+        ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .35f, 0), .9f, BLUE, .35f * shown);
+        // An icicle loosed: it streaks to its mark, frost trailing it, and bursts there
         Entity victim = e.victim();
         float since = e.sinceStruck(pt);
-        if (victim != null && since >= 0 && since < 12) {
+        if (victim != null && since >= 0 && since < 14) {
             Vec3 to3 = victim.getPosition(pt).add(0, victim.getBbHeight() * .6, 0).subtract(e.getPosition(pt));
-            Vector3f to = v(to3);
+            Vector3f to = ElementFx.v(to3);
             float fly = Math.min(1, since / 4f);
             if (fly < 1) {
-                Vector3f head = new Vector3f(to).mul(fly), tail = new Vector3f(to).mul(Math.max(0, fly - .35f));
-                WaterMesh.streak(BossMesh.light(buffer, WaterMesh.STREAK), poseStack.last(), view.eye(), head, tail, .18f, BossMesh.glow(FROST, .9f), full);
+                Vector3f head = new Vector3f(to).mul(fly), tail = new Vector3f(to).mul(Math.max(0, fly - .45f));
+                WaterMesh.streak(BossMesh.light(buffer, WaterMesh.STREAK), poseStack.last(), view.eye(), head, tail, .34f, BossMesh.glow(FROST, .9f), FULL);
                 Vector3f d = new Vector3f(to).normalize();
-                RitualMesh.crystal(ice, poseStack.last(), new Vector3f(head).sub(new Vector3f(d).mul(.5f)), d, .55f, .07f, age, BossMesh.argb(0xF0FAFF, 1), full);
+                RitualMesh.crystal(ice, poseStack.last(), new Vector3f(head).sub(new Vector3f(d).mul(.8f)), d, .9f, .12f, age, BossMesh.argb(0xF0FAFF, 1), FULL);
+                ElementFx.bloom(poseStack, buffer, view, head, .5f, BLUE, .7f);
             } else {
-                float t = (since - 4) / 8f;
-                ClockMesh.glow(poseStack, buffer, view, to, 1.6f * (1 + t), FROST, .8f * (1 - t), full);
-                VertexConsumer flakes = BossMesh.light(buffer, FLAKE);
-                for (int k = 0; k < 8; k++) {
-                    float a = k * Mth.TWO_PI / 8;
-                    Vector3f p = new Vector3f(Mth.cos(a), Mth.sin(a * 2) * .5f, Mth.sin(a)).mul(.8f * t).add(to);
-                    RitualMesh.billboard(flakes, poseStack, view, p, .22f, t * 3 + k, -1, BossMesh.glow(WHITE, 1 - t), full);
+                float t = (since - 4) / 10f;
+                ElementFx.bloom(poseStack, buffer, view, to, 1.2f * (1 + t), FROST, .9f * (1 - t));
+                ElementFx.burst(poseStack, buffer, view, FLAKE, to, 1.6f, .8f, .3f, 12, t, WHITE, 1, seed + (int) since, true, FULL);
+                for (int k = 0; k < 6; k++) {
+                    float a = k * Mth.TWO_PI / 6;
+                    Vector3f d = new Vector3f(Mth.cos(a), .4f, Mth.sin(a)).normalize();
+                    RitualMesh.crystal(ice, poseStack.last(), new Vector3f(to).add(new Vector3f(d).mul(.9f * t)), d, .35f * (1 - t), .06f, a,
+                            BossMesh.argb(0xF0FAFF, 1 - t), FULL);
                 }
             }
         }
@@ -269,53 +357,54 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
     // ---------------------------------------------------------------- Whiteout
 
     private void whiteout(SnowScene e, PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, float age, float pt, int seed, int light) {
-        int full = LightTexture.FULL_BRIGHT;
         float r = e.getSize();
         float appear = BossMesh.ramp(age, 0, 25);
         float fade = 1 - BossMesh.ramp(age, e.getLife() - 20, e.getLife());
         float shown = appear * fade;
-        // Frost spreading over the ground
+        // Frost spreading over the ground, deeper blue at the wall's foot
         BossMesh.annulus(BossMesh.ground(buffer, ICE), poseStack.last(), new Vector3f(0, .05f, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, -1), .01f,
-                r * appear, 56, 6, 0, 0, BossMesh.argb(0xEAF6FF, .55f * fade), BossMesh.argb(0xEAF6FF, .2f * fade), light, false);
-        // The wall of blizzard, whirling round in three tiers, each its own way
+                r * appear, 64, 6, 0, 0, BossMesh.argb(0xEAF6FF, .7f * fade), BossMesh.argb(0xB8DCF8, .55f * fade), light, false);
+        // The wall of blizzard: bands of driven snow whirling round, each its own way, puffs tumbling in them
+        ElementFx.wall(poseStack, buffer, BossMesh.CLOUD, r, 0, 5.5f, 4, age, .012f, WHITE, .8f * shown, light);
+        ElementFx.wall(poseStack, buffer, BossMesh.CLOUD, r * .93f, .2f, 4.2f, 3, age + 40, .02f, 0xDDEEFF, .5f * shown, light);
         VertexConsumer cloud = BossMesh.see(buffer, BossMesh.CLOUD);
-        for (int tier = 0; tier < 3; tier++) {
-            int count = 30;
-            float way = tier % 2 == 0 ? 1 : -1;
-            for (int k = 0; k < count; k++) {
-                float a = k * Mth.TWO_PI / count + age * .035f * way * (1 + tier * .25f) + tier;
-                float rr = r * (.9f + .07f * tier) + .4f * Mth.sin(age * .07f + k);
-                float y = .4f + tier * 1.35f + .35f * Mth.sin(age * .05f + k * 1.3f);
-                RitualMesh.billboard(cloud, poseStack, view, new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), 3.2f - tier * .3f, a + age * .01f, -1,
-                        BossMesh.argb(WHITE, .5f * shown), light);
-            }
+        for (int k = 0; k < 40; k++) {
+            float a = k * Mth.TWO_PI / 40 + age * .03f + BossMesh.hash(seed + k) * .3f;
+            float rr = r * (.9f + .1f * BossMesh.hash(seed + k * 3));
+            float y = .4f + 4.4f * BossMesh.hash(seed + k * 5) + .3f * Mth.sin(age * .06f + k);
+            RitualMesh.billboard(cloud, poseStack, view, new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), 2.4f, a + age * .01f, -1,
+                    BossMesh.argb(WHITE, .5f * shown), light);
         }
-        // Flurries racing round inside it
+        // Snow driving round inside, soft streaks and flakes
         VertexConsumer streaks = BossMesh.light(buffer, WaterMesh.STREAK);
-        for (int k = 0; k < 70; k++) {
+        for (int k = 0; k < 110; k++) {
             float h1 = BossMesh.hash(seed + k), h2 = BossMesh.hash(seed + k * 3), h3 = BossMesh.hash(seed + k * 7);
-            float a = h1 * Mth.TWO_PI + age * (.05f + .05f * h2);
-            float rr = r * (.15f + .8f * h2), y = .2f + h3 * 3.6f;
+            float a = h1 * Mth.TWO_PI + age * (.05f + .06f * h2);
+            float rr = r * (.2f + .78f * h2), y = .2f + h3 * 4.2f;
             Vector3f head = new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr);
-            Vector3f tangent = new Vector3f(-Mth.sin(a), -.08f, Mth.cos(a)).mul(.7f + .6f * h3);
-            WaterMesh.streak(streaks, poseStack.last(), view.eye(), head, new Vector3f(head).sub(tangent), .05f, BossMesh.glow(WHITE, .65f * shown), full);
+            Vector3f tangent = new Vector3f(-Mth.sin(a), -.12f, Mth.cos(a)).mul(.4f + .5f * h3);
+            WaterMesh.streak(streaks, poseStack.last(), view.eye(), head, new Vector3f(head).sub(tangent), .07f, BossMesh.glow(WHITE, .32f * shown), FULL);
         }
-        ClockMesh.glow(poseStack, buffer, view, new Vector3f(0, 1.5f, 0), r * 1.6f, FROST, .12f * shown, full);
-        // The frozen shatter: a ring of cold running out, spikes of ice bursting from the ground
+        ElementFx.motes(poseStack, buffer, view, FLAKE, new Vector3f(), r * .95f, 4.5f, .3f, 50, age * 2, WHITE, .9f * shown, seed + 9);
+        ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 1.8f, 0), r * .9f, FROST, .12f * shown);
+        // The frozen shatter: a ring of cold running out, spikes of ice bursting from the ground, shards and flakes
         if (e.hasBurst()) {
-            float t = e.sinceBurst(pt) / 20f;
+            float t = e.sinceBurst(pt) / 22f;
             if (t < 1) {
-                ClockMesh.ring(poseStack.last(), buffer, .08f, r * t, r * t + .8f, FROST, 1 - t, full);
-                ClockMesh.glow(poseStack, buffer, view, new Vector3f(0, 1, 0), r * 2 * (1 - t * .5f), BLUE, .6f * (1 - t), full);
-                VertexConsumer ice = BossMesh.light(buffer, BossMesh.SHEEN);
-                float rise = Mth.sin(Mth.PI * Math.min(1, t * 1.5f));
-                for (int k = 0; k < 24; k++) {
-                    float a = BossMesh.hash(seed + k * 23) * Mth.TWO_PI, rr = r * (.3f + .65f * BossMesh.hash(seed + k * 29));
+                ElementFx.groundRing(poseStack, buffer, .08f, r * t, r * t + 1, FROST, 1 - t);
+                ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 1, 0), r * 1.2f * (1 - t * .5f), BLUE, .7f * (1 - t));
+                VertexConsumer ice = BossMesh.see(buffer, ICE);
+                VertexConsumer gleam = BossMesh.light(buffer, BossMesh.SHEEN);
+                float rise = Mth.sin(Mth.PI * Math.min(1, t * 1.4f));
+                for (int k = 0; k < 30; k++) {
+                    float a = BossMesh.hash(seed + k * 23) * Mth.TWO_PI, rr = r * (.25f + .7f * BossMesh.hash(seed + k * 29));
                     Vector3f base = new Vector3f(Mth.cos(a) * rr, 0, Mth.sin(a) * rr);
-                    Vector3f dir = new Vector3f(Mth.cos(a) * .3f, 1, Mth.sin(a) * .3f).normalize();
-                    RitualMesh.crystal(ice, poseStack.last(), base, dir, (1 + BossMesh.hash(seed + k) * 1.4f) * rise, .18f, a, BossMesh.glow(FROST, .9f * (1 - t)),
-                            full);
+                    Vector3f dir = new Vector3f(Mth.cos(a) * .35f, 1, Mth.sin(a) * .35f).normalize();
+                    float len = (1.2f + BossMesh.hash(seed + k) * 1.8f) * rise;
+                    RitualMesh.crystal(ice, poseStack.last(), base, dir, len, .24f, a, BossMesh.argb(0xE6F6FF, .92f), light);
+                    RitualMesh.crystal(gleam, poseStack.last(), base, dir, len * 1.03f, .26f, a, BossMesh.glow(FROST, .45f * (1 - t)), FULL);
                 }
+                ElementFx.burst(poseStack, buffer, view, FLAKE, new Vector3f(0, .5f, 0), r, 2.5f, .4f, 30, t, WHITE, 1, seed + 41, true, FULL);
             }
         }
     }
