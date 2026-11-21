@@ -220,63 +220,13 @@ public final class MetierService {
             ItemStack perfect = r.perfect.isEmpty() ? partial : MetierDefs.stack(r.perfect.get(0), Math.max(1, r.perfect.get(0).max),
                     level.registryAccess());
             int wait = (int) (cooldownLeft(player, def.id + "#" + i, level) / 20);
-            views.add(new MetierNet.RecipeView(r.name, inputs, have, partial, perfect, def.difficulty * r.difficulty, wait, r.folder));
+            views.add(new MetierNet.RecipeView(r.name, inputs, have, partial, perfect, def.difficulty * r.difficulty, wait));
         }
         BlockState state = level.getBlockState(pos);
         PacketDistributor.sendToPlayer(player, new MetierNet.Station(def.id, pos, def.name, def.game.ordinal(), new ItemStack(state.getBlock().asItem()),
-                views, (int) (cooldownLeft(player, def.id, level) / 20), List.copyOf(def.folders), player.hasPermissions(PERMISSION)));
+                views, (int) (cooldownLeft(player, def.id, level) / 20)));
     }
 
-    /**
-     * A game master organised a station's recipes in its screen: its folders, the recipes' order and folders. Taken
-     * only if it still matches the station's recipes (none added or removed meanwhile); saved, and the screen refreshed.
-     */
-    static void organize(ServerPlayer player, MetierNet.Organize o) {
-        Def def = MetierDefs.byId(o.def());
-        if (!player.hasPermissions(PERMISSION) || def == null || !organize(def, o)) {
-            return;
-        }
-        ServerLevel level = player.serverLevel();
-        BlockPos pos = o.pos();
-        if (level.isLoaded(pos) && def.matches(level.getBlockState(pos)) && player.distanceToSqr(pos.getCenter()) <= MAX_DISTANCE * MAX_DISTANCE * 4) {
-            openStation(player, level, pos, def);
-        }
-    }
-
-    /** Applies {@code o} to the station {@code def} and saves the trades; false (nothing changed) if it no longer fits. */
-    public static boolean organize(Def def, MetierNet.Organize o) {
-        if (!def.isStation()) {
-            return false;
-        }
-        int n = def.recipes.size();
-        if (o.order().size() != n || o.recipeFolders().size() != n) {
-            return false;
-        }
-        boolean[] seen = new boolean[n];
-        for (int i : o.order()) {
-            if (i < 0 || i >= n || seen[i]) {
-                return false;
-            }
-            seen[i] = true;
-        }
-        List<Recipe> recipes = new ArrayList<>(n);
-        for (int k = 0; k < n; k++) {
-            Recipe r = def.recipes.get(o.order().get(k));
-            r.folder = MetierDefs.folderName(o.recipeFolders().get(k));
-            recipes.add(r);
-        }
-        List<String> folders = new ArrayList<>();
-        for (String f : o.folders()) {
-            String name = MetierDefs.folderName(f);
-            if (!name.isEmpty() && !folders.contains(name)) {
-                folders.add(name);
-            }
-        }
-        def.recipes = recipes;
-        def.folders = folders;
-        MetierDefs.replace(MetierDefs.get());
-        return true;
-    }
 
     static void pick(ServerPlayer player, MetierNet.Pick pick) {
         Def def = MetierDefs.byId(pick.def());
@@ -318,8 +268,9 @@ public final class MetierService {
         ItemStack subject = r.perfect.isEmpty() ? (r.partial.isEmpty() ? new ItemStack(state.getBlock().asItem())
                 : MetierDefs.stack(r.partial.get(0), 1, level.registryAccess())) : MetierDefs.stack(r.perfect.get(0), 1, level.registryAccess());
         double difficulty = def.difficulty * r.difficulty * (tool == null ? 1 : tool.difficulty);
-        begin(player, level, pos, state, def, pick.recipe(), tool == null ? null : held.getItem(), difficulty, subject,
-                tool == null ? ItemStack.EMPTY : held.copyWithCount(1), inputs, r.name, def.name);
+        // The recipe's own minigame if it has one (a potion distilled at the healers' table), else the station's
+        begin(player, level, pos, state, def.id, r.game != null ? r.game : def.game, pick.recipe(), tool == null ? null : held.getItem(), difficulty,
+                subject, tool == null ? ItemStack.EMPTY : held.copyWithCount(1), inputs, r.name, def.name, (float) def.perfectAt, (float) def.criticalBelow);
     }
 
     private static int count(Inventory inv, Item item) {

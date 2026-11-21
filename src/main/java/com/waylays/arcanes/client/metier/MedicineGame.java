@@ -14,80 +14,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Medicine at the medical table: a gash across the patient's forearm, to be stitched. Each stitch is a point on one
- * side of the wound then the other; a ring closes on the point to pierce: click it (or press space) on the point as
- * the ring meets it. Sure and in time, the thread draws the lips together; early, late or beside it, the patient
- * winces. The wound bleeds all the while, a little less with each stitch: too much blood, or too much pain and the
- * patient faints, and it is a failure.
+ * Medicine at the medical table: a remedy prepared the way a healer does. First the ingredients are ground in the
+ * mortar: hold the left button and turn the pestle round the bowl (the mouse in circles), neither too slowly (nothing
+ * happens) nor too fast (it splashes out of the bowl), until the paste is smooth. Then the dose: hold the left button
+ * (or space) to pour into the phial and let go at its mark; the remedy keeps flowing a moment after. Too little and it
+ * is weak, too much and it runs over.
  */
 public class MedicineGame extends MinigameScreen {
     private static final ResourceLocation SCENE = Draw.tex("bg_medicine");
-    /** The forearm across the scene: its ends, its middle, half its width. */
-    private static final float ARM_X0 = 22, ARM_X1 = 398, ARM_Y = 140, ARM_HALF = 46;
-    /** The rings: their size when they appear, the size of a stitch's point. */
-    private static final float RING0 = 26, POINT = 6;
+    /** The mortar's middle and size; the phial's place and size. */
+    private static final float MX = 150, MY = 152, MR = 54, PX = 318, PY0 = 74, PY1 = 196, PW = 34;
+    private static final float LIMIT = 40;
+    /** The colours of the bits of herb, root and seed in the bowl. */
+    private static final int[] GRAIN_COLORS = {0xFF5A8A3A, 0xFF7AA048, 0xFF8A5A30, 0xFFB08850, 0xFFA03A4A, 0xFF6A6A30};
 
-    /** A stitch's point: where, when its ring closes, and how it went (-1 not yet, 0 missed, else its quality). */
-    private static final class Point {
-        final float x, y, due;
-        float quality = -1;
+    private enum Phase {GRIND, POUR, DONE}
 
-        Point(float x, float y, float due) {
-            this.x = x;
-            this.y = y;
-            this.due = due;
-        }
-    }
-
-    private final List<Point> points = new ArrayList<>();
-    private final float window, bleedRate;
-    private final float[] woundX, woundY;
-    private int next;
-    private float pain, bleed, maxPain, quality, beat, mouseX = -100, mouseY = -100;
-    private float lastBeat;
+    private Phase phase = Phase.GRIND;
+    private final float band0, band1, mark, tolerance;
+    /** Grinding: the pestle's angle and speed (turns a second), how smooth the paste is, how well it went, splashes. */
+    private float angle, speed, smooth, grindGood, grindTime, lastAngle = Float.NaN;
+    private int splashes;
+    private float splashAt = -10;
+    private boolean holding;
+    /** Pouring: the level in the phial (0 to 1), the flow, how long since the pouring stopped. */
+    private float level, flow, pourScore = -1;
+    private boolean pouring;
+    private float mouseX = MX, mouseY = MY;
     private final Draw.Bits bits = new Draw.Bits();
-    /** Drops of blood running down from the wound: x, y, when. */
-    private final List<float[]> drops = new ArrayList<>();
-    private float dropDebt;
+    /** Bits of herb and grain in the bowl: angle, distance from the middle, size, colour (an index in GRAIN_COLORS). */
+    private final List<float[]> grains = new ArrayList<>();
 
     public MedicineGame(@Nullable MetierNet.Start start, double difficulty, long seed, ItemStack subject, ItemStack tool, List<ItemStack> inputs,
                         Component heading, Component sub, float perfectAt, float criticalBelow) {
         super(start, difficulty, seed, subject, tool, inputs, heading, sub, perfectAt, criticalBelow, 0xFF3E9A86);
-        float d = (float) Math.max(.3, difficulty);
-        this.window = 1.35f / (float) Math.sqrt(d);
-        this.bleedRate = .022f * d;
-        // The wound: a jagged gash slanting across the arm
-        int n = 24;
-        woundX = new float[n];
-        woundY = new float[n];
-        float x0 = 96, x1 = 324, tilt = (random.nextFloat() - .5f) * 30;
-        for (int i = 0; i < n; i++) {
-            float t = i / (n - 1f);
-            woundX[i] = Mth.lerp(t, x0, x1);
-            woundY[i] = ARM_Y + tilt * (t - .5f) * 2 + 6 * Mth.sin(t * 7 + random.nextFloat()) + (random.nextFloat() - .5f) * 3;
+        float d = (float) Math.sqrt(Math.max(.3, difficulty));
+        // The pace that grinds well, in turns a second: narrower the harder it is
+        float mid = 1.15f + random.nextFloat() * .3f;
+        float half = .55f / d;
+        this.band0 = mid - half;
+        this.band1 = mid + half;
+        this.mark = .55f + random.nextFloat() * .3f;
+        this.tolerance = .05f / d;
+        for (int i = 0; i < 46; i++) {
+            float a = random.nextFloat() * Mth.TWO_PI, r = Mth.sqrt(random.nextFloat()) * MR * .62f;
+            grains.add(new float[]{a, r, 2.2f + random.nextFloat() * 3.2f, random.nextInt(GRAIN_COLORS.length)});
         }
-        // The stitches along it: each a point above then below, in turn
-        int stitches = Math.round(5 + 1.5f * d);
-        float gap = window * .78f;
-        float at = 1.2f;
-        for (int s = 0; s < stitches; s++) {
-            float t = (s + .5f) / stitches;
-            float wx = Mth.lerp(t, x0 + 6, x1 - 6);
-            float wy = woundAt(wx);
-            float side = 13 + random.nextFloat() * 3;
-            points.add(new Point(wx - 3, wy - side, at += gap));
-            points.add(new Point(wx + 3, wy + side, at += gap * .8f));
-        }
-    }
-
-    private float woundAt(float x) {
-        for (int i = 1; i < woundX.length; i++) {
-            if (x <= woundX[i]) {
-                float t = (x - woundX[i - 1]) / Math.max(.01f, woundX[i] - woundX[i - 1]);
-                return Mth.lerp(t, woundY[i - 1], woundY[i]);
-            }
-        }
-        return woundY[woundY.length - 1];
     }
 
     @Override
@@ -97,126 +69,157 @@ public class MedicineGame extends MinigameScreen {
 
     @Override
     protected List<Control> controls() {
-        return List.of(control("click", "medicine.ctl_stitch"));
+        return phase == Phase.GRIND ? List.of(control("hold", "medicine.ctl_grind")) : List.of(control("click_hold", "medicine.ctl_pour"));
+    }
+
+    private float grindScore() {
+        return grindTime <= 0 ? 1 : Mth.clamp(grindGood / grindTime, 0, 1);
     }
 
     @Override
     protected float liveScore() {
-        int done = 0;
-        for (Point p : points) {
-            if (p.quality >= 0) {
-                done++;
-            }
+        float g = grindScore() * Math.min(1, smooth) - splashes * .12f;
+        if (phase == Phase.GRIND) {
+            return Mth.clamp(g * .5f + .25f, 0, 1);
         }
-        float average = done == 0 ? 1 : quality / done;
-        float progress = done / (float) points.size();
-        return Mth.clamp(average * (.3f + .7f * progress) - maxPain * .2f - Math.max(0, bleed - .5f) * .2f, 0, 1);
-    }
-
-    /** How big the ring of {@code p} is now (POINT when it should be pierced). */
-    private float ring(Point p) {
-        return POINT + (RING0 - POINT) * (p.due - time) / window;
+        float pour = pourScore >= 0 ? pourScore : Mth.clamp(1 - Math.abs(level - mark) / (tolerance * 6), 0, 1);
+        return Mth.clamp(g * .5f + pour * .5f, 0, 1);
     }
 
     @Override
     protected void update(float dt) {
-        float bpm = 70 + 80 * pain + 30 * bleed;
-        beat += dt * bpm / 60;
-        if (beat >= 1) {
-            beat -= 1;
-            lastBeat = time;
-            if (playing() && (pain > .5f || bleed > .6f)) {
-                sound(SoundEvents.WARDEN_HEARTBEAT, 1.2f, .25f + .4f * Math.max(pain, bleed));
-            }
-        }
         if (!playing()) {
             return;
         }
-        pain = Math.max(0, pain - dt * .05f);
-        int stitched = 0;
-        for (Point p : points) {
-            if (p.quality > 0) {
-                stitched++;
+        if (time >= LIMIT && phase != Phase.DONE) {
+            phase = Phase.DONE;
+            finish(liveScore() * .7f, false, Component.translatable("metier.arcanes_oublies.medicine.too_long"));
+            return;
+        }
+        if (phase == Phase.GRIND) {
+            grind(dt);
+        } else if (phase == Phase.POUR) {
+            pour(dt);
+        }
+    }
+
+    private void grind(float dt) {
+        // The pestle's turning, from how the mouse goes round the bowl while held
+        float a = (float) Math.atan2(mouseY - MY, mouseX - MX);
+        float dist = Mth.sqrt((mouseX - MX) * (mouseX - MX) + (mouseY - MY) * (mouseY - MY));
+        float turn = 0;
+        if (holding && dist > MR * .15f && !Float.isNaN(lastAngle)) {
+            turn = Mth.wrapDegrees((a - lastAngle) * Mth.RAD_TO_DEG) * Mth.DEG_TO_RAD;
+        }
+        lastAngle = holding ? a : Float.NaN;
+        float instant = Math.abs(turn) / Mth.TWO_PI / Math.max(dt, .001f);
+        speed = Mth.lerp(Math.min(1, dt * 6), speed, holding ? instant : 0);
+        angle += turn;
+        if (speed > .05f) {
+            grindTime += dt;
+            boolean good = speed >= band0 && speed <= band1;
+            if (good) {
+                grindGood += dt;
+                smooth += dt / 6.5f;
+                if (random.nextFloat() < dt * 6) {
+                    sound(SoundEvents.GRAVEL_HIT, .7f + random.nextFloat() * .3f, .25f);
+                }
+            } else if (speed < band0) {
+                smooth += dt / 6.5f * .2f;
+            } else if (time - splashAt > .8f) {
+                // Too fast: the paste splashes over the rim
+                splashAt = time;
+                splashes++;
+                shake(2);
+                flash(Component.translatable("metier.arcanes_oublies.medicine.splash"), 0xFFFFB070);
+                sound(SoundEvents.SLIME_SQUISH_SMALL, 1.2f, .6f);
+                float sa = angle;
+                for (int i = 0; i < 6; i++) {
+                    bits.add(time, MX + Mth.cos(sa) * MR * .9f, MY + Mth.sin(sa) * MR * .5f - 8, Mth.cos(sa + i) * 60, -60 - random.nextFloat() * 50,
+                            .7f, 3.5f, 0xFF6A8A3A, 300, false);
+                }
+                if (splashes >= 4) {
+                    phase = Phase.DONE;
+                    finish(liveScore() * .4f, true, Component.translatable("metier.arcanes_oublies.medicine.spilt"));
+                    return;
+                }
             }
         }
-        float closing = stitched / (float) points.size();
-        bleed = Math.min(1, bleed + dt * bleedRate * (1.2f - closing));
-        // Blood: drops welling up along the open part of the wound
-        dropDebt += dt * (1 + 6 * bleed) * (1 - closing);
-        while (dropDebt >= 1) {
-            dropDebt--;
-            float x = Mth.lerp(random.nextFloat(), woundX[0], woundX[woundX.length - 1]);
-            drops.add(new float[]{x, woundAt(x) + 2, time, .8f + random.nextFloat() * 1.2f});
+        // The grains wear down as the paste comes
+        for (float[] g : grains) {
+            g[0] += turn * (1.1f - g[1] / MR);
         }
-        drops.removeIf(d -> time - d[2] > 2.6f);
-        // A ring that closed with nothing done: missed
-        while (next < points.size() && time - points.get(next).due > window * .3f) {
-            miss(points.get(next), false);
+        if (smooth >= 1) {
+            phase = Phase.POUR;
+            holding = false;
+            flash(Component.translatable("metier.arcanes_oublies.medicine.ground"), 0xFFD8F8C8);
+            sound(SoundEvents.NOTE_BLOCK_BELL.value(), 1.4f, .5f);
         }
-        if (bleed >= 1) {
-            finish(liveScore() * .4f, true, Component.translatable("metier.arcanes_oublies.medicine.blood"));
-        } else if (pain >= 1) {
-            finish(liveScore() * .4f, true, Component.translatable("metier.arcanes_oublies.medicine.fainted"));
-        } else if (next >= points.size()) {
-            flash(Component.translatable("metier.arcanes_oublies.medicine.closed"), 0xFFE0FFF0);
+    }
+
+    private void pour(float dt) {
+        // The flow follows the button with a lag; the remedy keeps running a moment after
+        float want = pouring ? .34f : 0;
+        flow = Mth.lerp(Math.min(1, dt * (pouring ? 3.5f : 2.2f)), flow, want);
+        if (flow < .004f && !pouring) {
+            flow = 0;
+        }
+        level += flow * dt;
+        if (flow > .01f && random.nextFloat() < dt * 10) {
+            sound(SoundEvents.BOTTLE_FILL, 1.4f + level * .5f, .12f);
+        }
+        if (level >= 1) {
+            phase = Phase.DONE;
+            pourScore = 0;
+            flash(Component.translatable("metier.arcanes_oublies.medicine.overflow"), 0xFFFF9080);
+            finish(liveScore() * .5f, true, Component.translatable("metier.arcanes_oublies.medicine.overflow"));
+            return;
+        }
+        if (!pouring && flow == 0 && level > .05f) {
+            // Settled: judged against the mark
+            float off = Math.abs(level - mark);
+            pourScore = Mth.clamp(1 - off / (tolerance * 6), 0, 1);
+            phase = Phase.DONE;
+            if (off <= tolerance) {
+                flash(Component.translatable("metier.arcanes_oublies.medicine.exact"), 0xFFB0FFD0);
+            } else {
+                flash(Component.translatable(level < mark ? "metier.arcanes_oublies.medicine.short" : "metier.arcanes_oublies.medicine.over"), 0xFFFFD080);
+            }
             finish(liveScore(), false, null);
         }
     }
 
-    private void miss(Point p, boolean beside) {
-        p.quality = 0;
-        next++;
-        pain = Math.min(1, pain + (beside ? .2f : .16f));
-        maxPain = Math.max(maxPain, pain);
-        shake(2);
-        flash(Component.translatable(beside ? "metier.arcanes_oublies.medicine.beside" : "metier.arcanes_oublies.medicine.missed"), 0xFFFF9080);
-        sound(SoundEvents.PLAYER_HURT, 1.3f, .35f);
-    }
-
-    /** The needle goes in at {@code x, y}. */
-    private void pierce(float x, float y) {
-        if (!playing() || next >= points.size()) {
+    @Override
+    protected void onMouseDown(double mx, double my, int button) {
+        if (button != 0) {
             return;
         }
-        Point p = points.get(next);
-        float dist = Mth.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
-        float r = ring(p);
-        if (r > RING0 * .95f) {
-            // Too early for this one: the needle goes in for nothing
-            pain = Math.min(1, pain + .08f);
-            maxPain = Math.max(maxPain, pain);
-            flash(Component.translatable("metier.arcanes_oublies.medicine.early"), 0xFFFFC080);
-            return;
+        if (phase == Phase.GRIND) {
+            holding = true;
+        } else if (phase == Phase.POUR) {
+            pouring = true;
         }
-        if (dist > 12) {
-            miss(p, true);
-            return;
-        }
-        float timing = Mth.clamp(1 - Math.abs(r - POINT) / (RING0 * .5f), 0, 1);
-        float aim = Mth.clamp(1 - dist / 12, 0, 1);
-        float q = Mth.clamp(.25f + .5f * timing + .25f * aim, 0, 1);
-        p.quality = q;
-        quality += q;
-        next++;
-        bleed = Math.max(0, bleed - .05f);
-        if (q > .85f) {
-            flash(Component.translatable("metier.arcanes_oublies.medicine.neat"), 0xFFB0FFD0);
-        }
-        bits.add(time, p.x, p.y, 0, -20, .4f, 6, 0xFFFFFFFF, 0, true);
-        sound(SoundEvents.WOOL_PLACE, 1.4f + q * .4f, .6f);
     }
 
     @Override
-    protected void onMouseDown(double mx, double my, int button) {
+    protected void onMouseUp(double mx, double my, int button) {
         if (button == 0) {
-            pierce((float) mx, (float) my);
+            holding = false;
+            pouring = false;
         }
     }
 
     @Override
     protected void onKeyDown(int key) {
+        if (key == GLFW.GLFW_KEY_SPACE && phase == Phase.POUR) {
+            pouring = true;
+        }
+    }
+
+    @Override
+    protected void onKeyUp(int key) {
         if (key == GLFW.GLFW_KEY_SPACE) {
-            pierce(mouseX, mouseY);
+            pouring = false;
         }
     }
 
@@ -226,164 +229,119 @@ public class MedicineGame extends MinigameScreen {
     protected void drawGame(GuiGraphics g, float mx, float my) {
         mouseX = mx;
         mouseY = my;
-        drawArm(g);
-        drawWound(g);
-        drawStitches(g);
-        // The next points: the one to pierce with its ring, the one after faintly
-        for (int i = next; i < Math.min(points.size(), next + 2); i++) {
-            Point p = points.get(i);
-            float r = ring(p);
-            boolean now = i == next;
-            if (r > RING0 * 1.4f) {
-                continue;
-            }
-            float a = now ? 1 : .35f;
-            Draw.glow(g, p.x, p.y, 12, Draw.argb((int) (90 * a), 0xFFB0FFD0));
-            Draw.disc(g, p.x, p.y, 2.2f, Draw.argb((int) (255 * a), 0xFF1E6A4A));
-            if (now) {
-                float rr = Math.max(POINT * .6f, r);
-                boolean good = Math.abs(r - POINT) < 4;
-                Draw.ring(g, p.x, p.y, rr, Draw.argb(220, good ? 0xFF7AFFB0 : 0xFFFFFFFF), false);
-                Draw.ring(g, p.x, p.y, POINT, 0x80FFFFFF, false);
-            }
-        }
+        drawMortar(g);
+        drawPhial(g);
         bits.draw(g, time);
-        drawNeedle(g, mx, my);
-        drawMonitor(g);
+        drawGauges(g);
     }
 
-    private void drawArm(GuiGraphics g) {
-        float y0 = ARM_Y - ARM_HALF, y1 = ARM_Y + ARM_HALF;
-        Draw.shadow(g, (ARM_X0 + ARM_X1) / 2, y1 + 8, ARM_X1 - ARM_X0, 26, 160);
-        // Skin: lit from above, rounded at its edges
-        Draw.vgrad(g, ARM_X0, y0, ARM_X1, ARM_Y, 0xFFE8B898, 0xFFDCA484);
-        Draw.vgrad(g, ARM_X0, ARM_Y, ARM_X1, y1, 0xFFDCA484, 0xFFB07858);
-        Draw.rect(g, ARM_X0, y0, ARM_X1, y0 + 1.5f, 0x50FFFFFF);
-        Draw.vgrad(g, ARM_X0, y1 - 8, ARM_X1, y1, 0x00000000, 0x40501810);
-        // A rolled-up linen sleeve at one end, a clean cloth under the other
-        Draw.vgrad(g, ARM_X0 - 6, y0 - 6, ARM_X0 + 34, y1 + 6, 0xFFF4F0E6, 0xFFC8C0B0);
-        for (int i = 0; i < 4; i++) {
-            Draw.rect(g, ARM_X0 + 4 + i * 8, y0 - 6, ARM_X0 + 5 + i * 8, y1 + 6, 0x30000000);
-        }
-        // Fine hair and freckles, for the skin to read as skin
-        for (int i = 0; i < 40; i++) {
-            float x = ARM_X0 + 40 + (i * 97 % 330), y = y0 + 6 + (i * 53 % (int) (ARM_HALF * 2 - 12));
-            Draw.disc(g, x, y, .7f, 0x40804030);
-        }
+    private int paste() {
+        float s = Mth.clamp(smooth, 0, 1);
+        return Draw.lerp(0xFF6A7A3A, 0xFF8AB060, s);
     }
 
-    private void drawWound(GuiGraphics g) {
-        int stitched = 0;
-        for (Point p : points) {
-            if (p.quality > 0) {
-                stitched++;
-            }
-        }
-        float open = 1 - .7f * stitched / (float) points.size();
-        // Bruised skin round it, the open lips, the dark of the cut
-        for (int i = 1; i < woundX.length; i++) {
-            Draw.line(g, woundX[i - 1], woundY[i - 1], woundX[i], woundY[i], 10 * open + 3, 0x30802020);
-        }
-        for (int i = 1; i < woundX.length; i++) {
-            float t = i / (float) woundX.length;
-            float w = (2 + 4 * Mth.sin(Mth.PI * t)) * open + 1;
-            Draw.line(g, woundX[i - 1], woundY[i - 1], woundX[i], woundY[i], w + 1.6f, 0xFFC04A48);
-            Draw.line(g, woundX[i - 1], woundY[i - 1], woundX[i], woundY[i], w, 0xFF6A0E14);
-        }
-        // Blood running from it
-        for (float[] d : drops) {
-            float age = time - d[2];
-            float len = Math.min(d[3] * 14, age * 18);
-            float a = age > 2 ? 1 - (age - 2) / .6f : 1;
-            Draw.line(g, d[0], d[1], d[0] + .6f, d[1] + len, 1.8f, Draw.argb((int) (220 * a), 0xFF8A0E16));
-            Draw.disc(g, d[0] + .6f, d[1] + len, 1.6f, Draw.argb((int) (230 * a), 0xFFA01A20));
-        }
-    }
-
-    private void drawStitches(GuiGraphics g) {
-        // The thread: from each point to the next one stitched, across the wound, a knot at each pair's end
-        Point prev = null;
-        for (int i = 0; i < next && i < points.size(); i++) {
-            Point p = points.get(i);
-            if (p.quality <= 0) {
-                prev = null;
+    private void drawMortar(GuiGraphics g) {
+        // The bowl, seen a little from above: its shadow, its outside, its rim, the hollow and what is in it
+        Draw.shadow(g, MX, MY + MR * .62f + 6, MR * 2.4f, 22, 180);
+        Draw.vgrad(g, MX - MR, MY, MX + MR, MY + MR * .62f, 0xFFA8A49A, 0xFF5E5A54);
+        Draw.disc(g, MX - MR * .55f, MY + MR * .5f, MR * .45f, 0xFF6A665E);
+        Draw.disc(g, MX + MR * .55f, MY + MR * .5f, MR * .45f, 0xFF56524C);
+        Draw.rect(g, MX - MR * .55f, MY + MR * .3f, MX + MR * .55f, MY + MR * .95f, 0xFF615D56);
+        Draw.rect(g, MX - MR * .6f, MY + MR * .9f, MX + MR * .6f, MY + MR + 2, 0xFF4A4640);
+        ellipse(g, MX, MY, MR, MR * .42f, 0xFFC8C4BA);
+        ellipse(g, MX, MY + 1, MR * .86f, MR * .34f, 0xFF3A3632);
+        // The paste: rough with grains at first, smooth and even at the end
+        ellipse(g, MX, MY + 4, MR * .78f, MR * .27f, paste());
+        float rough = 1 - Mth.clamp(smooth, 0, 1);
+        for (float[] gr : grains) {
+            float size = gr[2] * (.15f + .85f * rough);
+            if (size < .5f) {
                 continue;
             }
-            if (prev != null) {
-                int c = Draw.lerp(0xFF2A3A6A, 0xFF101828, 1 - p.quality);
-                Draw.line(g, prev.x, prev.y, p.x, p.y, 1.6f, c);
-                Draw.line(g, prev.x, prev.y - .6f, p.x, p.y - .6f, .6f, 0x70FFFFFF);
-            }
-            Draw.disc(g, p.x, p.y, 1.8f, 0xFF1A2440);
-            if (i % 2 == 1) {
-                Draw.disc(g, p.x + 2.5f, p.y + 1.5f, 1.6f, 0xFF1A2440);
-            }
-            prev = i % 2 == 0 ? p : null;
+            float x = MX + Mth.cos(gr[0]) * gr[1], y = MY + 4 + Mth.sin(gr[0]) * gr[1] * .34f;
+            Draw.disc(g, x, y, size, Draw.argb(230, GRAIN_COLORS[(int) gr[3]]));
+            Draw.disc(g, x - size * .3f, y - size * .3f, size * .35f, 0x50FFFFFF);
+        }
+        Draw.glow(g, MX - MR * .3f, MY - 2, MR * .5f, Draw.argb((int) (60 * smooth), 0xFFE8FFD0));
+        // The pestle, its head in the bowl where it is turning, its handle leaning out
+        float hx = MX + Mth.cos(angle) * MR * .45f, hy = MY + 4 + Mth.sin(angle) * MR * .16f;
+        float tx = hx + 30 + Mth.cos(angle) * 10, ty = hy - 62;
+        Draw.line(g, hx, hy, tx, ty, 11, 0xFF8A6A48);
+        Draw.line(g, hx + 2, hy, tx + 2, ty, 3, 0x40FFFFFF);
+        Draw.disc(g, tx, ty, 6.5f, 0xFF9A7A56);
+        Draw.disc(g, hx, hy, 8, 0xFFB0AA9E);
+        Draw.disc(g, hx - 2, hy - 2, 3, 0x60FFFFFF);
+    }
+
+    private static void ellipse(GuiGraphics g, float cx, float cy, float rx, float ry, int color) {
+        g.pose().pushPose();
+        g.pose().translate(cx, cy, 0);
+        g.pose().scale(1, ry / rx, 1);
+        Draw.disc(g, 0, 0, rx, color);
+        g.pose().popPose();
+    }
+
+    private void drawPhial(GuiGraphics g) {
+        boolean active = phase != Phase.GRIND;
+        float x0 = PX - PW / 2, x1 = PX + PW / 2;
+        float alpha = active ? 1 : .45f;
+        // The phial: clear glass, its neck, the mark to fill to
+        Draw.shadow(g, PX, PY1 + 6, PW * 2, 14, (int) (150 * alpha));
+        Draw.rect(g, x0, PY0 + 24, x1, PY1, Draw.argb((int) (70 * alpha), 0xFFD8F0FF));
+        Draw.rect(g, PX - 8, PY0, PX + 8, PY0 + 24, Draw.argb((int) (70 * alpha), 0xFFD8F0FF));
+        // The remedy in it
+        float y = Mth.lerp(level, PY1, PY0 + 24);
+        if (level > 0) {
+            Draw.vgrad(g, x0 + 2, y, x1 - 2, PY1 - 2, Draw.argb((int) (235 * alpha), 0xFF9ADA7A), Draw.argb((int) (235 * alpha), 0xFF4A8A3A));
+            Draw.rect(g, x0 + 2, y, x1 - 2, y + 1.5f, Draw.argb((int) (255 * alpha), 0xFFD8FFC0));
+        }
+        // The stream falling into it while it pours
+        if (flow > .004f) {
+            float w = 1 + flow * 14;
+            Draw.rect(g, PX - w / 2, PY0 - 30, PX + w / 2, y, 0xE08ACA6A);
+            Draw.glow(g, PX, y, 6 + flow * 20, 0x60D8FFC0);
+        }
+        // The glass's edges and highlight
+        Draw.rect(g, x0, PY0 + 24, x0 + 1.5f, PY1, Draw.argb((int) (200 * alpha), 0xFFFFFFFF));
+        Draw.rect(g, x1 - 1.5f, PY0 + 24, x1, PY1, Draw.argb((int) (120 * alpha), 0xFFFFFFFF));
+        Draw.rect(g, x0, PY1 - 1.5f, x1, PY1, Draw.argb((int) (200 * alpha), 0xFFFFFFFF));
+        Draw.rect(g, x0 + 5, PY0 + 30, x0 + 8, PY1 - 12, Draw.argb((int) (90 * alpha), 0xFFFFFFFF));
+        Draw.rect(g, PX - 10, PY0 - 3, PX + 10, PY0 + 1, Draw.argb((int) (220 * alpha), 0xFFE8F4FF));
+        // The mark: a line round the glass, and the band that counts as exact
+        float my = Mth.lerp(mark, PY1, PY0 + 24);
+        float band = (Mth.lerp(mark + tolerance, PY1, PY0 + 24) - my);
+        Draw.rect(g, x0 - 4, my + band, x1 + 4, my - band, Draw.argb((int) (60 * alpha), 0xFF7AFFB0));
+        Draw.rect(g, x0 - 6, my - .7f, x1 + 6, my + .7f, Draw.argb((int) (255 * alpha), 0xFF2A3A30));
+        Draw.text(g, Component.translatable("metier.arcanes_oublies.medicine.mark"), x1 + 9, my - 4, Draw.argb((int) (255 * alpha), 0xFFF0E8D8), .75f);
+        // The flask it is poured from, tilted over the phial while pouring
+        if (active) {
+            float tilt = Mth.clamp(flow * 3, 0, 1);
+            float fx = PX - 20 - 8 * tilt, fy = PY0 - 44;
+            Draw.disc(g, fx, fy, 14, 0xC0D8F0FF);
+            Draw.disc(g, fx, fy + 2, 11, 0xE07ABA5A);
+            Draw.line(g, fx + 8, fy - 8, PX - 2, PY0 - 30 - 4 * (1 - tilt), 5, 0xC0D8F0FF);
         }
     }
 
-    private void drawNeedle(GuiGraphics g, float mx, float my) {
-        if (!inArea(mx, my)) {
-            return;
-        }
-        // The thread trailing back to the last stitch
-        for (int i = Math.min(next, points.size()) - 1; i >= 0; i--) {
-            if (points.get(i).quality > 0) {
-                Point p = points.get(i);
-                float cx = (p.x + mx) / 2, cy = Math.max(p.y, my) + 18;
-                float px = p.x, py = p.y;
-                for (int s = 1; s <= 10; s++) {
-                    float t = s / 10f;
-                    float x = (1 - t) * (1 - t) * p.x + 2 * (1 - t) * t * cx + t * t * mx;
-                    float y = (1 - t) * (1 - t) * p.y + 2 * (1 - t) * t * cy + t * t * my;
-                    Draw.line(g, px, py, x, y, 1, 0xC02A3A6A);
-                    px = x;
-                    py = y;
-                }
-                break;
+    private void drawGauges(GuiGraphics g) {
+        // The paste coming smooth, and the pace of the pestle against the pace that grinds well
+        float gx0 = 40, gx1 = 260, gy = AY0 + 12;
+        Draw.text(g, Component.translatable("metier.arcanes_oublies.medicine.paste"), gx0, gy - 10, 0xFF2A2420, .75f);
+        Draw.pill(g, gx0, gy, gx1, gy + 7, 0xFF3A3430);
+        Draw.pill(g, gx0, gy, gx0 + (gx1 - gx0) * Mth.clamp(smooth, 0, 1), gy + 7, 0xFF9ADA7A);
+        if (phase == Phase.GRIND) {
+            float py = gy + 20, top = 2.6f;
+            Draw.text(g, Component.translatable("metier.arcanes_oublies.medicine.pace"), gx0, py - 1, 0xFF2A2420, .75f);
+            float px0 = gx0 + 40;
+            Draw.pill(g, px0, py, gx1, py + 7, 0xFF3A3430);
+            Draw.rect(g, px0 + (gx1 - px0) * band0 / top, py, px0 + (gx1 - px0) * Math.min(top, band1) / top, py + 7, 0xB050D070);
+            float at = px0 + (gx1 - px0) * Mth.clamp(speed / top, 0, 1);
+            boolean good = speed >= band0 && speed <= band1;
+            Draw.glow(g, at, py + 3.5f, good ? 10 : 6, good ? 0xC0FFE070 : 0x80FFFFFF);
+            Draw.rect(g, at - 1, py - 3, at + 1, py + 10, speed > band1 ? 0xFFFF7050 : 0xFFFFFFFF);
+            for (int i = 0; i < splashes; i++) {
+                Draw.disc(g, gx1 + 10 + i * 9, py + 3.5f, 3, 0xFFFF9060);
             }
         }
-        // A curved surgeon's needle, its point at the mouse
-        float px = mx, py = my;
-        for (int s = 1; s <= 8; s++) {
-            float a = Mth.PI + s * Mth.PI / 9;
-            float x = mx + 9 + 9 * Mth.cos(a), y = my - 9 * Mth.sin(a) * .6f;
-            Draw.line(g, px, py, x, y, 1.4f, 0xFFD8DCE4);
-            px = x;
-            py = y;
-        }
-        Draw.disc(g, mx, my, 1, 0xFFFFFFFF);
-    }
-
-    /** A heart monitor in the corner: its trace, faster with pain and loss of blood; the two gauges under it. */
-    private void drawMonitor(GuiGraphics g) {
-        float x0 = AX1 - 104, y0 = AY0 + 8, x1 = AX1 - 8, y1 = AY0 + 42;
-        Draw.rect(g, x0 - 2, y0 - 2, x1 + 2, y1 + 2, 0xFF2A3030);
-        Draw.rect(g, x0, y0, x1, y1, 0xFF081410);
-        int color = pain > .6f || bleed > .7f ? 0xFFFF6A5A : 0xFF6AFF9A;
-        float px = x0, py = (y0 + y1) / 2;
-        for (float x = x0; x <= x1; x += 1.5f) {
-            float phase = (x - x0) / (x1 - x0) * 3 - (time - lastBeat) * 2.2f;
-            float f = phase - (float) Math.floor(phase);
-            float y = (y0 + y1) / 2;
-            if (f > .45f && f < .5f) {
-                y -= 12;
-            } else if (f >= .5f && f < .55f) {
-                y += 7;
-            } else if (f > .65f && f < .75f) {
-                y -= 2.5f;
-            }
-            Draw.line(g, px, py, x, y, 1, color);
-            px = x;
-            py = y;
-        }
-        Draw.glow(g, x1 - 6, y0 + 6, 6, Draw.argb((int) (200 * Math.max(0, 1 - (time - lastBeat) * 4)), color));
-        float gx0 = x0, gx1 = x1;
-        Draw.text(g, Component.translatable("metier.arcanes_oublies.medicine.pain"), gx0, y1 + 5, 0xFFF0DCC0, .7f);
-        Draw.pill(g, gx0 + 36, y1 + 6, gx1, y1 + 11, 0xFF2E2420);
-        Draw.pill(g, gx0 + 36, y1 + 6, gx0 + 36 + (gx1 - gx0 - 36) * pain, y1 + 11, 0xFFFFA060);
-        Draw.text(g, Component.translatable("metier.arcanes_oublies.medicine.bleeding"), gx0, y1 + 15, 0xFFF0DCC0, .7f);
-        Draw.pill(g, gx0 + 36, y1 + 16, gx1, y1 + 21, 0xFF2E2420);
-        Draw.pill(g, gx0 + 36, y1 + 16, gx0 + 36 + (gx1 - gx0 - 36) * bleed, y1 + 21, 0xFFD0303A);
     }
 }

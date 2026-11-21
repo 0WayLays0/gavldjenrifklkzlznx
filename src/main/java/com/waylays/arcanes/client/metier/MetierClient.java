@@ -61,11 +61,6 @@ public final class MetierClient {
     }
 
     public static void station(MetierNet.Station s) {
-        // The same station again (organised by a game master): refreshed in place, the folder open kept
-        if (Minecraft.getInstance().screen instanceof StationScreen open && open.sameStation(s)) {
-            open.update(s);
-            return;
-        }
         Minecraft.getInstance().setScreen(new StationScreen(s));
     }
 

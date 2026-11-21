@@ -118,6 +118,9 @@ public final class MetierDefs {
         public int cooldown = 0;
         /** The station's folder it is listed in ("": at the top, outside any folder). */
         public String folder = "";
+        /** The minigame it is played with (null: the station's own); so that each recipe has the one that fits it. */
+        @Nullable
+        public Game game;
     }
 
     /** A trade. */
@@ -160,6 +163,73 @@ public final class MetierDefs {
             return !recipes.isEmpty();
         }
 
+        /** A new folder (a name not taken yet, from {@code base}); returns its name. */
+        public String newFolder(String base) {
+            String name = folderName(base);
+            if (name.isEmpty()) {
+                name = "Dossier";
+            }
+            String unique = name;
+            for (int i = 2; folders.contains(unique); i++) {
+                unique = name + " " + i;
+            }
+            folders.add(unique);
+            return unique;
+        }
+
+        /** Renames a folder, its recipes with it; false if the new name is empty or taken. */
+        public boolean renameFolder(String from, String to) {
+            String name = folderName(to);
+            int at = folders.indexOf(from);
+            if (at < 0 || name.isEmpty() || folders.contains(name)) {
+                return false;
+            }
+            folders.set(at, name);
+            recipes.forEach(r -> {
+                if (r.folder.equals(from)) {
+                    r.folder = name;
+                }
+            });
+            return true;
+        }
+
+        /** Deletes a folder: its recipes are left outside any folder. */
+        public void deleteFolder(String name) {
+            folders.remove(name);
+            recipes.forEach(r -> {
+                if (r.folder.equals(name)) {
+                    r.folder = "";
+                }
+            });
+        }
+
+        /** Moves a folder up ({@code by} -1) or down (1) the list. */
+        public void moveFolder(String name, int by) {
+            int at = folders.indexOf(name), to = at + by;
+            if (at >= 0 && to >= 0 && to < folders.size()) {
+                folders.add(to, folders.remove(at));
+            }
+        }
+
+        /** Moves a recipe before the previous (or after the next) recipe of its own folder; returns its new index. */
+        public int moveRecipe(int index, int by) {
+            if (index < 0 || index >= recipes.size()) {
+                return index;
+            }
+            String folder = recipes.get(index).folder;
+            int to = index + by;
+            while (to >= 0 && to < recipes.size() && !recipes.get(to).folder.equals(folder)) {
+                to += by;
+            }
+            if (to < 0 || to >= recipes.size()) {
+                return index;
+            }
+            Recipe r = recipes.get(index);
+            recipes.set(index, recipes.get(to));
+            recipes.set(to, r);
+            return to;
+        }
+
         @Nullable
         public Tool tool(ItemStack stack) {
             ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
@@ -178,12 +248,14 @@ public final class MetierDefs {
     }
 
     /** The version of the file the mod writes: trades it brought in since are added to an older file (see {@link #load}). */
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     /** The whole file. */
     public static final class Config {
         public int version = VERSION;
         public List<Def> metiers = new ArrayList<>();
+        /** The kinds of item (item ids) kept from the grindstone's repair (see {@code Grindstone}). */
+        public List<String> grindstoneBanned = new ArrayList<>();
     }
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -277,6 +349,16 @@ public final class MetierDefs {
         if (c.metiers == null) {
             c.metiers = new ArrayList<>();
         }
+        if (c.grindstoneBanned == null) {
+            c.grindstoneBanned = new ArrayList<>();
+        }
+        List<String> kept = new ArrayList<>();
+        for (String id : c.grindstoneBanned) {
+            if (id != null && !id.isBlank() && !kept.contains(id.strip())) {
+                kept.add(id.strip());
+            }
+        }
+        c.grindstoneBanned = kept;
         List<String> seen = new ArrayList<>();
         for (Def d : c.metiers) {
             if (d.id == null || d.id.isBlank()) {
@@ -451,6 +533,17 @@ public final class MetierDefs {
             for (Def d : defaults().metiers) {
                 if ((d.id.equals("menuiserie") || d.id.equals("medecine")) && byIdIn(c, d.id) == null) {
                     c.metiers.add(d);
+                }
+            }
+        }
+        if (c.version < 3) {
+            // The healers' table of 1.8.0 made a golden apple: an antidote now, as a healer would make
+            Def medic = byIdIn(c, "medecine");
+            if (medic != null) {
+                for (int i = 0; i < medic.recipes.size(); i++) {
+                    if (medic.recipes.get(i).name.equals("Pomme de vie")) {
+                        medic.recipes.set(i, antidote());
+                    }
                 }
             }
         }
@@ -633,18 +726,27 @@ public final class MetierDefs {
         longRegen.components = parseObject("{\"minecraft:potion_contents\":{\"potion\":\"minecraft:long_regeneration\"}}");
         elixir.partial = new ArrayList<>(List.of(regen));
         elixir.perfect = new ArrayList<>(List.of(longRegen, new Reward("minecraft:glass_bottle", 1, 1)));
-        Recipe apple = new Recipe();
-        apple.name = "Pomme de vie";
-        apple.difficulty = 1.25;
-        apple.inputs = new ArrayList<>(List.of(new Ingredient("minecraft:apple", 1), new Ingredient("minecraft:gold_ingot", 6)));
-        apple.partial = new ArrayList<>(List.of(new Reward("minecraft:golden_apple", 1, 1)));
-        apple.perfect = new ArrayList<>(List.of(new Reward("minecraft:golden_apple", 1, 1), new Reward("minecraft:gold_nugget", 9, 18)));
-        apple.critical = new ArrayList<>(List.of(new Reward("minecraft:gold_nugget", 9, 27)));
-        medic.recipes = new ArrayList<>(List.of(poultice, elixir, apple));
+        medic.recipes = new ArrayList<>(List.of(poultice, elixir, antidote()));
         medic.durability = 0;
         medic.durabilityCritical = 0;
         c.metiers.add(medic);
         return sanitize(c);
+    }
+
+    /** The healers' antidote: honey worked with glow berries, which cures poison (a honey bottle). */
+    private static Recipe antidote() {
+        Recipe r = new Recipe();
+        r.name = "Antidote au miel";
+        r.difficulty = 1.1;
+        r.inputs = new ArrayList<>(List.of(new Ingredient("minecraft:glass_bottle", 2), new Ingredient("minecraft:honeycomb", 1),
+                new Ingredient("minecraft:glow_berries", 2)));
+        Reward honey = new Reward("minecraft:honey_bottle", 2, 2);
+        honey.components = parseObject("{\"minecraft:custom_name\":\"{\\\"text\\\":\\\"Antidote au miel\\\",\\\"italic\\\":false}\"}");
+        Reward more = new Reward("minecraft:honey_bottle", 3, 3);
+        more.components = honey.components;
+        r.partial = new ArrayList<>(List.of(honey));
+        r.perfect = new ArrayList<>(List.of(more));
+        return r;
     }
 
     /** A deep copy (for the editor). */

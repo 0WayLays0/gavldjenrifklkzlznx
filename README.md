@@ -698,6 +698,8 @@ addons. Un sort instantané est chargé une seconde (barre d'incantation et post
 propre geste ; un sort à charger plus court qu'une seconde est allongé à une seconde. Les sorts canalisés, les relances
 d'un sort (renvoyer ses invocations, second lancer…) et les sorts des monstres ne changent pas. Réglable dans la config
 serveur (`world/serverconfig/arcanes_oublies-server.toml`, `spells.minCastTicks`, en ticks : 20 = 1 s, 0 = désactivé).
+Le temps d'incantation réglé pour un sort dans l'éditeur de sorts passe avant tout cela, sorts instantanés compris : un
+sort instantané réglé à 40 ticks se charge 2 s, réglé à 0 il redevient instantané.
 
 ## Récupérer le mod
 
@@ -827,14 +829,23 @@ Minage sans pioche : « *Il semble qu'une pioche soit nécessaire pour récupér
 Les stations (table de craft, forge, alambic…) n'ont plus de bouton « Utilisation classique » : on ne s'en sert que par
 les recettes du métier. Les cartes de recettes sont plus compactes (jusqu'à six visibles d'un coup).
 
-### Métiers : dossiers de recettes
+### Métiers : dossiers de recettes (côté staff)
 
-Dans une station (artisanat, forge, alchimie, menuiserie, médecine…), les recettes peuvent être rangées dans des
-dossiers, affichés en premier ; un clic ouvre un dossier, « ◀ Retour » (ou Échap) revient à la liste. Un maître du jeu
-(permission 2) voit le bouton **Organiser** : créer un dossier (« + Dossier »), le renommer (✎), le monter ou le
-descendre (▲ ▼), le supprimer (✕ : ses recettes reviennent hors dossier) ; monter ou descendre une recette (▲ ▼) et la
-ranger dans un autre dossier (⇄). Chaque changement est enregistré tout de suite sur le serveur, dans
-`config/arcanes_oublies/metiers.json`. Le dossier d'une recette se règle aussi dans l'éditeur des métiers.
+Dans l'éditeur des métiers (`/arcanes metiers`), les recettes d'une station (artisanat, forge, alchimie, menuiserie,
+médecine…) se rangent dans des dossiers : « + Dossier » en crée un, un clic l'ouvre ou le ferme, ✎ le renomme (ou le
+supprime), ▲ ▼ le déplacent, ✕ le supprime (ses recettes sortent du dossier). Sur la fiche d'une recette, « Dossier : … »
+la range ailleurs et ▲ ▼ la déplacent dans son dossier. Les joueurs, eux, voient toujours la simple liste des recettes.
+
+Chaque recette peut aussi avoir **son propre mini-jeu** (« Mini-jeu : … » sur sa fiche), pour qu'il colle à ce qui est
+fabriqué : par exemple une potion distillée à la table de soins. Par défaut, c'est celui de la station.
+
+### Métiers : la meule dans l'éditeur
+
+Pas de recette pour réparer : on fait clic droit sur une meule avec l'arme ou l'armure usée en main, et le mini-jeu se
+lance dessus. La liste des objets que la meule refuse se gère dans `/arcanes metiers`, entrée **Meule** (groupe
+« Réparation ») : « + » ajoute l'objet tenu en main (ou un identifiant), un clic sur un objet le retire. Les commandes
+restent : `/meule interdire` (le type d'objet tenu), `/meule interdire <id>`, `/meule interdire objet` (cet objet-là
+seulement), `/meule autoriser …`, `/meule liste`. Le joueur lit « Cette arme ne semble pas réparable. »
 
 ### Métiers : menuiserie et médecine
 
@@ -843,15 +854,17 @@ ranger dans un autre dossier (⇄). Chaque changement est enregistré tout de su
   descendant la souris (ou W / S) pour rester sur le trait ; le trait de scie laissé derrière montre si la coupe est
   droite. Trop loin du trait, le bois se fend : trois mauvais coups et la planche est perdue (échec critique). Recettes de
   départ : planches de chêne, porte en chêne, tonneau.
-- **Médecine** (sur la **Table de soins**, un bloc du mod : une table sous un drap blanc à croix rouge, un rouleau de
-  bandage, un pot d'onguent et une fiole) : recoudre une plaie au bras. Chaque point est à piquer quand l'anneau le
-  rejoint (clic ou Espace) ; trop tôt, trop tard ou à côté, le patient a mal. La plaie saigne tant qu'elle n'est pas
-  refermée : trop de sang perdu ou trop de douleur, et le patient s'évanouit (échec critique). Recettes de départ :
-  cataplasme de soin (régénération), élixir de régénération, pomme de vie (pomme dorée). Recette de la table :
-  laine blanche, colorant rouge, planches et bâtons.
+- **Médecine** (sur la **Table de soins**, un bloc du mod : une table de chêne avec un tiroir, un chemin de lin à croix
+  rouge, un mortier et son pilon, une fiole et un flacon de teintures, un rouleau de bandage et un bouquet d'herbes) :
+  préparer un remède comme un soigneur. D'abord broyer les ingrédients au mortier en tournant le pilon (souris en
+  cercles, clic maintenu) à la bonne allure : trop lent, rien ne se passe ; trop vite, ça déborde (quatre fois et le
+  mortier se renverse). Puis verser la dose dans la fiole (clic ou Espace maintenu) et relâcher au trait : le remède
+  coule encore un instant ; trop peu, il est faible ; trop, la fiole déborde. Recettes de départ : cataplasme de soin
+  (régénération), élixir de régénération, antidote au miel (soigne le poison).
 
 Un serveur qui avait déjà son fichier des métiers reçoit ces deux métiers en plus au démarrage, sans rien perdre du
-reste. Les fonds des mini-jeux de minage (une galerie de mine sous une lanterne) et de cueillette (une prairie au soleil
+reste. Les fonds des mini-jeux de minage (une paroi de roche, avec un vrai rocher taillé et des pépites de minerai qui
+scintillent, des fissures qui éclatent en étoile à chaque coup) et de cueillette (une prairie au soleil
 couchant au-dessus de la terre en coupe) ont été repeints.
 
 ### `/invsee` et `/repair`

@@ -919,11 +919,11 @@ public final class ClientSmokeTest {
                                     new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CRAFTING_TABLE), List.of(
                                     new com.waylays.arcanes.metier.MetierNet.RecipeView("Lanterne", in, List.of(true, false),
                                             new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN),
-                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN, 2), 1, 0, "Éclairage"),
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN, 2), 1, 0),
                                     new com.waylays.arcanes.metier.MetierNet.RecipeView("Coffre", List.of(new net.minecraft.world.item.ItemStack(
                                             net.minecraft.world.item.Items.OAK_PLANKS, 8)), List.of(true),
                                             new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST),
-                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST), .8, 0)), 0, List.of("Éclairage"), true)));
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST), .8, 0)), 0)));
                             metierTick = ticks;
                             metierTrial++;
                             return false;
@@ -931,18 +931,8 @@ public final class ClientSmokeTest {
                         if (ticks - metierTick < 20) {
                             return false;
                         }
-                        if (shots && index == others.length + 1) {
-                            screenshot(mc, "metier_station");
-                        }
-                        if (mc.screen instanceof com.waylays.arcanes.client.metier.StationScreen station && index == others.length + 1) {
-                            // The folder opened: the lantern inside it
-                            station.showFolder("Éclairage");
-                            metierTrial++;
-                            metierTick = ticks;
-                            return false;
-                        }
                         if (shots) {
-                            screenshot(mc, "metier_station_folder");
+                            screenshot(mc, "metier_station");
                         }
                         mc.setScreen(null);
                         metierStep = 10;

@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * The minimum cast time (see {@link CastTimeFloor}) where Iron's starts a player's cast: whatever the spell's own
- * cast time (and however a spell computes it), the cast it starts lasts at least that long. A recast the spell holds
+ * The cast time where Iron's starts a player's cast (see {@link CastTimeFloor#forCast}): the one set in the spell
+ * editor, instant spells included, else at least the minimum, whatever the spell's own (however a spell computes it). A recast the spell holds
  * open (sending summons away, a second throw) stays as quick as the spell makes it.
  */
 @Mixin(value = AbstractSpell.class, remap = false)
@@ -22,6 +22,6 @@ public abstract class AbstractSpellMixin {
         if (caster != null && MagicData.getPlayerMagicData(caster).getPlayerRecasts().hasRecastForSpell(spell.getSpellId())) {
             return ticks;
         }
-        return CastTimeFloor.apply(spell, caster, ticks);
+        return CastTimeFloor.forCast(spell, caster, ticks);
     }
 }

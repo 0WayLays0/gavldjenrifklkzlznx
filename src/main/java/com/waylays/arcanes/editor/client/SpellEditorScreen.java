@@ -1252,7 +1252,10 @@ public class SpellEditorScreen extends Screen {
             String p = String.format(Locale.ROOT, "%.1f", power) + (Math.abs(dmg - 1) > 1e-6 ? String.format(Locale.ROOT, "  (×%.2f)", dmg) : "");
             g.drawString(font, p, cols[2], y, 0xFFFF9F6B, false);
             g.drawString(font, String.format(Locale.ROOT, "%.1f s", cooldown), cols[3], y, TEXT, false);
-            g.drawString(font, spell.getCastType() == CastType.INSTANT ? "—" : String.format(Locale.ROOT, "%.2f s", cast / 20), cols[4], y, TEXT, false);
+            Map<String, Object> waiting = pending.get(spell.getSpellResource());
+            boolean castSet = waiting != null && waiting.containsKey("tune:" + Stat.CAST_TIME.key);
+            double shownCast = spell.getCastType() == CastType.INSTANT && !castSet ? com.waylays.arcanes.spells.CastTimeFloor.instantCharge(spell) : cast;
+            g.drawString(font, shownCast <= 0 ? "—" : String.format(Locale.ROOT, "%.2f s", shownCast / 20), cols[4], y, TEXT, false);
             final int lv = level;
             hots.add(new Hot(x0, y - 1, x1, y + 10, () -> {
                 previewLevel = lv;

@@ -72,6 +72,8 @@ public class MetierEditorScreen extends Screen {
     private MetierDefs.Config config;
     private String savedJson;
     private int selected, recipe;
+    /** The grindstone's page is shown (its blacklist) instead of a trade. */
+    private boolean grindPage;
     private Tab tab = Tab.SETTINGS;
     private int scroll, listScroll, contentBottom, listBottom;
     private int left, top, w, h;
@@ -82,6 +84,8 @@ public class MetierEditorScreen extends Screen {
     private final List<int[]> icons = new ArrayList<>();
     private final List<ItemStack> iconStacks = new ArrayList<>();
     private final Map<EditBox, Num> numbers = new HashMap<>();
+    /** The folders closed in the recipe list. */
+    private final java.util.Set<String> collapsed = new java.util.HashSet<>();
     private final List<AbstractWidget> background = new ArrayList<>();
     // The small window open over the rest (to change one item, block or tool)
     @Nullable
@@ -115,6 +119,9 @@ public class MetierEditorScreen extends Screen {
 
     @Nullable
     private Def def() {
+        if (grindPage) {
+            return null;
+        }
         return selected >= 0 && selected < config.metiers.size() ? config.metiers.get(selected) : null;
     }
 
@@ -339,21 +346,39 @@ public class MetierEditorScreen extends Screen {
                 int index = i;
                 if (inList(y)) {
                     add(new Btn(x, y, SIDE, 19, () -> Component.literal(d.name), () -> {
+                        grindPage = false;
                         selected = index;
                         recipe = 0;
                         scroll = 0;
                         rebuildWidgets();
-                    }, null, d.enabled ? GAME_COLORS[d.game.ordinal()] : DIM, () -> selected == index,
+                    }, null, d.enabled ? GAME_COLORS[d.game.ordinal()] : DIM, () -> !grindPage && selected == index,
                             () -> d.blocks.isEmpty() ? GAME_ICONS[d.game.ordinal()] : blockIcon(d.blocks.get(0)), 1));
                 }
                 y += 21;
             }
             y += 8;
         }
+        if (inList(y)) {
+            labels.add(new Label(x + 2, y + 5, tr("group.grindstone"), GOLD_LIGHT, 1));
+        }
+        y += 20;
+        if (inList(y)) {
+            add(new Btn(x, y, SIDE, 19, () -> tr("grind_page"), () -> {
+                grindPage = true;
+                scroll = 0;
+                rebuildWidgets();
+            }, tr("grind_page.tip"), 0xFF8AA0B8, () -> grindPage, () -> new ItemStack(Items.GRINDSTONE), 1));
+        }
+        y += 29;
         listBottom = y + listScroll - (top + 34);
     }
 
     private void buildTrade() {
+        if (grindPage) {
+            labels.add(new Label(mx0 + 10, top + 40, tr("grind_page"), GOLD_LIGHT, 1));
+            labels.add(new Label(mx0 + 10, top + 58, tr("grind_page.sub"), DIM, 1));
+            return;
+        }
         Def d = def();
         if (d == null) {
             labels.add(new Label(mx0 + 10, top + 50, tr("none"), DIM, 1));
@@ -456,6 +481,10 @@ public class MetierEditorScreen extends Screen {
     private void buildContent() {
         Def d = def();
         contentBottom = 0;
+        if (grindPage) {
+            contentBottom = grindstone(cy0 + 6 - scroll) + scroll - cy0;
+            return;
+        }
         if (d == null) {
             return;
         }
@@ -467,6 +496,46 @@ public class MetierEditorScreen extends Screen {
             case RECIPES -> y = recipes(d, y);
         }
         contentBottom = y + scroll - cy0;
+    }
+
+    /** The grindstone's page: the kinds of item kept from its repair, as chips (a click removes one). */
+    private int grindstone(int y) {
+        List<String> banned = config.grindstoneBanned;
+        y = card(mx0, mx1, y, tr("card.grind_banned"), RED);
+        List<Object[]> list = new ArrayList<>();
+        for (String id : List.copyOf(banned)) {
+            ItemStack shown = icon(id);
+            list.add(chip(() -> shown, shown.isEmpty() ? Component.literal(id) : shown.getHoverName(), () -> change(() -> banned.remove(id)),
+                    tr("grind_banned.remove"), RED));
+        }
+        y = chips(y, list, () -> {
+            ItemStack held = held();
+            if (!held.isEmpty() && held.isDamageableItem()) {
+                change(() -> {
+                    String id = BuiltInRegistries.ITEM.getKey(held.getItem()).toString();
+                    if (!banned.contains(id)) {
+                        banned.add(id);
+                    }
+                });
+            } else {
+                String[] id = {""};
+                open(tr("popup.grind_banned"), p -> {
+                    label(p[0], p[1] + 5, tr("popup.item"), TEXT);
+                    field(p[0] + 70, p[1], 180, "", v -> id[0] = v.strip(), MetierEditorScreen::itemExists);
+                    btn(px1 - 74, py1 - 26, 62, tr("popup.ok"), () -> {
+                        if (itemExists(id[0]) && !banned.contains(id[0])) {
+                            banned.add(id[0]);
+                        }
+                        closePopup();
+                    }, null, GREEN);
+                });
+            }
+        }, tr("grind_banned.none"));
+        if (visible(y, 12)) {
+            labels.add(new Label(cardX0 + 10, y, tr("grind_banned.help"), DIM, 1));
+        }
+        y += 16;
+        return endCard(y);
     }
 
     private int settings(Def d, int y) {
@@ -607,34 +676,69 @@ public class MetierEditorScreen extends Screen {
 
     private int recipes(Def d, int y) {
         int split = mx0 + 168;
-        // The list, on the left
+        // The list, on the left: the folders first, each with its recipes, then the recipes outside any folder
         int ly = card(mx0, split - 6, y, tr("card.recipes"), GOLD_LIGHT);
         if (visible(ly, 18)) {
-            btn(cardX0 + 8, ly, 72, tr("recipe_new"), () -> change(() -> {
+            btn(cardX0 + 8, ly, 60, tr("recipe_new"), () -> change(() -> {
+                Recipe cur = currentRecipe();
                 Recipe r = new Recipe();
                 r.name = tr("recipe_default").getString();
                 r.partial.add(new Reward("minecraft:stick", 1, 1));
+                // In the folder of the recipe chosen, if it has one
+                r.folder = cur == null ? "" : cur.folder;
                 d.recipes.add(r);
                 recipe = d.recipes.size() - 1;
             }), null, GREEN);
-            btn(cardX0 + 84, ly, cardX1 - cardX0 - 92, tr("sort"), () -> change(() -> {
+            btn(cardX0 + 72, ly, 62, tr("folder_new"), () -> change(() -> {
+                String name = d.newFolder(tr("folder_default").getString());
+                collapsed.remove(name);
+                open(tr("popup.folder"), p -> folderPopup(p, d, name));
+            }), tr("folder_new.tip"), BLUE);
+            btn(cardX0 + 138, ly, cardX1 - cardX0 - 146, tr("sort"), () -> change(() -> {
                 Recipe cur = currentRecipe();
                 d.recipes.sort(Comparator.comparing(r -> r.name.toLowerCase(Locale.ROOT)));
                 recipe = Math.max(0, d.recipes.indexOf(cur));
             }), tr("sort.tip"), DIM);
         }
         ly += 24;
-        for (int i = 0; i < d.recipes.size(); i++) {
-            int index = i;
-            Recipe r = d.recipes.get(i);
+        for (String folder : List.copyOf(d.folders)) {
+            int count = 0;
+            for (Recipe r : d.recipes) {
+                if (r.folder.equals(folder)) {
+                    count++;
+                }
+            }
+            boolean open = !collapsed.contains(folder);
             if (visible(ly, 19)) {
-                add(new Btn(cardX0 + 6, ly, cardX1 - cardX0 - 12, 19, () -> Component.literal(r.name), () -> {
-                    recipe = index;
-                    rebuildWidgets();
-                }, null, GOLD, () -> recipe == index, () -> resultIcon(r), 1));
+                int w = cardX1 - cardX0 - 12 - 4 * 16;
+                Component label = Component.literal((open ? "▾ " : "▸ ") + folder + "  (" + count + ")");
+                add(new Btn(cardX0 + 6, ly, w, 19, () -> label, () -> change(() -> {
+                    if (!collapsed.remove(folder)) {
+                        collapsed.add(folder);
+                    }
+                }), tr("folder.tip"), BLUE, () -> false, () -> new ItemStack(Items.BOOKSHELF), 1));
+                int bx = cardX0 + 6 + w + 2;
+                add(new Btn(bx, ly + 1, 14, 17, () -> Component.literal("✎"), () -> open(tr("popup.folder"), p -> folderPopup(p, d, folder)),
+                        tr("folder_rename"), BLUE, () -> false, null, 0));
+                add(new Btn(bx + 16, ly + 1, 14, 17, () -> Component.literal("▲"), () -> change(() -> d.moveFolder(folder, -1)), tr("folder_up"), DIM,
+                        () -> false, null, 0));
+                add(new Btn(bx + 32, ly + 1, 14, 17, () -> Component.literal("▼"), () -> change(() -> d.moveFolder(folder, 1)), tr("folder_down"), DIM,
+                        () -> false, null, 0));
+                add(new Btn(bx + 48, ly + 1, 14, 17, () -> Component.literal("✕"), () -> change(() -> d.deleteFolder(folder)), tr("folder_delete"), RED,
+                        () -> false, null, 0));
             }
             ly += 21;
+            if (open) {
+                ly = recipeRows(d, folder, ly, 12);
+            }
         }
+        if (!d.folders.isEmpty() && visible(ly, 12)) {
+            label(cardX0 + 8, ly + 2, tr("no_folder"), DIM);
+        }
+        if (!d.folders.isEmpty()) {
+            ly += 14;
+        }
+        ly = recipeRows(d, "", ly, 0);
         ly = endCard(ly);
         // The recipe chosen, on the right
         Recipe r = currentRecipe();
@@ -646,7 +750,21 @@ public class MetierEditorScreen extends Screen {
             }
             ry += ROW + 2;
             if (visible(ry, 18)) {
-                field(cardX0 + 10, ry, Math.min(180, cardX1 - cardX0 - 20), r.folder, s -> r.folder = s, null).setTooltip(Tooltip.create(tr("recipe_folder")));
+                int fw = Math.min(180, cardX1 - cardX0 - 60);
+                add(new Btn(cardX0 + 10, ry, fw, 18, () -> tr("recipe_in_folder", r.folder.isEmpty() ? tr("no_folder") : Component.literal(r.folder)),
+                        () -> open(tr("popup.move_to"), p -> moveToPopup(p, d, r)), tr("recipe_folder"), BLUE, () -> false, null, 0));
+                add(new Btn(cardX0 + 14 + fw, ry, 18, 18, () -> Component.literal("▲"), () -> change(() -> recipe = d.moveRecipe(recipe, -1)), tr("recipe_up"),
+                        DIM, () -> false, null, 0));
+                add(new Btn(cardX0 + 34 + fw, ry, 18, 18, () -> Component.literal("▼"), () -> change(() -> recipe = d.moveRecipe(recipe, 1)), tr("recipe_down"),
+                        DIM, () -> false, null, 0));
+            }
+            ry += ROW + 2;
+            if (visible(ry, 18)) {
+                // Its own minigame, so that it fits what is made (a potion distilled, a blade forged...)
+                add(new Btn(cardX0 + 10, ry, Math.min(240, cardX1 - cardX0 - 20), 18,
+                        () -> tr("recipe_game", r.game == null ? tr("recipe_game.station", gameName(d.game)) : gameName(r.game)),
+                        () -> change(() -> r.game = nextGame(r.game)), tr("recipe_game.tip"), r.game == null ? DIM : GAME_COLORS[r.game.ordinal()],
+                        () -> r.game != null, () -> GAME_ICONS[(r.game == null ? d.game : r.game).ordinal()], 0));
             }
             ry += ROW + 2;
             ry = numberRow(ry, tr("recipe_difficulty"), () -> r.difficulty, v -> r.difficulty = v, .05, .2, 5, false, tr("recipe_difficulty.tip"));
@@ -696,6 +814,72 @@ public class MetierEditorScreen extends Screen {
             ry = outcomeCards(split, mx1, ry, r.critical, r.partial, r.perfect);
         }
         return Math.max(ly, ry);
+    }
+
+    /** The recipes of {@code folder} ("" for those outside any), {@code indent} in. */
+    private int recipeRows(Def d, String folder, int ly, int indent) {
+        for (int i = 0; i < d.recipes.size(); i++) {
+            int index = i;
+            Recipe r = d.recipes.get(i);
+            if (!r.folder.equals(folder)) {
+                continue;
+            }
+            if (visible(ly, 19)) {
+                add(new Btn(cardX0 + 6 + indent, ly, cardX1 - cardX0 - 12 - indent, 19, () -> Component.literal(r.name), () -> {
+                    recipe = index;
+                    rebuildWidgets();
+                }, null, GOLD, () -> recipe == index, () -> resultIcon(r), 1));
+            }
+            ly += 21;
+        }
+        return ly;
+    }
+
+    /** A folder's name, and the recipe chosen put in it or taken out. */
+    private void folderPopup(int[] p, Def d, String folder) {
+        int x = p[0], y = p[1];
+        String[] name = {folder};
+        label(x, y + 5, tr("popup.folder_name"), TEXT);
+        field(x + 70, y, 180, folder, s -> {
+            if (d.renameFolder(name[0], s)) {
+                if (collapsed.remove(name[0])) {
+                    collapsed.add(MetierDefs.folderName(s));
+                }
+                name[0] = MetierDefs.folderName(s);
+            }
+        }, s -> !MetierDefs.folderName(s).isEmpty() && (MetierDefs.folderName(s).equals(name[0]) || !d.folders.contains(MetierDefs.folderName(s))));
+        popupActions(x, y, () -> d.deleteFolder(name[0]));
+    }
+
+    /** The folders the recipe chosen can be put in. */
+    private void moveToPopup(int[] p, Def d, Recipe r) {
+        int x = p[0], y = p[1];
+        List<String> targets = new ArrayList<>();
+        targets.add("");
+        targets.addAll(d.folders);
+        for (String f : targets) {
+            if (y > py1 - 34) {
+                break;
+            }
+            add(new Btn(x, y, px1 - px0 - 28, 17, () -> f.isEmpty() ? tr("no_folder") : Component.literal(f), () -> {
+                r.folder = f;
+                closePopup();
+            }, null, f.equals(r.folder) ? GOLD : BLUE, () -> f.equals(r.folder), null, 1));
+            y += 19;
+        }
+        popupActions(x, y, null);
+    }
+
+    /** The next minigame a recipe can be played with: none of its own, then each in turn (not the grindstone's). */
+    @Nullable
+    private static Game nextGame(@Nullable Game game) {
+        Game[] all = Game.values();
+        for (int i = game == null ? 0 : game.ordinal() + 1; i < all.length; i++) {
+            if (all[i] != Game.GRIND) {
+                return all[i];
+            }
+        }
+        return null;
     }
 
     private static ItemStack resultIcon(Recipe r) {
@@ -938,7 +1122,8 @@ public class MetierEditorScreen extends Screen {
         if (subject.isEmpty()) {
             subject = GAME_ICONS[d.game.ordinal()];
         }
-        Minecraft.getInstance().setScreen(MetierClient.create(d.game, null, difficulty, new java.util.Random().nextLong(), subject, toolStack, inputs,
+        Game game = r != null && r.game != null ? r.game : d.game;
+        Minecraft.getInstance().setScreen(MetierClient.create(game, null, difficulty, new java.util.Random().nextLong(), subject, toolStack, inputs,
                 Component.literal(r != null ? r.name : d.name), tr("trial_sub"), (float) d.perfectAt, (float) d.criticalBelow).returnTo(this));
     }
 

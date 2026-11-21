@@ -15,20 +15,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mining, "points de rupture": a boulder of ore sits in the gallery. Its weak points light up one after the other (two
+ * Mining, "points de rupture": a boulder of ore sits against the rock. Its weak points light up one after the other (two
  * at once as the vein gives), each with a ring closing on it; strike the point as the ring meets it. A clean blow
  * splits the rock along the vein; too early or too late barely bites; striking beside the point, or letting it pass,
  * shakes the rock, and shaken too often it caves in. A worse pick gives smaller windows, faster rings, less room.
  */
 public class MiningGame extends MinigameScreen {
-    private static final ResourceLocation SCENE = Draw.tex("bg_mining"), ROCK = Draw.tex("boulder"), ORE = Draw.tex("boulder_ore");
+    private static final ResourceLocation SCENE = Draw.tex("bg_mining"), ROCK = Draw.tex("boulder"), ORE = Draw.tex("boulder_ore"),
+            GLINT = Draw.tex("boulder_glint");
     private static final float CX = 210, CY = 140, BW = 300, BH = 169;
     private static final float RX = 124, RY = 64;
     private static final float INNER = 8, OUTER = 38;
 
     private record Point(float x, float y, float born) {}
 
-    private record Crack(float x, float y, float[] path, float born) {}
+    /** A strike's mark: the chipped hole where the pick bit, and the cracks running from it (each a path of x, y). */
+    private record Crack(float x, float y, List<float[]> paths, float size, float born) {}
 
     private final int strikes;
     private final float ringTime;
@@ -191,51 +193,74 @@ public class MiningGame extends MinigameScreen {
         if (q >= 1) {
             sound(SoundEvents.AMETHYST_BLOCK_CHIME, 1.6f, .5f);
         }
-        // A crack running from the point, wandering
-        int n = 3 + (int) (q * 3);
-        float[] path = new float[n * 2 + 2];
-        float a = random.nextFloat() * Mth.TWO_PI, x = best.x(), y = best.y();
+        // Cracks bursting from where the pick bit, more and longer for a cleaner blow, some forking
+        List<float[]> paths = new ArrayList<>();
+        int arms = 3 + (int) (q * 3);
+        float a0 = random.nextFloat() * Mth.TWO_PI;
+        for (int k = 0; k < arms; k++) {
+            float a = a0 + k * Mth.TWO_PI / arms + (random.nextFloat() - .5f) * .6f;
+            paths.add(crackPath(best.x(), best.y(), a, 4 + (int) (q * 4)));
+            if (random.nextFloat() < .45f) {
+                float[] main = paths.get(paths.size() - 1);
+                int at = 2 + random.nextInt(Math.max(1, main.length / 2 - 3));
+                paths.add(crackPath(main[at * 2], main[at * 2 + 1], a + (random.nextBoolean() ? .8f : -.8f), 2 + random.nextInt(2)));
+            }
+        }
+        cracks.add(new Crack(best.x(), best.y(), paths, 3 + q * 3, time));
+        bits.sparks(random, time, best.x(), best.y(), 8 + (int) (q * 10), 140, 0xFFFFC070);
+        bits.chips(random, time, best.x(), best.y(), 5 + (int) (q * 6), ore);
+    }
+
+    /** A crack's path from x, y heading {@code a}: {@code steps} short segments, zigzagging. */
+    private float[] crackPath(float x, float y, float a, int steps) {
+        float[] path = new float[steps * 2 + 2];
         path[0] = x;
         path[1] = y;
-        for (int i = 1; i <= n; i++) {
-            a += (random.nextFloat() - .5f) * 1.1f;
-            float step = 6 + random.nextFloat() * 6;
+        for (int i = 1; i <= steps; i++) {
+            a += (i % 2 == 0 ? .5f : -.5f) * random.nextFloat();
+            float step = 5 + random.nextFloat() * 6;
             x += Mth.cos(a) * step;
             y += Mth.sin(a) * step * .7f;
             path[i * 2] = x;
             path[i * 2 + 1] = y;
         }
-        cracks.add(new Crack(best.x(), best.y(), path, time));
-        bits.sparks(random, time, best.x(), best.y(), 8 + (int) (q * 10), 140, 0xFFFFC070);
-        bits.chips(random, time, best.x(), best.y(), 5 + (int) (q * 6), ore);
+        return path;
     }
 
     @Override
     protected void drawGame(GuiGraphics g, float mx, float my) {
-        // Lantern light flickering on the wall
-        float flick = .85f + .1f * Mth.sin(time * 7) + .05f * Mth.sin(time * 17);
-        Draw.glow(g, AX0 + 60, AY0 + 30, 90, Draw.argb((int) (40 * flick), 0xFFFFA040));
         // The boulder, its shadow, its veins, glowing more as it gives
         Draw.shadow(g, CX + 6, CY + BH * .42f, BW * 1.05f, 40, 190);
         float hit = hitAt < 0 ? 0 : Math.max(0, 1 - (time - hitAt) * 6);
         float bob = hit * 1.5f;
         Draw.picture(g, ROCK, CX - BW / 2, CY - BH / 2 + bob, CX + BW / 2, CY + BH / 2 + bob, 512, 288, 0xFFFFFFFF);
         Draw.picture(g, ORE, CX - BW / 2, CY - BH / 2 + bob, CX + BW / 2, CY + BH / 2 + bob, 512, 288, ore);
+        // The ore's crystals catching the light, twinkling
+        float twinkle = .55f + .45f * Mth.sin(time * 2.3f) * Mth.sin(time * 3.7f + 1);
+        Draw.sprite(g, GLINT, CX, CY + bob, BW, BH, Draw.argb((int) (90 + 120 * twinkle), 0xFFFFFFFF), true, 512, 288);
         float shown = (float) done / Math.max(1, strikes);
         Draw.glow(g, CX, CY, 110, Draw.argb((int) (20 + 40 * shown), ore));
-        // Cracks: dark, with a lit lip
+        // Strike marks: a chipped hole, cracks running from it, widest near it and closing at their ends; a shadow
+        // inside, a lit lower lip
         for (Crack c : cracks) {
-            float grow = Math.min(1, (time - c.born()) * 8);
-            float[] p = c.path();
-            int segs = p.length / 2 - 1;
-            int drawn = Math.max(1, (int) (segs * grow));
-            for (int i = 0; i < drawn; i++) {
-                float w = 2.6f * (1 - i / (float) segs) + .6f;
-                Draw.stroke(g, p[i * 2], p[i * 2 + 1] + bob, p[i * 2 + 2], p[i * 2 + 3] + bob, w, 0xF0140F0C);
-                Draw.line(g, p[i * 2] + .6f, p[i * 2 + 1] + bob + w * .6f, p[i * 2 + 2] + .6f, p[i * 2 + 3] + bob + w * .6f, .6f, 0x50FFE6C0);
+            float grow = Math.min(1, (time - c.born()) * 7);
+            Draw.disc(g, c.x() + .8f, c.y() + bob + 1, c.size() + 1.5f, 0x50000000);
+            Draw.disc(g, c.x(), c.y() + bob, c.size(), 0xFF1A1512);
+            Draw.disc(g, c.x() - c.size() * .3f, c.y() + bob - c.size() * .3f, c.size() * .5f, 0xFF2E2620);
+            Draw.ring(g, c.x(), c.y() + bob + .6f, c.size() + .8f, 0x60FFE6C8, false);
+            for (float[] p : c.paths()) {
+                int segs = p.length / 2 - 1;
+                int drawn = Math.max(1, (int) Math.ceil(segs * grow));
+                for (int i = 0; i < drawn; i++) {
+                    float w = 2.8f * (1 - i / (float) segs) + .5f;
+                    float x0 = p[i * 2], y0 = p[i * 2 + 1] + bob, x1 = p[i * 2 + 2], y1 = p[i * 2 + 3] + bob;
+                    Draw.stroke(g, x0 + .8f, y0 + 1.2f, x1 + .8f, y1 + 1.2f, w + 1.6f, 0x40000000);
+                    Draw.stroke(g, x0, y0, x1, y1, w, 0xF5120E0C);
+                    Draw.line(g, x0, y0 + w * .55f, x1, y1 + w * .55f, .7f, 0x70FFE8CC);
+                }
             }
             if (time - c.born() < .3f) {
-                Draw.glow(g, c.x(), c.y() + bob, 22, Draw.argb((int) (200 * (1 - (time - c.born()) / .3f)), 0xFFFFE0A0));
+                Draw.glow(g, c.x(), c.y() + bob, 24, Draw.argb((int) (200 * (1 - (time - c.born()) / .3f)), 0xFFFFE0A0));
             }
         }
         // Weak points and their closing rings

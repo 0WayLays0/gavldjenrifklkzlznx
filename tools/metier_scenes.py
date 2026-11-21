@@ -93,7 +93,7 @@ def finish(rgb, vig=.5, seed=9):
 
 def rock_face():
     """A face of bare rock seen up close, wherever the ore is: in a cave, a cliff or a quarry. Layers of stone, their
-    ledges catching the light, cracks, flecks of ore, a little moss, loose stones at its foot."""
+    ledges catching the light, fractures, a little moss, loose stones at its foot."""
     xs, ys = grid()
     # Layers of stone, tilted a little and warped, each its own shade
     tilt = ys + xs * .08 + 30 * fbm(W, H, 3, 4, 701)
@@ -111,8 +111,7 @@ def rock_face():
     under = smooth(.86, 1, within) * smooth(.3, .6, fbm(W, H, 5, 3, 704))
     rgb = rgb * (1 + .28 * ledge[..., None] - .3 * under[..., None])
     # Cracks running through it
-    cracks = smooth(.012, 0, f2 - f1) * smooth(.5, .7, fbm(W, H, 3, 3, 705))
-    rgb = mix(rgb, (30, 26, 28), cracks * .6)
+    cracks = np.zeros((H, W))
     # Moss in the hollows near the top, damp darker streaks below it
     moss = smooth(.62, .78, fbm(W, H, 5, 4, 706)) * smooth(160, 0, ys) * (under + cracks * .5 + .2)
     rgb = mix(rgb, (74, 104, 52), np.clip(moss, 0, 1) * .55)
@@ -121,20 +120,25 @@ def rock_face():
     rnd = random.Random(708)
 
     def ore(d, s):
-        # Flecks of ore along the cracks and layers, near the edges (the boulder hides the middle)
-        for _ in range(55):
-            x, y = rnd.uniform(0, W), rnd.uniform(0, H)
-            if abs(x - 392) < 230 and abs(y - 188) < 140:
-                continue
-            c = rnd.choice([(236, 132, 66), (236, 132, 66), (214, 186, 150), (44, 40, 42), (110, 230, 180)])
-            for _ in range(rnd.randint(4, 9)):
-                ox, oy, r = x + rnd.gauss(0, 9), y + rnd.gauss(0, 6), rnd.uniform(2.8, 6.5)
-                a = rnd.uniform(0, math.tau)
-                pts = [((ox + r * math.cos(a + k * 2.1 + rnd.uniform(-.4, .4))) * s, (oy + r * .8 * math.sin(a + k * 2.1)) * s) for k in range(3)]
-                d.polygon(pts, fill=tuple(int(v * .6) for v in c) + (255,))
-                d.polygon([pts[0], pts[1], (ox * s, oy * s)], fill=c + (255,))
-                if rnd.random() < .35:
-                    d.point(pts[0], fill=(255, 240, 210, 255))
+        # Fractures: joints across the layers, zigzagging sharply, widest in the middle and closing at both ends; a dark
+        # gap, its shadow below, its lower lip catching the light
+        for k in range(6):
+            x, y = rnd.uniform(40, W - 40), rnd.uniform(10, 90)
+            base = rnd.uniform(1.25, 1.85)
+            pts = [(x, y)]
+            n = rnd.randint(7, 12)
+            for i in range(n):
+                a = base + (.55 if i % 2 == 0 else -.55) * rnd.uniform(.4, 1)
+                step = rnd.uniform(10, 20)
+                x, y = x + math.cos(a) * step, y + math.sin(a) * step
+                pts.append((x, y))
+            for i in range(len(pts) - 1):
+                t = i / (len(pts) - 2)
+                w = .6 + 3.2 * math.sin(math.pi * t) ** .7
+                (x0, y0), (x1, y1) = pts[i], pts[i + 1]
+                d.line(((x0 + 1.5) * s, (y0 + 2) * s, (x1 + 1.5) * s, (y1 + 2) * s), fill=(10, 8, 10, 70), width=int((w + 3) * s))
+                d.line((x0 * s, (y0 + w * .6) * s, x1 * s, (y1 + w * .6) * s), fill=(206, 198, 184, 110), width=max(1, int(1.1 * s)))
+                d.line((x0 * s, y0 * s, x1 * s, y1 * s), fill=(16, 14, 16, 245), width=max(1, int(w * s)))
         # Loose stones and grit at the foot of the face
         for _ in range(90):
             x, y = rnd.uniform(0, W), rnd.uniform(H - 46, H + 6)
@@ -406,22 +410,25 @@ def infirmary():
         d.rectangle((wx * s, wy * s, (wx + 80) * s, (wy + 68) * s), fill=(214, 234, 246, 255))
         d.rectangle(((wx + 38) * s, wy * s, (wx + 42) * s, (wy + 68) * s), fill=(110, 80, 52, 255))
         d.rectangle((wx * s, (wy + 32) * s, (wx + 80) * s, (wy + 36) * s), fill=(110, 80, 52, 255))
-        # The table's linen below, folded, its hem
-        d.rectangle((0, 286 * s, W * s, H * s), fill=(236, 232, 222, 255))
+        # The table's linen, folded, its hem; the remedy is made on it
+        top = 212
+        d.rectangle((0, top * s, W * s, H * s), fill=(236, 232, 222, 255))
         for k in range(12):
             x = 30 + k * 66 + rnd.uniform(-10, 10)
-            d.line((x * s, 288 * s, (x + rnd.uniform(-20, 20)) * s, H * s), fill=(206, 200, 188, 255), width=int(3 * s))
-        d.rectangle((0, 286 * s, W * s, 290 * s), fill=(200, 194, 182, 255))
+            d.line((x * s, (top + 2) * s, (x + rnd.uniform(-20, 20)) * s, H * s), fill=(214, 208, 196, 255), width=int(3 * s))
+        d.rectangle((0, top * s, W * s, (top + 4) * s), fill=(200, 194, 182, 255))
         d.rectangle((0, (H - 14) * s, W * s, (H - 10) * s), fill=(190, 40, 46, 255))
-        # Instruments laid out on the linen: scissors, a roll of bandage, a phial
-        d.ellipse((60 * s, 318 * s, 76 * s, 334 * s), outline=(150, 150, 160, 255), width=int(2 * s))
-        d.ellipse((80 * s, 318 * s, 96 * s, 334 * s), outline=(150, 150, 160, 255), width=int(2 * s))
-        d.line((74 * s, 322 * s, 130 * s, 304 * s), fill=(176, 178, 188, 255), width=int(3 * s))
-        d.line((82 * s, 322 * s, 130 * s, 314 * s), fill=(176, 178, 188, 255), width=int(3 * s))
-        d.ellipse((640 * s, 300 * s, 690 * s, 340 * s), fill=(244, 238, 222, 255))
-        d.ellipse((652 * s, 310 * s, 678 * s, 330 * s), outline=(214, 206, 188, 255), width=int(2 * s))
-        d.rounded_rectangle((720 * s, 296 * s, 744 * s, 340 * s), radius=6 * s, fill=(90, 170, 120, 255))
-        d.rectangle((726 * s, 288 * s, 738 * s, 298 * s), fill=(160, 124, 80, 255))
+        # Instruments laid out on it: scissors, a roll of bandage, a phial, a spoon
+        d.ellipse((470 * s, 300 * s, 486 * s, 316 * s), outline=(150, 150, 160, 255), width=int(2 * s))
+        d.ellipse((490 * s, 300 * s, 506 * s, 316 * s), outline=(150, 150, 160, 255), width=int(2 * s))
+        d.line((484 * s, 304 * s, 540 * s, 286 * s), fill=(176, 178, 188, 255), width=int(3 * s))
+        d.line((492 * s, 304 * s, 540 * s, 296 * s), fill=(176, 178, 188, 255), width=int(3 * s))
+        d.ellipse((660 * s, 262 * s, 716 * s, 306 * s), fill=(244, 238, 222, 255))
+        d.ellipse((674 * s, 274 * s, 702 * s, 294 * s), outline=(214, 206, 188, 255), width=int(2 * s))
+        d.rounded_rectangle((736 * s, 248 * s, 760 * s, 296 * s), radius=6 * s, fill=(90, 170, 120, 255))
+        d.rectangle((742 * s, 240 * s, 754 * s, 250 * s), fill=(160, 124, 80, 255))
+        d.line((560 * s, 330 * s, 620 * s, 318 * s), fill=(150, 150, 160, 255), width=int(3 * s))
+        d.ellipse((616 * s, 312 * s, 632 * s, 324 * s), fill=(160, 160, 170, 255))
     rgb = over(rgb, rgba_layer(build))
     # Soft daylight from the window, a clean shadow under the beam
     light = np.clip(glow(600, 60, 360) * 1.0 + .25, 0, 1.15)

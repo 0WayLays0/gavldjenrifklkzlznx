@@ -104,36 +104,91 @@ def star():
 # ---------------------------------------------------------------- mining
 
 def boulder():
-    """The boulder (rock) and its ore veins (white, tinted in game), 512 x 288."""
+    """The boulder (rock, cut in flat facets lit from the top left), its ore (white, shaded by facet, tinted in game) and
+    the glints on the ore's crystals (white, drawn additively and twinkling), 512 x 288 each."""
     w, h = 512, 288
     xs, ys = _grid(w, h)
     u, v = (xs - w / 2) / (w * .47), (ys - h / 2) / (h * .45)
     ang = np.arctan2(v, u)
-    edge = 1 + .05 * np.sin(ang * 3 + 1) + .03 * np.sin(ang * 5 + 2) + .012 * np.sin(ang * 11)
+    # A broken stone's outline: lumpy, with a few flat breaks
+    edge = 1 + .07 * np.sin(ang * 3 + 1) + .04 * np.sin(ang * 5 + 2) + .02 * np.sin(ang * 9 + .5) + .012 * np.sin(ang * 17)
+    for cut_a, depth in ((.4, .09), (2.3, .07), (3.9, .1), (5.3, .06)):
+        edge = np.minimum(edge, (1 - depth) / np.maximum(.2, np.cos(ang - cut_a)))
     r = np.hypot(u, v) / edge
     inside = smooth(1.0, .985, r)
-    # Rounded light from the top left
-    nz = np.sqrt(np.clip(1 - r * r, 0, 1))
-    lit = np.clip((-u * .45 - v * .6 + nz * .65), 0, 1.2)
-    f1, f2 = worley(w, h, 70, 520)
-    facets = emboss(np.clip(f1, 0, 1), 1.6)
-    tex = fbm(w, h, 5, 5, 521)
-    t = .2 + lit * .55 + facets * .1 + (tex - .5) * .25
-    rgb = ramp(t, [(0, (26, 24, 26)), (.35, (64, 60, 62)), (.65, (112, 106, 102)), (.9, (160, 152, 142)), (1.1, (196, 188, 176))])
-    rgb = mix(rgb, (18, 16, 18), smooth(.03, .0, f2 - f1) * .45)
+    # Its shape as a height: a dome, flattened on top, with lumps, broad flat faces and crevices
+    rnd = np.random.default_rng(520)
+    dome = np.sqrt(np.clip(1 - r * r, 0, 1)) ** .8
+    lumps = fbm(w, h, 3, 5, 523) - .5
+    f1, f2 = worley(w, h, 26, 524)
+    crevice = smooth(.02, 0, f2 - f1) * smooth(.45, .65, fbm(w, h, 3, 3, 529))
+    planes = np.clip(f1, 0, 1)
+    height = dome * (1 + .35 * lumps) - .08 * planes - .05 * crevice + .05 * fbm(w, h, 24, 3, 525) + .025 * noise(w, h, (160, 90), 531)
+    height = height * 60
+    gy, gx = np.gradient(height)
+    nz = np.ones_like(height) * 2.2
+    norm = np.sqrt(gx * gx + gy * gy + nz * nz)
+    nx, ny, nz = -gx / norm, -gy / norm, nz / norm
+    # Light from the top left and a little in front; a cool fill from the right
+    light = np.clip(nx * -.55 + ny * -.6 + nz * .58, 0, 1)
+    fill = np.clip(nx * .7 + ny * .1 + nz * .4, 0, 1) * .18
+    # Stone: grey with a warm cast, darker in its pits, a few flecks of quartz and patches of lichen
+    tex = fbm(w, h, 8, 6, 526)
+    stain = fbm(w, h, 3, 4, 532)
+    albedo = ramp(.35 + (tex - .5) * .8 + (stain - .5) * .4, [(0, (62, 58, 56)), (.5, (122, 114, 104)), (1, (172, 164, 150))])
+    flecks = smooth(.9, .96, noise(w, h, (90, 50), 527)) * smooth(.5, .7, fbm(w, h, 4, 3, 530))
+    albedo = mix(albedo, (204, 200, 190), flecks * .35)
+    lichen = smooth(.66, .78, fbm(w, h, 6, 4, 528)) * np.clip(-ny * 2, 0, 1)
+    albedo = mix(albedo, (132, 140, 92), lichen * .4)
+    occl = 1 - crevice * .55 - smooth(.55, 1, r) * smooth(-.2, .6, v) * .45
+    rgb = albedo * (.22 + .95 * light + fill)[..., None] * occl[..., None]
+    rgb = mix(rgb, (24, 22, 22), crevice * .3)
+    # A soft lit edge along the top-left of the outline only
+    rgb = mix(rgb, (210, 204, 192), smooth(.9, .99, r) * np.clip(-(u + v * 1.3) * .8, 0, 1) * inside * .35)
     rock = image(rgb, inside * 255)
-    # Ore: clusters of rounded nuggets, lit like the rock
-    rnd = random.Random(522)
-    veins = np.zeros((h, w))
-    for _ in range(26):
-        cx, cy = rnd.uniform(.15, .85) * w, rnd.uniform(.2, .8) * h
-        for _ in range(rnd.randint(3, 7)):
-            ox, oy, rr = cx + rnd.gauss(0, 14), cy + rnd.gauss(0, 9), rnd.uniform(5, 11)
-            veins = np.maximum(veins, smooth(rr, rr * .6, np.hypot(xs - ox, ys - oy)))
-    veins *= inside * smooth(.92, .8, r)
-    shade = np.clip(.45 + lit * .5 + emboss(veins, 2.2) * .35, 0, 1.2)
-    ore = image(np.dstack([shade * 230] * 3), veins * 255)
-    return rock, ore
+    # Ore: patches of angular nuggets set in the stone, each lit on its top left and in shade below, a thin dark seam
+    # round it where it sits in the rock; a glint on the brightest
+    big = 2
+    ore_img = Image.new("L", (w * big, h * big), 0)
+    glint_img = Image.new("L", (w * big, h * big), 0)
+    od = ImageDraw.Draw(ore_img)
+    gd = ImageDraw.Draw(glint_img)
+    rr = random.Random(522)
+    patches = [(.3, .38), (.52, .3), (.7, .45), (.42, .62), (.62, .7), (.24, .6), (.8, .62), (.5, .48)]
+    for (pu, pv) in patches:
+        cx, cy = pu * w + rr.gauss(0, 8), pv * h + rr.gauss(0, 6)
+        for _ in range(rr.randint(4, 8)):
+            ox, oy = cx + rr.gauss(0, 13), cy + rr.gauss(0, 8)
+            size = rr.uniform(5, 12)
+            n = rr.randint(5, 7)
+            start = rr.uniform(0, math.tau)
+            poly = [(ox + math.cos(start + k * math.tau / n + rr.uniform(-.25, .25)) * size * rr.uniform(.75, 1.15),
+                     oy + math.sin(start + k * math.tau / n + rr.uniform(-.25, .25)) * size * rr.uniform(.6, .95)) for k in range(n)]
+            sc = [(x * big, y * big) for x, y in poly]
+            seam = [((x - ox) * 1.18 + ox) * big for x, _ in poly]
+            seam = [(sx, ((y - oy) * 1.22 + oy) * big) for sx, (_, y) in zip(seam, poly)]
+            od.polygon(seam, fill=70)
+            od.polygon(sc, fill=150)
+            # The lit half: the part of the nugget above a slanting line through it
+            lit = [(x, y) for x, y in poly if (x - ox) + (y - oy) * 1.3 < size * .15]
+            if len(lit) >= 2:
+                lit_poly = [(ox * big, oy * big)] + [(x * big, y * big) for x, y in lit]
+                od.polygon(lit_poly, fill=235)
+            # A facet's edge catching the light
+            top = min(poly, key=lambda q: q[0] + q[1])
+            od.line([(ox * big, oy * big), (top[0] * big, top[1] * big)], fill=255, width=big)
+            gx, gy = top[0] * .6 + ox * .4, top[1] * .6 + oy * .4
+            if rr.random() < .7:
+                gd.ellipse(((gx - 1.4) * big, (gy - 1.4) * big, (gx + 1.4) * big, (gy + 1.4) * big), fill=255)
+    ore_a = np.asarray(ore_img.resize((w, h), Image.LANCZOS), dtype=float) / 255
+    ore_a = ore_a * inside * smooth(.95, .82, r)
+    shade = np.clip(ore_a, 0, 1)
+    coverage = smooth(.1, .25, ore_a)
+    ore = image(np.dstack([shade * 255] * 3), coverage * 255)
+    glints = np.asarray(glint_img.resize((w, h), Image.LANCZOS).filter(ImageFilter.GaussianBlur(1.2)), dtype=float) / 255
+    glints = np.clip(glints * 2.5, 0, 1) * inside
+    glint = image(np.full((h, w, 3), 255.0), glints * 255)
+    return rock, ore, glint
 
 
 # ---------------------------------------------------------------- crafting
@@ -390,9 +445,10 @@ def main():
     g.save(star(), OUT + "star.png")
     import metier_scenes
     g.save(metier_scenes.rock_face(), OUT + "bg_mining.png")
-    rock, ore = boulder()
+    rock, ore, glint = boulder()
     g.save(rock, OUT + "boulder.png")
     g.save(ore, OUT + "boulder_ore.png")
+    g.save(glint, OUT + "boulder_glint.png")
     g.save(metier_scenes.meadow(), OUT + "bg_harvest.png")
     g.save(metier_scenes.workshop(), OUT + "bg_carpentry.png")
     g.save(metier_scenes.infirmary(), OUT + "bg_medicine.png")

@@ -83,6 +83,22 @@ public final class MetierGameTests {
         MetierDefs.upgrade(old);
         helper.assertTrue(old.metiers.size() == 3 && old.metiers.get(0).id.equals("ma_mine") && old.version == MetierDefs.VERSION,
                 "an old file was not brought up to date: " + old.metiers.stream().map(d -> d.id).toList());
+        // A file of 1.8.0: the healers' golden apple becomes the antidote, the rest of the trade kept
+        MetierDefs.Config v2 = MetierDefs.copy(MetierDefs.defaults());
+        v2.version = 2;
+        MetierDefs.Def healers = v2.metiers.stream().filter(d -> d.id.equals("medecine")).findFirst().orElseThrow();
+        MetierDefs.Recipe apple = new MetierDefs.Recipe();
+        apple.name = "Pomme de vie";
+        healers.recipes.set(2, apple);
+        healers.name = "Mes soigneurs";
+        MetierDefs.upgrade(v2);
+        helper.assertTrue(healers.recipes.get(2).name.equals("Antidote au miel") && healers.name.equals("Mes soigneurs"),
+                "the 1.8.0 healers' table was not brought up to date: " + healers.recipes.get(2).name);
+        // A recipe with its own minigame keeps it through the file
+        MetierDefs.Config own = MetierDefs.copy(MetierDefs.defaults());
+        own.metiers.get(2).recipes.get(0).game = MetierDefs.Game.DISTILL;
+        helper.assertTrue(MetierDefs.fromJson(MetierDefs.toJson(own)).metiers.get(2).recipes.get(0).game == MetierDefs.Game.DISTILL,
+                "a recipe's own minigame was lost");
         // The file's round trip, and an item with data
         MetierDefs.Config again = MetierDefs.fromJson(MetierDefs.toJson(MetierDefs.get()));
         helper.assertTrue(again.metiers.size() == MetierDefs.all().size(), "the trades do not survive their JSON");
@@ -216,44 +232,40 @@ public final class MetierGameTests {
     }
 
     /**
-     * A station organised in its screen: a folder made, the two recipes swapped and one put in it; an organisation that
-     * no longer fits the recipes is refused. Put back as it was at once (other tests use the station).
+     * A station's recipes sorted into folders (as game masters do in the trades' editor): a folder made, renamed with
+     * its recipe, moved, deleted (its recipes back outside), a recipe moved within its folder; the folders survive the
+     * file, and a folder a recipe names but the list lacks is added. Done on a copy: the trades are not touched.
      */
     @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true, batch = "metier_folders")
     public static void stationRecipesGoInFolders(GameTestHelper helper) {
-        MetierDefs.Def craft = MetierDefs.byId("artisanat");
-        helper.assertTrue(craft != null && craft.recipes.size() >= 2, "no crafting station with two recipes");
-        List<String> names = new java.util.ArrayList<>();
-        craft.recipes.forEach(r -> names.add(r.name));
-        String first = names.get(0), second = names.get(1);
-        List<Integer> swap = new java.util.ArrayList<>();
-        List<String> where = new java.util.ArrayList<>();
-        for (int i = 0; i < names.size(); i++) {
-            swap.add(i == 0 ? 1 : i == 1 ? 0 : i);
-            where.add(i == 1 ? "  Éclairage " : "");
-        }
-        BlockPos pos = helper.absolutePos(ORE);
-        boolean done = MetierService.organize(craft, new com.waylays.arcanes.metier.MetierNet.Organize("artisanat", pos, List.of("Éclairage", "Vide"), swap, where));
-        try {
-            helper.assertTrue(done, "the organisation was refused");
-            helper.assertTrue(craft.recipes.get(0).name.equals(second) && craft.recipes.get(1).name.equals(first), "the recipes were not swapped");
-            helper.assertTrue(craft.recipes.get(1).folder.equals("Éclairage") && craft.recipes.get(0).folder.isEmpty(), "the recipe is not in its folder");
-            helper.assertTrue(craft.folders.equals(List.of("Éclairage", "Vide")), "the folders are " + craft.folders);
-            MetierDefs.Def again = MetierDefs.fromJson(MetierDefs.toJson(MetierDefs.get())).metiers.stream().filter(d -> d.id.equals("artisanat")).findFirst()
-                    .orElseThrow();
-            helper.assertTrue(again.folders.contains("Vide") && again.recipes.get(1).folder.equals("Éclairage"), "the folders do not survive the file");
-            helper.assertTrue(!MetierService.organize(craft, new com.waylays.arcanes.metier.MetierNet.Organize("artisanat", pos, List.of(), List.of(0), List.of(""))),
-                    "an organisation that no longer fits was taken");
-        } finally {
-            List<Integer> back = new java.util.ArrayList<>();
-            List<String> none = new java.util.ArrayList<>();
-            for (int i = 0; i < craft.recipes.size(); i++) {
-                back.add(i == 0 ? 1 : i == 1 ? 0 : i);
-                none.add("");
-            }
-            MetierService.organize(craft, new com.waylays.arcanes.metier.MetierNet.Organize("artisanat", pos, List.of(), back, none));
-        }
-        helper.assertTrue(craft.recipes.get(0).name.equals(first) && craft.folders.isEmpty(), "the station was not put back");
+        MetierDefs.Def craft = MetierDefs.copy(MetierDefs.get()).metiers.stream().filter(d -> d.id.equals("artisanat")).findFirst().orElseThrow();
+        helper.assertTrue(craft.recipes.size() >= 2, "no crafting station with two recipes");
+        String first = craft.recipes.get(0).name, second = craft.recipes.get(1).name;
+        String light = craft.newFolder("  Éclairage ");
+        String other = craft.newFolder("Éclairage");
+        helper.assertTrue(light.equals("Éclairage") && other.equals("Éclairage 2"), "the folders are named " + craft.folders);
+        craft.recipes.get(0).folder = light;
+        helper.assertTrue(craft.renameFolder(light, "Lumières") && craft.recipes.get(0).folder.equals("Lumières"), "the recipe did not follow its folder's new name");
+        helper.assertTrue(!craft.renameFolder("Lumières", "Éclairage 2"), "a folder took a name already taken");
+        craft.moveFolder("Éclairage 2", -1);
+        helper.assertTrue(craft.folders.equals(List.of("Éclairage 2", "Lumières")), "the folder did not move up: " + craft.folders);
+        // Two recipes outside any folder swap; the one in a folder is passed over
+        craft.recipes.get(1).folder = "";
+        craft.recipes.add(new MetierDefs.Recipe());
+        int moved = craft.moveRecipe(1, 1);
+        helper.assertTrue(moved == craft.recipes.size() - 1 && craft.recipes.get(moved).name.equals(second), "the recipe did not move within its folder");
+        MetierDefs.Config config = new MetierDefs.Config();
+        config.metiers.add(craft);
+        MetierDefs.Def again = MetierDefs.fromJson(MetierDefs.toJson(config)).metiers.get(0);
+        helper.assertTrue(again.folders.equals(craft.folders) && again.recipes.get(0).folder.equals("Lumières"), "the folders do not survive the file");
+        craft.deleteFolder("Lumières");
+        helper.assertTrue(!craft.folders.contains("Lumières") && craft.recipes.get(0).folder.isEmpty() && craft.recipes.get(0).name.equals(first),
+                "the deleted folder's recipe was not put back outside");
+        craft.recipes.get(0).folder = "Oubli";
+        MetierDefs.Config lost = new MetierDefs.Config();
+        lost.metiers.add(craft);
+        helper.assertTrue(MetierDefs.fromJson(MetierDefs.toJson(lost)).metiers.get(0).folders.contains("Oubli"), "a recipe's folder missing from the list was not added");
+        helper.assertTrue(MetierDefs.byId("artisanat").folders.isEmpty(), "the real crafting station was changed");
         helper.succeed();
     }
 }

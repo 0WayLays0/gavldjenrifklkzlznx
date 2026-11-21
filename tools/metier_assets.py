@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Trades' art: the Medical Table (a low oak table under a linen cloth marked with a red cross, a roll of bandage, a
-jar of salve and a phial on it), its models, blockstate, loot table and recipe; the Alembic (a copper still on a small brick furnace: the furnace with its fire mouth, the riveted
+"""Trades' art: the Medical Table (an oak table with a drawer, a linen runner marked with a red cross, a stone mortar
+with its pestle, a phial and a bottle of tinctures, a roll of bandage and a bundle of herbs on it), its models, blockstate, loot table and recipe; the Alembic (a copper still on a small brick furnace: the furnace with its fire mouth, the riveted
 copper pot and dome, the swan-neck pipe down to a glass receiver holding a violet distillate), its block and item
 models, blockstate, loot table and recipe; and the minigames' art (metier_art.py).
 
@@ -258,6 +258,64 @@ def phial_texture():
     return img
 
 
+def stone_texture():
+    """16 x 16: the mortar's grey stone, flecked, lit from the top."""
+    rnd = random.Random(4500)
+    tones = [(88, 86, 84), (112, 110, 106), (138, 136, 130), (164, 162, 156)]
+    img = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            level = 2 - (1 if y > 9 else 0) + (1 if y < 3 else 0) + (rnd.choice((-1, 0, 0, 1)) if rnd.random() < .3 else 0)
+            img.putpixel((x, y), tones[max(0, min(3, level))] + (255,))
+    return img
+
+
+def herbs_texture():
+    """16 x 16: a bundle of dried herbs: sprigs and leaves in greens and a little lavender, a twine tie."""
+    rnd = random.Random(4600)
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    greens = [(52, 84, 40), (76, 116, 56), (104, 146, 70), (140, 120, 170)]
+    for _ in range(70):
+        x, y = rnd.randint(0, 15), rnd.randint(0, 15)
+        img.putpixel((x, y), greens[rnd.randint(0, 3) if rnd.random() < .85 else 3] + (255,))
+    for y in range(16):
+        for x in range(6, 9):
+            if img.getpixel((x, y))[3] == 0:
+                img.putpixel((x, y), greens[1] + (255,))
+    for x in range(16):
+        if img.getpixel((x, 7))[3] or 5 <= x <= 10:
+            img.putpixel((x, 7), (196, 166, 110, 255))
+    return img
+
+
+def tincture_texture():
+    """16 x 16: a red tincture in its glass, a highlight down one side, the glass clear above."""
+    img = Image.new("RGBA", (16, 16))
+    red = [(110, 20, 30), (170, 40, 50), (220, 96, 96)]
+    for y in range(16):
+        for x in range(16):
+            c = (GLASS[1] if x < 12 else GLASS[0]) if y < 4 else (red[2] if y == 4 else red[1] if x < 11 else red[0])
+            img.putpixel((x, y), c + (255,))
+    for y in range(1, 15):
+        img.putpixel((3, y), GLASS[2] + (255,))
+    return img
+
+
+def drawer_texture():
+    """16 x 16: a drawer's front in the table's oak, its frame darker, a brass pull in the middle."""
+    img = oak_texture().copy()
+    for x in range(16):
+        for y in (0, 15):
+            img.putpixel((x, y), WOOD[0] + (255,))
+    for y in range(16):
+        for x in (0, 15):
+            img.putpixel((x, y), WOOD[0] + (255,))
+    for x in range(6, 10):
+        for y in range(6, 9):
+            img.putpixel((x, y), (214, 172, 80, 255) if y < 8 else (150, 110, 40, 255))
+    return img
+
+
 def medical_table_model():
     def el(frm, to, faces, rot=None):
         out = {"from": frm, "to": to, "faces": {side: {"texture": tex, **({"uv": uv} if uv else {})} for side, (tex, uv) in faces.items()}}
@@ -265,35 +323,54 @@ def medical_table_model():
             out["rotation"] = rot
         return out
 
-    def all6(tex, uv=None, top=None):
+    def all6(tex, uv=None, top=None, front=None):
         f = {side: (tex, uv) for side in ("north", "south", "east", "west", "down", "up")}
         if top:
             f["up"] = (top, None)
+        if front:
+            f["north"] = (front, None)
         return f
 
-    legs = [el([x, 0, z], [x + 2, 9.5, z + 2], all6("#oak", [0, 0, 2, 9.5])) for x, z in ((1, 1), (13, 1), (1, 13), (13, 13))]
+    legs = [el([x, 0, z], [x + 2, 10, z + 2], all6("#oak", [0, 0, 2, 10])) for x, z in ((1, 1), (13, 1), (1, 13), (13, 13))]
     return {
         "parent": "block/block",
         "render_type": "minecraft:cutout",
         "textures": {"particle": "arcanes_oublies:block/medical_oak", "oak": "arcanes_oublies:block/medical_oak",
-                     "cloth": "arcanes_oublies:block/medical_cloth", "hem": "arcanes_oublies:block/medical_cloth_side",
-                     "bandage": "arcanes_oublies:block/medical_bandage", "salve": "arcanes_oublies:block/medical_salve",
-                     "phial": "arcanes_oublies:block/medical_phial"},
+                     "drawer": "arcanes_oublies:block/medical_drawer", "cloth": "arcanes_oublies:block/medical_cloth",
+                     "hem": "arcanes_oublies:block/medical_cloth_side", "bandage": "arcanes_oublies:block/medical_bandage",
+                     "stone": "arcanes_oublies:block/medical_stone", "herbs": "arcanes_oublies:block/medical_herbs",
+                     "phial": "arcanes_oublies:block/medical_phial", "tincture": "arcanes_oublies:block/medical_tincture",
+                     "salve": "arcanes_oublies:block/medical_salve"},
         "elements": legs + [
-            # A stretcher between the legs, the top board
-            el([2, 3, 1.5], [14, 4.5, 2.5], all6("#oak", [0, 0, 12, 1.5])),
-            el([2, 3, 13.5], [14, 4.5, 14.5], all6("#oak", [0, 0, 12, 1.5])),
-            el([0, 9.5, 0], [16, 11, 16], all6("#oak")),
-            # The linen over it, hanging down the front and back
-            el([0.5, 11, 0.5], [15.5, 11.5, 15.5], all6("#cloth", top="#cloth")),
-            el([0.5, 7, 0], [15.5, 11.5, 0.5], all6("#hem", [0, 7, 15, 11.5])),
-            el([0.5, 7, 15.5], [15.5, 11.5, 16], all6("#hem", [0, 7, 15, 11.5])),
-            # A roll of bandage, a jar of salve, a phial with its cork
-            el([2, 11.5, 9.5], [6.5, 14.5, 12.5], {"north": ("#bandage", None), "south": ("#bandage", None), "east": ("#hem", [0, 4, 3, 7]),
-                                                     "west": ("#hem", [0, 4, 3, 7]), "up": ("#hem", [0, 0, 4.5, 3]), "down": ("#hem", None)}),
-            el([10, 11.5, 2.5], [13, 14.5, 5.5], all6("#salve")),
-            el([10.5, 11.5, 9], [12.5, 15, 11], all6("#phial")),
-            el([11, 15, 9.5], [12, 16, 10.5], all6("#oak", [0, 0, 1, 1])),
+            # The apron under the top, a drawer in front, the top board
+            el([2, 8, 1.5], [14, 10, 2.5], all6("#oak", [0, 6, 12, 8], front="#drawer")),
+            el([2, 8, 13.5], [14, 10, 14.5], all6("#oak", [0, 6, 12, 8])),
+            el([1.5, 8, 3], [2.5, 10, 13], all6("#oak", [0, 6, 10, 8])),
+            el([13.5, 8, 3], [14.5, 10, 13], all6("#oak", [0, 6, 10, 8])),
+            el([0, 10, 0], [16, 11.5, 16], all6("#oak")),
+            # A linen runner marked with the red cross, hanging over both sides
+            el([3, 11.5, 0.5], [13, 11.75, 15.5], {"up": ("#cloth", None), "down": ("#hem", None), "north": ("#hem", [0, 0, 10, 0.25]),
+                                                  "south": ("#hem", [0, 0, 10, 0.25]), "east": ("#hem", [0, 0, 15, 0.25]), "west": ("#hem", [0, 0, 15, 0.25])}),
+            el([3, 8.5, 0.25], [13, 11.75, 0.5], all6("#hem", [3, 8, 13, 11.25])),
+            el([3, 8.5, 15.5], [13, 11.75, 15.75], all6("#hem", [3, 8, 13, 11.25])),
+            # A stone mortar with green paste in it, the pestle leaning
+            el([1, 11.5, 9.5], [5, 12.75, 13.5], all6("#stone")),
+            el([1, 12.75, 9.5], [5, 13.75, 10], all6("#stone")),
+            el([1, 12.75, 13], [5, 13.75, 13.5], all6("#stone")),
+            el([1, 12.75, 10], [1.5, 13.75, 13], all6("#stone")),
+            el([4.5, 12.75, 10], [5, 13.75, 13], all6("#stone")),
+            el([1.5, 12.75, 10], [4.5, 13.25, 13], all6("#herbs")),
+            el([2.5, 12.5, 11], [3.5, 17, 12], all6("#oak", [0, 0, 1, 4.5]), {"angle": 22.5, "axis": "z", "origin": [3, 13, 11.5]}),
+            # A phial of green tincture and a bottle of red, corked
+            el([10.5, 11.5, 2], [12.5, 14.5, 4], all6("#phial")),
+            el([11, 14.5, 2.5], [12, 15.5, 3.5], all6("#phial", [0, 0, 1, 1])),
+            el([11, 15.5, 2.5], [12, 16, 3.5], all6("#salve", [0, 0, 1, 1])),
+            el([13, 11.5, 3.5], [15, 14, 5.5], all6("#tincture")),
+            el([13.5, 14, 4], [14.5, 15, 5], all6("#salve", [0, 0, 1, 1])),
+            # A roll of bandage, a bundle of herbs
+            el([9, 11.5, 10.5], [13, 13.5, 12.5], {"north": ("#bandage", None), "south": ("#bandage", None), "east": ("#hem", [0, 4, 2, 6]),
+                                                     "west": ("#hem", [0, 4, 2, 6]), "up": ("#hem", [0, 0, 4, 2]), "down": ("#hem", None)}),
+            el([6, 11.75, 2], [9, 12.5, 7], all6("#herbs"), {"angle": 22.5, "axis": "y", "origin": [7.5, 12, 4.5]}),
         ],
         "display": {
             "gui": {"rotation": [30, 225, 0], "scale": [0.625, 0.625, 0.625]},
@@ -304,7 +381,6 @@ def medical_table_model():
             "firstperson_lefthand": {"rotation": [0, 225, 0], "scale": [0.4, 0.4, 0.4]},
         },
     }
-
 
 def main():
     import metier_art
@@ -332,6 +408,10 @@ def main():
     g.save(bandage_texture(), "textures/block/medical_bandage.png")
     g.save(salve_texture(), "textures/block/medical_salve.png")
     g.save(phial_texture(), "textures/block/medical_phial.png")
+    g.save(stone_texture(), "textures/block/medical_stone.png")
+    g.save(herbs_texture(), "textures/block/medical_herbs.png")
+    g.save(tincture_texture(), "textures/block/medical_tincture.png")
+    g.save(drawer_texture(), "textures/block/medical_drawer.png")
     g.write_json("models/block/medical_table.json", medical_table_model())
     g.write_json("models/item/medical_table.json", {"parent": "arcanes_oublies:block/medical_table"})
     g.write_json("blockstates/medical_table.json", {"variants": {

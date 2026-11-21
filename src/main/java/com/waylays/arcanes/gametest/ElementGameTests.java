@@ -354,6 +354,20 @@ public final class ElementGameTests {
         if (firebolt != null && firebolt != SpellRegistry.none()) {
             helper.assertTrue(CastTimeFloor.apply(firebolt, player, 0) == min, "Iron's own instant spell is not charged");
         }
+        // A cast time set in the spell editor wins: an instant spell charged as long as it says, or not at all
+        java.util.Map<ResourceLocation, java.util.Map<com.waylays.arcanes.editor.SpellTuning.Stat, Double>> before = com.waylays.arcanes.editor.SpellTuning.all();
+        try {
+            java.util.Map<ResourceLocation, java.util.Map<com.waylays.arcanes.editor.SpellTuning.Stat, Double>> tuned = new java.util.HashMap<>(before);
+            tuned.put(spray.getSpellResource(), java.util.Map.of(com.waylays.arcanes.editor.SpellTuning.Stat.CAST_TIME, 47.0));
+            com.waylays.arcanes.editor.SpellTuning.replace(tuned);
+            helper.assertTrue(CastTimeFloor.forCast(spray, player, 0) == 47, "the editor's cast time was not taken: " + CastTimeFloor.forCast(spray, player, 0));
+            tuned.put(spray.getSpellResource(), java.util.Map.of(com.waylays.arcanes.editor.SpellTuning.Stat.CAST_TIME, 0.0));
+            com.waylays.arcanes.editor.SpellTuning.replace(tuned);
+            helper.assertTrue(CastTimeFloor.forCast(spray, player, 0) == 0 && !CastTimeFloor.chargesInstant(spray), "a cast time of 0 did not make it instant");
+        } finally {
+            com.waylays.arcanes.editor.SpellTuning.replace(before);
+        }
+        helper.assertTrue(CastTimeFloor.forCast(spray, player, 0) == min, "the spell did not go back to the minimum");
         // Only its own witch: the creatures of tests running beside this one stay
         witch.discard();
         helper.succeed();

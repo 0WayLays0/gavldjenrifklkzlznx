@@ -30,7 +30,6 @@ public final class MetierNet {
         r.playToServer(Result.TYPE, Result.CODEC, Result::handle);
         r.playToServer(Pick.TYPE, Pick.CODEC, Pick::handle);
         r.playToServer(Save.TYPE, Save.CODEC, Save::handle);
-        r.playToServer(Organize.TYPE, Organize.CODEC, Organize::handle);
     }
 
     private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> payload(String name) {
@@ -42,22 +41,6 @@ public final class MetierNet {
         for (ItemStack s : stacks) {
             ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, s);
         }
-    }
-
-    private static void writeNames(RegistryFriendlyByteBuf buf, List<String> names) {
-        buf.writeVarInt(names.size());
-        for (String n : names) {
-            buf.writeUtf(n.length() > 64 ? n.substring(0, 64) : n, 64);
-        }
-    }
-
-    private static List<String> readNames(RegistryFriendlyByteBuf buf) {
-        int n = Math.min(buf.readVarInt(), 256);
-        List<String> out = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) {
-            out.add(buf.readUtf(64));
-        }
-        return out;
     }
 
     private static List<ItemStack> readStacks(RegistryFriendlyByteBuf buf) {
@@ -160,13 +143,9 @@ public final class MetierNet {
         }
     }
 
-    /** A recipe as a station lists it: what it takes (and whether the player has it), what it gives, its wait, its folder. */
+    /** A recipe as a station lists it: what it takes (and whether the player has it), what it gives, its wait. */
     public record RecipeView(String name, List<ItemStack> inputs, List<Boolean> have, ItemStack partial, ItemStack perfect, double difficulty,
-                             int cooldown, String folder) {
-        public RecipeView(String name, List<ItemStack> inputs, List<Boolean> have, ItemStack partial, ItemStack perfect, double difficulty, int cooldown) {
-            this(name, inputs, have, partial, perfect, difficulty, cooldown, "");
-        }
-
+                             int cooldown) {
         static RecipeView read(RegistryFriendlyByteBuf buf) {
             String name = buf.readUtf(128);
             List<ItemStack> inputs = readStacks(buf);
@@ -175,7 +154,7 @@ public final class MetierNet {
                 have.add(buf.readBoolean());
             }
             return new RecipeView(name, inputs, have, ItemStack.OPTIONAL_STREAM_CODEC.decode(buf), ItemStack.OPTIONAL_STREAM_CODEC.decode(buf),
-                    buf.readDouble(), buf.readVarInt(), buf.readUtf(64));
+                    buf.readDouble(), buf.readVarInt());
         }
 
         void write(RegistryFriendlyByteBuf buf) {
@@ -188,7 +167,6 @@ public final class MetierNet {
             ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, perfect);
             buf.writeDouble(difficulty);
             buf.writeVarInt(cooldown);
-            buf.writeUtf(folder.length() > 64 ? folder.substring(0, 64) : folder, 64);
         }
 
         public boolean ready() {
@@ -196,22 +174,15 @@ public final class MetierNet {
         }
     }
 
-    /**
-     * A station's recipes, for the player to choose one: its folders in order (each recipe names its own), and whether
-     * the player may organise them (a game master).
-     */
-    public record Station(String def, BlockPos pos, String title, int game, ItemStack icon, List<RecipeView> recipes, int cooldown, List<String> folders,
-                          boolean canEdit) implements CustomPacketPayload {
+    /** A station's recipes, for the player to choose one. */
+    public record Station(String def, BlockPos pos, String title, int game, ItemStack icon, List<RecipeView> recipes, int cooldown)
+            implements CustomPacketPayload {
         public static final Type<Station> TYPE = payload("station");
         public static final StreamCodec<RegistryFriendlyByteBuf, Station> CODEC = CustomPacketPayload.codec(Station::write, Station::new);
 
-        public Station(String def, BlockPos pos, String title, int game, ItemStack icon, List<RecipeView> recipes, int cooldown) {
-            this(def, pos, title, game, icon, recipes, cooldown, List.of(), false);
-        }
-
         Station(RegistryFriendlyByteBuf buf) {
             this(buf.readUtf(64), buf.readBlockPos(), buf.readUtf(128), buf.readVarInt(), ItemStack.OPTIONAL_STREAM_CODEC.decode(buf), readRecipes(buf),
-                    buf.readVarInt(), readNames(buf), buf.readBoolean());
+                    buf.readVarInt());
         }
 
         private static List<RecipeView> readRecipes(RegistryFriendlyByteBuf buf) {
@@ -232,8 +203,6 @@ public final class MetierNet {
             buf.writeVarInt(recipes.size());
             recipes.forEach(r -> r.write(buf));
             buf.writeVarInt(cooldown);
-            writeNames(buf, folders);
-            buf.writeBoolean(canEdit);
         }
 
         @Override
@@ -321,48 +290,6 @@ public final class MetierNet {
         void handle(IPayloadContext context) {
             if (context.player() instanceof ServerPlayer player) {
                 context.enqueueWork(() -> MetierService.pick(player, this));
-            }
-        }
-    }
-
-    /**
-     * A game master's organisation of a station's recipes: its {@code folders} in order, the recipes in their new
-     * {@code order} (indices into the station's recipes as listed) and the folder of each, in that order.
-     */
-    public record Organize(String def, BlockPos pos, List<String> folders, List<Integer> order, List<String> recipeFolders) implements CustomPacketPayload {
-        public static final Type<Organize> TYPE = payload("organize");
-        public static final StreamCodec<RegistryFriendlyByteBuf, Organize> CODEC = CustomPacketPayload.codec(Organize::write, Organize::new);
-
-        Organize(RegistryFriendlyByteBuf buf) {
-            this(buf.readUtf(64), buf.readBlockPos(), readNames(buf), readInts(buf), readNames(buf));
-        }
-
-        private static List<Integer> readInts(RegistryFriendlyByteBuf buf) {
-            int n = Math.min(buf.readVarInt(), 256);
-            List<Integer> out = new ArrayList<>(n);
-            for (int i = 0; i < n; i++) {
-                out.add(buf.readVarInt());
-            }
-            return out;
-        }
-
-        void write(RegistryFriendlyByteBuf buf) {
-            buf.writeUtf(def, 64);
-            buf.writeBlockPos(pos);
-            writeNames(buf, folders);
-            buf.writeVarInt(order.size());
-            order.forEach(buf::writeVarInt);
-            writeNames(buf, recipeFolders);
-        }
-
-        @Override
-        public Type<Organize> type() {
-            return TYPE;
-        }
-
-        void handle(IPayloadContext context) {
-            if (context.player() instanceof ServerPlayer player) {
-                context.enqueueWork(() -> MetierService.organize(player, this));
             }
         }
     }

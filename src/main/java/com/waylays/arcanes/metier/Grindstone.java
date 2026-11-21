@@ -6,7 +6,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.rp.RpConfig;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -43,7 +45,8 @@ import java.util.TreeSet;
  * The grindstone: a right click on it with a worn weapon (or any item with durability) starts its sharpening
  * minigame ({@code GrindGame}). A critical success gives back 200 durability, a success 100, a failure takes 50.
  * Each weapon may go back to the grindstone only 12 hours (real time) later. Game masters keep some weapons from it
- * altogether (/meule): the kind of item, or one item only.
+ * altogether: the kind of item (in /arcanes metiers, "Meule", or /meule interdire [id]), or one item only (/meule
+ * interdire objet).
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID)
 public final class Grindstone extends SavedData {
@@ -56,7 +59,7 @@ public final class Grindstone extends SavedData {
     private static final int CRITICAL = 200, SUCCESS = 100, FAILURE = 50;
     private static final float PERFECT_AT = .82f, CRITICAL_BELOW = .3f;
 
-    /** The kinds of item kept from the grindstone. */
+    /** The kinds of item kept from the grindstone by an older version (the list is now in metiers.json, see {@link #bannedKinds}). */
     private final Set<String> banned = new TreeSet<>();
 
     private static Grindstone get(MinecraftServer server) {
@@ -92,7 +95,32 @@ public final class Grindstone extends SavedData {
     }
 
     static boolean banned(MinecraftServer server, ItemStack stack) {
-        return data(stack).getBoolean(BANNED) || get(server).banned.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
+        return data(stack).getBoolean(BANNED) || bannedKinds(server).contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
+    }
+
+    /**
+     * The kinds of item kept from the grindstone: the list in the trades' file (edited in /arcanes metiers or with
+     * /meule), and any an older version kept in the world.
+     */
+    public static Set<String> bannedKinds(MinecraftServer server) {
+        Set<String> all = new TreeSet<>(MetierDefs.get().grindstoneBanned);
+        all.addAll(get(server).banned);
+        return all;
+    }
+
+    /** Keeps the kind {@code id} from the grindstone, or lets it back; saved in the trades' file. */
+    public static void setBanned(MinecraftServer server, String id, boolean ban) {
+        List<String> list = MetierDefs.get().grindstoneBanned;
+        if (ban && !list.contains(id)) {
+            list.add(id);
+        } else if (!ban) {
+            list.remove(id);
+            Grindstone old = get(server);
+            if (old.banned.remove(id)) {
+                old.setDirty();
+            }
+        }
+        MetierDefs.save();
     }
 
     static void start(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState state) {
@@ -164,15 +192,17 @@ public final class Grindstone extends SavedData {
 
     @SubscribeEvent
     public static void onCommands(RegisterCommandsEvent event) {
-        register(event.getDispatcher());
+        register(event.getDispatcher(), event.getBuildContext());
     }
 
-    private static void register(CommandDispatcher<CommandSourceStack> d) {
+    private static void register(CommandDispatcher<CommandSourceStack> d, CommandBuildContext context) {
         d.register(Commands.literal("meule").requires(s -> s.hasPermission(RpConfig.get(RpConfig.REPAIR_PERMISSION, 2)))
                 .then(Commands.literal("interdire").executes(c -> kind(c, true))
-                        .then(Commands.literal("objet").executes(c -> one(c, true))))
+                        .then(Commands.literal("objet").executes(c -> one(c, true)))
+                        .then(Commands.argument("id", ItemArgument.item(context)).executes(c -> kind(c, ItemArgument.getItem(c, "id").getItem(), true))))
                 .then(Commands.literal("autoriser").executes(c -> kind(c, false))
-                        .then(Commands.literal("objet").executes(c -> one(c, false))))
+                        .then(Commands.literal("objet").executes(c -> one(c, false)))
+                        .then(Commands.argument("id", ItemArgument.item(context)).executes(c -> kind(c, ItemArgument.getItem(c, "id").getItem(), false))))
                 .then(Commands.literal("liste").executes(Grindstone::list))
                 .then(Commands.literal("reset").executes(c -> {
                     ItemStack held = held(c);
@@ -198,19 +228,15 @@ public final class Grindstone extends SavedData {
     /** Keeps (or lets back) every item of the held one's kind from the grindstone. */
     private static int kind(CommandContext<CommandSourceStack> c, boolean ban) throws CommandSyntaxException {
         ItemStack held = held(c);
-        if (held == null) {
-            return 0;
-        }
-        ResourceLocation id = BuiltInRegistries.ITEM.getKey(held.getItem());
-        Grindstone g = get(c.getSource().getServer());
-        if (ban) {
-            g.banned.add(id.toString());
-        } else {
-            g.banned.remove(id.toString());
-        }
-        g.setDirty();
+        return held == null ? 0 : kind(c, held.getItem(), ban);
+    }
+
+    /** Keeps (or lets back) every item of this kind from the grindstone. */
+    private static int kind(CommandContext<CommandSourceStack> c, Item item, boolean ban) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+        setBanned(c.getSource().getServer(), id.toString(), ban);
         c.getSource().sendSuccess(() -> Component.translatable(ban ? "metier.arcanes_oublies.grind.banned_kind" : "metier.arcanes_oublies.grind.allowed_kind",
-                held.getItem().getDescription()), true);
+                item.getDescription()), true);
         return 1;
     }
 
@@ -233,7 +259,7 @@ public final class Grindstone extends SavedData {
     }
 
     private static int list(CommandContext<CommandSourceStack> c) {
-        Set<String> all = get(c.getSource().getServer()).banned;
+        Set<String> all = bannedKinds(c.getSource().getServer());
         c.getSource().sendSuccess(() -> Component.translatable("metier.arcanes_oublies.grind.list", all.isEmpty() ? "—" : String.join(", ", all)), false);
         return all.size();
     }
