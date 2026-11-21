@@ -44,7 +44,7 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 31;
-        int light = ElementFx.light(e, 9);
+        int light = ElementFx.light(e, 12);
         switch (e.getKind()) {
             case SPIT -> spit(e, poseStack, buffer, view, age, partialTicks, seed, light);
             case GEYSER -> geyser(e, poseStack, buffer, view, age, seed, light);
@@ -191,9 +191,14 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
 
     private void spit(LavaScene e, PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, float age, float pt, int seed, int light) {
         if (!e.landed()) {
-            Vec3 vel = e.getDeltaMovement();
-            Vector3f back = vel.lengthSqr() > 1.0E-4 ? ElementFx.v(vel).normalize().negate() : new Vector3f(0, -1, 0);
+            // Which way it flies, from how far it moved since the last tick (no tail before it has moved)
+            Vec3 vel = new Vec3(e.getX() - e.xo, e.getY() - e.yo, e.getZ() - e.zo);
             glob(poseStack, buffer, view, new Vector3f(), .45f, age, 1);
+            if (vel.lengthSqr() < 1.0E-4) {
+                ElementFx.motes(poseStack, buffer, view, BossMesh.EMBER, new Vector3f(0, -.5f, 0), .6f, 1, .18f, 8, age * 3, HOT, 1, seed);
+                return;
+            }
+            Vector3f back = ElementFx.v(vel).normalize().negate();
             // A tail of fire: gobs shrinking behind it, a streak, smoke rolling off
             for (int i = 1; i <= 5; i++) {
                 Vector3f p = new Vector3f(back).mul(i * .32f).add(.05f * Mth.sin(age + i), .05f * Mth.cos(age * 1.3f + i), 0);

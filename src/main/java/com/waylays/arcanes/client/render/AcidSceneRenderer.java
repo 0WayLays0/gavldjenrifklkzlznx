@@ -43,7 +43,7 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 37;
-        int light = ElementFx.light(e, 11);
+        int light = ElementFx.light(e, 13);
         switch (e.getKind()) {
             case SPRAY -> spray(e, poseStack, buffer, view, age, seed, light);
             case POOL -> pool(e, poseStack, buffer, view, age, seed, light);
@@ -64,10 +64,10 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
         WaterMesh.streak(streaks, poseStack.last(), view.eye(), at, from, width, BossMesh.glow(0xF4FFC0, alpha), FULL);
     }
 
-    /** Green fumes curling up from {@code at}: soft puffs, lit by the spot (never the black of the floor under it). */
+    /** Green fumes curling up from {@code at}: soft puffs, lit as by daylight (a dim light turned them a dirty grey). */
     private static void fumes(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f at, float reach, float size, int count, float age,
                               float alpha, int seed, int light) {
-        ElementFx.puffs(poseStack, buffer, view, BossMesh.CLOUD, at, reach * .4f, reach, size, count, age, .02f, FUME, .5f * alpha, seed, light);
+        ElementFx.puffs(poseStack, buffer, view, BossMesh.CLOUD, at, reach * .4f, reach, size, count, age, .02f, FUME, .5f * alpha, seed, FULL);
     }
 
     /** A puddle of acid lying flat, {@code r} across, glowing and slowly swirling, a rim of froth; bubbles swell and burst on it. */
@@ -218,10 +218,10 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             float rr = r * Mth.sqrt(BossMesh.hash(seed + k * 3)) * (.6f + .4f * gather);
             float low = BossMesh.hash(seed + k * 5);
             float y = h + (low - .3f) * 1.2f + .15f * Mth.sin(age * .05f + k);
-            int col = BossMesh.mix(0x6E9A3A, 0xC8E080, low);
+            int col = BossMesh.mix(0x5E8A30, 0xB8D878, low);
             col = BossMesh.mix(col, 0xE8FF90, .4f * flicker);
             RitualMesh.billboard(puffs, poseStack, view, new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), 2 + 1.4f * BossMesh.hash(seed + k * 11),
-                    k + age * .005f, -1, BossMesh.argb(col, .8f * shown), light);
+                    k + age * .005f, -1, BossMesh.argb(col, .8f * shown), FULL);
         }
         float fa = BossMesh.hash(seed + flash * 17) * Mth.TWO_PI, fr = r * .6f * BossMesh.hash(seed + flash * 19);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(Mth.cos(fa) * fr, h - .2f, Mth.sin(fa) * fr), r * .8f, GREEN, (.2f + .8f * flicker) * shown);

@@ -45,7 +45,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 31;
-        int light = ElementFx.light(e, 11);
+        int light = ElementFx.light(e, 13);
         switch (e.getKind()) {
             case BLOOM -> bloom(e, poseStack, buffer, view, age, seed, light);
             case POLLEN -> pollen(e, poseStack, buffer, view, age, seed, light);
@@ -205,7 +205,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             float rr = r * (.3f + .55f * BossMesh.hash(seed + k));
             float y = .6f + 1.6f * BossMesh.hash(seed + k * 3) + .25f * Mth.sin(age * .04f + k);
             RitualMesh.billboard(cloud, poseStack, view, new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), 2.6f + BossMesh.hash(seed + k * 5), a, -1,
-                    BossMesh.argb(0xFFE890, .3f * shown), light);
+                    BossMesh.argb(0xFFE890, .3f * shown), FULL);
         }
         VertexConsumer haze = BossMesh.light(buffer, BossMesh.CLOUD);
         for (int k = 0; k < 8; k++) {
@@ -255,11 +255,11 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             Vector3f spot = new Vector3f((float) spot3.x, 0, (float) spot3.z);
             if (age < PlantScene.SEED_FLIGHT) {
                 // In flight: a seed spinning, a green streak behind it
-                float t = age / PlantScene.SEED_FLIGHT, t0 = Math.max(0, t - .25f);
+                float t = age / PlantScene.SEED_FLIGHT, t0 = Math.max(0, t - .12f);
                 Vector3f at = new Vector3f(spot).mul(t).add(0, 1.2f + 2.5f * 4 * t * (1 - t) - 1.2f * t, 0);
                 Vector3f was = new Vector3f(spot).mul(t0).add(0, 1.2f + 2.5f * 4 * t0 * (1 - t0) - 1.2f * t0, 0);
                 BossMesh.sphere(husk, poseStack.last(), at, .16f, 5, 8, age * .2f, 0, 1, BossMesh.argb(0xA07A44, 1), light);
-                WaterMesh.streak(BossMesh.light(buffer, WaterMesh.STREAK), poseStack.last(), view.eye(), at, was, .25f, BossMesh.glow(SPORE, .8f), FULL);
+                WaterMesh.streak(BossMesh.light(buffer, WaterMesh.STREAK), poseStack.last(), view.eye(), at, was, .14f, BossMesh.glow(0x6ACF3A, .45f), FULL);
                 ElementFx.bloom(poseStack, buffer, view, at, .35f, SPORE, .6f);
                 continue;
             }
@@ -292,7 +292,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             if (t < 1) {
                 Vector3f at = new Vector3f(spot).add(0, .6f, 0);
                 ElementFx.puffs(poseStack, buffer, view, BossMesh.CLOUD, at, 2.4f * t + .2f, .6f, 1.2f + 1.2f * t, 7, t * 40, .02f, SPORE, .75f * (1 - t) * fade,
-                        seed + i * 13, light);
+                        seed + i * 13, FULL);
                 ElementFx.burst(poseStack, buffer, view, BossMesh.MOTE, at, 2, 1.2f, .22f, 14, t, SPORE, 1, seed + i * 7, true, FULL);
                 ElementFx.groundRing(poseStack, buffer, .06f, 2 * t, 2 * t + .35f, SPORE, (1 - t) * .8f);
                 ElementFx.bloom(poseStack, buffer, view, at, 1.2f, SPORE, .7f * (1 - t));
@@ -447,7 +447,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
                              int light) {
         poseStack.pushPose();
         poseStack.scale(1, .5f, 1);
-        BossMesh.sphere(skin, poseStack.last(), new Vector3f(), r, 10, 24, 0, lat0, lat1, BossMesh.argb(0x6ABE4A, 1), light);
+        BossMesh.sphere(skin, poseStack.last(), new Vector3f(), r, 10, 24, 0, lat0, lat1, BossMesh.argb(0xFFFFFF, 1), light);
         BossMesh.sphere(flesh, poseStack.last(), new Vector3f(), r * .95f, 10, 24, 0, lat0, lat1, BossMesh.argb(0xFF8A90, 1), FULL);
         if (open > .2f) {
             BossMesh.sphere(glow, poseStack.last(), new Vector3f(), r * .93f, 8, 18, 0, lat0, lat1, BossMesh.glow(0xFF3050, .25f * Math.min(1, open)), FULL);

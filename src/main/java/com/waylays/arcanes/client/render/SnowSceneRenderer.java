@@ -46,7 +46,8 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 31;
-        int light = ElementFx.light(e, 11);
+        // Snow is white in any weather: lit as by full daylight (a dimmer light turned the powder and the blizzard grey)
+        int light = ElementFx.light(e, 15);
         switch (e.getKind()) {
             case ROLL -> roll(e, poseStack, buffer, view, age, partialTicks, seed, light);
             case GLOBE -> globe(e, poseStack, buffer, view, age, partialTicks, seed, light);
