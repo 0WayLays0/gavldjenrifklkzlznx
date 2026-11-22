@@ -227,7 +227,13 @@ public class PoseEditorScreen extends Screen {
         Ui.section(g, font, m, bottomTop, width - 2 * m, tr("cinematic.pose.section_time"));
         // Between the columns, over the world: how to look around, and the state of the edit
         int cx = (m + lw + rx) / 2;
-        g.drawCenteredString(font, tr("cinematic.pose.hint_view"), cx, bottomTop - 30, 0xFFFFFFFF);
+        int gap = rx - (m + lw) - 28;
+        var lines = font.split(tr("cinematic.pose.hint_view"), Math.max(40, gap));
+        int hy = bottomTop - 16 - lines.size() * 10;
+        for (var line : lines) {
+            g.drawCenteredString(font, line, cx, hy, 0xFFFFFFFF);
+            hy += 10;
+        }
         if (live) g.drawCenteredString(font, tr("cinematic.pose.live"), cx, Ui.TOP + 4, 0xFFFFC060);
         else if (dirty) g.drawCenteredString(font, tr("cinematic.pose.unsaved"), cx, Ui.TOP + 4, 0xFFFFC060);
         super.render(g, mx, my, pt);

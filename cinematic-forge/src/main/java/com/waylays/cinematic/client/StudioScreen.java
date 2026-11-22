@@ -111,13 +111,17 @@ public class StudioScreen extends Screen {
         // Playback
         int ty = bottomTop + 15;
         timeline = addRenderableWidget(new TimelineSlider(m, ty, width - 2 * m, 20, () -> ClientStudio.sceneLength(ClientStudio.selectedScene)));
-        int n = 5, w = (width - 2 * m - (n - 1) * Ui.GAP) / n, by = ty + 26, x = m;
-        btn(tr("cinematic.studio.play"), x, by, w, () -> {
-            ClientStudio.playOnServer();
-            onClose();
-        }).active = can && scene != null && !ClientStudio.isRecording();
-        x += w + Ui.GAP;
-        btn(tr("cinematic.studio.stop"), x, by, w, ClientStudio::stopOnServer).active = can;
+        int n = 4, w = (width - 2 * m - (n - 1) * Ui.GAP) / n, by = ty + 26, x = m;
+        boolean running = ClientStudio.serverPlaying() || ClientStudio.isRecording() || ClientStudio.play().countdown() > 0;
+        btn(tr(running ? "cinematic.studio.stop" : "cinematic.studio.play"), x, by, w, () -> {
+            if (running) {
+                ClientStudio.stopOnServer();
+                refresh();
+            } else {
+                ClientStudio.playOnServer();
+                onClose();
+            }
+        }).active = can && scene != null;
         x += w + Ui.GAP;
         btn(tr(ClientStudio.previewing ? "cinematic.studio.preview_pause" : "cinematic.studio.preview"), x, by, w, () -> {
             if (!ClientStudio.serverPlaying()) {

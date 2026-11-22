@@ -164,7 +164,10 @@ public final class StudioServer implements FrameSource {
                 a.scene = s.name;
                 a.dim = p.serverLevel().dimension();
                 s.actors.add(a);
-                spawn(a, p.serverLevel(), p.getX(), p.getY(), p.getZ(), p.getYRot());
+                // Two blocks in front of the director, facing them
+                float yr = p.getYRot() * Mth.DEG_TO_RAD;
+                net.minecraft.world.phys.Vec3 front = p.position().add(-Mth.sin(yr) * 2.0, 0, Mth.cos(yr) * 2.0);
+                spawn(a, p.serverLevel(), front.x, p.getY(), front.z, Mth.wrapDegrees(p.getYRot() + 180f));
                 d.setDirty();
             }
             case DUPLICATE_ACTOR -> {
