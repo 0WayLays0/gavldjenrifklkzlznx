@@ -51,6 +51,8 @@ public class StudioScreen extends Screen {
         bottomTop = height - 76;
         int y = Ui.TOP + 15;
 
+        btn(tr("cinematic.help.open"), width - m - 110, 6, 110, () -> minecraft.setScreen(new HelpScreen(this)));
+
         // The scene
         btn(Component.literal("<"), m, y, 20, () -> cycleScene(-1));
         btn(Component.literal(">"), m + lw - 20, y, 20, () -> cycleScene(1));

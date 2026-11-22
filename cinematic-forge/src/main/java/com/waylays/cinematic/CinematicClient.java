@@ -63,6 +63,7 @@ public final class CinematicClient {
         modBus.addListener(CinematicClient::onReloadListeners);
         modBus.addListener(CinematicClient::onSetup);
         modBus.addListener(CinematicClient::onRenderers);
+        modBus.addListener(CinematicClient::onLayers);
         ClientStudio.init();
         IEventBus bus = MinecraftForge.EVENT_BUS;
         bus.addListener(CinematicClient::onClientTick);
@@ -91,6 +92,11 @@ public final class CinematicClient {
         event.register(NEXT_SHOT);
         event.register(TOGGLE_DOF);
         for (KeyMapping k : new KeyMapping[] {STUDIO, FREECAM, CAM_POINT, EMOTES, PLAY, BACK, FORWARD}) event.register(k);
+    }
+
+    private static void onLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(com.waylays.cinematic.client.ActorLayers.WIDE, () -> com.waylays.cinematic.client.ActorLayers.create(false));
+        event.registerLayerDefinition(com.waylays.cinematic.client.ActorLayers.SLIM, () -> com.waylays.cinematic.client.ActorLayers.create(true));
     }
 
     private static void onRenderers(EntityRenderersEvent.RegisterRenderers event) {

@@ -247,6 +247,8 @@ public final class SmokeTest {
             mc.setScreen(new StudioScreen());
         });
         then(10, () -> shot(mc, "studio_screen"));
+        then(5, () -> mc.setScreen(new com.waylays.cinematic.client.HelpScreen(null)));
+        then(10, () -> shot(mc, "help_screen"));
         then(5, () -> mc.setScreen(new com.waylays.cinematic.client.ActorScreen(bob())));
         then(15, () -> shot(mc, "actor_screen"));
         then(5, () -> {
@@ -314,6 +316,10 @@ public final class SmokeTest {
             ClientStudio.cursor = 40;
             ClientStudio.editKeys().add(new PoseKey(40, BodyPart.RIGHT_ARM, -150f, 0f, 20f));
             ClientStudio.editKeys().add(new PoseKey(40, BodyPart.HEAD, 0f, 0f, 25f));
+            ClientStudio.editKeys().add(new PoseKey(40, BodyPart.RIGHT_FOREARM, -90f, 0f, 0f));
+            ClientStudio.editKeys().add(new PoseKey(40, BodyPart.BODY, 25f, 20f, 10f));
+            ClientStudio.editKeys().add(new PoseKey(40, BodyPart.LEFT_SHIN, 70f, 0f, 0f));
+            ClientStudio.editKeys().add(new PoseKey(40, BodyPart.LEFT_LEG, -40f, 0f, 0f));
         });
         then(15, () -> shot(mc, "pose_editor"));
         then(10, () -> {
@@ -322,8 +328,8 @@ public final class SmokeTest {
         });
         then(15, () -> {
             Track t = ClientStudio.trackOf(bob());
-            if (t == null || t.poseKeys.size() != 2) fail("pose keys not saved ({})", t == null ? -1 : t.poseKeys.size());
-            else log("poses: 2 keys saved");
+            if (t == null || t.poseKeys.size() != 6) fail("pose keys not saved ({})", t == null ? -1 : t.poseKeys.size());
+            else log("poses: 6 keys saved (elbow, knee, torso included)");
             mc.setScreen(new EmoteScreen());
         });
         then(10, () -> shot(mc, "emotes"));

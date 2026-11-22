@@ -10,23 +10,28 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 /**
- * Retouches a take limb by limb: at a moment of the timeline, turn the head, body, arms or legs (degrees, on top of
- * the recorded movement) and set a key; the pose eases from key to key. The camera turns around the actor
- * (right-drag, wheel to zoom); the world stays visible in the middle.
+ * Retouches a take joint by joint. Pick a moment on the timeline, click a joint on the figure, move its sliders: the
+ * pose is kept at that moment (a key) and the actor moves smoothly from key to key, on top of what was recorded.
+ * The camera turns around the actor (right-drag, wheel to zoom); the world stays visible in the middle.
  */
 public class PoseEditorScreen extends Screen {
     private final UUID actor;
     private static BodyPart part = BodyPart.RIGHT_ARM;
-    private final Angle[] sliders = new Angle[3];
+    private final List<Angle> sliders = new ArrayList<>();
     private TimelineSlider timeline;
-    private boolean dirty, live;
+    private Mannequin mannequin;
+    private boolean dirty;
+    private Button saveButton, closeButton;
     private float lastCursor = -1;
-    private int lw, rx, rw, keysTop, bottomTop;
+    private int lw, rx, rw, bottomTop;
 
     public PoseEditorScreen(UUID actor) {
         super(Component.translatable("cinematic.pose.title"));
@@ -44,68 +49,54 @@ public class PoseEditorScreen extends Screen {
     @Override
     protected void init() {
         if (ClientStudio.editActor() == null || !ClientStudio.editActor().equals(actor)) ClientStudio.beginEdit(actor);
+        ClientStudio.setLive(part, null);
         StudioCamera.setOrbit(true);
-        ClientStudio.previewing = false;
         int m = Ui.MARGIN, p = Ui.pitch(height);
-        lw = 112;
-        rw = 184;
+        lw = 120;
+        rw = 200;
         rx = width - m - rw;
         bottomTop = height - 72;
+        mannequin = new Mannequin(m, Ui.TOP + 16, lw, bottomTop - 12 - Ui.TOP - 30);
 
+        // The joint's movements
+        sliders.clear();
         int y = Ui.TOP + 15;
-        for (BodyPart bp : BodyPart.values()) {
-            Component label = tr(bp.key());
-            if (bp == part) label = Component.literal("> ").append(label).append(" <");
-            btn(label, m, y, lw, () -> {
-                part = bp;
-                live = false;
-                ClientStudio.setLive(part, null);
-                rebuildWidgets();
-                loadSliders();
-            });
+        for (Joints.Move mv : Joints.moves(part)) {
+            sliders.add(addRenderableWidget(new Angle(rx, y, rw, mv)));
             y += p;
         }
-
-        String[] axes = {"x", "y", "z"};
-        y = Ui.TOP + 15;
-        for (int i = 0; i < 3; i++) {
-            sliders[i] = addRenderableWidget(new Angle(rx, y, rw, axes[i]));
-            y += p;
-        }
-        keysTop = y + 8;
-        y = keysTop + 15;
+        y += 4;
         int hw = (rw - Ui.GAP) / 2;
-        btn(tr("cinematic.pose.set_key"), rx, y, hw, this::setKey);
+        btn(tr("cinematic.pose.straighten"), rx, y, hw, () -> {
+            for (Angle a : sliders) a.setShown(0);
+            keyNow();
+        });
         btn(tr("cinematic.pose.delete_key"), rx + hw + Ui.GAP, y, hw, this::deleteKey);
         y += p;
         btn(tr("cinematic.pose.prev_key"), rx, y, hw, () -> jumpKey(-1));
         btn(tr("cinematic.pose.next_key"), rx + hw + Ui.GAP, y, hw, () -> jumpKey(1));
 
+        // Time
         int ty = bottomTop + 15;
         timeline = addRenderableWidget(new TimelineSlider(m, ty, width - 2 * m, 20, () -> ClientStudio.sceneLength(ClientStudio.selectedScene)));
         int n = 5, w = (width - 2 * m - (n - 1) * Ui.GAP) / n, x = m, by = ty + 26;
+        btn(tr("cinematic.pose.back_1s"), x, by, w, () -> step(-20));
+        x += w + Ui.GAP;
         btn(tr("cinematic.pose.play"), x, by, w, () -> {
             if (!ClientStudio.previewing && ClientStudio.cursor >= ClientStudio.sceneLength(ClientStudio.selectedScene)) ClientStudio.cursor = 0;
             ClientStudio.previewing = !ClientStudio.previewing;
         });
         x += w + Ui.GAP;
-        btn(tr("cinematic.pose.reset_angles"), x, by, w, () -> {
-            for (Angle a : sliders) a.set(0);
-            changed();
-        });
+        btn(tr("cinematic.pose.forward_1s"), x, by, w, () -> step(20));
         x += w + Ui.GAP;
-        btn(tr("cinematic.pose.clear_part"), x, by, w, () -> {
-            ClientStudio.editKeys().removeIf(k -> k.part() == part);
-            dirty = true;
-            loadSliders();
-        });
-        x += w + Ui.GAP;
-        btn(tr("cinematic.pose.save"), x, by, w, () -> {
+        saveButton = btn(tr("cinematic.pose.save"), x, by, w, () -> {
             ClientStudio.saveEdit();
             dirty = false;
-        }).active = ClientStudio.canDirect();
+            updateButtons();
+        });
         x += w + Ui.GAP;
-        btn(tr(dirty ? "cinematic.pose.close_unsaved" : "cinematic.pose.close"), x, by, w, this::onClose);
+        closeButton = btn(tr("cinematic.pose.close"), x, by, w, this::onClose);
+        updateButtons();
         loadSliders();
     }
 
@@ -113,37 +104,46 @@ public class PoseEditorScreen extends Screen {
         return Math.round(ClientStudio.cursor);
     }
 
+    private void step(int ticks) {
+        ClientStudio.previewing = false;
+        ClientStudio.cursor = Math.max(0, Math.min(ClientStudio.sceneLength(ClientStudio.selectedScene), now() + ticks));
+    }
+
+    private PoseKey keyHere() {
+        int t = now();
+        for (PoseKey k : ClientStudio.editKeys()) if (k.tick() == t && k.part() == part) return k;
+        return null;
+    }
+
     /** The sliders show the pose at the cursor. */
     private void loadSliders() {
         float[] v = new float[3];
         if (!Track.poseOffset(ClientStudio.editKeys(), part, ClientStudio.cursor, v)) v = new float[3];
-        for (int i = 0; i < 3; i++) sliders[i].set(v[i]);
-        live = false;
-        ClientStudio.setLive(part, null);
+        for (Angle a : sliders) a.setStored(v[a.move.comp()]);
         lastCursor = ClientStudio.cursor;
     }
 
-    private void changed() {
-        live = true;
-        ClientStudio.setLive(part, new float[] {sliders[0].degrees(), sliders[1].degrees(), sliders[2].degrees()});
+    /** Moving a slider keeps the joint's pose at this moment: a key is set (or updated) at once. */
+    private void keyNow() {
+        float[] v = new float[3];
+        for (Angle a : sliders) v[a.move.comp()] = a.stored();
+        int t = now();
+        List<PoseKey> keys = ClientStudio.editKeys();
+        keys.removeIf(k -> k.tick() == t && k.part() == part);
+        keys.add(new PoseKey(t, part, v[0], v[1], v[2]));
+        keys.sort((a, b) -> a.tick() != b.tick() ? Integer.compare(a.tick(), b.tick()) : a.part().compareTo(b.part()));
+        markDirty();
     }
 
     private void markDirty() {
-        if (!dirty) {
-            dirty = true;
-            rebuildWidgets();
-        }
+        dirty = true;
+        updateButtons();
     }
 
-    private void setKey() {
-        List<PoseKey> keys = ClientStudio.editKeys();
-        int t = now();
-        PoseKey k = new PoseKey(t, part, sliders[0].degrees(), sliders[1].degrees(), sliders[2].degrees());
-        keys.removeIf(o -> o.tick() == t && o.part() == part);
-        keys.add(k);
-        keys.sort((a, b) -> a.tick() != b.tick() ? Integer.compare(a.tick(), b.tick()) : a.part().compareTo(b.part()));
-        markDirty();
-        loadSliders();
+    /** Changed in place: rebuilding the screen would drop the slider being dragged. */
+    private void updateButtons() {
+        saveButton.active = ClientStudio.canDirect() && dirty;
+        closeButton.setMessage(tr(dirty ? "cinematic.pose.close_unsaved" : "cinematic.pose.close"));
     }
 
     private void deleteKey() {
@@ -170,7 +170,6 @@ public class PoseEditorScreen extends Screen {
     @Override
     public void tick() {
         if (!timeline.isFocused() || ClientStudio.previewing) timeline.sync();
-        // Moving in time shows the pose there (a change not set as a key is dropped)
         if (ClientStudio.cursor != lastCursor) loadSliders();
         int[] others = ClientStudio.editKeys().stream().filter(k -> k.part() != part).mapToInt(PoseKey::tick).toArray();
         int[] mine = ClientStudio.editKeys().stream().filter(k -> k.part() == part).mapToInt(PoseKey::tick).toArray();
@@ -178,20 +177,24 @@ public class PoseEditorScreen extends Screen {
     }
 
     @Override
+    public boolean mouseClicked(double mx, double my, int button) {
+        BodyPart picked = button == GLFW.GLFW_MOUSE_BUTTON_LEFT ? mannequin.at(mx, my) : null;
+        if (picked != null) {
+            part = picked;
+            rebuildWidgets();
+            return true;
+        }
+        return super.mouseClicked(mx, my, button);
+    }
+
+    @Override
     public boolean keyPressed(int key, int scan, int mods) {
         if (key == GLFW.GLFW_KEY_LEFT || key == GLFW.GLFW_KEY_RIGHT) {
-            int step = (mods & GLFW.GLFW_MOD_SHIFT) != 0 ? 20 : 1;
-            ClientStudio.previewing = false;
-            ClientStudio.cursor = Math.max(0, Math.min(ClientStudio.sceneLength(ClientStudio.selectedScene),
-                    now() + (key == GLFW.GLFW_KEY_LEFT ? -step : step)));
+            step(((mods & GLFW.GLFW_MOD_SHIFT) != 0 ? 20 : 1) * (key == GLFW.GLFW_KEY_LEFT ? -1 : 1));
             return true;
         }
         if (key == GLFW.GLFW_KEY_SPACE) {
             ClientStudio.previewing = !ClientStudio.previewing;
-            return true;
-        }
-        if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) {
-            setKey();
             return true;
         }
         return super.keyPressed(key, scan, mods);
@@ -222,20 +225,32 @@ public class PoseEditorScreen extends Screen {
         Ui.panel(g, rx, Ui.TOP, rw, colH);
         Ui.panel(g, m, bottomTop, width - 2 * m, 61);
         Ui.section(g, font, m, Ui.TOP, lw, tr("cinematic.pose.section_part"));
-        Ui.section(g, font, rx, Ui.TOP, rw, tr("cinematic.pose.section_angles", tr(part.key())));
-        Ui.section(g, font, rx, keysTop, rw, tr("cinematic.pose.section_keys", TimelineSlider.time(ClientStudio.cursor)));
+        Ui.section(g, font, rx, Ui.TOP, rw, tr(part.key()));
         Ui.section(g, font, m, bottomTop, width - 2 * m, tr("cinematic.pose.section_time"));
-        // Between the columns, over the world: how to look around, and the state of the edit
-        int cx = (m + lw + rx) / 2;
-        int gap = rx - (m + lw) - 28;
-        var lines = font.split(tr("cinematic.pose.hint_view"), Math.max(40, gap));
+
+        Set<BodyPart> withKeys = EnumSet.noneOf(BodyPart.class);
+        for (PoseKey k : ClientStudio.editKeys()) withKeys.add(k.part());
+        mannequin.render(g, font, part, withKeys, mx, my);
+        g.drawCenteredString(font, tr("cinematic.pose.front_view"), m + lw / 2, mannequin.bottom() + 4, Ui.HINT);
+        BodyPart hover = mannequin.at(mx, my);
+        if (hover != null && hover != part) g.renderTooltip(font, tr(hover.key()), mx, my);
+
+        // Over the world, between the columns: is there a key here, and how to look around
+        int cx = (m + lw + rx) / 2, gap = Math.max(60, rx - (m + lw) - 28);
+        PoseKey here = keyHere();
+        Component state = here != null ? tr("cinematic.pose.key_here", TimelineSlider.time(here.tick()))
+                : tr("cinematic.pose.no_key_here");
+        int sy = Ui.TOP + 2;
+        for (var line : font.split(state, gap)) {
+            g.drawCenteredString(font, line, cx, sy, here != null ? 0xFF80FF80 : 0xFFE0E0E0);
+            sy += 10;
+        }
+        var lines = font.split(tr("cinematic.pose.hint_view"), gap);
         int hy = bottomTop - 16 - lines.size() * 10;
         for (var line : lines) {
             g.drawCenteredString(font, line, cx, hy, 0xFFFFFFFF);
             hy += 10;
         }
-        if (live) g.drawCenteredString(font, tr("cinematic.pose.live"), cx, Ui.TOP + 4, 0xFFFFC060);
-        else if (dirty) g.drawCenteredString(font, tr("cinematic.pose.unsaved"), cx, Ui.TOP + 4, 0xFFFFC060);
         super.render(g, mx, my, pt);
     }
 
@@ -251,34 +266,42 @@ public class PoseEditorScreen extends Screen {
         return false;
     }
 
-    /** -180..180 degrees. */
+    /** One movement of the joint, within its natural limits. */
     private final class Angle extends AbstractSliderButton {
-        private final String axis;
+        final Joints.Move move;
 
-        Angle(int x, int y, int w, String axis) {
+        Angle(int x, int y, int w, Joints.Move move) {
             super(x, y, w, 20, Component.empty(), 0.5);
-            this.axis = axis;
+            this.move = move;
+            setShown(0);
+        }
+
+        float shown() {
+            return Math.round((float) (move.min() + value * (move.max() - move.min())));
+        }
+
+        float stored() {
+            return shown() * move.sign();
+        }
+
+        void setShown(float deg) {
+            value = Math.max(0, Math.min(1, (deg - move.min()) / (move.max() - move.min())));
             updateMessage();
         }
 
-        float degrees() {
-            return Math.round((float) (value * 360.0 - 180.0));
-        }
-
-        void set(float deg) {
-            value = Math.max(0, Math.min(1, (deg + 180.0) / 360.0));
-            updateMessage();
+        void setStored(float deg) {
+            setShown(deg * move.sign());
         }
 
         @Override
         protected void updateMessage() {
-            if (axis == null) return;
-            setMessage(Component.translatable("cinematic.pose.axis_" + axis, String.format(Locale.ROOT, "%.0f", degrees())));
+            if (move == null) return;
+            setMessage(Component.translatable(move.key(), String.format(Locale.ROOT, "%.0f", shown())));
         }
 
         @Override
         protected void applyValue() {
-            changed();
+            keyNow();
         }
     }
 }

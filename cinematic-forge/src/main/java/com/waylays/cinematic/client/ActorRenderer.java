@@ -55,7 +55,7 @@ public class ActorRenderer extends EntityRenderer<ActorEntity> {
 
     static final class Body extends LivingEntityRenderer<ActorEntity, ActorModel> {
         Body(EntityRendererProvider.Context ctx, boolean slim) {
-            super(ctx, new ActorModel(ctx.bakeLayer(slim ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), slim), 0.5f);
+            super(ctx, new ActorModel(ctx.bakeLayer(slim ? ActorLayers.SLIM : ActorLayers.WIDE), slim), 0.5f);
             addLayer(new HumanoidArmorLayer<>(this,
                     new HumanoidModel<>(ctx.bakeLayer(slim ? ModelLayers.PLAYER_SLIM_INNER_ARMOR : ModelLayers.PLAYER_INNER_ARMOR)),
                     new HumanoidModel<>(ctx.bakeLayer(slim ? ModelLayers.PLAYER_SLIM_OUTER_ARMOR : ModelLayers.PLAYER_OUTER_ARMOR)),
