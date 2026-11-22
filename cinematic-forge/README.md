@@ -46,8 +46,13 @@ Elles se changent dans Options > Commandes > Cinematic.
      réfléchir, applaudir, s'asseoir, danser, genou à terre, hausser les épaules).
 
    **P** pour couper. Les autres acteurs de la scène rejouent leur prise **en même temps** : tu joues avec eux, prise après prise.
-4. **Modifier les poses** : choisis un moment sur la timeline et un membre (tête, corps, bras, jambes). Règle les
-   3 angles, puis « Poser la clé ». Le membre passe en douceur d'une clé à l'autre, par-dessus le mouvement enregistré.
+4. **Modifier les poses** : 10 articulations, à savoir la tête, le torse, les épaules, les **coudes**, les hanches et
+   les **genoux**.
+   - Choisis le moment sur la timeline, puis clique un membre sur le **mannequin** (vu de face).
+   - Bouge ses curseurs, qui disent ce qu'ils font (« Plier le coude », « Lever en avant », « Se pencher en avant »…)
+     et ont des limites naturelles.
+   - La clé se pose toute seule. Entre deux clés, le membre bouge en douceur, par-dessus le mouvement enregistré.
+   - Pencher ou tourner le torse emporte la tête et les bras avec lui.
    - La caméra tourne autour de l'acteur : clic droit glissé pour tourner, molette pour zoomer.
    - Pense à cliquer sur « Enregistrer ».
 5. **Caméras** (« Réalisateur… ») : un film est une suite de **plans**. Chaque plan commence à un moment précis : la **coupe**.
@@ -99,7 +104,8 @@ Où sont rangées les données :
   pendant la prise, les blocs peuvent arriver un poil décalés.
 - Les blocs rejoués sont posés sans mettre à jour leurs voisins (pour que l'eau ou le sable ne partent pas en vrille).
   Le contenu des coffres et des panneaux n'est pas enregistré.
-- Le geste « s'asseoir » baisse le corps mais ne s'assoit pas sur un bloc précis.
+- Le geste « s'asseoir » plie les genoux comme sur une chaise, sans s'accrocher à un bloc précis.
+- Les armures ne plient pas au coude ni au genou.
 - Dormir dans un lit n'est pas rejoué comme une vraie pose couchée.
 - Le rendu film passe après le monde et avant la main : la main en 1re personne n'est pas étalonnée.
 - Incompatible avec un shader pack OptiFine/Oculus actif.
