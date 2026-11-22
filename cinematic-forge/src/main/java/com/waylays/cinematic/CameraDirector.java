@@ -120,6 +120,8 @@ public final class CameraDirector {
         float pt = (float) event.getPartialTick();
         if (entity == null) return;
         if (active) {
+            Entity actor = com.waylays.cinematic.client.ClientStudio.findEntity(com.waylays.cinematic.client.ClientStudio.autoTarget);
+            if (actor != null) entity = actor;
             directShot(event, camera, entity, pt, dt);
         } else {
             smoothPlay(event, entity, dt);
@@ -244,7 +246,7 @@ public final class CameraDirector {
         focus = (float) camPos.distanceTo(eye);
     }
 
-    private static boolean moveCamera(Camera camera, Vec3 pos) {
+    public static boolean moveCamera(Camera camera, Vec3 pos) {
         if (setPositionMissing) return false;
         try {
             if (setPosition == null) {

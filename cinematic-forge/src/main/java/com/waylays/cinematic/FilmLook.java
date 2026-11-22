@@ -81,7 +81,7 @@ public final class FilmLook {
         clock = (clock + dt) % 3600f;
         if (fade > 0f) fade = Math.max(0f, fade - fadeSpeed * dt);
 
-        boolean shots = CameraDirector.active();
+        boolean shots = CameraDirector.active() || com.waylays.cinematic.client.StudioCamera.filmActive();
         boolean on = CinematicClient.lookOn() || shots;
         float barsTarget = on && (shots || CinematicConfig.LETTERBOX.get()) ? 1f : 0f;
         float dofTarget = on && CinematicClient.dofOn() ? 1f : 0f;
@@ -97,7 +97,7 @@ public final class FilmLook {
             height = h;
         }
         float look = on ? 1f : 0f;
-        float focus = CameraDirector.focusDistance();
+        float focus = com.waylays.cinematic.client.StudioCamera.focus() >= 0 ? com.waylays.cinematic.client.StudioCamera.focus() : CameraDirector.focusDistance();
         for (EffectInstance fx : effects) {
             fx.safeGetUniform("Clock").set(clock);
             fx.safeGetUniform("Bars").set(smooth(bars));
