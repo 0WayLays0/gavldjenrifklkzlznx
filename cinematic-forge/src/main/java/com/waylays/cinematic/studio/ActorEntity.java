@@ -212,15 +212,22 @@ public class ActorEntity extends LivingEntity {
         return driven ? Mth.lerp(partialTick, swimO, swim) : super.getSwimAmount(partialTick);
     }
 
-    // Client: positions come from the take, not from the server's movement packets
+    // Client: positions come from the take, not from the server's movement packets. Without a take the statue
+    // jumps to where the server puts it (its movement step never runs).
     @Override
     public void lerpTo(double x, double y, double z, float yRot, float xRot, int steps, boolean teleport) {
-        if (!driven) super.lerpTo(x, y, z, yRot, xRot, steps, teleport);
+        if (driven) return;
+        setPos(x, y, z);
+        setRot(yRot, xRot);
+        setOldPosAndRot();
     }
 
     @Override
     public void lerpHeadTo(float yaw, int steps) {
-        if (!driven) super.lerpHeadTo(yaw, steps);
+        if (!driven) {
+            yHeadRot = yaw;
+            yBodyRot = yaw;
+        }
     }
 
     // ------------------------------------------------------------------ a statue
