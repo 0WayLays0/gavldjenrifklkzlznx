@@ -70,7 +70,7 @@ public final class SmokeTest {
     private static Runnable everyTick;
     private static Vec3 origin;
 
-    private record Step(int delay, Runnable action) {}
+    private record Step(int delay, Runnable action, java.util.function.BooleanSupplier until) {}
 
     private SmokeTest() {}
 
@@ -141,7 +141,19 @@ public final class SmokeTest {
             } else if (stage == 2) {
                 if (--wait > 0) return;
                 if (step < STEPS.size()) {
-                    Step s = STEPS.get(step++);
+                    Step s = STEPS.get(step);
+                    if (s.until() != null) {
+                        // Waits (up to the step's delay) for a condition
+                        if (!s.until().getAsBoolean() && ticks < s.delay()) return;
+                        if (!s.until().getAsBoolean()) fail("timed out at step {}", step);
+                        ticks = 0;
+                        step++;
+                        s.action().run();
+                        wait = 1;
+                        return;
+                    }
+                    step++;
+                    ticks = 0;
                     s.action().run();
                     wait = s.delay();
                 } else {
@@ -155,7 +167,12 @@ public final class SmokeTest {
     }
 
     private static void then(int delay, Runnable r) {
-        STEPS.add(new Step(delay, r));
+        STEPS.add(new Step(delay, r, null));
+    }
+
+    /** Runs {@code r} once {@code cond} holds, failing after {@code timeout} ticks. */
+    private static void when(java.util.function.BooleanSupplier cond, int timeout, Runnable r) {
+        STEPS.add(new Step(timeout, r, cond));
     }
 
     private static void onServer(Minecraft mc, java.util.function.Consumer<ServerPlayer> r) {
@@ -184,11 +201,15 @@ public final class SmokeTest {
         then(20, () -> onServer(mc, p -> {
             p.serverLevel().setDayTime(6000);
             p.serverLevel().setWeatherParameters(6000, 0, false, false);
-            BlockPos base = p.blockPosition().below();
-            for (int dx = -8; dx <= 8; dx++) for (int dz = -8; dz <= 8; dz++) {
-                p.serverLevel().setBlockAndUpdate(base.offset(dx, 0, dz), Blocks.SMOOTH_STONE.defaultBlockState());
-                for (int dy = 1; dy <= 4; dy++) p.serverLevel().setBlockAndUpdate(base.offset(dx, dy, dz), Blocks.AIR.defaultBlockState());
+            BlockPos base = new BlockPos(p.blockPosition().getX(), 140, p.blockPosition().getZ());
+            for (int dx = -12; dx <= 12; dx++) for (int dz = -12; dz <= 12; dz++) {
+                boolean edge = Math.abs(dx) == 12 || Math.abs(dz) == 12;
+                p.serverLevel().setBlockAndUpdate(base.offset(dx, 0, dz), (dx + dz) % 2 == 0 ? Blocks.SMOOTH_STONE.defaultBlockState()
+                        : Blocks.POLISHED_ANDESITE.defaultBlockState());
+                if (edge) p.serverLevel().setBlockAndUpdate(base.offset(dx, 1, dz), Blocks.OAK_FENCE.defaultBlockState());
             }
+            p.getAbilities().flying = false;
+            p.onUpdateAbilities();
             p.teleportTo(base.getX() + 0.5, base.getY() + 1, base.getZ() + 0.5);
             p.setYRot(0);
             p.setXRot(0);
@@ -226,14 +247,16 @@ public final class SmokeTest {
             mc.setScreen(new StudioScreen());
         });
         then(10, () -> shot(mc, "studio_screen"));
+        then(5, () -> mc.setScreen(new com.waylays.cinematic.client.ActorScreen(bob())));
+        then(15, () -> shot(mc, "actor_screen"));
         then(5, () -> {
             mc.setScreen(null);
             // Record: 3 s countdown, then a walk with a turn, a swing, a gesture
             ClientStudio.send(Action.RECORD, bob(), "", 0);
         });
         then(30, () -> shot(mc, "countdown"));
-        then(40, () -> {
-            if (!ClientStudio.amRecording()) fail("the recording did not start");
+        when(() -> ClientStudio.recordedTicks() > 0, 600, () -> {
+            log("recording started");
             origin = mc.player.position();
             int[] t = {0};
             everyTick = () -> {
@@ -249,11 +272,11 @@ public final class SmokeTest {
             };
         });
         then(30, () -> shot(mc, "recording"));
-        then(90, () -> {
+        when(() -> ClientStudio.recordedTicks() >= 140, 600, () -> {
             everyTick = null;
             ClientStudio.stopOnServer();
         });
-        then(30, () -> {
+        when(() -> ClientStudio.trackOf(bob()) != null && ClientStudio.trackOf(bob()).length() >= 100, 600, () -> {
             Track t = ClientStudio.trackOf(bob());
             if (t == null || t.length() < 100) fail("the take did not come back from the server ({} frames)", t == null ? -1 : t.length());
             else log("studio: take of {} frames recorded and synced", t.length());
@@ -261,11 +284,15 @@ public final class SmokeTest {
             if (a == null || a.length() < 100) fail("the server did not keep the take");
             // A second actor, duplicate of the first, moved aside
             ClientStudio.send(Action.DUPLICATE_ACTOR, bob(), "", 0);
-            onServer(mc, p -> p.teleportTo(origin.x + 6, origin.y, origin.z + 2));
+            onServer(mc, p -> {
+                p.teleportTo(origin.x - 7, origin.y, origin.z + 4);
+                p.setYRot(-90f);
+                p.setXRot(8f);
+            });
         });
         then(20, () -> {
-            mc.player.setYRot(-120f);
-            mc.player.setXRot(10f);
+            mc.player.setYRot(-90f);
+            mc.player.setXRot(8f);
             mc.options.setCameraType(CameraType.FIRST_PERSON);
             ClientStudio.cursor = 60;
             ClientStudio.previewing = false;

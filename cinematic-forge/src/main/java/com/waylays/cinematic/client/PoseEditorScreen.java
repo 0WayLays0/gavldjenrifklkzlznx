@@ -63,16 +63,16 @@ public class PoseEditorScreen extends Screen {
         for (int i = 0; i < 3; i++) {
             sliders[i] = addRenderableWidget(new Angle(rx, 28 + i * 24, 160, axes[i]));
         }
-        int by = 28 + 3 * 24 + 4;
-        btn(tr("cinematic.pose.set_key"), rx, by, 160, this::setKey);
-        btn(tr("cinematic.pose.delete_key"), rx, by + 22, 160, this::deleteKey);
-        btn(tr("cinematic.pose.prev_key"), rx, by + 44, 78, () -> jumpKey(-1));
-        btn(tr("cinematic.pose.next_key"), rx + 82, by + 44, 78, () -> jumpKey(1));
-        btn(tr("cinematic.pose.reset_angles"), rx, by + 66, 160, () -> {
+        int by = 28 + 3 * 24 + 4, hw = 78;
+        btn(tr("cinematic.pose.set_key"), rx, by, hw, this::setKey);
+        btn(tr("cinematic.pose.delete_key"), rx + 82, by, hw, this::deleteKey);
+        btn(tr("cinematic.pose.prev_key"), rx, by + 22, hw, () -> jumpKey(-1));
+        btn(tr("cinematic.pose.next_key"), rx + 82, by + 22, hw, () -> jumpKey(1));
+        btn(tr("cinematic.pose.reset_angles"), rx, by + 44, hw, () -> {
             for (Angle a : sliders) a.set(0);
             changed();
         });
-        btn(tr("cinematic.pose.clear_part"), rx, by + 88, 160, () -> {
+        btn(tr("cinematic.pose.clear_part"), rx + 82, by + 44, hw, () -> {
             ClientStudio.editKeys().removeIf(k -> k.part() == part);
             dirty = true;
             loadSliders();
@@ -199,15 +199,15 @@ public class PoseEditorScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
-        g.fill(0, 0, 116, height - 56, 0x70000000);
-        g.fill(width - 176, 0, width, height - 56, 0x70000000);
-        g.fill(0, height - 56, width, height, 0x70000000);
+        g.fill(0, 0, 116, height - 72, 0x70000000);
+        g.fill(width - 176, 0, width, height - 72, 0x70000000);
+        g.fill(0, height - 72, width, height, 0x70000000);
         var info = ClientStudio.actor(actor);
         g.drawString(font, title.copy().append(info == null ? "" : " - " + info.name()), 8, 8, 0xFFFFFF);
         g.drawString(font, tr("cinematic.pose.at", TimelineSlider.time(ClientStudio.cursor), tr(part.key())), width - 168, 12, 0xFFE070);
-        g.drawCenteredString(font, tr("cinematic.pose.hint"), width / 2, height - 64, 0xC0C0C0);
-        if (dirty) g.drawString(font, tr("cinematic.pose.unsaved"), 8, height - 64, 0xFFC060);
-        if (live) g.drawString(font, tr("cinematic.pose.live"), width - 168, 28 + 3 * 24 + 4 + 112, 0xFFC060);
+        g.drawCenteredString(font, tr("cinematic.pose.hint"), width / 2, height - 66, 0xC0C0C0);
+        if (dirty) g.drawString(font, tr("cinematic.pose.unsaved"), 8, 8 + 10, 0xFFC060);
+        if (live) g.drawString(font, tr("cinematic.pose.live"), width - 168, 28 + 3 * 24 + 4 + 68, 0xFFC060);
         super.render(g, mx, my, pt);
     }
 

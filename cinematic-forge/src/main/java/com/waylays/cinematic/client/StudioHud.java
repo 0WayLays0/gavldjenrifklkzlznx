@@ -41,7 +41,8 @@ public final class StudioHud {
                 ps.pushPose();
                 ps.translate(w / 2f, h / 2f - 30, 0);
                 ps.scale(5f, 5f, 1f);
-                g.drawCenteredString(font, String.valueOf(n), 0, 0, 0xFFFF5050);
+                String digit = String.valueOf(n);
+                g.drawString(font, digit, -font.width(digit) / 2, -4, 0xFFFF5050, false);
                 ps.popPose();
                 g.drawCenteredString(font, Component.translatable("cinematic.hud.get_ready"), w / 2, h / 2 + 20, 0xFFFFFF);
             } else if (play.playing()) {

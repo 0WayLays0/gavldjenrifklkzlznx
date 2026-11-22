@@ -335,6 +335,7 @@ public final class ClientStudio implements FrameSource {
             cursor = 0;
         }
         if (Minecraft.getInstance().screen instanceof StudioScreen s) s.refresh();
+        if (Minecraft.getInstance().screen instanceof ActorScreen s) s.refresh();
     }
 
     public static void onDownload(DownloadMsg msg) {

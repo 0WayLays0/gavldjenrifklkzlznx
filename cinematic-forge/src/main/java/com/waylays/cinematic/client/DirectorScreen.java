@@ -48,7 +48,7 @@ public class DirectorScreen extends Screen {
         CameraTrack t = track();
         boolean scene = ClientStudio.scene(ClientStudio.selectedScene) != null;
         int left = 8, top = 24;
-        int rows = Math.max(1, (height - top - 110) / 22);
+        int rows = Math.max(1, (height - top - 76) / 22);
         listOffset = Math.max(0, Math.min(listOffset, t.shots.size() - rows));
         for (int i = 0; i < rows && listOffset + i < t.shots.size(); i++) {
             int idx = listOffset + i;
@@ -74,44 +74,47 @@ public class DirectorScreen extends Screen {
             });
         }
 
-        int rx = Math.max(220, width - 228), w = 220;
+        int rx = Math.max(220, width - 228), w = width - rx - 8, hw = (w - 4) / 2, rx2 = rx + hw + 4;
         btn(tr("cinematic.director.new_shot"), rx, top, w, this::newShot).active = scene;
         CameraTrack.Shot s = t.selectedShot();
         if (s != null) {
-            int y = top + 30;
-            btn(tr("cinematic.director.type", tr(s.type.key())), rx, y, w, () -> {
+            int y = top + 24;
+            btn(tr("cinematic.director.type", tr(s.type.key())), rx, y, hw, () -> {
                 s.type = CameraTrack.Type.values()[(s.type.ordinal() + 1) % CameraTrack.Type.values().length];
                 changed();
             });
             String target = targetName(s.targetId());
-            btn(tr("cinematic.director.target", target.isEmpty() ? tr("cinematic.director.none") : Component.literal(target)), rx, y + 22, w,
+            btn(tr("cinematic.director.target", target.isEmpty() ? tr("cinematic.director.none") : Component.literal(target)), rx2, y, hw,
                     () -> {
                         s.target = nextTarget(s.targetId());
                         changed();
                     });
-            btn(tr(s.lookAt ? "cinematic.director.look_on" : "cinematic.director.look_off"), rx, y + 44, w, () -> {
+            y += 22;
+            btn(tr(s.lookAt ? "cinematic.director.look_on" : "cinematic.director.look_off"), rx, y, hw, () -> {
                 s.lookAt = !s.lookAt;
                 changed();
             });
             if (s.type == CameraTrack.Type.ORBIT) {
-                btn(Component.literal("-"), rx, y + 66, 20, () -> {
+                btn(Component.literal("-"), rx2, y, 16, () -> {
                     s.orbitSpeed -= 4f;
                     changed();
                 });
-                btn(tr("cinematic.director.orbit_speed", String.format(java.util.Locale.ROOT, "%.0f", s.orbitSpeed)), rx + 22, y + 66, w - 44, () -> {
-                });
-                btn(Component.literal("+"), rx + w - 20, y + 66, 20, () -> {
+                btn(tr("cinematic.director.orbit_speed", String.format(java.util.Locale.ROOT, "%.0f", s.orbitSpeed)), rx2 + 18, y, hw - 36, () -> {
+                }).active = false;
+                btn(Component.literal("+"), rx2 + hw - 16, y, 16, () -> {
                     s.orbitSpeed += 4f;
                     changed();
                 });
             }
-            btn(tr("cinematic.director.add_point"), rx, y + 92, w, this::addPoint);
-            btn(tr("cinematic.director.remove_point"), rx, y + 114, w / 2 - 2, () -> {
+            y += 22;
+            btn(tr("cinematic.director.add_point"), rx, y, hw, this::addPoint);
+            btn(tr("cinematic.director.remove_point"), rx2, y, hw, () -> {
                 int now = Math.round(ClientStudio.cursor);
                 if (!s.keys.removeIf(k -> k.tick == now) && !s.keys.isEmpty()) s.keys.remove(s.keys.size() - 1);
                 changed();
             });
-            btn(tr("cinematic.director.go_point"), rx + w / 2 + 2, y + 114, w / 2 - 2, () -> {
+            y += 22;
+            btn(tr("cinematic.director.go_point"), rx, y, hw, () -> {
                 if (s.keys.isEmpty()) return;
                 CameraTrack.Key near = s.keys.get(0);
                 for (CameraTrack.Key k : s.keys) if (Math.abs(k.tick - ClientStudio.cursor) < Math.abs(near.tick - ClientStudio.cursor)) near = k;
@@ -120,11 +123,12 @@ public class DirectorScreen extends Screen {
                 StudioCamera.goTo(near);
                 onClose();
             });
-            btn(tr("cinematic.director.start_here"), rx, y + 136, w, () -> {
+            btn(tr("cinematic.director.start_here"), rx2, y, hw, () -> {
                 s.start = Math.round(ClientStudio.cursor);
                 changed();
             });
-            btn(tr("cinematic.director.delete_shot"), rx, y + 158, w, () -> {
+            y += 22;
+            btn(tr("cinematic.director.delete_shot"), rx, y, w, () -> {
                 t.shots.remove(s);
                 t.selected = -1;
                 changed();
@@ -229,16 +233,16 @@ public class DirectorScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
-        g.fill(0, 0, 214, height - 56, 0x70000000);
-        g.fill(Math.max(220, width - 228) - 4, 0, width, height - 56, 0x70000000);
-        g.fill(0, height - 56, width, height, 0x70000000);
+        g.fill(0, 0, 214, height - 72, 0x70000000);
+        g.fill(Math.max(220, width - 228) - 4, 0, width, height - 72, 0x70000000);
+        g.fill(0, height - 72, width, height, 0x70000000);
         g.drawString(font, title.copy().append(" - " + (ClientStudio.selectedScene.isEmpty() ? "-" : ClientStudio.selectedScene)), 8, 8, 0xFFFFFF);
         if (track().shots.isEmpty()) g.drawString(font, tr("cinematic.director.empty"), 8, 30, 0xA0A0A0);
         CameraTrack.Shot s = track().selectedShot();
         if (s != null) {
             g.drawString(font, tr("cinematic.director.points", s.keys.size()), Math.max(220, width - 228), 12, 0xFFE070);
         }
-        g.drawCenteredString(font, tr("cinematic.director.hint"), width / 2, height - 64, 0xC0C0C0);
+        g.drawCenteredString(font, tr("cinematic.director.hint"), width / 2, height - 66, 0xC0C0C0);
         super.render(g, mx, my, pt);
     }
 
