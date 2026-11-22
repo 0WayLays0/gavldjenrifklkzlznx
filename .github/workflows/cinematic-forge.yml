@@ -1,0 +1,50 @@
+name: Cinematic (Forge 1.20.1)
+
+on:
+  push:
+    paths:
+      - 'cinematic-forge/**'
+      - '.github/workflows/cinematic-forge.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: cinematic-forge-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: cinematic-forge-${{ runner.os }}-${{ hashFiles('cinematic-forge/build.gradle', 'cinematic-forge/settings.gradle', 'cinematic-forge/gradle.properties') }}
+          restore-keys: |
+            cinematic-forge-${{ runner.os }}-
+            eraphones-forge-${{ runner.os }}-
+
+      - name: Build (compile, jar)
+        working-directory: cinematic-forge
+        run: |
+          set -o pipefail
+          chmod +x gradlew
+          ./gradlew build --stacktrace --console=plain 2>&1 | tee build.log
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: cinematic-forge-1.20.1-jar
+          path: cinematic-forge/build/libs/cinematic-*-forge-1.20.1.jar

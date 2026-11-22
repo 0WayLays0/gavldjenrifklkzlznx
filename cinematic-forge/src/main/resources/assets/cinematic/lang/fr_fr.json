@@ -1,0 +1,12 @@
+{
+  "key.categories.cinematic": "Cinématique",
+  "key.cinematic.toggle_look": "Activer/désactiver le rendu film",
+  "key.cinematic.toggle_camera": "Activer/désactiver la caméra cinématique",
+  "key.cinematic.next_shot": "Plan suivant",
+  "key.cinematic.toggle_dof": "Activer/désactiver la profondeur de champ",
+  "cinematic.state.on": "ACTIVÉ",
+  "cinematic.state.off": "DÉSACTIVÉ",
+  "cinematic.msg.look": "Rendu film : %s",
+  "cinematic.msg.dof": "Profondeur de champ : %s",
+  "cinematic.msg.camera": "Caméra cinématique : %s"
+}

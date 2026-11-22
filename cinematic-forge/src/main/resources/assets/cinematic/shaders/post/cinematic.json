@@ -1,0 +1,16 @@
+{
+  "targets": [ "swap", "swap2" ],
+  "passes": [
+    {
+      "name": "cinematic:dof", "intarget": "minecraft:main", "outtarget": "swap",
+      "auxtargets": [ { "name": "DepthSampler", "id": "minecraft:main:depth" } ],
+      "uniforms": [ { "name": "Direction", "values": [ 1.0, 0.0 ] } ]
+    },
+    {
+      "name": "cinematic:dof", "intarget": "swap", "outtarget": "swap2",
+      "auxtargets": [ { "name": "DepthSampler", "id": "minecraft:main:depth" } ],
+      "uniforms": [ { "name": "Direction", "values": [ 0.0, 1.0 ] } ]
+    },
+    { "name": "cinematic:grade", "intarget": "swap2", "outtarget": "minecraft:main" }
+  ]
+}

@@ -17,3 +17,6 @@ era-phones-forge/build/
 era-phones-forge/run/
 era-phones-forge/run-gametest/
 era-phones-forge/.gradle/
+cinematic-forge/build/
+cinematic-forge/run/
+cinematic-forge/.gradle/

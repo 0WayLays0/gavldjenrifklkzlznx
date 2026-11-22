@@ -1,0 +1,12 @@
+{
+  "key.categories.cinematic": "Cinematic",
+  "key.cinematic.toggle_look": "Toggle film look",
+  "key.cinematic.toggle_camera": "Toggle cinematic camera",
+  "key.cinematic.next_shot": "Next camera shot",
+  "key.cinematic.toggle_dof": "Toggle depth of field",
+  "cinematic.state.on": "ON",
+  "cinematic.state.off": "OFF",
+  "cinematic.msg.look": "Film look: %s",
+  "cinematic.msg.dof": "Depth of field: %s",
+  "cinematic.msg.camera": "Cinematic camera: %s"
+}

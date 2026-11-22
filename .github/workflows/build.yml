@@ -4,6 +4,8 @@ on:
   push:
     paths-ignore:
       - 'era-phones/**'
+      - 'cinematic-forge/**'
+      - '.github/workflows/cinematic-forge.yml'
       - '.github/workflows/era-phones.yml'
   workflow_dispatch:
 
