@@ -32,7 +32,7 @@ public final class StudioCamera {
 
     // Pose editor orbit
     private static boolean orbit;
-    private static float orbitYaw = 200f, orbitPitch = 10f, orbitDist = 3.2f;
+    private static float orbitYaw = 200f, orbitPitch = 10f, orbitDist = 4.2f;
 
     // State forced on the game while a studio camera is on, restored after
     private static boolean forced;

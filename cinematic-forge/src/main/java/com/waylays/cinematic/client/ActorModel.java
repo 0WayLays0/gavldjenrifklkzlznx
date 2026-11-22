@@ -18,6 +18,8 @@ public class ActorModel extends PlayerModel<ActorEntity> {
     final ModelPart rightForearm, leftForearm, rightShin, leftShin;
     private final ModelPart rightSleeveLower, leftSleeveLower, rightPantsLower, leftPantsLower;
     private final ModelPart[] all;
+    /** Where each part sits when built, to put it back each frame. */
+    private final float[][] home;
     private final float[] offset = new float[3];
 
     public ActorModel(ModelPart root, boolean slim) {
@@ -32,12 +34,19 @@ public class ActorModel extends PlayerModel<ActorEntity> {
         leftPantsLower = leftPants.getChild("left_pants_lower");
         all = new ModelPart[] {head, hat, body, jacket, rightArm, leftArm, rightLeg, leftLeg, rightSleeve, leftSleeve, rightPants, leftPants,
                 rightForearm, leftForearm, rightShin, leftShin, rightSleeveLower, leftSleeveLower, rightPantsLower, leftPantsLower};
+        home = new float[all.length][];
+        for (int i = 0; i < all.length; i++) home[i] = new float[] {all[i].x, all[i].y, all[i].z};
     }
 
     @Override
     public void setupAnim(ActorEntity e, float limbSwing, float limbAmount, float age, float headYaw, float headPitch) {
-        // The vanilla animation does not reset every angle each frame: start from a straight pose so nothing adds up
-        for (ModelPart p : all) {
+        // The vanilla animation does not reset every angle nor every position each frame: start from the built pose
+        // so nothing adds up from one frame to the next
+        for (int i = 0; i < all.length; i++) {
+            ModelPart p = all[i];
+            p.x = home[i][0];
+            p.y = home[i][1];
+            p.z = home[i][2];
             p.xRot = 0f;
             p.yRot = 0f;
             p.zRot = 0f;

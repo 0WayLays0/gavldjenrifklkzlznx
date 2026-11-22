@@ -31,7 +31,7 @@ public class PoseEditorScreen extends Screen {
     private boolean dirty;
     private Button saveButton, closeButton;
     private float lastCursor = -1;
-    private int lw, rx, rw, bottomTop;
+    private int lw, rx, rw, bottomTop, stateY;
 
     public PoseEditorScreen(UUID actor) {
         super(Component.translatable("cinematic.pose.title"));
@@ -75,6 +75,7 @@ public class PoseEditorScreen extends Screen {
         y += p;
         btn(tr("cinematic.pose.prev_key"), rx, y, hw, () -> jumpKey(-1));
         btn(tr("cinematic.pose.next_key"), rx + hw + Ui.GAP, y, hw, () -> jumpKey(1));
+        stateY = y + 24;
 
         // Time
         int ty = bottomTop + 15;
@@ -232,26 +233,17 @@ public class PoseEditorScreen extends Screen {
         for (PoseKey k : ClientStudio.editKeys()) withKeys.add(k.part());
         mannequin.render(g, font, part, withKeys, mx, my);
         g.drawCenteredString(font, tr("cinematic.pose.front_view"), m + lw / 2, mannequin.bottom() + 4, Ui.HINT);
+
+        // Is there a key at this moment, under the joint's buttons
+        PoseKey here = keyHere();
+        Component state = here != null ? tr("cinematic.pose.key_here", TimelineSlider.time(here.tick())) : tr("cinematic.pose.no_key_here");
+        g.drawWordWrap(font, state, rx, stateY, rw, here != null ? 0xFF80FF80 : Ui.HINT);
+        // How to look around, on the right of the time section's title
+        Component hint = tr("cinematic.pose.hint_view");
+        g.drawString(font, hint, width - m - font.width(hint), bottomTop, Ui.HINT);
+        super.render(g, mx, my, pt);
         BodyPart hover = mannequin.at(mx, my);
         if (hover != null && hover != part) g.renderTooltip(font, tr(hover.key()), mx, my);
-
-        // Over the world, between the columns: is there a key here, and how to look around
-        int cx = (m + lw + rx) / 2, gap = Math.max(60, rx - (m + lw) - 28);
-        PoseKey here = keyHere();
-        Component state = here != null ? tr("cinematic.pose.key_here", TimelineSlider.time(here.tick()))
-                : tr("cinematic.pose.no_key_here");
-        int sy = Ui.TOP + 2;
-        for (var line : font.split(state, gap)) {
-            g.drawCenteredString(font, line, cx, sy, here != null ? 0xFF80FF80 : 0xFFE0E0E0);
-            sy += 10;
-        }
-        var lines = font.split(tr("cinematic.pose.hint_view"), gap);
-        int hy = bottomTop - 16 - lines.size() * 10;
-        for (var line : lines) {
-            g.drawCenteredString(font, line, cx, hy, 0xFFFFFFFF);
-            hy += 10;
-        }
-        super.render(g, mx, my, pt);
     }
 
     @Override
