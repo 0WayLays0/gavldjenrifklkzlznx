@@ -63,7 +63,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class SmokeTest {
     private static final Logger LOG = LogUtils.getLogger();
     private static final boolean ENABLED = Boolean.getBoolean("cinematic.autotest");
-    private static final int SHOT_WIDTH = 640, SHOT_CHUNK = 8000;
+    private static final int SHOT_WIDTH = 960, SHOT_CHUNK = 8000;
     private static final AtomicInteger FAILURES = new AtomicInteger();
     private static final List<Step> STEPS = new ArrayList<>();
     private static int stage = -1, ticks, step, wait;

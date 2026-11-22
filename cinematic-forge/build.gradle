@@ -31,6 +31,8 @@ minecraft {
             // Automated client test (debug/SmokeTest), only with -Pcinematic.autotest=true
             if (project.hasProperty('cinematic.autotest')) {
                 property 'cinematic.autotest', project.property('cinematic.autotest')
+                // The most common screen: 1920x1080 with the automatic interface size
+                args '--width', '1920', '--height', '1080'
             }
         }
     }

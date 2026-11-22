@@ -43,42 +43,57 @@ public class DirectorScreen extends Screen {
         rebuildWidgets();
     }
 
+    private int lw, rx, rw, pointsTop, bottomTop;
+
     @Override
     protected void init() {
         CameraTrack t = track();
         boolean scene = ClientStudio.scene(ClientStudio.selectedScene) != null;
-        int left = 8, top = 24;
-        int rows = Math.max(1, (height - top - 76) / 22);
+        int m = Ui.MARGIN, p = Ui.pitch(height);
+        lw = Math.min(220, (width - 3 * m) * 2 / 5);
+        rx = m + lw + 18;
+        rw = width - rx - m;
+        bottomTop = height - 72;
+        btn(tr("cinematic.studio.back"), width - m - 110, 6, 110, () -> minecraft.setScreen(new StudioScreen()));
+
+        // The shots
+        int y = Ui.TOP + 15;
+        btn(tr("cinematic.director.new_shot"), m, y, lw, this::newShot).active = scene;
+        y += p;
+        int rows = Math.max(1, (bottomTop - 12 - y) / p);
         listOffset = Math.max(0, Math.min(listOffset, t.shots.size() - rows));
+        boolean scroll = t.shots.size() > rows;
+        int bw = scroll ? lw - 24 : lw;
         for (int i = 0; i < rows && listOffset + i < t.shots.size(); i++) {
             int idx = listOffset + i;
             CameraTrack.Shot s = t.shots.get(idx);
             String target = targetName(s.targetId());
-            Component label = Component.literal((idx == t.selected ? "> " : "") + (idx + 1) + ". " + TimelineSlider.time(s.start) + "  ")
-                    .append(tr(s.type.key())).append(target.isEmpty() ? "" : " - " + target);
-            btn(label, left, top + i * 22, 190, () -> {
+            Component label = Component.literal((idx == t.selected ? "> " : "") + (idx + 1) + ".  " + TimelineSlider.time(s.start) + "   ")
+                    .append(tr(s.type.key())).append(target.isEmpty() ? "" : " (" + target + ")");
+            btn(label, m, y + i * p, bw, () -> {
                 t.selected = idx;
                 ClientStudio.previewing = false;
                 ClientStudio.cursor = s.start;
                 rebuildWidgets();
             });
         }
-        if (t.shots.size() > rows) {
-            btn(Component.literal("^"), left + 192, top, 18, () -> {
+        if (scroll) {
+            btn(Component.literal("^"), m + lw - 20, y, 20, () -> {
                 listOffset = Math.max(0, listOffset - 1);
                 rebuildWidgets();
             });
-            btn(Component.literal("v"), left + 192, top + (rows - 1) * 22, 18, () -> {
+            btn(Component.literal("v"), m + lw - 20, y + (rows - 1) * p, 20, () -> {
                 listOffset++;
                 rebuildWidgets();
             });
         }
 
-        int rx = Math.max(220, width - 228), w = width - rx - 8, hw = (w - 4) / 2, rx2 = rx + hw + 4;
-        btn(tr("cinematic.director.new_shot"), rx, top, w, this::newShot).active = scene;
+        // The selected shot
+        int hw = (rw - Ui.GAP) / 2, rx2 = rx + hw + Ui.GAP;
         CameraTrack.Shot s = t.selectedShot();
+        pointsTop = -1;
         if (s != null) {
-            int y = top + 24;
+            y = Ui.TOP + 15;
             btn(tr("cinematic.director.type", tr(s.type.key())), rx, y, hw, () -> {
                 s.type = CameraTrack.Type.values()[(s.type.ordinal() + 1) % CameraTrack.Type.values().length];
                 changed();
@@ -89,31 +104,32 @@ public class DirectorScreen extends Screen {
                         s.target = nextTarget(s.targetId());
                         changed();
                     });
-            y += 22;
+            y += p;
             btn(tr(s.lookAt ? "cinematic.director.look_on" : "cinematic.director.look_off"), rx, y, hw, () -> {
                 s.lookAt = !s.lookAt;
                 changed();
             });
             if (s.type == CameraTrack.Type.ORBIT) {
-                btn(Component.literal("-"), rx2, y, 16, () -> {
+                btn(Component.literal("-"), rx2, y, 20, () -> {
                     s.orbitSpeed -= 4f;
                     changed();
                 });
-                btn(tr("cinematic.director.orbit_speed", String.format(java.util.Locale.ROOT, "%.0f", s.orbitSpeed)), rx2 + 18, y, hw - 36, () -> {
+                btn(tr("cinematic.director.orbit_speed", String.format(java.util.Locale.ROOT, "%.0f", s.orbitSpeed)), rx2 + 22, y, hw - 44, () -> {
                 }).active = false;
-                btn(Component.literal("+"), rx2 + hw - 16, y, 16, () -> {
+                btn(Component.literal("+"), rx2 + hw - 20, y, 20, () -> {
                     s.orbitSpeed += 4f;
                     changed();
                 });
             }
-            y += 22;
+            pointsTop = y + p + 8;
+            y = pointsTop + 15;
             btn(tr("cinematic.director.add_point"), rx, y, hw, this::addPoint);
             btn(tr("cinematic.director.remove_point"), rx2, y, hw, () -> {
                 int now = Math.round(ClientStudio.cursor);
                 if (!s.keys.removeIf(k -> k.tick == now) && !s.keys.isEmpty()) s.keys.remove(s.keys.size() - 1);
                 changed();
             });
-            y += 22;
+            y += p;
             btn(tr("cinematic.director.go_point"), rx, y, hw, () -> {
                 if (s.keys.isEmpty()) return;
                 CameraTrack.Key near = s.keys.get(0);
@@ -127,40 +143,40 @@ public class DirectorScreen extends Screen {
                 s.start = Math.round(ClientStudio.cursor);
                 changed();
             });
-            y += 22;
-            btn(tr("cinematic.director.delete_shot"), rx, y, w, () -> {
+            y += p;
+            btn(tr("cinematic.director.delete_shot"), rx, y, rw, () -> {
                 t.shots.remove(s);
                 t.selected = -1;
                 changed();
             });
         }
 
-        timeline = addRenderableWidget(new TimelineSlider(8, height - 50, width - 16, 20, () -> ClientStudio.sceneLength(ClientStudio.selectedScene)));
-        int n = 5, bw = Math.min(124, (width - 16 - (n - 1) * 3) / n), x = 8, by = height - 26;
-        btn(tr(ClientStudio.previewing ? "cinematic.studio.preview_pause" : "cinematic.studio.preview"), x, by, bw, () -> {
+        // Preview and playback
+        int ty = bottomTop + 15;
+        timeline = addRenderableWidget(new TimelineSlider(m, ty, width - 2 * m, 20, () -> ClientStudio.sceneLength(ClientStudio.selectedScene)));
+        int n = 4, w = (width - 2 * m - (n - 1) * Ui.GAP) / n, x = m, by = ty + 26;
+        btn(tr(ClientStudio.previewing ? "cinematic.studio.preview_pause" : "cinematic.studio.preview"), x, by, w, () -> {
             if (!ClientStudio.previewing && ClientStudio.cursor >= ClientStudio.sceneLength(ClientStudio.selectedScene)) ClientStudio.cursor = 0;
             ClientStudio.previewing = !ClientStudio.previewing;
             if (ClientStudio.previewing && StudioCamera.free()) StudioCamera.toggleFree(minecraft);
             rebuildWidgets();
         });
-        x += bw + 3;
-        btn(tr("cinematic.studio.play"), x, by, bw, () -> {
+        x += w + Ui.GAP;
+        btn(tr("cinematic.studio.play"), x, by, w, () -> {
             ClientStudio.playOnServer();
             onClose();
         }).active = scene && ClientStudio.canDirect();
-        x += bw + 3;
-        btn(tr(StudioCamera.free() ? "cinematic.studio.freecam_on" : "cinematic.studio.freecam_off"), x, by, bw, () -> {
+        x += w + Ui.GAP;
+        btn(tr(StudioCamera.free() ? "cinematic.studio.freecam_on" : "cinematic.studio.freecam_off"), x, by, w, () -> {
             StudioCamera.toggleFree(minecraft);
             if (StudioCamera.free()) onClose();
             else rebuildWidgets();
         });
-        x += bw + 3;
-        btn(tr(StudioCamera.filmCamera ? "cinematic.studio.filmcam_on" : "cinematic.studio.filmcam_off"), x, by, bw, () -> {
+        x += w + Ui.GAP;
+        btn(tr(StudioCamera.filmCamera ? "cinematic.studio.filmcam_on" : "cinematic.studio.filmcam_off"), x, by, w, () -> {
             StudioCamera.filmCamera = !StudioCamera.filmCamera;
             rebuildWidgets();
         });
-        x += bw + 3;
-        btn(tr("cinematic.studio.back"), x, by, bw, () -> minecraft.setScreen(new StudioScreen()));
     }
 
     private static String targetName(UUID id) {
@@ -233,16 +249,24 @@ public class DirectorScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
-        g.fill(0, 0, 214, height - 72, 0x70000000);
-        g.fill(Math.max(220, width - 228) - 4, 0, width, height - 72, 0x70000000);
-        g.fill(0, height - 72, width, height, 0x70000000);
-        g.drawString(font, title.copy().append(" - " + (ClientStudio.selectedScene.isEmpty() ? "-" : ClientStudio.selectedScene)), 8, 8, 0xFFFFFF);
-        if (track().shots.isEmpty()) g.drawString(font, tr("cinematic.director.empty"), 8, 30, 0xA0A0A0);
-        CameraTrack.Shot s = track().selectedShot();
-        if (s != null) {
-            g.drawString(font, tr("cinematic.director.points", s.keys.size()), Math.max(220, width - 228), 12, 0xFFE070);
+        int m = Ui.MARGIN;
+        String scene = ClientStudio.selectedScene.isEmpty() ? "-" : ClientStudio.selectedScene;
+        Ui.header(g, font, width, title.copy().append(" : " + scene), tr("cinematic.director.subtitle"));
+        int colH = bottomTop - 12 - Ui.TOP;
+        Ui.panel(g, m, Ui.TOP, lw, colH);
+        Ui.panel(g, rx, Ui.TOP, rw, colH);
+        Ui.panel(g, m, bottomTop, width - 2 * m, 61);
+        Ui.section(g, font, m, Ui.TOP, lw, tr("cinematic.director.section_shots"));
+        Ui.section(g, font, m, bottomTop, width - 2 * m, tr("cinematic.director.section_play"));
+        CameraTrack t = track();
+        CameraTrack.Shot s = t.selectedShot();
+        if (s == null) {
+            Ui.section(g, font, rx, Ui.TOP, rw, tr("cinematic.director.section_shot_none"));
+            g.drawWordWrap(font, tr(t.shots.isEmpty() ? "cinematic.director.empty" : "cinematic.director.pick"), rx, Ui.TOP + 20, rw, Ui.HINT);
+        } else {
+            Ui.section(g, font, rx, Ui.TOP, rw, tr("cinematic.director.section_shot", t.selected + 1));
+            if (pointsTop > 0) Ui.section(g, font, rx, pointsTop, rw, tr("cinematic.director.section_points", s.keys.size()));
         }
-        g.drawCenteredString(font, tr("cinematic.director.hint"), width / 2, height - 66, 0xC0C0C0);
         super.render(g, mx, my, pt);
     }
 

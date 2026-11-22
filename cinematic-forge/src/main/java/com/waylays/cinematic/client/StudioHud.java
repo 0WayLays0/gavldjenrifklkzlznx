@@ -60,15 +60,16 @@ public final class StudioHud {
         if (StudioCamera.free()) {
             CameraTrack t = CameraTrack.forScene(ClientStudio.activeScene());
             CameraTrack.Shot s = t.selectedShot();
-            int y = h - 62;
+            int y = h - 70;
+            g.fill(4, y - 6, Math.min(w - 4, 330), h - 4, 0x90000000);
             g.drawString(font, Component.translatable("cinematic.hud.freecam", String.format(Locale.ROOT, "%.1f", StudioCamera.speed()),
                     String.format(Locale.ROOT, "%.0f", StudioCamera.freeFov()), String.format(Locale.ROOT, "%.0f", StudioCamera.freeRoll())), 8, y, 0xFFFFFF);
             g.drawString(font, Component.translatable("cinematic.hud.cursor", ClientStudio.selectedScene.isEmpty() ? "-" : ClientStudio.selectedScene,
-                    TimelineSlider.time(ClientStudio.cursor)), 8, y + 12, 0xFFE070);
+                    TimelineSlider.time(ClientStudio.cursor)), 8, y + 13, 0xFFE070);
             g.drawString(font, s == null ? Component.translatable("cinematic.hud.no_shot")
-                    : Component.translatable("cinematic.hud.shot", t.selected + 1, Component.translatable(s.type.key()), s.keys.size()), 8, y + 24, 0xD0D0D0);
-            g.drawString(font, Component.translatable("cinematic.hud.freecam_keys"), 8, y + 36, 0xA0A0A0);
-            g.drawString(font, Component.translatable("cinematic.hud.freecam_keys2"), 8, y + 48, 0xA0A0A0);
+                    : Component.translatable("cinematic.hud.shot", t.selected + 1, Component.translatable(s.type.key()), s.keys.size()), 8, y + 26, 0xD0D0D0);
+            g.drawString(font, Component.translatable("cinematic.hud.freecam_keys"), 8, y + 42, 0xA0A0A0);
+            g.drawString(font, Component.translatable("cinematic.hud.freecam_keys2"), 8, y + 54, 0xA0A0A0);
         }
     }
 
