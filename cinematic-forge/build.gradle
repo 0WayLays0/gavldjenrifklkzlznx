@@ -27,7 +27,12 @@ minecraft {
                 }
             }
         }
-        client {}
+        client {
+            // Automated client test (debug/SmokeTest), only with -Pcinematic.autotest=true
+            if (project.hasProperty('cinematic.autotest')) {
+                property 'cinematic.autotest', project.property('cinematic.autotest')
+            }
+        }
     }
 }
 
