@@ -12,12 +12,16 @@ import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -25,9 +29,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -38,6 +45,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -45,8 +53,9 @@ import java.util.TreeSet;
  * The grindstone: a right click on it with a worn weapon (or any item with durability) starts its sharpening
  * minigame ({@code GrindGame}). A critical success gives back 200 durability, a success 100, a failure takes 50.
  * Each weapon may go back to the grindstone only 12 hours (real time) later. Game masters keep some weapons from it
- * altogether: the kind of item (in /arcanes metiers, "Meule", or /meule interdire [id]), or one item only (/meule
- * interdire objet).
+ * altogether: the kind of item (in /arcanes metiers, "Meule", or /meule interdire [id]: every iron dagger), or an item
+ * as it is made (the editor's "exact items", or /meule interdire objet: this dagger of 8 damage and every one made the
+ * same, but not the other daggers).
  */
 @EventBusSubscriber(modid = ArcanesOublies.MODID)
 public final class Grindstone extends SavedData {
@@ -95,7 +104,117 @@ public final class Grindstone extends SavedData {
     }
 
     static boolean banned(MinecraftServer server, ItemStack stack) {
-        return data(stack).getBoolean(BANNED) || bannedKinds(server).contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
+        return data(stack).getBoolean(BANNED) || bannedKinds(server).contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString())
+                || bannedExactly(server, stack);
+    }
+
+    // ---------------------------------------------------------------- single items, as they are made
+
+    /** What wear and use change on an item: its signature leaves them out (a worn, renamed or enchanted dagger is the same dagger). */
+    private static final List<DataComponentType<?>> WEAR = List.of(DataComponents.DAMAGE, DataComponents.REPAIR_COST, DataComponents.ENCHANTMENTS,
+            DataComponents.CUSTOM_NAME, DataComponents.TRIM, DataComponents.DYED_COLOR);
+
+    /** Puts {@code type} back as the item's kind has it. */
+    private static <T> void reset(ItemStack stack, DataComponentType<T> type) {
+        stack.set(type, stack.getItem().components().get(type));
+    }
+
+    /**
+     * How {@code stack} is made: its kind, and its components but those wear and use change (its damage, enchantments,
+     * name, trim, dye, and the grindstone's own marks), as SNBT; with its name and stats for the editor.
+     */
+    public static MetierDefs.GrindItem signature(HolderLookup.Provider registries, ItemStack stack) {
+        ItemStack bare = stack.copyWithCount(1);
+        WEAR.forEach(type -> reset(bare, type));
+        CompoundTag custom = data(bare);
+        custom.remove(NEXT);
+        custom.remove(BANNED);
+        if (custom.isEmpty()) {
+            reset(bare, DataComponents.CUSTOM_DATA);
+        } else {
+            bare.set(DataComponents.CUSTOM_DATA, CustomData.of(custom));
+        }
+        Tag made = DataComponentPatch.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), bare.getComponentsPatch()).result()
+                .orElseGet(CompoundTag::new);
+        MetierDefs.GrindItem g = new MetierDefs.GrindItem();
+        g.item = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
+        g.components = made.toString();
+        g.name = stack.getHoverName().getString();
+        // Its stats as its tooltip shows them (a hand's base damage 1 and speed 4 added)
+        double damage = 0, speed = 0, armor = 0, toughness = 0;
+        boolean weapon = false, armour = false;
+        for (ItemAttributeModifiers.Entry e : stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY).modifiers()) {
+            if (e.modifier().operation() != AttributeModifier.Operation.ADD_VALUE) {
+                continue;
+            }
+            double v = e.modifier().amount();
+            if (e.attribute().value() == Attributes.ATTACK_DAMAGE.value()) {
+                damage += v;
+                weapon = true;
+            } else if (e.attribute().value() == Attributes.ATTACK_SPEED.value()) {
+                speed += v;
+                weapon = true;
+            } else if (e.attribute().value() == Attributes.ARMOR.value()) {
+                armor += v;
+                armour = true;
+            } else if (e.attribute().value() == Attributes.ARMOR_TOUGHNESS.value()) {
+                toughness += v;
+                armour = true;
+            }
+        }
+        if (weapon) {
+            g.damage = 1 + damage;
+            g.speed = 4 + speed;
+        }
+        if (armour) {
+            g.armor = armor;
+            g.toughness = toughness;
+        }
+        return g;
+    }
+
+    @Nullable
+    private static Tag parse(String snbt) {
+        try {
+            return TagParser.parseTag(snbt);
+        } catch (CommandSyntaxException e) {
+            return null;
+        }
+    }
+
+    /** Whether {@code a} and {@code b} are the same item made the same way (their components compared as tags, not as text). */
+    private static boolean same(MetierDefs.GrindItem a, MetierDefs.GrindItem b) {
+        if (!a.item.equals(b.item)) {
+            return false;
+        }
+        Tag ta = parse(a.components);
+        return ta != null && Objects.equals(ta, parse(b.components));
+    }
+
+    /** Whether {@code stack} is made as one of the single items kept from the grindstone. */
+    public static boolean bannedExactly(MinecraftServer server, ItemStack stack) {
+        List<MetierDefs.GrindItem> list = MetierDefs.get().grindstoneExact;
+        if (list.isEmpty()) {
+            return false;
+        }
+        MetierDefs.GrindItem mine = signature(server.registryAccess(), stack);
+        for (MetierDefs.GrindItem g : list) {
+            if (same(g, mine)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Keeps the items made as {@code stack} from the grindstone, or lets them back; saved in the trades' file. */
+    public static void setBannedExactly(MinecraftServer server, ItemStack stack, boolean ban) {
+        MetierDefs.GrindItem mine = signature(server.registryAccess(), stack);
+        List<MetierDefs.GrindItem> list = MetierDefs.get().grindstoneExact;
+        list.removeIf(g -> same(g, mine));
+        if (ban) {
+            list.add(mine);
+        }
+        MetierDefs.save();
     }
 
     /**
@@ -240,19 +359,17 @@ public final class Grindstone extends SavedData {
         return 1;
     }
 
-    /** Keeps (or lets back) this one item from the grindstone. */
+    /** Keeps (or lets back) the held item as it is made from the grindstone: it, and any made the same, but not its whole kind. */
     private static int one(CommandContext<CommandSourceStack> c, boolean ban) throws CommandSyntaxException {
         ItemStack held = held(c);
         if (held == null) {
             return 0;
         }
-        CustomData.update(DataComponents.CUSTOM_DATA, held, t -> {
-            if (ban) {
-                t.putBoolean(BANNED, true);
-            } else {
-                t.remove(BANNED);
-            }
-        });
+        // The mark an older version put on the one item goes; the list in the trades' file is what counts now
+        if (!ban || data(held).getBoolean(BANNED)) {
+            CustomData.update(DataComponents.CUSTOM_DATA, held, t -> t.remove(BANNED));
+        }
+        setBannedExactly(c.getSource().getServer(), held, ban);
         c.getSource().sendSuccess(() -> Component.translatable(ban ? "metier.arcanes_oublies.grind.banned_one" : "metier.arcanes_oublies.grind.allowed_one",
                 held.getHoverName()), true);
         return 1;
@@ -260,7 +377,10 @@ public final class Grindstone extends SavedData {
 
     private static int list(CommandContext<CommandSourceStack> c) {
         Set<String> all = bannedKinds(c.getSource().getServer());
+        List<String> exact = MetierDefs.get().grindstoneExact.stream().map(g -> g.name.isBlank() ? g.item : g.name).toList();
         c.getSource().sendSuccess(() -> Component.translatable("metier.arcanes_oublies.grind.list", all.isEmpty() ? "—" : String.join(", ", all)), false);
-        return all.size();
+        c.getSource().sendSuccess(() -> Component.translatable("metier.arcanes_oublies.grind.list_exact", exact.isEmpty() ? "—" : String.join(", ", exact)),
+                false);
+        return all.size() + exact.size();
     }
 }

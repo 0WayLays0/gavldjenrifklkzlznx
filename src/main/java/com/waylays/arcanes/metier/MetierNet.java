@@ -30,6 +30,8 @@ public final class MetierNet {
         r.playToServer(Result.TYPE, Result.CODEC, Result::handle);
         r.playToServer(Pick.TYPE, Pick.CODEC, Pick::handle);
         r.playToServer(Save.TYPE, Save.CODEC, Save::handle);
+        r.playToServer(GrindAsk.TYPE, GrindAsk.CODEC, GrindAsk::handle);
+        r.playToClient(GrindItemView.TYPE, GrindItemView.CODEC, GrindItemView::handle);
     }
 
     private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> payload(String name) {
@@ -143,22 +145,24 @@ public final class MetierNet {
         }
     }
 
-    /** A recipe as a station lists it: what it takes (and whether the player has it), what it gives, its wait. */
+    /** A recipe as a station lists it: what it takes (and whether the player has it), what it gives, its wait, its folder ("": none). */
     public record RecipeView(String name, List<ItemStack> inputs, List<Boolean> have, ItemStack partial, ItemStack perfect, double difficulty,
-                             int cooldown) {
+                             int cooldown, String folder) {
         static RecipeView read(RegistryFriendlyByteBuf buf) {
             String name = buf.readUtf(128);
+            String folder = buf.readUtf(64);
             List<ItemStack> inputs = readStacks(buf);
             List<Boolean> have = new ArrayList<>();
             for (int i = 0; i < inputs.size(); i++) {
                 have.add(buf.readBoolean());
             }
             return new RecipeView(name, inputs, have, ItemStack.OPTIONAL_STREAM_CODEC.decode(buf), ItemStack.OPTIONAL_STREAM_CODEC.decode(buf),
-                    buf.readDouble(), buf.readVarInt());
+                    buf.readDouble(), buf.readVarInt(), folder);
         }
 
         void write(RegistryFriendlyByteBuf buf) {
             buf.writeUtf(name.length() > 128 ? name.substring(0, 128) : name, 128);
+            buf.writeUtf(folder.length() > 64 ? folder.substring(0, 64) : folder, 64);
             writeStacks(buf, inputs);
             for (int i = 0; i < inputs.size(); i++) {
                 buf.writeBoolean(i < have.size() && have.get(i));
@@ -174,15 +178,24 @@ public final class MetierNet {
         }
     }
 
-    /** A station's recipes, for the player to choose one. */
-    public record Station(String def, BlockPos pos, String title, int game, ItemStack icon, List<RecipeView> recipes, int cooldown)
+    /** A station's recipes, for the player to choose one, and its folders in the order the game masters listed them. */
+    public record Station(String def, BlockPos pos, String title, int game, ItemStack icon, List<RecipeView> recipes, int cooldown, List<String> folders)
             implements CustomPacketPayload {
         public static final Type<Station> TYPE = payload("station");
         public static final StreamCodec<RegistryFriendlyByteBuf, Station> CODEC = CustomPacketPayload.codec(Station::write, Station::new);
 
         Station(RegistryFriendlyByteBuf buf) {
             this(buf.readUtf(64), buf.readBlockPos(), buf.readUtf(128), buf.readVarInt(), ItemStack.OPTIONAL_STREAM_CODEC.decode(buf), readRecipes(buf),
-                    buf.readVarInt());
+                    buf.readVarInt(), readFolders(buf));
+        }
+
+        private static List<String> readFolders(RegistryFriendlyByteBuf buf) {
+            int n = Math.min(buf.readVarInt(), 128);
+            List<String> list = new ArrayList<>(n);
+            for (int i = 0; i < n; i++) {
+                list.add(buf.readUtf(64));
+            }
+            return list;
         }
 
         private static List<RecipeView> readRecipes(RegistryFriendlyByteBuf buf) {
@@ -203,6 +216,9 @@ public final class MetierNet {
             buf.writeVarInt(recipes.size());
             recipes.forEach(r -> r.write(buf));
             buf.writeVarInt(cooldown);
+            List<String> sent = folders.size() > 128 ? folders.subList(0, 128) : folders;
+            buf.writeVarInt(sent.size());
+            sent.forEach(f -> buf.writeUtf(f.length() > 64 ? f.substring(0, 64) : f, 64));
         }
 
         @Override
@@ -238,7 +254,47 @@ public final class MetierNet {
         }
     }
 
+    /** The item the editor asked for, as it is made (JSON of a {@code MetierDefs.GrindItem}), for the grindstone's list. */
+    public record GrindItemView(String json) implements CustomPacketPayload {
+        public static final Type<GrindItemView> TYPE = payload("grind_item");
+        public static final StreamCodec<RegistryFriendlyByteBuf, GrindItemView> CODEC = CustomPacketPayload.codec(GrindItemView::write, GrindItemView::new);
+
+        GrindItemView(RegistryFriendlyByteBuf buf) {
+            this(buf.readUtf(1 << 18));
+        }
+
+        void write(RegistryFriendlyByteBuf buf) {
+            buf.writeUtf(json, 1 << 18);
+        }
+
+        @Override
+        public Type<GrindItemView> type() {
+            return TYPE;
+        }
+
+        void handle(IPayloadContext context) {
+            context.enqueueWork(() -> com.waylays.arcanes.client.metier.MetierClient.grindItem(this));
+        }
+    }
+
     // ---------------------------------------------------------------- client to server
+
+    /** The editor asks for the item its user holds, as it is made, to keep it (and those made the same) from the grindstone. */
+    public record GrindAsk() implements CustomPacketPayload {
+        public static final Type<GrindAsk> TYPE = payload("grind_ask");
+        public static final StreamCodec<RegistryFriendlyByteBuf, GrindAsk> CODEC = StreamCodec.unit(new GrindAsk());
+
+        @Override
+        public Type<GrindAsk> type() {
+            return TYPE;
+        }
+
+        void handle(IPayloadContext context) {
+            if (context.player() instanceof ServerPlayer player) {
+                context.enqueueWork(() -> MetierService.grindAsk(player));
+            }
+        }
+    }
 
     /** How the minigame went: its {@code score} (0 to 1), whether it ended in a {@code critical} failure (or was given up). */
     public record Result(int session, float score, boolean critical) implements CustomPacketPayload {

@@ -256,6 +256,26 @@ public final class MetierDefs {
         public List<Def> metiers = new ArrayList<>();
         /** The kinds of item (item ids) kept from the grindstone's repair (see {@code Grindstone}). */
         public List<String> grindstoneBanned = new ArrayList<>();
+        /**
+         * Single items kept from the grindstone's repair: an item made as it is (its stats, its look), not its whole
+         * kind; a dagger of 8 damage is kept from it, other daggers are not (see {@code Grindstone#signature}).
+         */
+        public List<GrindItem> grindstoneExact = new ArrayList<>();
+    }
+
+    /** An item kept from the grindstone as it is made (see {@link Config#grindstoneExact}). */
+    public static final class GrindItem {
+        /** Its kind (an item id) and how it is made: its components but those wear and use change (as SNBT). */
+        public String item = "";
+        public String components = "{}";
+        /** For the editor: its name, and its attack damage and speed, or its armour and toughness (-1: it has none). */
+        public String name = "";
+        public double damage = -1, speed = -1, armor = -1, toughness = -1;
+
+        /** Whether {@code other} is the same item made the same way. */
+        public boolean same(GrindItem other) {
+            return item.equals(other.item) && components.equals(other.components);
+        }
     }
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -334,6 +354,20 @@ public final class MetierDefs {
         return GSON.toJson(c);
     }
 
+    public static String toJson(GrindItem g) {
+        return GSON.toJson(g);
+    }
+
+    @Nullable
+    public static GrindItem grindItemFromJson(String json) {
+        try {
+            GrindItem g = GSON.fromJson(json, GrindItem.class);
+            return g == null || g.item == null || g.item.isBlank() ? null : g;
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
     public static Config fromJson(String json) {
         return sanitize(GSON.fromJson(json, Config.class));
     }
@@ -359,6 +393,14 @@ public final class MetierDefs {
             }
         }
         c.grindstoneBanned = kept;
+        if (c.grindstoneExact == null) {
+            c.grindstoneExact = new ArrayList<>();
+        }
+        c.grindstoneExact.removeIf(g -> g == null || g.item == null || g.item.isBlank());
+        for (GrindItem g : c.grindstoneExact) {
+            if (g.components == null || g.components.isBlank()) g.components = "{}";
+            if (g.name == null) g.name = "";
+        }
         List<String> seen = new ArrayList<>();
         for (Def d : c.metiers) {
             if (d.id == null || d.id.isBlank()) {

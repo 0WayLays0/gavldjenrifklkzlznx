@@ -220,11 +220,12 @@ public final class MetierService {
             ItemStack perfect = r.perfect.isEmpty() ? partial : MetierDefs.stack(r.perfect.get(0), Math.max(1, r.perfect.get(0).max),
                     level.registryAccess());
             int wait = (int) (cooldownLeft(player, def.id + "#" + i, level) / 20);
-            views.add(new MetierNet.RecipeView(r.name, inputs, have, partial, perfect, def.difficulty * r.difficulty, wait));
+            views.add(new MetierNet.RecipeView(r.name, inputs, have, partial, perfect, def.difficulty * r.difficulty, wait,
+                    def.folders.contains(r.folder) ? r.folder : ""));
         }
         BlockState state = level.getBlockState(pos);
         PacketDistributor.sendToPlayer(player, new MetierNet.Station(def.id, pos, def.name, def.game.ordinal(), new ItemStack(state.getBlock().asItem()),
-                views, (int) (cooldownLeft(player, def.id, level) / 20)));
+                views, (int) (cooldownLeft(player, def.id, level) / 20), List.copyOf(def.folders)));
     }
 
 
@@ -520,6 +521,15 @@ public final class MetierService {
         int done = n;
         source.sendSuccess(() -> Component.translatable("metier.arcanes_oublies.regenerated", done), true);
         return n;
+    }
+
+    /** The editor's user's held item, as it is made, sent back for the grindstone's list (the editor saves the list). */
+    static void grindAsk(ServerPlayer player) {
+        ItemStack held = player.getMainHandItem();
+        if (!player.hasPermissions(PERMISSION) || held.isEmpty()) {
+            return;
+        }
+        PacketDistributor.sendToPlayer(player, new MetierNet.GrindItemView(MetierDefs.toJson(Grindstone.signature(player.server.registryAccess(), held))));
     }
 
     static void save(ServerPlayer player, MetierNet.Save save) {

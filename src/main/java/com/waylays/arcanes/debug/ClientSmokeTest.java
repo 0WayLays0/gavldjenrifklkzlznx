@@ -919,11 +919,16 @@ public final class ClientSmokeTest {
                                     new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CRAFTING_TABLE), List.of(
                                     new com.waylays.arcanes.metier.MetierNet.RecipeView("Lanterne", in, List.of(true, false),
                                             new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN),
-                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN, 2), 1, 0),
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LANTERN, 2), 1, 0, ""),
                                     new com.waylays.arcanes.metier.MetierNet.RecipeView("Coffre", List.of(new net.minecraft.world.item.ItemStack(
                                             net.minecraft.world.item.Items.OAK_PLANKS, 8)), List.of(true),
                                             new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST),
-                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST), .8, 0)), 0)));
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST), .8, 0, "Rangement"),
+                                    new com.waylays.arcanes.metier.MetierNet.RecipeView("Tonneau", List.of(new net.minecraft.world.item.ItemStack(
+                                            net.minecraft.world.item.Items.OAK_PLANKS, 6)), List.of(true),
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BARREL),
+                                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BARREL), 1, 0, "Rangement")), 0,
+                                    List.of("Rangement"))));
                             metierTick = ticks;
                             metierTrial++;
                             return false;

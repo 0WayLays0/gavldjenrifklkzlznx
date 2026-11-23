@@ -535,7 +535,61 @@ public class MetierEditorScreen extends Screen {
             labels.add(new Label(cardX0 + 10, y, tr("grind_banned.help"), DIM, 1));
         }
         y += 16;
+        y = endCard(y);
+        // Single items, as they are made: this dagger of 8 damage, not every iron dagger
+        List<MetierDefs.GrindItem> exact = config.grindstoneExact;
+        y = card(mx0, mx1, y, tr("card.grind_exact"), RED);
+        List<Object[]> items = new ArrayList<>();
+        for (MetierDefs.GrindItem g : List.copyOf(exact)) {
+            ItemStack shown = icon(g.item);
+            Component text = Component.literal(g.name.isBlank() ? g.item : g.name);
+            Component stats = stats(g);
+            if (stats != null) {
+                text = text.copy().append(Component.literal("  ")).append(stats.copy().withColor(DIM & 0xFFFFFF));
+            }
+            items.add(chip(() -> shown, text, () -> change(() -> exact.remove(g)), tr("grind_exact.remove"), RED));
+        }
+        y = chips(y, items, () -> {
+            ItemStack held = held();
+            if (!held.isEmpty()) {
+                PacketDistributor.sendToServer(new MetierNet.GrindAsk());
+            } else {
+                open(tr("popup.grind_exact"), p -> {
+                    label(p[0], p[1] + 5, tr("grind_exact.hold"), TEXT);
+                    btn(px1 - 74, py1 - 26, 62, tr("popup.ok"), this::closePopup, null, GREEN);
+                });
+            }
+        }, tr("grind_exact.none"));
+        if (visible(y, 12)) {
+            labels.add(new Label(cardX0 + 10, y, tr("grind_exact.help"), DIM, 1));
+        }
+        y += 16;
         return endCard(y);
+    }
+
+    /** An exact item's stats as its tooltip shows them (damage and speed, or armour and toughness), if it has any. */
+    @Nullable
+    private static Component stats(MetierDefs.GrindItem g) {
+        if (g.damage >= 0) {
+            return tr("grind_exact.weapon", number(g.damage), number(g.speed));
+        }
+        if (g.armor >= 0) {
+            return tr("grind_exact.armour", number(g.armor), number(g.toughness));
+        }
+        return null;
+    }
+
+    private static String number(double v) {
+        return Math.abs(v - Math.rint(v)) < 1.0E-6 ? String.valueOf((long) Math.rint(v)) : String.format(Locale.ROOT, "%.1f", v).replace('.', ',');
+    }
+
+    /** The held item, as the server read it, put on the grindstone's list of exact items (replacing one made the same). */
+    public void addGrindItem(MetierDefs.GrindItem g) {
+        grindPage = true;
+        change(() -> {
+            config.grindstoneExact.removeIf(x -> x.same(g));
+            config.grindstoneExact.add(g);
+        });
     }
 
     private int settings(Def d, int y) {

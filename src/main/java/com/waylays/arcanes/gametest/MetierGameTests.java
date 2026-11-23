@@ -3,17 +3,25 @@ package com.waylays.arcanes.gametest;
 import com.mojang.authlib.GameProfile;
 import com.waylays.arcanes.ArcanesOublies;
 import com.waylays.arcanes.metier.Deposits;
+import com.waylays.arcanes.metier.Grindstone;
 import com.waylays.arcanes.metier.MetierDefs;
 import com.waylays.arcanes.metier.MetierService;
 import com.waylays.arcanes.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
@@ -228,6 +236,44 @@ public final class MetierGameTests {
         ItemStack whole = new ItemStack(Items.IRON_SWORD);
         p.setItemInHand(InteractionHand.MAIN_HAND, whole);
         helper.assertTrue(!MetierService.grindForTest(p, pos), "an unworn sword started the grindstone");
+        helper.succeed();
+    }
+
+    /** An iron sword with its own stats: {@code damage} and {@code speed} as its tooltip shows them. */
+    private static ItemStack sword(double damage, double speed) {
+        ItemStack s = new ItemStack(Items.IRON_SWORD);
+        s.set(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.builder()
+                .add(Attributes.ATTACK_DAMAGE, new AttributeModifier(ArcanesOublies.id("test_damage"), damage - 1, AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .add(Attributes.ATTACK_SPEED, new AttributeModifier(ArcanesOublies.id("test_speed"), speed - 4, AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .build());
+        return s;
+    }
+
+    @GameTest(template = "platform", setupTicks = GameTestSetup.TICKS, skyAccess = true)
+    public static void theGrindstoneKeepsOneItemNotItsKind(GameTestHelper helper) {
+        var server = helper.getLevel().getServer();
+        ItemStack special = sword(8, 1);
+        MetierDefs.GrindItem sig = Grindstone.signature(server.registryAccess(), special);
+        helper.assertTrue(Math.abs(sig.damage - 8) < 1.0E-6 && Math.abs(sig.speed - 1) < 1.0E-6, "its stats read " + sig.damage + " / " + sig.speed);
+        Grindstone.setBannedExactly(server, special, true);
+        try {
+            // The same sword, worn, renamed and enchanted, is still kept from the grindstone
+            ItemStack same = sword(8, 1);
+            same.setDamageValue(120);
+            same.set(DataComponents.CUSTOM_NAME, Component.literal("Lame du bourreau"));
+            same.enchant(helper.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.SHARPNESS), 2);
+            helper.assertTrue(Grindstone.bannedExactly(server, same), "a sword made the same got through: " + Grindstone.signature(server.registryAccess(), same).components
+                    + " vs " + sig.components);
+            // Other iron swords are not
+            helper.assertTrue(!Grindstone.bannedExactly(server, new ItemStack(Items.IRON_SWORD)), "a plain iron sword was kept from the grindstone");
+            helper.assertTrue(!Grindstone.bannedExactly(server, sword(2, 5)), "a sword of other stats was kept from the grindstone");
+            helper.assertTrue(!Grindstone.bannedExactly(server, new ItemStack(Items.DIAMOND_SWORD)), "another kind was kept from the grindstone");
+        } finally {
+            Grindstone.setBannedExactly(server, special, false);
+        }
+        helper.assertTrue(!Grindstone.bannedExactly(server, special), "the sword stayed on the list once let back");
         helper.succeed();
     }
 

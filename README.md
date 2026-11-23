@@ -829,8 +829,8 @@ verte**, qui se déplace ; trop léger, rien ne se passe, trop fort, la lame cha
 - une arme sans usure ne lance pas le mini-jeu.
 
 Maîtres du jeu (`repairPermission`) : `/meule interdire` (tous les objets du type tenu en main),
-`/meule interdire objet` (cet objet seulement), `/meule autoriser [objet]`, `/meule liste`, `/meule reset` (l'objet
-tenu peut repasser tout de suite). Une arme interdite affiche « *Cette arme ne semble pas réparable.* ».
+`/meule interdire objet` (cet objet tel qu'il est fait : mêmes stats, voir plus bas), `/meule autoriser [objet]`,
+`/meule liste`, `/meule reset` (l'objet tenu peut repasser tout de suite). Une arme interdite affiche « *Cette arme ne semble pas réparable.* ».
 
 Minage sans pioche : « *Il semble qu'une pioche soit nécessaire pour récupérer ce minerai…* ».
 
@@ -839,12 +839,14 @@ Minage sans pioche : « *Il semble qu'une pioche soit nécessaire pour récupér
 Les stations (table de craft, forge, alambic…) n'ont plus de bouton « Utilisation classique » : on ne s'en sert que par
 les recettes du métier. Les cartes de recettes sont plus compactes (jusqu'à six visibles d'un coup).
 
-### Métiers : dossiers de recettes (côté staff)
+### Métiers : dossiers de recettes
 
 Dans l'éditeur des métiers (`/arcanes metiers`), les recettes d'une station (artisanat, forge, alchimie, menuiserie,
 médecine…) se rangent dans des dossiers : « + Dossier » en crée un, un clic l'ouvre ou le ferme, ✎ le renomme (ou le
 supprime), ▲ ▼ le déplacent, ✕ le supprime (ses recettes sortent du dossier). Sur la fiche d'une recette, « Dossier : … »
-la range ailleurs et ▲ ▼ la déplacent dans son dossier. Les joueurs, eux, voient toujours la simple liste des recettes.
+la range ailleurs et ▲ ▼ la déplacent dans son dossier. Seul le staff les modifie ; les joueurs **voient** les dossiers à la
+station : d'abord les recettes hors dossier, puis chaque dossier (son nom, son nombre de recettes), qu'un clic ouvre ou
+ferme. Sur une station de six recettes ou moins, les dossiers sont ouverts au départ ; au-delà, fermés.
 
 Chaque recette peut aussi avoir **son propre mini-jeu** (« Mini-jeu : … » sur sa fiche), pour qu'il colle à ce qui est
 fabriqué : par exemple une potion distillée à la table de soins. Par défaut, c'est celui de la station.
@@ -853,9 +855,19 @@ fabriqué : par exemple une potion distillée à la table de soins. Par défaut,
 
 Pas de recette pour réparer : on fait clic droit sur une meule avec l'arme ou l'armure usée en main, et le mini-jeu se
 lance dessus. La liste des objets que la meule refuse se gère dans `/arcanes metiers`, entrée **Meule** (groupe
-« Réparation ») : « + » ajoute l'objet tenu en main (ou un identifiant), un clic sur un objet le retire. Les commandes
-restent : `/meule interdire` (le type d'objet tenu), `/meule interdire <id>`, `/meule interdire objet` (cet objet-là
-seulement), `/meule autoriser …`, `/meule liste`. Le joueur lit « Cette arme ne semble pas réparable. »
+« Réparation »), en deux listes :
+
+- **Types d'objets** : « + » ajoute le type tenu en main (ou un identifiant) ; *tous* les exemplaires sont refusés (toutes
+  les dagues en fer).
+- **Objets précis (mêmes stats seulement)** : « + » ajoute l'objet tenu en main **tel qu'il est fait** : ses stats (dégâts,
+  vitesse, armure…), son modèle, ses données. Seuls les objets faits pareil sont refusés : une dague à 8 de dégâts et 1 de
+  vitesse est bloquée, une dague en fer ordinaire (ou à 5 de vitesse) reste réparable. L'usure, le nom donné à l'enclume,
+  les enchantements, la teinte et l'ornement n'y changent rien : la dague bloquée le reste même renommée ou enchantée. La
+  carte affiche le nom et les stats de chaque objet ; un clic le retire.
+
+Un clic sur un objet le retire. Les commandes restent : `/meule interdire` (le type d'objet tenu), `/meule interdire <id>`,
+`/meule interdire objet` (l'objet tenu, tel qu'il est fait), `/meule autoriser …`, `/meule liste`. Le joueur lit « Cette
+arme ne semble pas réparable. »
 
 ### Métiers : menuiserie et médecine
 

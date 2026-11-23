@@ -64,6 +64,14 @@ public final class MetierClient {
         Minecraft.getInstance().setScreen(new StationScreen(s));
     }
 
+    /** The held item as it is made, for the editor's grindstone list. */
+    public static void grindItem(MetierNet.GrindItemView v) {
+        MetierDefs.GrindItem g = MetierDefs.grindItemFromJson(v.json());
+        if (g != null && Minecraft.getInstance().screen instanceof MetierEditorScreen editor) {
+            editor.addGrindItem(g);
+        }
+    }
+
     public static void editor(MetierNet.Editor e) {
         MetierDefs.Config config;
         try {
