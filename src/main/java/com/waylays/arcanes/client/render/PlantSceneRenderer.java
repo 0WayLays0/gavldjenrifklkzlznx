@@ -68,22 +68,32 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             return;
         }
         Vector3f s = new Vector3f(side).normalize().mul(width * .5f);
-        Vector3f prev = null;
+        // The way its face looks (upward): its midrib is pressed that way's opposite, so the blade is cupped like a real leaf
+        Vector3f face = new Vector3f(side).normalize().cross(dir);
+        if (face.lengthSquared() < 1.0E-8f) {
+            face.set(0, 1, 0);
+        }
+        face.normalize();
+        if (face.y < 0) {
+            face.negate();
+        }
+        float cup = width * .22f;
+        Vector3f prev = null, prevMid = null;
         for (int i = 0; i <= segs; i++) {
             float t = (float) i / segs;
             Vector3f at = new Vector3f(dir).mul(length * t).add(new Vector3f(bend).mul(length * t * t)).add(base);
+            Vector3f mid = new Vector3f(at).sub(new Vector3f(face).mul(cup * Mth.sin(Mth.PI * Math.min(1, t * 1.1f + .1f))));
             if (prev != null) {
                 float t0 = (float) (i - 1) / segs;
                 Vector3f a = new Vector3f(prev).sub(s), b = new Vector3f(prev).add(s), d = new Vector3f(at).add(s), f = new Vector3f(at).sub(s);
-                Vector3f n = new Vector3f(b).sub(a).cross(new Vector3f(f).sub(a));
-                n = n.lengthSquared() < 1.0E-12f ? new Vector3f(BossMesh.UP) : n.normalize();
-                if (n.y < 0) {
-                    n.negate();
-                }
-                n.add(0, .6f, 0).normalize();
-                BossMesh.quad(c, p, a, b, d, f, 0, 1 - t0, 1, 1 - t0, 1, 1 - t, 0, 1 - t, BossMesh.blend(root, tip, t0), BossMesh.blend(root, tip, t), light, n);
+                Vector3f n = new Vector3f(face).add(0, .6f, 0).normalize();
+                int c0 = BossMesh.blend(root, tip, t0), c1 = BossMesh.blend(root, tip, t);
+                // Two halves either side of the midrib
+                BossMesh.quad(c, p, a, prevMid, mid, f, 0, 1 - t0, .5f, 1 - t0, .5f, 1 - t, 0, 1 - t, c0, c1, light, n);
+                BossMesh.quad(c, p, prevMid, b, d, mid, .5f, 1 - t0, 1, 1 - t0, 1, 1 - t, .5f, 1 - t, c0, c1, light, n);
             }
             prev = at;
+            prevMid = mid;
         }
     }
 
@@ -111,7 +121,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
         float grow = BossMesh.ramp(age, 0, PlantScene.BLOOM_OPEN);
         float open = BossMesh.ramp(age, PlantScene.BLOOM_OPEN - 3, PlantScene.BLOOM_OPEN + 5);
         float wither = BossMesh.ramp(age, e.getLife() - 18, e.getLife());
-        float height = 2.3f * grow * (1 - wither * .5f);
+        float height = 2.7f * grow * (1 - wither * .5f);
         Vector3f sway = new Vector3f(.12f * Mth.sin(age * .08f), 0, .08f * Mth.cos(age * .07f));
         // The stem, thorns on it, leaves unfurling from it and lying round its foot
         VertexConsumer stem = BossMesh.solid(buffer, STEM);
@@ -122,6 +132,20 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             Vector3f at = new Vector3f(sway).mul(t * t).add(0, height * t, 0);
             BossMesh.horn(stem, poseStack.last(), at, new Vector3f(Mth.cos(a), .4f, Mth.sin(a)).normalize(), new Vector3f(), .16f * grow, .035f, 4, 1,
                     BossMesh.argb(0x3A7A30, 1), BossMesh.argb(0xE8F0C0, 1), light);
+        }
+        // A vine twining up round it
+        if (height > .2f) {
+            int n = 24;
+            Vector3f[] helix = new Vector3f[n];
+            float[] rad = new float[n];
+            int[] cols = new int[n];
+            for (int i = 0; i < n; i++) {
+                float t = (float) i / (n - 1), a = t * Mth.TWO_PI * 3 + seed;
+                helix[i] = new Vector3f(sway).mul(t * t).add(Mth.cos(a) * .2f, height * t * .92f, Mth.sin(a) * .2f);
+                rad[i] = .045f * (1 - t * .6f);
+                cols[i] = BossMesh.argb(BossMesh.mix(0x2E6A24, 0x8ADA60, t), 1);
+            }
+            WaterMesh.tube(stem, poseStack.last(), helix, rad, cols, 6, 0, 1, 0, 2, 0, seed, light);
         }
         VertexConsumer leaves = BossMesh.see(buffer, LEAF);
         int leaf = BossMesh.argb(BossMesh.mix(LEAFY, 0x8A7A40, wither), 1);
@@ -140,7 +164,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
         // The head: a bud swelling, opening into a great flower, three rings of petals curving out round a golden heart
         Vector3f head = new Vector3f(sway).add(0, height, 0);
         VertexConsumer petals = BossMesh.see(buffer, PETAL);
-        float size = (.55f + .45f * grow) * (1 + .45f * open);
+        float size = (.8f + .7f * grow) * (1 + .45f * open);
         int[] counts = {8, 7, 6};
         for (int ring = 0; ring < 3; ring++) {
             float tilt = Mth.lerp(open, .18f, 1.45f - ring * .32f) + wither * .5f;
@@ -152,6 +176,12 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
                 Vector3f dir = new Vector3f(out).mul(Mth.sin(tilt)).add(0, Mth.cos(tilt), 0);
                 blade(petals, poseStack.last(), head, dir, new Vector3f(-Mth.sin(a), 0, Mth.cos(a)), new Vector3f(0, .3f * open - .15f * wither, 0), len,
                         len * .72f, 4, BossMesh.argb(BossMesh.mix(col, 0xFFFFFF, .45f), 1 - wither * .4f), BossMesh.argb(col, 1 - wither * .4f), light);
+                if (ring == 0) {
+                    // A glow running along the great petals' edges
+                    blade(BossMesh.light(buffer, PETAL), poseStack.last(), head, dir, new Vector3f(-Mth.sin(a), 0, Mth.cos(a)),
+                            new Vector3f(0, .3f * open - .15f * wither, 0), len * 1.03f, len * .76f, 4, BossMesh.glow(PINK, .12f * open * (1 - wither)),
+                            BossMesh.glow(0xFFB0E0, .3f * open * (1 - wither)), FULL);
+                }
             }
         }
         // The heart, stamens round it with glowing tips
@@ -278,7 +308,8 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
                 }
                 float pr = (.12f + .45f * grow) * swell;
                 Vector3f ball = new Vector3f(spot).add(0, stalk + pr * .8f, 0);
-                BossMesh.sphere(puff, poseStack.last(), ball, pr, 10, 16, i * .1f, 0, 1, BossMesh.argb(0xF0E6C0, 1), light);
+                ElementFx.lumpy(puff, poseStack.last(), ball, pr, 12, 18, .1f, 2.4f, age * .02f * grow, seed + i * 31, .9f, BossMesh.argb(0xF0E6C0, 1), light);
+                ElementFx.shadow(poseStack, buffer, spot, pr * 1.3f, .35f);
                 for (int k = 0; k < 7; k++) {
                     float a = BossMesh.hash(seed + i * 9 + k) * Mth.TWO_PI, b = BossMesh.hash(seed + i * 9 + k * 3) * 2.2f;
                     Vector3f at = new Vector3f(Mth.sin(b) * Mth.cos(a), Mth.cos(b), Mth.sin(b) * Mth.sin(a)).mul(pr).add(ball);
@@ -409,6 +440,12 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
         lobe(poseStack, skin, flesh, glow, r, .5f, 1, angle, light);
         poseStack.popPose();
         rimTeeth(teeth, poseStack.last(), new Vector3f(0, h, 0), r, 1, seed, light);
+        // Its trigger hairs, standing in its red bowl
+        for (int k = 0; k < 3; k++) {
+            float a = k * Mth.TWO_PI / 3 + .5f;
+            BossMesh.horn(teeth, poseStack.last(), new Vector3f(Mth.cos(a) * r * .35f, h - r * .38f, Mth.sin(a) * r * .35f), new Vector3f(0, 1, 0), new Vector3f(),
+                    r * .3f, r * .025f, 4, 1, BossMesh.argb(0xC8F090, 1), BossMesh.argb(0xFFFFFF, 1), light);
+        }
         // The upper lobe, hinged at the back
         poseStack.pushPose();
         poseStack.translate(0, h, -r);
@@ -449,6 +486,9 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
         poseStack.scale(1, .5f, 1);
         BossMesh.sphere(skin, poseStack.last(), new Vector3f(), r, 10, 24, 0, lat0, lat1, BossMesh.argb(0xFFFFFF, 1), light);
         BossMesh.sphere(flesh, poseStack.last(), new Vector3f(), r * .95f, 10, 24, 0, lat0, lat1, BossMesh.argb(0xFF8A90, 1), FULL);
+        // A band of red round its rim, as on a real flytrap
+        boolean upper = lat0 < .25f;
+        BossMesh.sphere(flesh, poseStack.last(), new Vector3f(), r * 1.012f, 2, 24, 0, upper ? .42f : .5f, upper ? .5f : .58f, BossMesh.argb(0xFF4A50, 1), light);
         if (open > .2f) {
             BossMesh.sphere(glow, poseStack.last(), new Vector3f(), r * .93f, 8, 18, 0, lat0, lat1, BossMesh.glow(0xFF3050, .25f * Math.min(1, open)), FULL);
         }

@@ -634,6 +634,15 @@ gonflent, rayons de soleil avec herbe et fleurs qui poussent, dionée à deux lo
 jet épais et lumineux, nuage vert qui s'éclaire de l'intérieur, bulle de dissolution translucide, vague plus basse et
 transparente.
 
+**Deuxième passe (1.9.3)** : de vraies formes organiques au lieu de sphères lisses. Boule d'avalanche bosselée avec mottes
+qui s'en détachent, éclats de glace et ombre au sol ; dans le globe, une petite cabane à la fenêtre éclairée et des congères ;
+cœurs lumineux dans les cristaux de la couronne, deux halos givrés ; plafond de nuages d'orage et neige qui s'accumule dans
+le blizzard. Globes de magma qui bouillonnent, roches irrégulières aux fissures rougeoyantes, cône de croûte autour du
+geyser avec sa bouche de lave, filets de lave qui coulent sur la rivière, reflets vitreux de l'obsidienne. Feuilles et
+pétales creusés le long de leur nervure, grande fleur aux bords lumineux et liane enroulée sur sa tige, vesses-de-loup
+bosselées, dionée avec sa bande rouge et ses poils sensitifs. Le jet d'acide laisse des flaques qui grésillent là où les
+gouttes tombent, la pluie est verte, la bulle de dissolution tremble, l'écume roule sur la crête de la marée.
+
 ### Téléphones (mod à part)
 
 Les téléphones ne font plus partie d'Arcanes Oubliés : ils sont dans le mod séparé **Téléphones d'Époque & RP**

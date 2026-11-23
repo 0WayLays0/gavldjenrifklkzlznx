@@ -160,6 +160,52 @@ public final class ElementFx {
         }
     }
 
+    /**
+     * A lumpy ball round {@code centre}: a sphere {@code r} across, its surface pushed in and out by noise ({@code rough}
+     * of its radius, {@code grain} how fine; {@code time} makes it churn), squashed to {@code squash} of its height: a
+     * snowball, a gob of magma, a rock, a puffball, a wobbling bubble. Its texture wraps round it once.
+     */
+    public static void lumpy(VertexConsumer c, PoseStack.Pose p, Vector3f centre, float r, int rings, int segs, float rough, float grain, float time,
+                             int seed, float squash, int argb, int light) {
+        if (r <= .001f) {
+            return;
+        }
+        Vector3f[][] pts = new Vector3f[rings + 1][segs + 1];
+        Vector3f[][] nrm = new Vector3f[rings + 1][segs + 1];
+        for (int i = 0; i <= rings; i++) {
+            float th = Mth.PI * i / rings;
+            for (int j = 0; j <= segs; j++) {
+                float ph = Mth.TWO_PI * (j % segs) / segs;
+                Vector3f d = new Vector3f(Mth.sin(th) * Mth.cos(ph), Mth.cos(th), Mth.sin(th) * Mth.sin(ph));
+                float bump = 1 + rough * WaterMesh.turbulence(d.x * grain + seed * .37f, d.y * grain + time, d.z * grain - seed * .11f);
+                pts[i][j] = new Vector3f(d.x * r * bump, d.y * r * bump * squash, d.z * r * bump).add(centre);
+                nrm[i][j] = new Vector3f(d.x, d.y / Math.max(.2f, squash), d.z).normalize();
+            }
+        }
+        for (int i = 0; i < rings; i++) {
+            for (int j = 0; j < segs; j++) {
+                float u0 = (float) j / segs, u1 = (float) (j + 1) / segs, v0 = (float) i / rings, v1 = (float) (i + 1) / rings;
+                // Wound to face out (a solid render type culls the inside)
+                WaterMesh.put(c, p, pts[i][j], u0, v0, argb, light, nrm[i][j]);
+                WaterMesh.put(c, p, pts[i][j + 1], u1, v0, argb, light, nrm[i][j + 1]);
+                WaterMesh.put(c, p, pts[i + 1][j + 1], u1, v1, argb, light, nrm[i + 1][j + 1]);
+                WaterMesh.put(c, p, pts[i + 1][j], u0, v1, argb, light, nrm[i + 1][j]);
+            }
+        }
+    }
+
+    /** A soft shadow on the ground under something, {@code radius} across, at {@code at} (its y the ground's). */
+    public static void shadow(PoseStack poseStack, MultiBufferSource buffer, Vector3f at, float radius, float alpha) {
+        if (alpha <= .01f || radius <= .01f) {
+            return;
+        }
+        VertexConsumer c = BossMesh.ground(buffer, BossMesh.GLOW);
+        int col = BossMesh.argb(0x101018, alpha);
+        Vector3f a = new Vector3f(at).add(-radius, .02f, -radius), b = new Vector3f(at).add(radius, .02f, -radius);
+        Vector3f d = new Vector3f(at).add(radius, .02f, radius), e = new Vector3f(at).add(-radius, .02f, radius);
+        flat(c, poseStack.last(), a, b, d, e, 0, 0, 1, 0, 1, 1, 0, 1, col, col, FULL);
+    }
+
     /** A flat ring of light on the ground from {@code r0} to {@code r1}, at {@code y}. */
     public static void groundRing(PoseStack poseStack, MultiBufferSource buffer, float y, float r0, float r1, int rgb, float alpha) {
         if (alpha > .01f && r1 > r0) {

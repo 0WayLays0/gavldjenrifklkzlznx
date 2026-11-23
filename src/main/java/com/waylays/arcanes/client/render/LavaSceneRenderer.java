@@ -61,9 +61,10 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
         if (alpha <= .01f || r <= .01f) {
             return;
         }
-        BossMesh.sphere(BossMesh.see(buffer, LAVA), poseStack.last(), at, r, 12, 20, age * .006f, 0, 1, BossMesh.argb(0xFFFFFF, alpha), FULL);
-        BossMesh.sphere(BossMesh.light(buffer, BossMesh.NOISE), poseStack.last(), at, r * 1.06f, 10, 18, -age * .01f, 0, 1, BossMesh.glow(ORANGE, .4f * alpha),
-                FULL);
+        int seed = Float.floatToIntBits(at.x * 7 + at.z * 13) & 0xFFFF;
+        ElementFx.lumpy(BossMesh.see(buffer, LAVA), poseStack.last(), at, r, 14, 22, .16f, 2.2f, age * .06f, seed, 1, BossMesh.argb(0xFFFFFF, alpha), FULL);
+        ElementFx.lumpy(BossMesh.light(buffer, BossMesh.NOISE), poseStack.last(), at, r * 1.05f, 12, 20, .18f, 2.2f, age * .06f, seed, 1,
+                BossMesh.glow(ORANGE, .45f * alpha), FULL);
         ElementFx.bloom(poseStack, buffer, view, at, r * 1.6f, ORANGE, .55f * alpha);
     }
 
@@ -182,8 +183,10 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             float t = ((age + BossMesh.hash(seed + k * 3) * cycle) % cycle) / cycle;
             float hop = .5f * strength * 4 * t * (1 - t);
             float s = .08f + .08f * BossMesh.hash(seed + k * 11);
-            BossMesh.box(rock, poseStack.last(), new Vector3f(Mth.cos(a) * rr, .06f + s + hop, Mth.sin(a) * rr), new Vector3f(s, 0, 0).rotateY(a + t * 4),
-                    new Vector3f(0, s * .8f, 0), new Vector3f(0, 0, s).rotateY(a + t * 4), BossMesh.argb(0xFFFFFF, 1), light);
+            Vector3f at = new Vector3f(Mth.cos(a) * rr, .06f + s * .7f + hop, Mth.sin(a) * rr);
+            ElementFx.lumpy(rock, poseStack.last(), at, s * 1.3f, 5, 8, .35f, 1.8f, 0, seed + k * 13, .7f, BossMesh.argb(0xFFFFFF, 1), light);
+            ElementFx.lumpy(BossMesh.light(buffer, BossMesh.NOISE), poseStack.last(), at, s * 1.36f, 5, 8, .35f, 1.8f, 0, seed + k * 13, .7f,
+                    BossMesh.glow(ORANGE, .35f * strength), FULL);
         }
     }
 
@@ -202,7 +205,7 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             // A tail of fire: gobs shrinking behind it, a streak, smoke rolling off
             for (int i = 1; i <= 5; i++) {
                 Vector3f p = new Vector3f(back).mul(i * .32f).add(.05f * Mth.sin(age + i), .05f * Mth.cos(age * 1.3f + i), 0);
-                BossMesh.sphere(BossMesh.see(buffer, LAVA), poseStack.last(), p, .3f * (1 - i / 6f), 6, 10, age * .01f + i, 0, 1,
+                ElementFx.lumpy(BossMesh.see(buffer, LAVA), poseStack.last(), p, .3f * (1 - i / 6f), 7, 12, .25f, 2.5f, age * .1f + i, seed + i, 1,
                         BossMesh.argb(0xFFD8A0, 1 - i / 7f), FULL);
             }
             WaterMesh.streak(BossMesh.light(buffer, WaterMesh.STREAK), poseStack.last(), view.eye(), new Vector3f(), new Vector3f(back).mul(2.4f), .7f,
@@ -255,6 +258,12 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             ElementFx.puffs(poseStack, buffer, view, BossMesh.SMOKE, new Vector3f(0, .1f, 0), r * 1.2f, 2, .8f, 6, age, .04f, SMOKE, .4f * warn, seed, light);
             return;
         }
+        // The vent: a cone of crust heaved up round the hole, its lip glowing
+        VertexConsumer crust = BossMesh.solid(buffer, CRUST);
+        ElementFx.lumpy(crust, poseStack.last(), new Vector3f(), r * 1.05f, 8, 18, .25f, 1.8f, 0, seed + 99, .38f, BossMesh.argb(0xFFFFFF, 1), light);
+        BossMesh.annulus(BossMesh.ground(buffer, LAVA), poseStack.last(), new Vector3f(0, r * .41f, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, -1), .01f,
+                r * .45f, 24, 1, age * .003f, age * .006f, BossMesh.argb(0xFFF0D0, 1), BossMesh.argb(0xFF9A60, 1), FULL, false);
+        ElementFx.groundRing(poseStack, buffer, r * .42f, r * .4f, r * .5f, HOT, .9f);
         // The jet: bursting up fast, churning, then sinking back into its pool
         float up = BossMesh.ramp(erupt, 0, 4) * (1 - BossMesh.ramp(erupt, LavaScene.GEYSER_BURST - 2, LavaScene.GEYSER_BURST + 8));
         jet(poseStack, buffer, view, new Vector3f(), LavaScene.GEYSER_HEIGHT * up, r * .55f, age, 1, seed, light);
@@ -292,6 +301,8 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             RitualMesh.crystal(stone, poseStack.last(), base, dir, len, w, a * 2, BossMesh.argb(0xFFFFFF, 1), light);
             float pulse = .35f + .2f * Mth.sin(age * .2f + k) + .7f * flare;
             RitualMesh.crystal(veins, poseStack.last(), base, dir, len * 1.02f, w * 1.06f, a * 2, BossMesh.glow(ORANGE, pulse * shown), FULL);
+            RitualMesh.crystal(BossMesh.light(buffer, BossMesh.SHEEN), poseStack.last(), base, dir, len * 1.04f, w * 1.1f, a * 2 + age * .02f,
+                    BossMesh.glow(0xB890FF, .22f * shown), FULL);
             float b = -age * .05f + (k + .5f) * Mth.TWO_PI / shards;
             Vector3f small = new Vector3f(Mth.cos(b) * rr * 1.15f, .5f + .7f * ((k * .61f) % 1), Mth.sin(b) * rr * 1.15f);
             Vector3f sd = new Vector3f(Mth.cos(age * .07f + k), 1, Mth.sin(age * .09f + k)).normalize();
@@ -364,10 +375,23 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             }
             RitualMesh.thread(edge, poseStack.last(), view.eye(), line, .22f, cols, FULL);
         }
+        // Bright threads of molten rock running down its surface
+        VertexConsumer runs = BossMesh.light(buffer, BossMesh.GLOW);
+        for (int k = 0; k < 16; k++) {
+            float t = (BossMesh.hash(seed + k * 23) + age * (.012f + .008f * BossMesh.hash(seed + k))) % 1;
+            if (t * e.getSize() > length) {
+                continue;
+            }
+            float across = (BossMesh.hash(seed + k * 29) * 2 - 1) * half * .7f;
+            Vector3f a0 = new Vector3f(f).mul(t * e.getSize()).add(new Vector3f(side).mul(across)).add(0, .1f, 0);
+            Vector3f a1 = new Vector3f(a0).add(new Vector3f(f).mul(-.9f));
+            RitualMesh.shaft(runs, poseStack.last(), new Vector3f(0, 60, 0), a0, a1, .1f, BossMesh.glow(HOT, .8f * (1 - cool) * gone * Mth.sin(Mth.PI * t)), FULL);
+        }
         // Its head, a rolling tongue of fire while it still flows
         if (flow < 1) {
             Vector3f head = new Vector3f(f).mul(length).add(0, .05f, 0);
-            BossMesh.sphere(BossMesh.see(buffer, LAVA), poseStack.last(), head, half * .9f, 8, 16, age * .02f, 0, .5f, BossMesh.argb(0xFFE6C0, 1), FULL);
+            ElementFx.lumpy(BossMesh.see(buffer, LAVA), poseStack.last(), head, half * .95f, 10, 18, .2f, 2, age * .08f, seed, .45f, BossMesh.argb(0xFFE6C0, 1),
+                    FULL);
             ElementFx.bloom(poseStack, buffer, view, new Vector3f(head).add(0, .4f, 0), 1.2f, ORANGE, .8f);
         }
         // Plates of crust drifting on it
@@ -381,8 +405,7 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             Vector3f at = new Vector3f(f).mul(t * e.getSize()).add(new Vector3f(side).mul(across)).add(0, .11f, 0);
             float s = .15f + .18f * BossMesh.hash(seed + k * 5);
             float turn = age * .01f + k;
-            BossMesh.box(stone, poseStack.last(), at, new Vector3f(Mth.cos(turn), 0, Mth.sin(turn)).mul(s), new Vector3f(0, .03f, 0),
-                    new Vector3f(-Mth.sin(turn), 0, Mth.cos(turn)).mul(s * .8f), BossMesh.argb(0xFFFFFF, gone), light);
+            ElementFx.lumpy(stone, poseStack.last(), at, s * 1.2f, 4, 9, .3f, 1.6f, turn * .1f, seed + k * 17, .22f, BossMesh.argb(0xFFFFFF, 1), light);
         }
         for (int k = 0; k <= 5; k++) {
             Vector3f p = new Vector3f(f).mul(length * k / 5f).add(0, .4f, 0);
@@ -435,8 +458,8 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
         for (int k = 0; k < 10; k++) {
             float a = BossMesh.hash(seed + k * 3) * Mth.TWO_PI + age * .004f, rr = R * (.25f + .55f * BossMesh.hash(seed + k * 5));
             float s = .25f + .35f * BossMesh.hash(seed + k * 7), turn = age * .006f + k;
-            BossMesh.box(stone, poseStack.last(), new Vector3f(Mth.cos(a) * rr, .09f, Mth.sin(a) * rr), new Vector3f(Mth.cos(turn), 0, Mth.sin(turn)).mul(s),
-                    new Vector3f(0, .04f, 0), new Vector3f(-Mth.sin(turn), 0, Mth.cos(turn)).mul(s * .7f), BossMesh.argb(0xFFFFFF, fade), light);
+            ElementFx.lumpy(stone, poseStack.last(), new Vector3f(Mth.cos(a) * rr, .1f, Mth.sin(a) * rr), s * 1.3f, 5, 10, .3f, 1.6f, turn * .1f, seed + k * 19,
+                    .25f, BossMesh.argb(0xFFFFFF, 1), light);
         }
         // Jets bursting from it, each in its own time
         for (int k = 0; k < 5; k++) {

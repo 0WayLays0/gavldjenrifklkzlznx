@@ -41,7 +41,7 @@ public class AcidSpraySpell extends ElementSpell {
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         if (level instanceof ServerLevel server) {
             AcidScene.spawn(server, entity, this, AcidScene.Kind.SPRAY, entity.getEyePosition().add(0, -.3, 0), entity.getYRot(), entity.getXRot(), null,
-                    AcidScene.SPRAY_TIME + 14, getPower(spellLevel, entity));
+                    AcidScene.SPRAY_TIME + 40, getPower(spellLevel, entity));
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
     }
