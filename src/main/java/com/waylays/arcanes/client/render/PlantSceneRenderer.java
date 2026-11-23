@@ -229,7 +229,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             return;
         }
         // A golden haze turning slowly, lit by its own glitter
-        VertexConsumer cloud = BossMesh.see(buffer, BossMesh.CLOUD);
+        VertexConsumer cloud = BossMesh.see(buffer, WaterMesh.MIST);
         for (int k = 0; k < 20; k++) {
             float a = k * Mth.TWO_PI / 20 + age * .012f;
             float rr = r * (.3f + .55f * BossMesh.hash(seed + k));
@@ -237,7 +237,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             RitualMesh.billboard(cloud, poseStack, view, new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), 2.6f + BossMesh.hash(seed + k * 5), a, -1,
                     BossMesh.argb(0xFFE890, .3f * shown), FULL);
         }
-        VertexConsumer haze = BossMesh.light(buffer, BossMesh.CLOUD);
+        VertexConsumer haze = BossMesh.light(buffer, WaterMesh.MIST);
         for (int k = 0; k < 8; k++) {
             float a = k * Mth.TWO_PI / 8 - age * .008f;
             RitualMesh.billboard(haze, poseStack, view, new Vector3f(Mth.cos(a) * r * .5f, 1.3f, Mth.sin(a) * r * .5f), 3.5f, a, -1,
@@ -322,7 +322,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             float t = (age - PlantScene.SEED_BURST) / 16f;
             if (t < 1) {
                 Vector3f at = new Vector3f(spot).add(0, .6f, 0);
-                ElementFx.puffs(poseStack, buffer, view, BossMesh.CLOUD, at, 2.4f * t + .2f, .6f, 1.2f + 1.2f * t, 7, t * 40, .02f, SPORE, .75f * (1 - t) * fade,
+                ElementFx.puffs(poseStack, buffer, view, WaterMesh.MIST, at, 2.4f * t + .2f, .6f, 1.2f + 1.2f * t, 7, t * 40, .02f, SPORE, .75f * (1 - t) * fade,
                         seed + i * 13, FULL);
                 ElementFx.burst(poseStack, buffer, view, BossMesh.MOTE, at, 2, 1.2f, .22f, 14, t, SPORE, 1, seed + i * 7, true, FULL);
                 ElementFx.groundRing(poseStack, buffer, .06f, 2 * t, 2 * t + .35f, SPORE, (1 - t) * .8f);

@@ -80,13 +80,13 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
         BossMesh.annulus(BossMesh.ground(buffer, FROTH), poseStack.last(), new Vector3f(at).add(0, .04f, 0), u, v, size * .7f, size * 1.1f, 14, 1, seed * .3f, 0,
                 BossMesh.argb(0xFFFFFF, 0), BossMesh.argb(0xF4FFE0, .8f * alpha), FULL, false);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(at).add(0, .1f, 0), size * .6f, GREEN, .5f * alpha);
-        ElementFx.puffs(poseStack, buffer, view, BossMesh.CLOUD, at, .3f, .9f, .4f, 2, age, .05f, FUME, .4f * alpha, seed, FULL);
+        ElementFx.puffs(poseStack, buffer, view, WaterMesh.MIST, at, .3f, .9f, .4f, 2, age, .05f, FUME, .4f * alpha, seed, FULL);
     }
 
     /** Green fumes curling up from {@code at}: soft puffs, lit as by daylight (a dim light turned them a dirty grey). */
     private static void fumes(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f at, float reach, float size, int count, float age,
                               float alpha, int seed, int light) {
-        ElementFx.puffs(poseStack, buffer, view, BossMesh.CLOUD, at, reach * .4f, reach, size, count, age, .02f, FUME, .5f * alpha, seed, FULL);
+        ElementFx.puffs(poseStack, buffer, view, WaterMesh.MIST, at, reach * .4f, reach, size, count, age, .02f, FUME, .5f * alpha, seed, FULL);
     }
 
     /** A puddle of acid lying flat, {@code r} across, glowing and slowly swirling, a rim of froth; bubbles swell and burst on it. */
@@ -268,6 +268,7 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, h - .6f, 0), r * .9f, DEEP, .3f * shown);
         // The rain: glowing streaks falling, each splashing in a small ring where it lands, droplets bouncing up
         VertexConsumer streaks = BossMesh.light(buffer, WaterMesh.STREAK);
+        VertexConsumer body = BossMesh.see(buffer, WaterMesh.STREAK);
         float fall = h / 8f;
         for (int k = 0; k < 64; k++) {
             float cycle = 10;
@@ -277,7 +278,10 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             float x = Mth.cos(a) * rr, z = Mth.sin(a) * rr;
             if (t < 8) {
                 float y = h - .6f - fall * t;
-                drop(streaks, poseStack, view, new Vector3f(x, y, z), new Vector3f(x, y + 1.1f, z), .07f, .9f * shown, BRIGHT);
+                // A green body drawn see-through under the glow (glow alone turns white against a bright sky)
+                WaterMesh.streak(body, poseStack.last(), view.eye(), new Vector3f(x, y, z), new Vector3f(x, y + 1.1f, z), .1f, BossMesh.argb(0x7ACC2A, .85f * shown),
+                        FULL);
+                drop(streaks, poseStack, view, new Vector3f(x, y, z), new Vector3f(x, y + 1.1f, z), .05f, .6f * shown, BRIGHT);
             } else {
                 float s = (t - 8) / 2f;
                 poseStack.pushPose();
@@ -364,7 +368,7 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
         }
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, centreY, 0), r * 2, BRIGHT, 1 - t);
         ElementFx.groundRing(poseStack, buffer, .08f, r * 2.6f * t, r * 2.6f * t + .6f, BRIGHT, 1 - t);
-        ElementFx.puffs(poseStack, buffer, view, BossMesh.CLOUD, new Vector3f(0, centreY, 0), r * 3, 1.2f, 1.4f, 8, since * 3, .03f, FUME, .6f * (1 - t),
+        ElementFx.puffs(poseStack, buffer, view, WaterMesh.MIST, new Vector3f(0, centreY, 0), r * 3, 1.2f, 1.4f, 8, since * 3, .03f, FUME, .6f * (1 - t),
                 seed + 11, light);
         puddle(poseStack, buffer, view, r * 1.5f, age, 1 - t, 5, seed, light);
     }
