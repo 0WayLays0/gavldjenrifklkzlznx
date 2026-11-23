@@ -294,11 +294,14 @@ public final class WallGameTests {
         husk.setHealth(400);
         Citadel.raise(helper.getLevel(), caster, ModSpells.FALLEN_CITADEL.get(), husk.position(), 8);
         float[] before = {0};
-        helper.runAfterDelay(Citadel.RISEN + 2 * Citadel.VOLLEY_TICKS + 30, () -> {
-            helper.assertTrue(hurt(husk), "no shell from the towers hit the husk");
-            helper.assertTrue(caster.hasEffect(MobEffects.DAMAGE_RESISTANCE), "the caster is not shielded by the fortress");
+        helper.runAfterDelay(Citadel.RISEN + 2 * Citadel.VOLLEY_TICKS + 30, () -> helper.assertTrue(caster.hasEffect(MobEffects.DAMAGE_RESISTANCE),
+                "the caster is not shielded by the fortress"));
+        // The fortress turns as it rises (at random), and a shell can clip the test's barrier walls on its way: the husk
+        // must have been hit by the end of the shelling, not by its first two volleys
+        helper.runAfterDelay(Citadel.COLLAPSE - 1, () -> {
+            helper.assertTrue(hurt(husk), "no shell from the towers hit the husk in " + (Citadel.COLLAPSE - Citadel.RISEN) + " ticks of shelling");
+            before[0] = husk.getHealth();
         });
-        helper.runAfterDelay(Citadel.COLLAPSE - 1, () -> before[0] = husk.getHealth());
         helper.runAfterDelay(Citadel.COLLAPSE + 2, () -> {
             helper.assertTrue(husk.getHealth() < before[0], "the fortress blowing apart did not hurt the husk");
             cleanUp(helper);
