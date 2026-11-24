@@ -317,7 +317,10 @@ public class GaleScene extends SpellEffectEntity {
                 cutParticles(e);
             }
         }
-        SpellUtil.particles(level(), ParticleTypes.GUST, front.x, front.y + .3, front.z, 2, half, .1, half, 0);
+        // A light touch: big vanilla gusts drowned out the violet wave drawn by the renderer
+        if (tickCount % 2 == 0) {
+            SpellUtil.particles(level(), ParticleTypes.SMALL_GUST, front.x, front.y + .3, front.z, 1, half, .1, half, 0);
+        }
     }
 
     // ---------------------------------------------------------------- Cutting Dash

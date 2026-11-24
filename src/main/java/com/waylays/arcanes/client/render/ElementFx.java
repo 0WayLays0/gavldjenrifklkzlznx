@@ -252,8 +252,9 @@ public final class ElementFx {
         if (alpha <= .01f || radius <= .01f) {
             return;
         }
-        VertexConsumer c = BossMesh.ground(buffer, BossMesh.GLOW);
-        int col = BossMesh.argb(0x101018, alpha);
+        // MIST fades to nothing at its edges: GLOW is black-backed and would print a dark square.
+        VertexConsumer c = BossMesh.ground(buffer, WaterMesh.MIST);
+        int col = BossMesh.argb(0x101018, Math.min(1, alpha * 1.6f));
         Vector3f a = new Vector3f(at).add(-radius, .02f, -radius), b = new Vector3f(at).add(radius, .02f, -radius);
         Vector3f d = new Vector3f(at).add(radius, .02f, radius), e = new Vector3f(at).add(-radius, .02f, radius);
         flat(c, poseStack.last(), a, b, d, e, 0, 0, 1, 0, 1, 1, 0, 1, col, col, FULL);
