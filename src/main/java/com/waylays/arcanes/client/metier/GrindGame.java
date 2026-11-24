@@ -83,7 +83,7 @@ public class GrindGame extends MinigameScreen {
         // Sparks where the blade bites
         if (pressure > .08f && time - lastSpark > (in ? .04f : .12f)) {
             lastSpark = time;
-            float cx = WX + WR * .72f, cy = WY - WR * .7f;
+            float cx = WX + WR * .71f, cy = WY - WR * .71f;
             int color = heat > .6f ? 0xFF7AA8FF : in ? 0xFFFFC050 : 0xFFFF9030;
             bits.sparks(random, time, cx, cy, in ? 4 : 1, 120 + pressure * 120, color);
             if (in && random.nextFloat() < .15f) {
@@ -147,14 +147,19 @@ public class GrindGame extends MinigameScreen {
         }
         Draw.disc(g, WX, WY, 7, 0xFF5A4028);
         Draw.disc(g, WX, WY, 3, 0xFF2A2018);
-        // The blade on the wheel: closer the harder it is pressed
+        // The blade laid on the wheel at its upper right, along its rim (its edge on the stone), closer the harder it is
+        // pressed; pressed, it is drawn back and forth across the stone, as one sharpens a blade
         float push = 22 - pressure * 16;
-        float bx = WX + WR * .72f + push * .7f, by = WY - WR * .7f - push * .7f;
+        float rx = Mth.cos(-Mth.HALF_PI / 2), ry = Mth.sin(-Mth.HALF_PI / 2), tx = -ry, ty = rx;
+        float stroke = Mth.sin(time * 6.5f) * 11 * Mth.clamp(pressure * 2.2f, 0, 1);
+        float off = WR + 5 + push * .7f;
+        float bx = WX + rx * off + tx * stroke, by = WY + ry * off + ty * stroke;
         int glow = heat > .05f ? Draw.lerp(0xFFFFA040, 0xFF6A90FF, Mth.clamp(heat, 0, 1)) : 0;
         if (glow != 0) {
-            Draw.glow(g, bx, by, 18 + heat * 14, Draw.argb((int) (60 + 120 * Math.min(1, heat)), glow));
+            Draw.glow(g, WX + rx * WR, WY + ry * WR, 18 + heat * 14, Draw.argb((int) (60 + 120 * Math.min(1, heat)), glow));
         }
-        Draw.itemRotated(g, subject, bx + 16, by - 16, 3.2f, -45);
+        // An item's picture has its blade from lower left to upper right: a quarter turn lays it along the rim
+        Draw.itemRotated(g, subject, bx, by, 3.2f, 90 + stroke * .6f);
         bits.draw(g, time);
 
         // The pressure gauge: the band to keep, the needle

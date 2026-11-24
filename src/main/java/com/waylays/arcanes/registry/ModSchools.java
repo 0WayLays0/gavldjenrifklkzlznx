@@ -553,6 +553,25 @@ public final class ModSchools {
             ACID_MAGIC
     ));
 
+    /**
+     * The Gale: blades, spheres and waves of air so dense they bend the light (shimmering, faintly violet), its weight
+     * crushing, and Cor Leonis (the star's old name), a storm of blades round the caster.
+     */
+    public static final ResourceLocation GALE_RESOURCE = ArcanesOublies.id("gale");
+    public static final TagKey<Item> GALE_FOCUS = TagKey.create(Registries.ITEM, ArcanesOublies.id("gale_focus"));
+    public static final ResourceKey<DamageType> GALE_MAGIC = ResourceKey.create(Registries.DAMAGE_TYPE, ArcanesOublies.id("gale_magic"));
+    public static final int GALE_COLOR = 0xC9A8FF;
+
+    public static final DeferredHolder<SchoolType, SchoolType> GALE = SCHOOLS.register(GALE_RESOURCE.getPath(), () -> new SchoolType(
+            GALE_RESOURCE,
+            GALE_FOCUS,
+            Component.translatable("school." + ArcanesOublies.MODID + ".gale").withStyle(Style.EMPTY.withColor(GALE_COLOR)),
+            ModAttributes.GALE_SPELL_POWER,
+            ModAttributes.GALE_MAGIC_RESIST,
+            sound(SoundEvents.BREEZE_WHIRL),
+            GALE_MAGIC
+    ));
+
     private ModSchools() {}
 
     /** A school's default cast sound, as the holder Iron's asks for. */

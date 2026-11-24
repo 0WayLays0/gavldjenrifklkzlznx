@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:feather",
+    "minecraft:phantom_membrane",
+    "minecraft:breeze_rod",
+    "minecraft:wind_charge"
+  ]
+}

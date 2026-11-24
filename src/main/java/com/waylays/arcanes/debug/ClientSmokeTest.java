@@ -412,7 +412,8 @@ public final class ClientSmokeTest {
                     : school.equals(ModSchools.SNOW_RESOURCE) ? ModItems.FIRST_FROST_CODEX.get()
                     : school.equals(ModSchools.LAVA_RESOURCE) ? ModItems.MAGMA_CODEX.get()
                     : school.equals(ModSchools.PLANT_RESOURCE) ? ModItems.HERBARIUM_CODEX.get()
-                    : school.equals(ModSchools.ACID_RESOURCE) ? ModItems.CORROSIVE_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get();
+                    : school.equals(ModSchools.ACID_RESOURCE) ? ModItems.CORROSIVE_CODEX.get()
+                    : school.equals(ModSchools.GALE_RESOURCE) ? ModItems.VIOLET_GALE_CODEX.get() : ModItems.GOLDEN_GRIMOIRE.get();
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(book));
             // A sturdy target dummy 6 blocks in front of the player, at eye level of the raycast
             Vec3 forward = Vec3.directionFromRotation(0, player.getYRot());

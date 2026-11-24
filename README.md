@@ -643,6 +643,26 @@ pétales creusés le long de leur nervure, grande fleur aux bords lumineux et li
 bosselées, dionée avec sa bande rouge et ses poils sensitifs. Le jet d'acide laisse des flaques qui grésillent là où les
 gouttes tombent, la pluie est verte, la bulle de dissolution tremble, l'écume roule sur la crête de la marée.
 
+### Magie de la Bourrasque (Gale)
+
+Six sorts d'air si dense qu'il **déforme la lumière** : des lignes qui ondulent, claires sur sombres, à travers lesquelles le
+monde semble trembler, d'un **violet léger**, et un fil blanc là où l'air tranche. Livre : **Codex of the Violet Gale** ;
+focus : plume, membrane de phantom, bâton de breeze, charge de vent. Aucune invocation.
+
+| Sort | Effet |
+|---|---|
+| **Air Slash** (tranche d'air, commun) | Une lame d'air part tout droit (≈ 21 blocs), inclinée au hasard, avec ses images rémanentes, et tranche tout ce qu'elle traverse. |
+| **Air Sphere** (sphère d'air, peu commun) | Une boule d'air comprimé (coques d'air déformé tournant autour d'un cœur lumineux) éclate sur la première créature ou le premier mur : dégâts et projection sur 4 blocs. |
+| **Sweeping Gale** (coup de pied au sol, commun) | Une vague de vent basse court au ras du sol sur 11 blocs, visant les jambes : dégâts, la cible est soulevée et ralentie. |
+| **Cutting Dash** (dash tranchant, peu commun) | Le lanceur file 9 blocs devant lui dans un sillage d'air déformé et tranche tous ceux qu'il frôle. |
+| **Crushing Gravity** (soumis à la gravité, rare) | L'air pèse sur la zone visée (4,5 blocs, ~6 s) : les ennemis dessous sont **courbés, forcés accroupis** sous le poids (les joueurs aussi, visible par tous), très ralentis, incapables de sauter, plaqués au sol. |
+| **Cor Leonis** (légendaire) | Mode « typhon humain » : pendant 10 à 16 s, des lames d'air tranchent sans fin autour du lanceur dans toutes les directions (4,5 blocs), dans un mur d'air tourbillonnant ; il court plus vite. *Cor Leonis* est le nom latin ancien de l'étoile Régulus. |
+
+**`/marchesurleau`** (staff) : l'eau porte le joueur comme un sol (comme la lave pour un arpenteur) ; accroupi, il y entre
+normalement. Seul : bascule pour soi ; `/marchesurleau <joueurs> [oui|non]` pour d'autres.
+
+**Meule** : la lame est maintenant posée sur la meule, le long de sa jante, et va et vient pendant qu'on appuie.
+
 ### Pièges
 
 Douze **blocs-pièges** au style médiéval (onglet créatif du mod, ou craft) ; ils ne touchent ni les spectateurs ni les

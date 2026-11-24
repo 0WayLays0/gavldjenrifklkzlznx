@@ -36,7 +36,8 @@
         "arcanes_snow": "arcanes_oublies:item/scroll_palettes/snow",
         "arcanes_lava": "arcanes_oublies:item/scroll_palettes/lava",
         "arcanes_plant": "arcanes_oublies:item/scroll_palettes/plant",
-        "arcanes_acid": "arcanes_oublies:item/scroll_palettes/acid"
+        "arcanes_acid": "arcanes_oublies:item/scroll_palettes/acid",
+        "arcanes_gale": "arcanes_oublies:item/scroll_palettes/gale"
       }
     }
   ]

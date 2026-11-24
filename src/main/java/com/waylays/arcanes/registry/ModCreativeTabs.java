@@ -89,7 +89,8 @@ public final class ModCreativeTabs {
             new Section(ModSchools.SNOW, () -> new ItemStack(ModItems.FIRST_FROST_CODEX.get()), List.of(ModItems.FIRST_FROST_CODEX)),
             new Section(ModSchools.LAVA, () -> new ItemStack(ModItems.MAGMA_CODEX.get()), List.of(ModItems.MAGMA_CODEX)),
             new Section(ModSchools.PLANT, () -> new ItemStack(ModItems.HERBARIUM_CODEX.get()), List.of(ModItems.HERBARIUM_CODEX)),
-            new Section(ModSchools.ACID, () -> new ItemStack(ModItems.CORROSIVE_CODEX.get()), List.of(ModItems.CORROSIVE_CODEX)));
+            new Section(ModSchools.ACID, () -> new ItemStack(ModItems.CORROSIVE_CODEX.get()), List.of(ModItems.CORROSIVE_CODEX)),
+            new Section(ModSchools.GALE, () -> new ItemStack(ModItems.VIOLET_GALE_CODEX.get()), List.of(ModItems.VIOLET_GALE_CODEX)));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup." + ArcanesOublies.MODID))

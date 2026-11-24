@@ -720,6 +720,13 @@ public final class ModSpells {
     public static final DeferredHolder<AbstractSpell, AbstractSpell> FROST_GLIDE = register(new com.waylays.arcanes.spells.snow.FrostGlideSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> HOARFROST_CROWN = register(new com.waylays.arcanes.spells.snow.HoarfrostCrownSpell());
     public static final DeferredHolder<AbstractSpell, AbstractSpell> WHITEOUT = register(new com.waylays.arcanes.spells.snow.WhiteoutSpell());
+    // The Gale
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> AIR_SLASH = register(new com.waylays.arcanes.spells.gale.AirSlashSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> AIR_SPHERE = register(new com.waylays.arcanes.spells.gale.AirSphereSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> SWEEPING_GALE = register(new com.waylays.arcanes.spells.gale.SweepingGaleSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CUTTING_DASH = register(new com.waylays.arcanes.spells.gale.CuttingDashSpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> CRUSHING_GRAVITY = register(new com.waylays.arcanes.spells.gale.CrushingGravitySpell());
+    public static final DeferredHolder<AbstractSpell, AbstractSpell> COR_LEONIS = register(new com.waylays.arcanes.spells.gale.CorLeonisSpell());
 
     // Lava Magic
     public static final DeferredHolder<AbstractSpell, AbstractSpell> MAGMA_SPIT = register(new com.waylays.arcanes.spells.lava.MagmaSpitSpell());

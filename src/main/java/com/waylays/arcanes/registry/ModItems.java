@@ -105,6 +105,8 @@ public final class ModItems {
             () -> spellbook(10, ModAttributes.PLANT_SPELL_POWER));
     public static final DeferredHolder<Item, Item> CORROSIVE_CODEX = ITEMS.register("corrosive_codex",
             () -> spellbook(10, ModAttributes.ACID_SPELL_POWER));
+    public static final DeferredHolder<Item, Item> VIOLET_GALE_CODEX = ITEMS.register("violet_gale_codex",
+            () -> spellbook(10, ModAttributes.GALE_SPELL_POWER));
 
     /** The Bone Blade grown out of the caster's elbow by Elbow Blade: a weapon for a while (see BoneBladeItem). */
     public static final DeferredHolder<Item, Item> BONE_BLADE = ITEMS.register("bone_blade", com.waylays.arcanes.item.BoneBladeItem::new);

@@ -77,6 +77,8 @@ PALETTES = {
     # Pale green paper, the writing in deep leaf green, bronze rod ends
     "plant": ["dcecc8", "e8f4d8", "f6fcee", "bcd2a4", "ccdeb4", "7ad860", "2e8a2a", "164a16", "f0c890", "c48c46", "6a4418"],
     "acid": ["dce8c0", "e8f2d0", "f4fae6", "bccc9a", "ccdcac", "d8ff4a", "8cf02a", "3c9a14", "a0b0a8", "60aa82", "28543e"],
+    # Pale lavender paper, the writing in deep violet, silver rod ends
+    "gale": ["e8e0f4", "f0eafa", "faf6ff", "cbbfe0", "dad0ec", "c9a8ff", "8a64d8", "3c2470", "f4f0fa", "c8c0dc", "7a6c9a"],
 }
 
 

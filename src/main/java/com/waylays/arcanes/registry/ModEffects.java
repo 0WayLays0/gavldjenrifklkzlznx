@@ -59,6 +59,12 @@ public final class ModEffects {
 
     // Echo Magic: the sound still ringing in a creature, waiting to burst
     public static final DeferredHolder<MobEffect, MobEffect> RESONANCE = EFFECTS.register("resonance", ResonanceEffect::new);
+    // The Gale: the air's weight bowing those under it
+    public static final DeferredHolder<MobEffect, MobEffect> CRUSHING_GRAVITY = EFFECTS.register("crushing_gravity",
+            com.waylays.arcanes.effect.CrushingGravityEffect::new);
+    /** Walking on water (/marchesurleau, for the staff). */
+    public static final DeferredHolder<MobEffect, MobEffect> WATER_WALKING = EFFECTS.register("water_walking",
+            com.waylays.arcanes.effect.WaterWalkingEffect::new);
 
     private ModEffects() {}
 }
