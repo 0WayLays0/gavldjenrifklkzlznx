@@ -122,6 +122,8 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             }
         }
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .2f, 0), r * 1.1f, GREEN, .4f * alpha);
+        // The foul air over it wavering
+        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .1f, 0), r * 1.8f, 1.6f + r * .3f, 3, age, .02f, 0xC8F090, .5f * alpha);
     }
 
     // ---------------------------------------------------------------- Acid Spray
@@ -346,6 +348,7 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             }
             float bite = Math.max(0, 1 - ((age - 1) % 20) / 8f);
             ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, centreY, 0), r * 1.4f, GREEN, (.25f + .4f * bite) * close);
+            ElementFx.haze(poseStack, buffer, view, new Vector3f(0, height * .3f, 0), r * 3f, height + 1.4f, 2, age, .03f, 0xC8F090, .45f * close);
             fumes(poseStack, buffer, view, new Vector3f(0, height + .2f, 0), 1.8f, .7f, 5, age, close, seed, light);
             puddle(poseStack, buffer, view, r * 1.1f * close, age, .7f * close, 4, seed, light);
             return;
@@ -455,6 +458,11 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             fumes(poseStack, buffer, view, new Vector3f(Mth.cos(a) * rr, .15f, Mth.sin(a) * rr), 2.4f, 1, 3, age, fade * Math.min(1, front / 3), seed + k * 5, light);
         }
         ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(), Math.max(1, front), 1.5f, .14f, 30, age, BRIGHT, fade, seed + 7);
+        for (int k = 0; k < 6 && front > 1; k++) {
+            float a = k * Mth.TWO_PI / 6 + .2f;
+            ElementFx.haze(poseStack, buffer, view, new Vector3f(Mth.cos(a) * front * .7f, .1f, Mth.sin(a) * front * .7f), 3f, 1.8f, 2, age + k * 7, .025f,
+                    0xC8F090, .4f * fade);
+        }
     }
 
     @Override

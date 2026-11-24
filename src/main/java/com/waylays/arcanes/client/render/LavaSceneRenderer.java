@@ -110,6 +110,8 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             Vector3f back = new Vector3f(Mth.cos(a) * reach, up * 2.4f - (height + up) * 2 * t, Mth.sin(a) * reach).mul(-.06f).add(p);
             WaterMesh.streak(streaks, poseStack.last(), view.eye(), p, back, s * 2.2f, BossMesh.glow(ORANGE, .8f * alpha), FULL);
         }
+        // Heat shimmering all up the jet
+        ElementFx.haze(poseStack, buffer, view, new Vector3f(base).add(0, -.1f, 0), r * 3.4f, height + 1.8f, 3, age, .045f, 0xFFB070, .55f * alpha);
         for (int i = 2; i < n; i += 3) {
             ElementFx.bloom(poseStack, buffer, view, axis[i], r * 1.3f, ORANGE, .35f * alpha);
         }
@@ -149,6 +151,8 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             }
         }
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .25f, 0), r * 1.1f, ORANGE, .45f * alpha);
+        // Heat rising off it, the air over it wavering
+        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .1f, 0), r * 1.9f, 1.8f + r * .5f, 3, age, .025f, 0xFFB070, .6f * alpha);
         ElementFx.motes(poseStack, buffer, view, BossMesh.EMBER, new Vector3f(0, .1f, 0), r, 2.2f, .18f, 10, age * 2, HOT, alpha, seed + 7);
         ElementFx.puffs(poseStack, buffer, view, BossMesh.SMOKE, new Vector3f(0, .3f, 0), r * 1.2f, 3, r * .8f + .4f, 5, age, .018f, SMOKE, .32f * alpha,
                 seed + 9, light);
@@ -309,10 +313,24 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             RitualMesh.crystal(stone, poseStack.last(), small, sd, .32f * shown, .08f * shown, b, BossMesh.argb(0xFFFFFF, 1), light);
             RitualMesh.crystal(veins, poseStack.last(), small, sd, .33f * shown, .085f * shown, b, BossMesh.glow(HOT, pulse * .8f * shown), FULL);
         }
+        // Molten rock dripping from the shards, glowing as it falls
+        VertexConsumer drips = BossMesh.light(buffer, BossMesh.GLOW);
+        for (int k = 0; k < 8; k++) {
+            float cycle = 18 + 8 * BossMesh.hash(seed + k);
+            float t = ((age + BossMesh.hash(seed + k * 5) * cycle) % cycle) / cycle;
+            float a = age * .035f + k * Mth.TWO_PI / 8;
+            float rr = (.85f + .08f * Mth.sin(age * .05f + k)) * (2.2f - 1.2f * appear);
+            float y0 = .2f + .9f * ((k * .37f) % 1);
+            Vector3f p = new Vector3f(Mth.cos(a) * rr, y0 - t * t * (y0 + .1f), Mth.sin(a) * rr);
+            RitualMesh.billboard(drips, poseStack, view, p, .12f, 0, -1, BossMesh.glow(HOT, (1 - t) * shown), FULL);
+            WaterMesh.streak(BossMesh.light(buffer, WaterMesh.STREAK), poseStack.last(), view.eye(), p, new Vector3f(p).add(0, .25f + t * .3f, 0), .05f,
+                    BossMesh.glow(ORANGE, .6f * (1 - t) * shown), FULL);
+        }
         // Heat round the caster's feet, embers rising, a glow that flares when the carapace is struck
         ElementFx.groundRing(poseStack, buffer, .05f, .7f, 1.25f, ORANGE, (.25f + .5f * flare) * shown);
         ElementFx.motes(poseStack, buffer, view, BossMesh.EMBER, new Vector3f(), 1.3f, 2.4f, .16f, 14, age * 2, HOT, .8f * shown, seed + 3);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 1, 0), 1.4f, RED, (.2f + .8f * flare) * shown);
+        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .2f, 0), 2.6f, 2.6f, 2, age, .03f, 0xFFB070, (.3f + .4f * flare) * shown);
         if (flare > 0) {
             ClockMesh.sparks(poseStack, buffer, view, new Vector3f(0, 1, 0), 1.8f, 20, age, flare, seed, FULL);
         }
@@ -407,6 +425,10 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             float turn = age * .01f + k;
             ElementFx.lumpy(stone, poseStack.last(), at, s * 1.2f, 4, 9, .3f, 1.6f, turn * .1f, seed + k * 17, .22f, BossMesh.argb(0xFFFFFF, 1), light);
         }
+        for (int k = 0; k < 4; k++) {
+            ElementFx.haze(poseStack, buffer, view, new Vector3f(f).mul(length * (k + .5f) / 4).add(0, .1f, 0), half * 2.4f, 2f, 2, age + k * 9, .03f,
+                    0xFFB070, .5f * (1 - cool) * gone);
+        }
         for (int k = 0; k <= 5; k++) {
             Vector3f p = new Vector3f(f).mul(length * k / 5f).add(0, .4f, 0);
             ElementFx.bloom(poseStack, buffer, view, p, 1.3f, ORANGE, .35f * (1 - cool) * gone);
@@ -478,6 +500,11 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 1, 0), r * (1 - t * .5f), ORANGE, 1 - t);
         }
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .6f, 0), R * .9f, ORANGE, .35f * fade);
+        for (int k = 0; k < 5; k++) {
+            float a = k * Mth.TWO_PI / 5 + .4f, rr = k == 0 ? 0 : R * .55f;
+            ElementFx.haze(poseStack, buffer, view, new Vector3f(Mth.cos(a) * rr, .1f, Mth.sin(a) * rr), R * .7f, 3.2f, 2, age + k * 13, .03f, 0xFFB070,
+                    .5f * fade);
+        }
         ElementFx.motes(poseStack, buffer, view, BossMesh.EMBER, new Vector3f(), R, 4, .22f, 30, age * 2, HOT, fade, seed + 9);
         ElementFx.puffs(poseStack, buffer, view, BossMesh.SMOKE, new Vector3f(0, .3f, 0), R, 5, 1.8f, 10, age, .012f, SMOKE, .35f * fade, seed + 7, light);
     }

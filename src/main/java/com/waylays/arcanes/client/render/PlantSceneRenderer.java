@@ -197,6 +197,21 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
         }
         ElementFx.bloom(poseStack, buffer, view, head, .9f + .6f * open, PINK, .35f * grow * (1 - wither));
         ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(head).add(0, -.6f, 0), 1.4f, 2, .14f, 14, age, GOLD, open * (1 - wither), seed);
+        // Fireflies round it, petals drifting down, grass springing up at its foot
+        ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(), 2.6f, 2.8f, .16f, 12, age * .6f, 0xE8FF80, .9f * grow * (1 - wither), seed + 21);
+        for (int k = 0; k < 8; k++) {
+            float fall = 1 - (BossMesh.hash(seed + k * 11) + age * .008f) % 1;
+            float a = BossMesh.hash(seed + k * 13) * Mth.TWO_PI + age * .03f, rr = .6f + 1.6f * BossMesh.hash(seed + k * 17);
+            Vector3f p = new Vector3f(Mth.cos(a) * rr, fall * height, Mth.sin(a) * rr);
+            RitualMesh.billboard(petals, poseStack, view, p, .3f, age * .06f + k, -1, BossMesh.argb(PINK, open * (1 - wither) * Mth.sin(Mth.PI * fall)), light);
+        }
+        for (int k = 0; k < 14; k++) {
+            float a = BossMesh.hash(seed + k * 7) * Mth.TWO_PI, rr = .5f + 1.4f * BossMesh.hash(seed + k * 9);
+            Vector3f at = new Vector3f(Mth.cos(a) * rr, .03f, Mth.sin(a) * rr);
+            int grassCol = BossMesh.argb(0x5AB040, 1);
+            blade(leaves, poseStack.last(), at, new Vector3f(Mth.cos(a) * .25f, 1, Mth.sin(a) * .25f).normalize(), new Vector3f(-Mth.sin(a), 0, Mth.cos(a)),
+                    new Vector3f(Mth.cos(a) * .2f, 0, Mth.sin(a) * .2f), (.4f + .3f * BossMesh.hash(seed + k)) * grow, .18f * grow, 3, grassCol, grassCol, light);
+        }
         // Its thorns flung out all round when it opens, petals torn off with them
         float since = age - PlantScene.BLOOM_OPEN;
         if (since >= 0 && since < 14) {
@@ -270,6 +285,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             RitualMesh.billboard(petals, poseStack, view, p, .28f, age * .05f + k, -1, BossMesh.argb(colours[k % 5], shown * Mth.sin(Mth.PI * fall)), light);
         }
         ElementFx.groundRing(poseStack, buffer, .05f, r * .9f, r, GOLD, .35f * shown);
+        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .2f, 0), r * 1.6f, 3f, 3, age, .015f, 0xFFE890, .35f * shown);
     }
 
     // ---------------------------------------------------------------- Seed Volley
@@ -384,6 +400,8 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             blade(leaves, poseStack.last(), new Vector3f(dir).mul(-.2f).add(at), dir, side, new Vector3f(0, -.1f, 0), .42f, .3f, 2, col, col, light);
         }
         ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(), 1.2f, 4.5f, .16f, 30, age, GOLD, shown, seed + 3);
+        // The sunlit air shimmering warm in the shaft
+        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .05f, 0), 3f, 5.5f, 3, age, .02f, 0xFFF0B0, .4f * shown);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 1, 0), 1.3f, 0xFFF0B0, .35f * shown);
         // Healing: green sparks rising round the caster
         ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(), .7f, 2.4f, .2f, 10, age * 2, GREEN, .9f * shown, seed + 9);
@@ -472,6 +490,15 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, h, 0), r * 1.4f, 0xFF4060, .6f * (1 - t));
             ElementFx.burst(poseStack, buffer, view, LEAF, new Vector3f(0, h, 0), r * 2, 2, .4f, 14, t, LEAFY, 1, seed + 3, false, light);
         } else if (since >= 14 && sink <= 0) {
+            // Drool dripping from its teeth as it chews
+            VertexConsumer drool = BossMesh.light(buffer, BossMesh.GLOW);
+            for (int k = 0; k < 6; k++) {
+                float cycle = 16 + 6 * BossMesh.hash(seed + k);
+                float t = ((age + BossMesh.hash(seed + k * 3) * cycle) % cycle) / cycle;
+                float a = k * Mth.TWO_PI / 6 + .3f;
+                Vector3f p = new Vector3f(Mth.cos(a) * r * .95f, h - t * t * h, Mth.sin(a) * r * .95f);
+                RitualMesh.billboard(drool, poseStack, view, p, .14f, 0, -1, BossMesh.glow(0xB8FF60, (1 - t) * .9f), FULL);
+            }
             ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(0, .3f, 0), r * .9f, h, .18f, 10, age, 0xC8FF60, .8f, seed + 5);
         }
     }

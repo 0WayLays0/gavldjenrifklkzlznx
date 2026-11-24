@@ -643,6 +643,12 @@ pétales creusés le long de leur nervure, grande fleur aux bords lumineux et li
 bosselées, dionée avec sa bande rouge et ses poils sensitifs. Le jet d'acide laisse des flaques qui grésillent là où les
 gouttes tombent, la pluie est verte, la bulle de dissolution tremble, l'écume roule sur la crête de la marée.
 
+**Troisième passe (1.11.1)** : une **brume de distorsion** (l'air qui ondule et déforme ce qu'on voit derrière, la même
+que la Bourrasque) au-dessus des sorts : chaleur sur la lave (flaques, geysers, rivière, caldeira, carapace), froid sur
+la glissade givrée, vapeurs sur l'acide (flaques, dissolution, marée), air chaud doré dans le rayon de soleil et le pollen.
+Plus : bourrelets de neige le long du sillon de la boule et neige projetée sur ses côtés ; gouttes de lave qui tombent
+des éclats d'obsidienne ; lucioles, pétales qui tombent et herbe autour de la grande fleur ; bave qui coule de la dionée.
+
 ### Magie de la Bourrasque (Gale)
 
 Six sorts d'air si dense qu'il **déforme la lumière** : des lignes qui ondulent, claires sur sombres, à travers lesquelles le

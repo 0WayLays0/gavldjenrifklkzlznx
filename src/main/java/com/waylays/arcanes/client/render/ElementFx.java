@@ -194,6 +194,41 @@ public final class ElementFx {
         }
     }
 
+    /** Air so hot (or cold, or foul) that it bends the light: rippling lines, light against dark (see GaleSceneRenderer). */
+    public static final ResourceLocation WARP = com.waylays.arcanes.ArcanesOublies.id("textures/entity/gale/warp.png");
+
+    /**
+     * A haze rising from {@code at}: {@code layers} sheets of bent air facing the eye, {@code width} wide and
+     * {@code height} tall, their ripples drifting up at {@code speed} (tiles a tick), tinted {@code rgb}, fading out at
+     * their top: heat over lava, cold over snow, fumes over acid.
+     */
+    public static void haze(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f at, float width, float height, int layers,
+                            float age, float speed, int rgb, float alpha) {
+        if (alpha <= .01f) {
+            return;
+        }
+        VertexConsumer c = BossMesh.see(buffer, WARP);
+        PoseStack.Pose p = poseStack.last();
+        for (int k = 0; k < layers; k++) {
+            float off = (k - (layers - 1) / 2f) * width * .35f;
+            Vector3f base = new Vector3f(at);
+            Vector3f toEye = new Vector3f(view.eye()).sub(base);
+            toEye.y = 0;
+            if (toEye.lengthSquared() < 1.0E-6f) {
+                toEye.set(0, 0, 1);
+            }
+            Vector3f side = new Vector3f(toEye).cross(0, 1, 0).normalize();
+            base.add(new Vector3f(side).mul(off));
+            Vector3f s = new Vector3f(side).mul(width * .5f);
+            float v0 = age * speed * (1 + k * .3f) + k * .37f, v1 = v0 + height / 2;
+            float u0 = k * .31f, u1 = u0 + width / 2;
+            int bottom = BossMesh.argb(rgb, alpha * (.9f - k * .15f)), top = BossMesh.argb(rgb, 0);
+            // Bottom edge, then the top, fading
+            BossMesh.quad(c, p, new Vector3f(base).sub(s), new Vector3f(base).add(s), new Vector3f(base).add(s).add(0, height, 0),
+                    new Vector3f(base).sub(s).add(0, height, 0), u0, v1, u1, v1, u1, v0, u0, v0, bottom, top, FULL, BossMesh.UP);
+        }
+    }
+
     /** A soft shadow on the ground under something, {@code radius} across, at {@code at} (its y the ground's). */
     public static void shadow(PoseStack poseStack, MultiBufferSource buffer, Vector3f at, float radius, float alpha) {
         if (alpha <= .01f || radius <= .01f) {

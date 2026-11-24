@@ -108,6 +108,29 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
                     new Vector3f(c1).add(new Vector3f(side).mul(w1)), new Vector3f(c1).sub(new Vector3f(side).mul(w1)), 0, t0 * 3, 1, t0 * 3, 1, t1 * 3, 0, t1 * 3,
                     BossMesh.argb(0xB8D0EA, a0), BossMesh.argb(0xB8D0EA, a1), light);
         }
+        // Banks of snow heaped up along both sides of the furrow, and snow sprayed off its sides
+        VertexConsumer banks = BossMesh.solid(buffer, SNOW);
+        for (int i = 0; i < 8; i++) {
+            float t = (i + .5f) / 8;
+            if (t * behind < .3f) {
+                continue;
+            }
+            for (int s = -1; s <= 1; s += 2) {
+                float w = r * (.95f - .35f * t);
+                Vector3f at = new Vector3f(f).mul(-behind * t).add(new Vector3f(side).mul(s * w)).add(0, .02f, 0);
+                ElementFx.lumpy(banks, poseStack.last(), at, r * (.28f - .12f * t), 5, 9, .3f, 2.2f, 0, seed + i * 7 + s, .45f, BossMesh.argb(0xF4FAFF, 1),
+                        light);
+            }
+        }
+        for (int s = -1; s <= 1; s += 2) {
+            for (int k = 0; k < 6; k++) {
+                float t = ((age * .12f + BossMesh.hash(seed + k * 3 + s)) % 1);
+                Vector3f at = new Vector3f(side).mul(s * (r * .9f + t * r * 1.6f)).add(new Vector3f(f).mul(r * .2f - t * r * .8f))
+                        .add(0, r * .3f + 3.2f * r * t * (1 - t), 0);
+                RitualMesh.billboard(BossMesh.see(buffer, SNOW), poseStack, view, at, r * .18f * (1 - t * .5f), age * .2f + k, -1,
+                        BossMesh.argb(0xFFFFFF, 1 - t), light);
+            }
+        }
         // The ball, turned over as far as it has rolled, lumps of snow packed onto it
         float turn = age * SnowScene.ROLL_SPEED / Math.max(.2f, r);
         poseStack.pushPose();
@@ -325,6 +348,11 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
                     RitualMesh.crystal(gleam, poseStack.last(), base, dir, len * 1.04f, .08f + .06f * h, h * 3, BossMesh.glow(BLUE, .3f), FULL);
                 }
             }
+        }
+        // The cold making the air over it shimmer
+        for (int k = 0; k < 3; k++) {
+            ElementFx.haze(poseStack, buffer, view, new Vector3f(f).mul(length * (k + .5f) / 3).add(0, .1f, 0), 2.4f, 1.3f, 2, age + k * 11, .015f, 0xDDEEFF,
+                    .45f * fade);
         }
         // Cold mist creeping low over it, frost glinting
         for (int k = 0; k < 4; k++) {
