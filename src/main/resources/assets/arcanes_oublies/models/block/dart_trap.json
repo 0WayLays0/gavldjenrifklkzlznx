@@ -1,0 +1,9 @@
+{
+  "parent": "block/orientable",
+  "textures": {
+    "top": "arcanes_oublies:block/trap_dart_side",
+    "front": "arcanes_oublies:block/trap_dart_face",
+    "side": "arcanes_oublies:block/trap_dart_side",
+    "particle": "arcanes_oublies:block/trap_dart_side"
+  }
+}

@@ -1,0 +1,299 @@
+{
+  "parent": "block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "wood": "arcanes_oublies:block/trap_oak",
+    "rope": "arcanes_oublies:block/trap_rope",
+    "particle": "arcanes_oublies:block/trap_oak"
+  },
+  "elements": [
+    {
+      "from": [
+        1,
+        0,
+        7
+      ],
+      "to": [
+        3,
+        8,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wood"
+        },
+        "south": {
+          "texture": "#wood"
+        },
+        "east": {
+          "texture": "#wood"
+        },
+        "west": {
+          "texture": "#wood"
+        },
+        "up": {
+          "texture": "#wood"
+        },
+        "down": {
+          "texture": "#wood"
+        }
+      }
+    },
+    {
+      "from": [
+        1.5,
+        8,
+        7.5
+      ],
+      "to": [
+        2.5,
+        9,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wood"
+        },
+        "south": {
+          "texture": "#wood"
+        },
+        "east": {
+          "texture": "#wood"
+        },
+        "west": {
+          "texture": "#wood"
+        },
+        "up": {
+          "texture": "#wood"
+        },
+        "down": {
+          "texture": "#wood"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        6,
+        7.5
+      ],
+      "to": [
+        6,
+        7,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rope"
+        },
+        "south": {
+          "texture": "#rope"
+        },
+        "east": {
+          "texture": "#rope"
+        },
+        "west": {
+          "texture": "#rope"
+        },
+        "up": {
+          "texture": "#rope"
+        },
+        "down": {
+          "texture": "#rope"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        0.5,
+        7.5
+      ],
+      "to": [
+        7,
+        6,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rope"
+        },
+        "south": {
+          "texture": "#rope"
+        },
+        "east": {
+          "texture": "#rope"
+        },
+        "west": {
+          "texture": "#rope"
+        },
+        "up": {
+          "texture": "#rope"
+        },
+        "down": {
+          "texture": "#rope"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        0,
+        4
+      ],
+      "to": [
+        14,
+        1,
+        5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rope"
+        },
+        "south": {
+          "texture": "#rope"
+        },
+        "east": {
+          "texture": "#rope"
+        },
+        "west": {
+          "texture": "#rope"
+        },
+        "up": {
+          "texture": "#rope"
+        },
+        "down": {
+          "texture": "#rope"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        0,
+        11
+      ],
+      "to": [
+        14,
+        1,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rope"
+        },
+        "south": {
+          "texture": "#rope"
+        },
+        "east": {
+          "texture": "#rope"
+        },
+        "west": {
+          "texture": "#rope"
+        },
+        "up": {
+          "texture": "#rope"
+        },
+        "down": {
+          "texture": "#rope"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        0,
+        5
+      ],
+      "to": [
+        7,
+        1,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rope"
+        },
+        "south": {
+          "texture": "#rope"
+        },
+        "east": {
+          "texture": "#rope"
+        },
+        "west": {
+          "texture": "#rope"
+        },
+        "up": {
+          "texture": "#rope"
+        },
+        "down": {
+          "texture": "#rope"
+        }
+      }
+    },
+    {
+      "from": [
+        13,
+        0,
+        5
+      ],
+      "to": [
+        14,
+        1,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rope"
+        },
+        "south": {
+          "texture": "#rope"
+        },
+        "east": {
+          "texture": "#rope"
+        },
+        "west": {
+          "texture": "#rope"
+        },
+        "up": {
+          "texture": "#rope"
+        },
+        "down": {
+          "texture": "#rope"
+        }
+      }
+    },
+    {
+      "from": [
+        9,
+        0,
+        7
+      ],
+      "to": [
+        11,
+        1,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wood"
+        },
+        "south": {
+          "texture": "#wood"
+        },
+        "east": {
+          "texture": "#wood"
+        },
+        "west": {
+          "texture": "#wood"
+        },
+        "up": {
+          "texture": "#wood"
+        },
+        "down": {
+          "texture": "#wood"
+        }
+      }
+    }
+  ]
+}

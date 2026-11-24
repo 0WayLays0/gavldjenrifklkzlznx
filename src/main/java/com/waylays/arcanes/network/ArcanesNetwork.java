@@ -24,6 +24,7 @@ public final class ArcanesNetwork {
         com.waylays.arcanes.editor.SpellEditorNet.register(registrar);
         com.waylays.arcanes.metier.MetierNet.register(registrar);
         com.waylays.arcanes.rp.RpNet.register(registrar);
+        com.waylays.arcanes.piege.Pieges.registerPayloads(registrar);
         com.waylays.arcanes.compat.epicnpc.EpicNpcNet.register(registrar);
     }
 

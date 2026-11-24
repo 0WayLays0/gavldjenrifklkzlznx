@@ -1,0 +1,150 @@
+{
+  "parent": "block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "keg": "arcanes_oublies:block/trap_keg",
+    "lid": "arcanes_oublies:block/trap_keg_top_lit",
+    "oak": "arcanes_oublies:block/trap_oak",
+    "rope": "arcanes_oublies:block/trap_rope",
+    "particle": "arcanes_oublies:block/trap_keg"
+  },
+  "elements": [
+    {
+      "from": [
+        3.5,
+        0,
+        3.5
+      ],
+      "to": [
+        12.5,
+        6,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#keg"
+        },
+        "south": {
+          "texture": "#keg"
+        },
+        "east": {
+          "texture": "#keg"
+        },
+        "west": {
+          "texture": "#keg"
+        },
+        "up": {
+          "texture": "#lid"
+        },
+        "down": {
+          "texture": "#keg"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        5.4,
+        5
+      ],
+      "to": [
+        15,
+        6.4,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#oak"
+        },
+        "south": {
+          "texture": "#oak"
+        },
+        "east": {
+          "texture": "#oak"
+        },
+        "west": {
+          "texture": "#oak"
+        },
+        "up": {
+          "texture": "#oak"
+        },
+        "down": {
+          "texture": "#oak"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          5.4,
+          8
+        ],
+        "axis": "y",
+        "angle": 22.5
+      }
+    },
+    {
+      "from": [
+        11,
+        6,
+        7.5
+      ],
+      "to": [
+        14,
+        7,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rope"
+        },
+        "south": {
+          "texture": "#rope"
+        },
+        "east": {
+          "texture": "#rope"
+        },
+        "west": {
+          "texture": "#rope"
+        },
+        "up": {
+          "texture": "#rope"
+        },
+        "down": {
+          "texture": "#rope"
+        }
+      }
+    },
+    {
+      "from": [
+        13,
+        5.5,
+        7.5
+      ],
+      "to": [
+        14,
+        6.5,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rope"
+        },
+        "south": {
+          "texture": "#rope"
+        },
+        "east": {
+          "texture": "#rope"
+        },
+        "west": {
+          "texture": "#rope"
+        },
+        "up": {
+          "texture": "#rope"
+        },
+        "down": {
+          "texture": "#rope"
+        }
+      }
+    }
+  ]
+}

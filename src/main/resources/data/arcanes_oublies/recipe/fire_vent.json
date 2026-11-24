@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "BBB",
+    "CFC"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:iron_bars"
+    },
+    "C": {
+      "item": "minecraft:cobblestone"
+    },
+    "F": {
+      "item": "minecraft:flint_and_steel"
+    }
+  },
+  "result": {
+    "id": "arcanes_oublies:fire_vent",
+    "count": 1
+  }
+}

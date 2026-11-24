@@ -643,6 +643,35 @@ pétales creusés le long de leur nervure, grande fleur aux bords lumineux et li
 bosselées, dionée avec sa bande rouge et ses poils sensitifs. Le jet d'acide laisse des flaques qui grésillent là où les
 gouttes tombent, la pluie est verte, la bulle de dissolution tremble, l'écume roule sur la crête de la marée.
 
+### Pièges
+
+Douze **blocs-pièges** au style médiéval (onglet créatif du mod, ou craft) ; ils ne touchent ni les spectateurs ni les
+joueurs en créatif (pour poser et tester tranquillement, passer en survie).
+
+| Piège | Ce qu'il fait (dégâts par défaut, 2 = 1 cœur) |
+|---|---|
+| **Floor Spikes** (pics au sol) | Marché dessus, des pics de fer jaillissent de la plaque un instant plus tard (6), puis redescendent. |
+| **Bear Trap** (piège à mâchoires) | Les mâchoires se referment sur la jambe (8) et la tiennent 4 s ; clic droit pour le rouvrir avant. |
+| **Caltrops** (chausse-trapes) | Pique et ralentit qui marche dessus, chaque seconde (2). |
+| **Nail Board** (planche à clous) | Pareil, en planche de bois cloutée (3). |
+| **Saw Trap** (lame tournante) | Une vieille lame de scie tourne dans un cadre de chêne et entaille qui s'y tient, deux fois par seconde (3). |
+| **Fire Vent** (bouche de feu) | Marché dessus, elle siffle puis crache une colonne de flammes 2 s : enflamme (2 par coup). |
+| **Gas Vent** (évent à gaz) | Marché dessus, il souffle un nuage de poison (ou des effets réglés dessus). |
+| **Snare** (collet) | Le nœud coulant se resserre sur le pied et le tient 3 s (1). |
+| **Wall Spikes** (pieux muraux) | Planche de chêne cerclée de fer hérissée de pointes : blesse et repousse qui s'y jette (4). |
+| **Tar Pit** (fosse à goudron) | Englue et ralentit fortement qui y patauge (0). |
+| **Powder Keg Trap** (poudrière) | Un tonnelet de poudre sous une planche : la planche s'enfonce, la mèche s'allume, et ça saute 1 s plus tard (sans casser les blocs) + 4. |
+| **Dart Trap** (gargouille) | Une gargouille de pierre crache des fléchettes sur qui passe devant elle, jusqu'à 10 blocs (4). |
+
+**`/piege`** (ou `/piège`, staff) en tenant un piège : un écran pour régler **ses dégâts** (vide = ceux du piège) et
+**jusqu'à 8 effets**, chacun avec sa **chance (%)**, son **niveau** et sa **durée** : tous les effets néfastes du jeu et des
+mods (poison, wither, lenteur, faiblesse, cécité, nausée, faim…), plus enflammer, geler, foudre et repousser ; le bouton
+« Tous les effets » montre aussi les effets positifs. Aucun effet = le piège ne fait que ses dégâts. Le réglage reste sur
+le piège une fois posé et revient avec lui quand on le casse ; il s'affiche sous son nom. En commandes :
+`/piege info`, `/piege degats <n>`, `/piege defaut`, `/piege effet <effet> [chance] [niveau] [secondes]`,
+`/piege special <feu|gel|foudre|recul> [chance] [puissance] [secondes]`, `/piege vider`. Les fléchettes de la gargouille
+portent les effets réglés dessus ; l'évent à gaz les met dans son nuage.
+
 ### Téléphones (mod à part)
 
 Les téléphones ne font plus partie d'Arcanes Oubliés : ils sont dans le mod séparé **Téléphones d'Époque & RP**

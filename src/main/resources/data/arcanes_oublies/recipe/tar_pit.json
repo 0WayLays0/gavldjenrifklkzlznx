@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CSC"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:coal"
+    },
+    "S": {
+      "item": "minecraft:slime_ball"
+    }
+  },
+  "result": {
+    "id": "arcanes_oublies:tar_pit",
+    "count": 2
+  }
+}

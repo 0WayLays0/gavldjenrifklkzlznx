@@ -105,6 +105,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ALTAR_OF_RITES.get());
                 output.accept(ModItems.ALEMBIC.get());
                 output.accept(ModItems.MEDICAL_TABLE.get());
+                com.waylays.arcanes.piege.Pieges.TRAP_ITEMS.values().forEach(trap -> output.accept(trap.get()));
                 for (Section section : SECTIONS) {
                     section.books().forEach(book -> output.accept(book.get()));
                     for (var entry : ModSpells.SPELLS.getEntries()) {

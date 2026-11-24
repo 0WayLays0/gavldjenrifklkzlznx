@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CSC",
+    "CPC"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:cobblestone"
+    },
+    "S": {
+      "item": "minecraft:spider_eye"
+    },
+    "P": {
+      "item": "minecraft:stone_pressure_plate"
+    }
+  },
+  "result": {
+    "id": "arcanes_oublies:gas_vent",
+    "count": 1
+  }
+}

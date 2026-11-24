@@ -1,0 +1,253 @@
+{
+  "parent": "block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "tar": "arcanes_oublies:block/trap_tar",
+    "oak": "arcanes_oublies:block/trap_oak",
+    "particle": "arcanes_oublies:block/trap_tar"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        1,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tar"
+        },
+        "south": {
+          "texture": "#tar"
+        },
+        "east": {
+          "texture": "#tar"
+        },
+        "west": {
+          "texture": "#tar"
+        },
+        "up": {
+          "texture": "#tar"
+        },
+        "down": {
+          "texture": "#tar"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        1,
+        4
+      ],
+      "to": [
+        5,
+        1.5,
+        6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tar"
+        },
+        "south": {
+          "texture": "#tar"
+        },
+        "east": {
+          "texture": "#tar"
+        },
+        "west": {
+          "texture": "#tar"
+        },
+        "up": {
+          "texture": "#tar"
+        },
+        "down": {
+          "texture": "#tar"
+        }
+      }
+    },
+    {
+      "from": [
+        10,
+        1,
+        9
+      ],
+      "to": [
+        12,
+        2,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tar"
+        },
+        "south": {
+          "texture": "#tar"
+        },
+        "east": {
+          "texture": "#tar"
+        },
+        "west": {
+          "texture": "#tar"
+        },
+        "up": {
+          "texture": "#tar"
+        },
+        "down": {
+          "texture": "#tar"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        1,
+        12
+      ],
+      "to": [
+        7,
+        1.5,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tar"
+        },
+        "south": {
+          "texture": "#tar"
+        },
+        "east": {
+          "texture": "#tar"
+        },
+        "west": {
+          "texture": "#tar"
+        },
+        "up": {
+          "texture": "#tar"
+        },
+        "down": {
+          "texture": "#tar"
+        }
+      }
+    },
+    {
+      "from": [
+        12,
+        1,
+        3
+      ],
+      "to": [
+        13,
+        1.5,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tar"
+        },
+        "south": {
+          "texture": "#tar"
+        },
+        "east": {
+          "texture": "#tar"
+        },
+        "west": {
+          "texture": "#tar"
+        },
+        "up": {
+          "texture": "#tar"
+        },
+        "down": {
+          "texture": "#tar"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        2.5,
+        1.8,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#oak"
+        },
+        "south": {
+          "texture": "#oak"
+        },
+        "east": {
+          "texture": "#oak"
+        },
+        "west": {
+          "texture": "#oak"
+        },
+        "up": {
+          "texture": "#oak"
+        },
+        "down": {
+          "texture": "#oak"
+        }
+      },
+      "rotation": {
+        "origin": [
+          1,
+          0,
+          4
+        ],
+        "axis": "x",
+        "angle": -22.5
+      }
+    },
+    {
+      "from": [
+        10,
+        0,
+        13.5
+      ],
+      "to": [
+        16,
+        1.6,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#oak"
+        },
+        "south": {
+          "texture": "#oak"
+        },
+        "east": {
+          "texture": "#oak"
+        },
+        "west": {
+          "texture": "#oak"
+        },
+        "up": {
+          "texture": "#oak"
+        },
+        "down": {
+          "texture": "#oak"
+        }
+      },
+      "rotation": {
+        "origin": [
+          13,
+          0,
+          15
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    }
+  ]
+}

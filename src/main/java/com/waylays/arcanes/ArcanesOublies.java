@@ -37,6 +37,8 @@ public class ArcanesOublies {
         ModEntities.ENTITIES.register(modBus);
         ModEffects.EFFECTS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
+        // The traps (/piege)
+        com.waylays.arcanes.piege.Pieges.register(modBus);
         container.registerConfig(ModConfig.Type.SERVER, ArcanesConfig.SPEC);
         // The role play and the game masters' tools (once part of Époque RP)
         com.waylays.arcanes.rp.RpRegistry.register(modBus);
