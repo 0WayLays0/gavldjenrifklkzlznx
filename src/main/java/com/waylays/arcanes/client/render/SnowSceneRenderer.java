@@ -43,6 +43,9 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
     public void render(SnowScene e, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource out, int packedLight) {
         // Recorded per render type, then written out one type after another (see SceneBuffers)
         SceneBuffers buffer = SceneBuffers.begin();
+        // On top of snow layers or a carpet, if the scene stands in them
+        poseStack.pushPose();
+        poseStack.translate(0, ElementFx.floorLift(e), 0);
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 31;
@@ -56,6 +59,7 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
             case WHITEOUT -> whiteout(e, poseStack, buffer, view, age, partialTicks, seed, light);
         }
         buffer.flush(out);
+        poseStack.popPose();
         super.render(e, entityYaw, partialTicks, poseStack, out, packedLight);
     }
 

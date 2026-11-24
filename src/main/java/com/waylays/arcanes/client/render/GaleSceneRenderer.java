@@ -31,7 +31,7 @@ import static com.waylays.arcanes.client.render.ElementFx.FULL;
 public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
     public static final ResourceLocation WARP = ArcanesOublies.id("textures/entity/gale/warp.png");
     public static final ResourceLocation BLADE = ArcanesOublies.id("textures/entity/gale/blade.png");
-    private static final int WHITE = 0xF8F4FF, LILAC = 0xD6C4FF, VIOLET = 0xAA82FF, DEEP = 0x5C3CAA;
+    private static final int WHITE = 0xF8F4FF, LILAC = 0xC4A8FF, VIOLET = 0x9A66FF, DEEP = 0x4A2A9A;
 
     public GaleSceneRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -40,6 +40,9 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
     @Override
     public void render(GaleScene e, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource out, int packedLight) {
         SceneBuffers buffer = SceneBuffers.begin();
+        // On top of snow layers or a carpet, if the scene stands in them
+        poseStack.pushPose();
+        poseStack.translate(0, ElementFx.floorLift(e), 0);
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 41;
@@ -53,6 +56,7 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
             case STORM -> storm(e, poseStack, buffer, view, age, seed);
         }
         buffer.flush(out);
+        poseStack.popPose();
         super.render(e, entityYaw, partialTicks, poseStack, out, packedLight);
     }
 
@@ -77,6 +81,12 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
             halo[i] = BossMesh.glow(VIOLET, .45f * alpha * k);
             core[i] = BossMesh.glow(WHITE, alpha * k);
         }
+        // A violet line drawn see-through under the glow: the glow alone is lost against a bright sky or snow
+        int[] under = new int[n];
+        for (int i = 0; i < n; i++) {
+            under[i] = BossMesh.argb(VIOLET, .75f * alpha * Mth.sin(Mth.PI * i / (n - 1)));
+        }
+        RitualMesh.thread(BossMesh.see(buffer, WindMesh.STREAK), poseStack.last(), view.eye(), pts, width * 2.2f, under, FULL);
         RitualMesh.thread(c, poseStack.last(), view.eye(), pts, width * 3.5f, halo, FULL);
         RitualMesh.thread(c, poseStack.last(), view.eye(), pts, width, core, FULL);
     }
@@ -112,8 +122,8 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
             BossMesh.quad2(bent, poseStack.last(), front[i], front[i + 1], wide[i + 1], wide[i], u0, 0, u1, 0, u1, 1, u0, 1, BossMesh.argb(LILAC, .9f * alpha),
                     BossMesh.argb(LILAC, .9f * alpha), FULL);
             // Its body, lilac, and its edge, glowing
-            BossMesh.quad2(edge, poseStack.last(), front[i], front[i + 1], back[i + 1], back[i], u0, 0, u1, 0, u1, 1, u0, 1, BossMesh.argb(LILAC, .85f * alpha),
-                    BossMesh.argb(LILAC, .85f * alpha), FULL);
+            BossMesh.quad2(edge, poseStack.last(), front[i], front[i + 1], back[i + 1], back[i], u0, 0, u1, 0, u1, 1, u0, 1, BossMesh.argb(VIOLET, alpha),
+                    BossMesh.argb(VIOLET, alpha), FULL);
             BossMesh.quad2(glow, poseStack.last(), front[i], front[i + 1], back[i + 1], back[i], u0, 0, u1, 0, u1, 1, u0, 1, BossMesh.glow(VIOLET, .7f * alpha),
                     BossMesh.glow(VIOLET, .7f * alpha), FULL);
         }
@@ -318,12 +328,12 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
         BossMesh.annulus(BossMesh.see(buffer, WARP), poseStack.last(), new Vector3f(0, 4.2f - .4f * Mth.sin(age * .15f), 0), u, v, .01f, r, 48, 2,
                 -age * .015f, -age * .03f, BossMesh.argb(LILAC, .7f * shown), BossMesh.argb(LILAC, 0), FULL, true);
         // Lines of falling air, raining straight down hard
-        for (int k = 0; k < 30; k++) {
+        for (int k = 0; k < 18; k++) {
             float h1 = BossMesh.hash(seed + k), h2 = BossMesh.hash(seed + k * 3);
             float a = h1 * Mth.TWO_PI, rr = r * Mth.sqrt(h2);
             float y = 4.4f - ((age * .45f + BossMesh.hash(seed + k * 7) * 4.4f) % 4.4f);
             Vector3f top = new Vector3f(Mth.cos(a) * rr, y + 1.2f, Mth.sin(a) * rr), bottom = new Vector3f(Mth.cos(a) * rr, Math.max(.05f, y), Mth.sin(a) * rr);
-            line(buffer, poseStack, view, new Vector3f[]{top, new Vector3f(top).lerp(bottom, .5f), bottom}, .035f, .8f * shown);
+            line(buffer, poseStack, view, new Vector3f[]{top, new Vector3f(top).lerp(bottom, .5f), bottom}, .06f, .9f * shown);
         }
         ElementFx.puffs(poseStack, buffer, view, WindMesh.DUST, new Vector3f(0, .1f, 0), r, .3f, .9f, 10, age, .03f, 0xC8BCA8, .45f * shown, seed + 3, light);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 2.5f, 0), r * .5f, DEEP, .25f * shown);
@@ -358,8 +368,8 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
             crescent(buffer, poseStack, view, at, dir, BossMesh.hash(h + 6) * Mth.TWO_PI, .8f + .6f * BossMesh.hash(h + 7), 2.2f, .45f, age, alpha);
         }
         // The typhoon: walls of bent air whirling round, lines spiralling up, a violet glow on its bearer
-        ElementFx.wall(poseStack, buffer, WARP, R * .92f, 0, 3.2f, 3, age, .09f, LILAC, .75f * shown, FULL);
-        ElementFx.wall(poseStack, buffer, WARP, R * .6f, .2f, 2.6f, 2, age + 30, -.13f, LILAC, .5f * shown, FULL);
+        ElementFx.wall(poseStack, buffer, WARP, R * .92f, 0, 3.2f, 3, age, .09f, VIOLET, .4f * shown, FULL);
+        ElementFx.wall(poseStack, buffer, WARP, R * .6f, .2f, 2.6f, 2, age + 30, -.13f, VIOLET, .25f * shown, FULL);
         for (int k = 0; k < 5; k++) {
             float a0 = age * .35f + k * Mth.TWO_PI / 5;
             line(buffer, poseStack, view, WindMesh.helix(0, 0, R * .5f, R * .95f, a0, 2.6f, .1f, 3.2f, 14), .04f, .7f * shown);

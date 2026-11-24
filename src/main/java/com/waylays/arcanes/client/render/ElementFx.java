@@ -229,6 +229,24 @@ public final class ElementFx {
         }
     }
 
+    /**
+     * How far above the scene's feet the thin cover of its block stands (snow layers, a carpet...): what lies on the
+     * ground is drawn on top of it (under snow it was hidden).
+     */
+    public static float floorLift(Entity e) {
+        BlockPos pos = e.blockPosition();
+        net.minecraft.world.level.block.state.BlockState state = e.level().getBlockState(pos);
+        if (state.isAir()) {
+            return 0;
+        }
+        net.minecraft.world.phys.shapes.VoxelShape shape = state.getShape(e.level(), pos);
+        if (shape.isEmpty()) {
+            return 0;
+        }
+        double top = shape.max(net.minecraft.core.Direction.Axis.Y), feet = e.getY() - pos.getY();
+        return top <= .5 && top > feet ? (float) (top - feet) : 0;
+    }
+
     /** A soft shadow on the ground under something, {@code radius} across, at {@code at} (its y the ground's). */
     public static void shadow(PoseStack poseStack, MultiBufferSource buffer, Vector3f at, float radius, float alpha) {
         if (alpha <= .01f || radius <= .01f) {

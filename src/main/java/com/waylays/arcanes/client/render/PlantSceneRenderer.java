@@ -42,6 +42,9 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
     public void render(PlantScene e, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource out, int packedLight) {
         // Recorded per render type, then written out one type after another (see SceneBuffers)
         SceneBuffers buffer = SceneBuffers.begin();
+        // On top of snow layers or a carpet, if the scene stands in them
+        poseStack.pushPose();
+        poseStack.translate(0, ElementFx.floorLift(e), 0);
         float age = e.tickCount + partialTicks;
         WaterMesh.View view = WaterViews.of(this.entityRenderDispatcher, e, partialTicks);
         int seed = e.getId() * 31;
@@ -54,6 +57,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             case MAW -> maw(e, poseStack, buffer, view, age, seed, light);
         }
         buffer.flush(out);
+        poseStack.popPose();
         super.render(e, entityYaw, partialTicks, poseStack, out, packedLight);
     }
 
@@ -285,7 +289,6 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             RitualMesh.billboard(petals, poseStack, view, p, .28f, age * .05f + k, -1, BossMesh.argb(colours[k % 5], shown * Mth.sin(Mth.PI * fall)), light);
         }
         ElementFx.groundRing(poseStack, buffer, .05f, r * .9f, r, GOLD, .35f * shown);
-        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .2f, 0), r * 1.6f, 3f, 3, age, .015f, 0xFFE890, .35f * shown);
     }
 
     // ---------------------------------------------------------------- Seed Volley
@@ -401,7 +404,7 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
         }
         ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(), 1.2f, 4.5f, .16f, 30, age, GOLD, shown, seed + 3);
         // The sunlit air shimmering warm in the shaft
-        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .05f, 0), 3f, 5.5f, 3, age, .02f, 0xFFF0B0, .4f * shown);
+        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .05f, 0), 2.2f, 4.5f, 2, age, .02f, 0xFFF0B0, .25f * shown);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 1, 0), 1.3f, 0xFFF0B0, .35f * shown);
         // Healing: green sparks rising round the caster
         ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(), .7f, 2.4f, .2f, 10, age * 2, GREEN, .9f * shown, seed + 9);
