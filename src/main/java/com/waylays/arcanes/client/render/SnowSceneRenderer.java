@@ -445,14 +445,18 @@ public class SnowSceneRenderer extends EntityRenderer<SnowScene> {
             ElementFx.lumpy(clumps, poseStack.last(), new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), (.18f + .14f * BossMesh.hash(seed + k * 41)) * shown,
                     5, 8, .3f, 2.5f, age * .05f, seed + k, .85f, BossMesh.argb(0xFFFFFF, 1), light);
         }
-        // The storm's ceiling: heavy snow clouds in body, turning slowly over it, greyer underneath
-        for (int k = 0; k < 16; k++) {
-            float a = k * Mth.TWO_PI / 16 + age * .006f;
-            float rr = r * (.1f + .85f * BossMesh.hash(seed + k * 7));
-            float size = (1.1f + .8f * BossMesh.hash(seed + k * 9)) * shown;
-            int col = BossMesh.mix(0xB4C2D8, 0xFFFFFF, BossMesh.hash(seed + k * 11));
-            ElementFx.lumpy(clumps, poseStack.last(), new Vector3f(Mth.cos(a) * rr, 5.9f + .5f * BossMesh.hash(seed + k * 13), Mth.sin(a) * rr), size, 8, 12,
-                    .22f, 2, age * .01f, seed + k * 3, .55f, BossMesh.argb(col, 1), light);
+        // The storm's ceiling: snow clouds in body, each a bank of soft white lumps, turning slowly over it
+        for (int k = 0; k < 9; k++) {
+            float a = k * Mth.TWO_PI / 9 + age * .006f;
+            float rr = r * (.15f + .75f * BossMesh.hash(seed + k * 7));
+            Vector3f centre = new Vector3f(Mth.cos(a) * rr, 6 + .4f * BossMesh.hash(seed + k * 13), Mth.sin(a) * rr);
+            for (int j = 0; j < 5; j++) {
+                float ja = BossMesh.hash(seed + k * 17 + j) * Mth.TWO_PI, jr = j == 0 ? 0 : .7f + .5f * BossMesh.hash(seed + k * 19 + j);
+                float size = (j == 0 ? 1 : .55f + .3f * BossMesh.hash(seed + k * 23 + j)) * shown;
+                Vector3f p = new Vector3f(centre).add(Mth.cos(ja) * jr, (j == 0 ? .25f : 0) - .1f * jr, Mth.sin(ja) * jr);
+                int col = BossMesh.mix(0xE4ECF6, 0xFFFFFF, BossMesh.hash(seed + k * 29 + j));
+                ElementFx.lumpy(clumps, poseStack.last(), p, size, 8, 12, .12f, 1.6f, age * .01f, seed + k * 31 + j, .62f, BossMesh.argb(col, 1), FULL);
+            }
         }
         // Snow piling up inside as it blows
         float pile = BossMesh.ramp(age, 10, 90) * fade;

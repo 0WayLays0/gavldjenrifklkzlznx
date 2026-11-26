@@ -234,17 +234,19 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
         // The cloud: sickly green-yellow puffs churning, a deeper green underneath, lit from within now and then
         int flash = Mth.floor(age / 9);
         float flicker = BossMesh.hash(seed + flash * 13) > .55f ? 1 - ((age % 9) / 9f) : 0;
-        // In body, not a fog: a fog hid the rain and everything behind it
+        // In body, not a fog (a fog hid the rain and everything behind it): a low, flat bank of soft lumps, yellow-green
+        // and pale on top, sicklier underneath, brightening when it flashes
         VertexConsumer puffs = BossMesh.solid(buffer, SnowSceneRenderer.SNOW);
-        for (int k = 0; k < 22; k++) {
+        for (int k = 0; k < 26; k++) {
             float a = BossMesh.hash(seed + k) * Mth.TWO_PI + age * .004f * (k % 2 == 0 ? 1 : -1);
-            float rr = r * Mth.sqrt(BossMesh.hash(seed + k * 3)) * (.6f + .4f * gather);
-            float low = BossMesh.hash(seed + k * 5);
-            float y = h + (low - .3f) * 1.1f + .15f * Mth.sin(age * .05f + k);
-            int col = BossMesh.mix(0x5E8A30, 0xB8D878, low);
-            col = BossMesh.mix(col, 0xE8FF90, .4f * flicker);
-            ElementFx.lumpy(puffs, poseStack.last(), new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), (.8f + .6f * BossMesh.hash(seed + k * 11)) * shown, 8,
-                    12, .22f, 2, age * .01f, seed + k * 7, .6f, BossMesh.argb(col, 1), FULL);
+            float rr = r * 1.05f * Mth.sqrt(BossMesh.hash(seed + k * 3)) * (.6f + .4f * gather);
+            float top = BossMesh.hash(seed + k * 5);
+            float y = h + (top - .4f) * .5f + .1f * Mth.sin(age * .05f + k);
+            int col = BossMesh.mix(0x9CBC48, 0xE2F2A8, top);
+            col = BossMesh.mix(col, 0xF4FFB8, .45f * flicker);
+            float size = (.55f + .35f * BossMesh.hash(seed + k * 11)) * (.7f + .3f * gather) * fade;
+            ElementFx.lumpy(puffs, poseStack.last(), new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), size, 8, 12, .12f, 1.6f, age * .01f, seed + k * 7,
+                    .55f, BossMesh.argb(col, 1), FULL);
         }
         float fa = BossMesh.hash(seed + flash * 17) * Mth.TWO_PI, fr = r * .6f * BossMesh.hash(seed + flash * 19);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(Mth.cos(fa) * fr, h - .2f, Mth.sin(fa) * fr), r * .8f, GREEN, (.2f + .8f * flicker) * shown);
