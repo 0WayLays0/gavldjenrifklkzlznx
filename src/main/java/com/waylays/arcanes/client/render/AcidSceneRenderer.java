@@ -242,7 +242,8 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             float rr = r * 1.05f * Mth.sqrt(BossMesh.hash(seed + k * 3)) * (.6f + .4f * gather);
             float top = BossMesh.hash(seed + k * 5);
             float y = h + (top - .4f) * .5f + .1f * Mth.sin(age * .05f + k);
-            int col = BossMesh.mix(0x9CBC48, 0xE2F2A8, top);
+            // Pale: its underside, turned from the light, is drawn darker, and a deep green read as a tree from below
+            int col = BossMesh.mix(0xC4DC7C, 0xF2FAD0, top);
             col = BossMesh.mix(col, 0xF4FFB8, .45f * flicker);
             float size = (.55f + .35f * BossMesh.hash(seed + k * 11)) * (.7f + .3f * gather) * fade;
             ElementFx.lumpy(puffs, poseStack.last(), new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), size, 8, 12, .12f, 1.6f, age * .01f, seed + k * 7,
