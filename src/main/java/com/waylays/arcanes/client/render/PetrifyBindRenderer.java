@@ -51,7 +51,7 @@ public class PetrifyBindRenderer extends EntityRenderer<PetrifyBind> {
         poseStack.translate(0, .03, 0);
         poseStack.mulPose(Axis.YP.rotationDegrees(age * 2));
         float r = width * .5f + .9f;
-        RenderHelper.groundQuad(buffer.getBuffer(RenderType.entityTranslucent(RuneRender.RING_CARVED)), poseStack.last(), r, RuneRender.alpha(0xFFFFFF, lit), packedLight);
+        RenderHelper.groundQuad(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(RuneRender.RING_CARVED)), poseStack.last(), r, RuneRender.alpha(0xFFFFFF, lit), packedLight);
         poseStack.translate(0, .01, 0);
         RenderHelper.groundQuad(buffer.getBuffer(RenderType.eyes(RuneRender.RING_GLOW)), poseStack.last(), r, RuneRender.additive(RuneFx.GLOW, lit), FULL);
         poseStack.popPose();

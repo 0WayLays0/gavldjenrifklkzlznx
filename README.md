@@ -656,6 +656,11 @@ de paquets de neige, sous un plafond de nuages en volume ; le nuage de la Pluie 
 voile). Les murs tournants de Cor Leonis sont lumineux au lieu d'être semi-transparents. Plus aucune ombre portée sous
 les sorts.
 
+**Plus de parties invisibles (1.11.7)** : les parties semi-transparentes des sorts (voiles, rubans, bulles, dômes,
+anneaux, flaques…) cachaient tout ce qui se trouvait derrière elles (lueurs, autres morceaux du sort, créatures dans une
+bulle ou une prison d'ambre), qui disparaissait. Elles sont maintenant dessinées sans rien masquer, pour tous les sorts
+du mod, et les parties solides d'un sort sont dessinées avant le reste.
+
 ### Magie de la Bourrasque (Gale)
 
 Six sorts d'air si dense qu'il **déforme la lumière** : des lignes qui ondulent, claires sur sombres, à travers lesquelles le

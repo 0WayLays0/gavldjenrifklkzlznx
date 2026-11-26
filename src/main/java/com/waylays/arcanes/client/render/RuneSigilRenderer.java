@@ -61,7 +61,7 @@ public class RuneSigilRenderer extends EntityRenderer<RuneSigil> {
         poseStack.translate(0, .02, 0);
         poseStack.mulPose(Axis.YP.rotationDegrees(age * .5f));
         // The grooves cut into the ground, lit by the world, then the same lines glowing
-        RenderHelper.groundQuad(buffer.getBuffer(RenderType.entityTranslucent(RuneRender.RING_CARVED)), poseStack.last(), r * 1.1f, RuneRender.alpha(0xFFFFFF, appear), light);
+        RenderHelper.groundQuad(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(RuneRender.RING_CARVED)), poseStack.last(), r * 1.1f, RuneRender.alpha(0xFFFFFF, appear), light);
         poseStack.translate(0, .01, 0);
         RenderHelper.groundQuad(buffer.getBuffer(RenderType.eyes(RuneRender.RING_GLOW)), poseStack.last(), r * 1.1f * appear, RuneRender.additive(RuneFx.GLOW, lit * breathe), FULL);
         // A smaller ring of runes turning the other way
@@ -143,7 +143,7 @@ public class RuneSigilRenderer extends EntityRenderer<RuneSigil> {
             poseStack.translate(f.x * along, heights[k] + .02f, f.z * along);
             poseStack.mulPose(Axis.YP.rotationDegrees(-yaw));
             float half = width * .46f * carved;
-            RenderHelper.groundQuad(buffer.getBuffer(RenderType.entityTranslucent(RuneRender.TILE)), poseStack.last(), half, RuneRender.alpha(0xFFFFFF, lit), light);
+            RenderHelper.groundQuad(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(RuneRender.TILE)), poseStack.last(), half, RuneRender.alpha(0xFFFFFF, lit), light);
             poseStack.translate(0, .012, 0);
             poseStack.mulPose(Axis.XP.rotationDegrees(-90));
             RuneRender.glyph(buffer.getBuffer(RenderType.eyes(RuneRender.GLYPHS)), poseStack.last(), sigil.getId() * 7 + k * 3, width * .55f * carved,
@@ -189,7 +189,7 @@ public class RuneSigilRenderer extends EntityRenderer<RuneSigil> {
             poseStack.pushPose();
             poseStack.translate(0, .02, 0);
             poseStack.mulPose(Axis.YP.rotationDegrees(sigil.getId() * 37));
-            RenderHelper.groundQuad(buffer.getBuffer(RenderType.entityTranslucent(RuneRender.RING_CARVED)), poseStack.last(), r, RuneRender.alpha(0xFFFFFF, .7f * lit), light);
+            RenderHelper.groundQuad(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(RuneRender.RING_CARVED)), poseStack.last(), r, RuneRender.alpha(0xFFFFFF, .7f * lit), light);
             poseStack.translate(0, .01, 0);
             float breathe = .18f + .14f * Mth.sin(age * .08f);
             RenderHelper.groundQuad(buffer.getBuffer(RenderType.eyes(RuneRender.RING_GLOW)), poseStack.last(), r,

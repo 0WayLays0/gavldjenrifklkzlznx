@@ -42,19 +42,33 @@ public final class SceneBuffers implements MultiBufferSource {
         return recorders.computeIfAbsent(type, t -> new Recorder());
     }
 
-    /** Writes out everything recorded, one render type after another, into {@code target}; then clears. */
+    /**
+     * Writes out everything recorded into {@code target}, one render type after another, then clears: the solid parts
+     * first, so that the see-through parts and the light drawn after them show in front of them, not hidden by them.
+     */
     public void flush(MultiBufferSource target) {
         try {
-            for (Map.Entry<RenderType, Recorder> entry : recorders.entrySet()) {
-                Recorder r = entry.getValue();
-                if (r.count > 0) {
-                    r.replay(target.getBuffer(entry.getKey()));
+            for (int pass = 0; pass < 2; pass++) {
+                for (Map.Entry<RenderType, Recorder> entry : recorders.entrySet()) {
+                    Recorder r = entry.getValue();
+                    if (r.count > 0 && solid(entry.getKey()) == (pass == 0)) {
+                        r.replay(target.getBuffer(entry.getKey()));
+                        r.clear();
+                    }
                 }
+            }
+            for (Recorder r : recorders.values()) {
                 r.clear();
             }
         } finally {
             inUse = false;
         }
+    }
+
+    /** Whether {@code type} draws solid (the game's cutout and solid entity types). */
+    private static boolean solid(RenderType type) {
+        String name = type.toString();
+        return name.contains("entity_cutout") || name.contains("entity_solid");
     }
 
     /** Records vertices as they are written (already transformed by the caller's pose), to write them out later. */

@@ -48,7 +48,7 @@ public class ElderCircleRenderer extends EntityRenderer<ElderCircle> {
         poseStack.pushPose();
         poseStack.translate(0, .03, 0);
         poseStack.mulPose(Axis.YP.rotationDegrees(age * .3f));
-        RenderHelper.groundQuad(buffer.getBuffer(RenderType.entityTranslucent(RuneRender.RING_CARVED)), poseStack.last(), (r + 1.4f) * appear, RuneRender.alpha(0xFFFFFF, lit), packedLight);
+        RenderHelper.groundQuad(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(RuneRender.RING_CARVED)), poseStack.last(), (r + 1.4f) * appear, RuneRender.alpha(0xFFFFFF, lit), packedLight);
         poseStack.translate(0, .01, 0);
         RenderHelper.groundQuad(buffer.getBuffer(RenderType.eyes(RuneRender.RING_GLOW)), poseStack.last(), (r + 1.4f) * appear,
                 RuneRender.additive(RuneFx.GLOW, lit * (.55f + .45f * flash)), FULL);

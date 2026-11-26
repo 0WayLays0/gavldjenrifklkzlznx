@@ -48,7 +48,7 @@ public class ImplosionRenderer extends EntityRenderer<ImplosionCore> {
         poseStack.pushPose();
         poseStack.translate(0, 0, .01f);
         poseStack.scale(coreSize, coreSize, coreSize);
-        RenderHelper.billboard(buffer.getBuffer(RenderType.entityTranslucent(CORE)), poseStack.last(), .5f, 0xF0FFFFFF, LightTexture.FULL_BRIGHT);
+        RenderHelper.billboard(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(CORE)), poseStack.last(), .5f, 0xF0FFFFFF, LightTexture.FULL_BRIGHT);
         poseStack.popPose();
 
         // White-hot heart in the last instants

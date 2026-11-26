@@ -100,7 +100,7 @@ public class AbyssalDomeRenderer extends EntityRenderer<AbyssalDome> {
         }
 
         // Kelp swaying round its rim
-        VertexConsumer kelp = buffer.getBuffer(RenderType.entityTranslucent(WaterRender.KELP));
+        VertexConsumer kelp = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(WaterRender.KELP));
         p = poseStack.last();
         for (int k = 0; k < KELP; k++) {
             float a = k * Mth.TWO_PI / KELP + WaterFx.hash(seed + k) * .2f;
@@ -124,7 +124,7 @@ public class AbyssalDomeRenderer extends EntityRenderer<AbyssalDome> {
         }
 
         // Shoals of fish wheeling round inside
-        VertexConsumer fish = buffer.getBuffer(RenderType.entityTranslucent(WaterRender.FISH));
+        VertexConsumer fish = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(WaterRender.FISH));
         for (int s = 0; s < SHOAL_COLOURS.length; s++) {
             float dir = s % 2 == 0 ? 1 : -1;
             float rs = r * (.32f + .14f * s);
@@ -147,7 +147,7 @@ public class AbyssalDomeRenderer extends EntityRenderer<AbyssalDome> {
         }
 
         // A manta ray gliding round under its roof
-        VertexConsumer manta = buffer.getBuffer(RenderType.entityTranslucent(WaterRender.MANTA));
+        VertexConsumer manta = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(WaterRender.MANTA));
         float mth = -age * .011f + seed;
         float mr = r * .5f;
         poseStack.pushPose();

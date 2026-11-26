@@ -58,7 +58,7 @@ public final class WaterMesh {
     public record View(Quaternionf camera, Vector3f eye) {}
 
     public static VertexConsumer translucent(MultiBufferSource buffer, ResourceLocation texture) {
-        return buffer.getBuffer(RenderType.entityTranslucent(texture));
+        return buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(texture));
     }
 
     public static VertexConsumer additive(MultiBufferSource buffer, ResourceLocation texture) {

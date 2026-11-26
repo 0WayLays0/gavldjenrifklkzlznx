@@ -46,7 +46,7 @@ public class QuillStrokeRenderer extends EntityRenderer<QuillStroke> {
         poseStack.mulPose(Axis.YP.rotationDegrees(-entity.getYRot()));
         if (written > .05f && fade < 1) {
             int alpha = (int) (255 * (1 - fade));
-            strip(buffer.getBuffer(RenderType.entityTranslucent(INK)), poseStack.last(), written, .03f, (alpha << 24) | 0xFFFFFF, packedLight);
+            strip(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(INK)), poseStack.last(), written, .03f, (alpha << 24) | 0xFFFFFF, packedLight);
             int r = (int) (255 * runes);
             strip(buffer.getBuffer(RenderType.eyes(INK_RUNES)), poseStack.last(), written, .04f, 0xFF000000 | r << 16 | r << 8 | r, LightTexture.FULL_BRIGHT);
         }

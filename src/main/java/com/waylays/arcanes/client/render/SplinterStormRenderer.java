@@ -182,7 +182,7 @@ public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
         }
 
         // Dusty wind spiralling with it, and the stirred dust round its foot
-        VertexConsumer wind = buffer.getBuffer(RenderType.entityTranslucent(WoodRender.WIND));
+        VertexConsumer wind = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(WoodRender.WIND));
         p = poseStack.last();
         for (int w = 0; w < STREAKS; w++) {
             float phase = w * Mth.TWO_PI / STREAKS;
@@ -201,7 +201,7 @@ public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
                 prev = at;
             }
         }
-        VertexConsumer dust = buffer.getBuffer(RenderType.entityTranslucent(WoodRender.DUST));
+        VertexConsumer dust = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(WoodRender.DUST));
         for (int k = 0; k < 3; k++) {
             poseStack.pushPose();
             poseStack.translate(0, .04f + k * .02f, 0);
@@ -211,7 +211,7 @@ public class SplinterStormRenderer extends EntityRenderer<SplinterStorm> {
         }
 
         // The funnel's body: two layers of dusty bands twisting up round it, turning
-        VertexConsumer body = buffer.getBuffer(RenderType.entityTranslucent(WoodRender.WIND));
+        VertexConsumer body = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(WoodRender.WIND));
         p = poseStack.last();
         funnelBody(body, p, age * .05f, 1, .34f * strength, 0xC9AE86, light, scatter);
         funnelBody(body, p, -age * .035f + .5f, .78f, .26f * strength, 0xA88660, light, scatter);

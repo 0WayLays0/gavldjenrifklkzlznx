@@ -50,7 +50,7 @@ public class VoidOrbRenderer extends EntityRenderer<VoidOrb> {
         poseStack.pushPose();
         poseStack.translate(0, 0, .01f);
         poseStack.scale(size, size, size);
-        RenderHelper.billboard(buffer.getBuffer(RenderType.entityTranslucent(CORE)), poseStack.last(), .5f, 0xF8FFFFFF, LightTexture.FULL_BRIGHT);
+        RenderHelper.billboard(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(CORE)), poseStack.last(), .5f, 0xF8FFFFFF, LightTexture.FULL_BRIGHT);
         poseStack.popPose();
         poseStack.popPose();
         super.render(orb, entityYaw, partialTicks, poseStack, buffer, packedLight);

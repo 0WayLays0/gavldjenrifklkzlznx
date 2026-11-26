@@ -43,7 +43,7 @@ public class CataclysmRenderer extends EntityRenderer<CataclysmCore> {
         poseStack.translate(0, 0, -.02f);
         poseStack.scale(dark, dark, dark);
         int alpha = (int) (110 * Mth.clamp(t * 2, 0f, 1f));
-        RenderHelper.billboard(buffer.getBuffer(RenderType.entityTranslucent(DARK)), poseStack.last(), .5f, (alpha << 24) | 0xFFFFFF, LightTexture.FULL_BRIGHT);
+        RenderHelper.billboard(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(DARK)), poseStack.last(), .5f, (alpha << 24) | 0xFFFFFF, LightTexture.FULL_BRIGHT);
         poseStack.popPose();
 
         // Churning ball of fire, whiter as it nears the end

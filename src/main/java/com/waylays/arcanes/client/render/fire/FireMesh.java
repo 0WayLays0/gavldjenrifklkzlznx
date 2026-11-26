@@ -166,7 +166,7 @@ public final class FireMesh {
             if (licks.isEmpty()) {
                 return;
             }
-            VertexConsumer body = buffer.getBuffer(RenderType.entityTranslucent(BODY));
+            VertexConsumer body = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(BODY));
             PoseStack.Pose p = poseStack.last();
             for (float[] l : licks) {
                 mesh(body, p, l, false);

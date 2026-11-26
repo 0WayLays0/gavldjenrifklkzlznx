@@ -66,7 +66,7 @@ public class AmberPrisonRenderer extends EntityRenderer<AmberPrison> {
         poseStack.popPose();
         // The shell, rising from the ground: one faceted lump of amber, seen through (only its near side is drawn, so
         // it stays as clear as one layer)
-        VertexConsumer amber = buffer.getBuffer(RenderType.entityTranslucentCull(WoodRender.AMBER));
+        VertexConsumer amber = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veilCull(WoodRender.AMBER));
         int argb = RuneRender.alpha(colour, alpha);
         float lift = ry * risen;
         // (the blob's faces wind inwards: mirrored, the side kept is the near one)
@@ -77,7 +77,7 @@ public class AmberPrisonRenderer extends EntityRenderer<AmberPrison> {
                 7, 5, light, argb);
         poseStack.popPose();
         // Drops and the pool are seen from both sides
-        amber = buffer.getBuffer(RenderType.entityTranslucent(WoodRender.AMBER));
+        amber = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(WoodRender.AMBER));
         PoseStack.Pose p = poseStack.last();
         // Drops running down it
         for (int k = 0; k < 5; k++) {
@@ -142,7 +142,7 @@ public class AmberPrisonRenderer extends EntityRenderer<AmberPrison> {
         if (fade <= 0) {
             return;
         }
-        VertexConsumer amber = buffer.getBuffer(RenderType.entityTranslucent(WoodRender.AMBER));
+        VertexConsumer amber = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(WoodRender.AMBER));
         for (int k = 0; k < SHARDS; k++) {
             float a = WoodFx.hash(seed + k * 3) * Mth.TWO_PI;
             float out = .18f + .2f * WoodFx.hash(seed + k * 3 + 1);

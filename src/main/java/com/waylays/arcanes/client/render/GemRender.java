@@ -190,7 +190,7 @@ public final class GemRender {
      */
     public static void gem(PoseStack poseStack, MultiBufferSource buffer, Cut cut, int rgb, float size, float alpha, float time) {
         float[] tris = MESH[cut.ordinal()];
-        VertexConsumer consumer = buffer.getBuffer(RenderType.entityTranslucent(FACET));
+        VertexConsumer consumer = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(FACET));
         poseStack.pushPose();
         poseStack.scale(size, size, size);
         PoseStack.Pose pose = poseStack.last();

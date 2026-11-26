@@ -39,15 +39,15 @@ public final class WaterRender {
     private WaterRender() {}
 
     public static VertexConsumer water(MultiBufferSource buffer) {
-        return buffer.getBuffer(RenderType.entityTranslucent(WATER));
+        return buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(WATER));
     }
 
     public static VertexConsumer foam(MultiBufferSource buffer) {
-        return buffer.getBuffer(RenderType.entityTranslucent(FOAM));
+        return buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(FOAM));
     }
 
     public static VertexConsumer drops(MultiBufferSource buffer) {
-        return buffer.getBuffer(RenderType.entityTranslucent(DROP));
+        return buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(DROP));
     }
 
     /** Additive light (caustics, glows): its colour fades it. */

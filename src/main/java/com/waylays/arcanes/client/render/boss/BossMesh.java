@@ -51,8 +51,9 @@ public final class BossMesh {
         return buffer.getBuffer(RenderType.eyes(texture));
     }
 
+    /** See-through, hiding nothing behind it (the game's own see-through type hid what lay behind its faint parts). */
     public static VertexConsumer see(MultiBufferSource buffer, ResourceLocation texture) {
-        return buffer.getBuffer(RenderType.entityTranslucent(texture));
+        return buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(texture));
     }
 
     /**
@@ -60,7 +61,7 @@ public final class BossMesh {
      * third-person camera dipping to the floor would otherwise see from beneath, covering the whole view.
      */
     public static VertexConsumer ground(MultiBufferSource buffer, ResourceLocation texture) {
-        return buffer.getBuffer(RenderType.entityTranslucentCull(texture));
+        return buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veilCull(texture));
     }
 
     public static VertexConsumer solid(MultiBufferSource buffer, ResourceLocation texture) {

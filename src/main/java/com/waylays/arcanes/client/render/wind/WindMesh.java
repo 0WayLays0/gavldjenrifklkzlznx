@@ -44,11 +44,11 @@ public final class WindMesh {
     private WindMesh() {}
 
     public static VertexConsumer lines(MultiBufferSource buffer) {
-        return buffer.getBuffer(RenderType.entityTranslucent(STREAK));
+        return buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(STREAK));
     }
 
     public static VertexConsumer see(MultiBufferSource buffer, ResourceLocation texture) {
-        return buffer.getBuffer(RenderType.entityTranslucent(texture));
+        return buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(texture));
     }
 
     public static VertexConsumer leaves(MultiBufferSource buffer) {

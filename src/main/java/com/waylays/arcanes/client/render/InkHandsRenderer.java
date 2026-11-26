@@ -53,7 +53,7 @@ public class InkHandsRenderer extends EntityRenderer<InkHands> {
         poseStack.pushPose();
         poseStack.translate(0, .03, 0);
         poseStack.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
-        RenderHelper.groundQuad(buffer.getBuffer(RenderType.entityTranslucent(SPLASH)), poseStack.last(), (ring + .8f) * out, ((int) (220 * out) << 24) | 0xFFFFFF, packedLight);
+        RenderHelper.groundQuad(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(SPLASH)), poseStack.last(), (ring + .8f) * out, ((int) (220 * out) << 24) | 0xFFFFFF, packedLight);
         poseStack.popPose();
 
         boolean holding = entity.isHolding();

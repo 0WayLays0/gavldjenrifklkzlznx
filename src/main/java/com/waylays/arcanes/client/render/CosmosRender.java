@@ -125,7 +125,7 @@ public final class CosmosRender {
      * rings, seen from both sides.
      */
     public static void ring(PoseStack poseStack, MultiBufferSource buffer, float inner, float outer, int tint, float alpha) {
-        VertexConsumer consumer = buffer.getBuffer(RenderType.entityTranslucent(RING));
+        VertexConsumer consumer = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(RING));
         PoseStack.Pose pose = poseStack.last();
         int argb = RuneRender.alpha(tint, alpha);
         int n = 48;
@@ -272,7 +272,7 @@ public final class CosmosRender {
      */
     public static void clock(PoseStack poseStack, MultiBufferSource buffer, float radius, float alpha, float hour, float minute, float second) {
         PoseStack.Pose pose = poseStack.last();
-        RenderHelper.rect(buffer.getBuffer(RenderType.entityTranslucent(CLOCK)), pose, radius * 2, radius * 2, RuneRender.alpha(0xFFFFFF, alpha), GlyphRender.FULL, true);
+        RenderHelper.rect(buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(CLOCK)), pose, radius * 2, radius * 2, RuneRender.alpha(0xFFFFFF, alpha), GlyphRender.FULL, true);
         VertexConsumer stroke = buffer.getBuffer(RenderType.eyes(GlyphRender.STROKE));
         for (int side = -1; side <= 1; side += 2) {
             poseStack.pushPose();

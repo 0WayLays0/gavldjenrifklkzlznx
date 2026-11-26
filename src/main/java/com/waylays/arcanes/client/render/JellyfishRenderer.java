@@ -73,7 +73,7 @@ public class JellyfishRenderer extends EntityRenderer<Jellyfish> {
             WaterRender.ribbon(water, p, pts, side, w, al, GoldRender.lerp(hue, 0xFFFFFF, .3f), age * .02f, light);
         }
         // The bell
-        VertexConsumer bell = buffer.getBuffer(RenderType.entityTranslucent(WaterRender.JELLY));
+        VertexConsumer bell = buffer.getBuffer(com.waylays.arcanes.client.render.SpellRenderTypes.veil(WaterRender.JELLY));
         p = poseStack.last();
         int body = RuneRender.alpha(GoldRender.lerp(hue, 0xFFFFFF, .45f), .5f * fade);
         for (int j = 0; j < RINGS; j++) {
