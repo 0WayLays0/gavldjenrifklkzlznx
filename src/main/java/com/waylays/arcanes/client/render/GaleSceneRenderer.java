@@ -25,7 +25,8 @@ import static com.waylays.arcanes.client.render.ElementFx.FULL;
  * world seems to waver, faintly violet, a white edge where the air cuts. Blades of air flying with their after-images;
  * a ball of crushed air, shells of bent air turning round a bright heart, that bursts in rings; a low wave of wind
  * running along the ground, dust kicked up before it; the dash's trail cut across with blades; the weight of the air
- * pressing down in a column of falling lines on a cracking ring; and Cor Leonis, blades flashing all round the caster
+ * pressing down, all light and no shade: a glowing lens overhead, rings dropping from it, lines of falling air, the
+ * ground cracking with light, and a ring pressing on each one held down; and Cor Leonis, blades flashing all round the caster
  * in every direction inside a whirling wall of bent air.
  */
 public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
@@ -52,7 +53,7 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
             case SPHERE -> sphere(e, poseStack, buffer, view, age, partialTicks, seed);
             case SWEEP -> sweep(e, poseStack, buffer, view, age, seed, light);
             case DASH -> dash(e, poseStack, buffer, view, age, partialTicks, seed);
-            case GRAVITY -> gravity(e, poseStack, buffer, view, age, seed, light);
+            case GRAVITY -> gravity(e, poseStack, buffer, view, age, partialTicks, seed);
             case STORM -> storm(e, poseStack, buffer, view, age, seed);
         }
         buffer.flush(out);
@@ -309,7 +310,7 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
 
     // ---------------------------------------------------------------- Crushing Gravity
 
-    private void gravity(GaleScene e, PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, float age, int seed, int light) {
+    private void gravity(GaleScene e, PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, float age, float partialTicks, int seed) {
         float r = GaleScene.GRAVITY_R;
         float appear = BossMesh.ramp(age, 0, 8);
         float fade = 1 - BossMesh.ramp(age, e.getLife() - 15, e.getLife());
@@ -318,15 +319,43 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
             return;
         }
         Vector3f u = new Vector3f(1, 0, 0), v = new Vector3f(0, 0, -1);
-        // The ground under the weight: a shadow, bent air turning on it, a ring cracking
-        ElementFx.shadow(poseStack, buffer, new Vector3f(), r * 1.1f, .45f * shown);
-        BossMesh.annulus(BossMesh.ground(buffer, WARP), poseStack.last(), new Vector3f(0, .06f, 0), u, v, .01f, r, 48, 3, age * .01f, age * .02f,
-                BossMesh.argb(LILAC, .8f * shown), BossMesh.argb(LILAC, .5f * shown), FULL, false);
-        ElementFx.groundRing(poseStack, buffer, .07f, r - .25f, r, VIOLET, .8f * shown);
-        ElementFx.groundRing(poseStack, buffer, .07f, r * .55f, r * .6f, DEEP, .5f * shown);
-        // The weight overhead: a lens of bent air pressing down
-        BossMesh.annulus(BossMesh.see(buffer, WARP), poseStack.last(), new Vector3f(0, 4.2f - .4f * Mth.sin(age * .15f), 0), u, v, .01f, r, 48, 2,
-                -age * .015f, -age * .03f, BossMesh.argb(LILAC, .7f * shown), BossMesh.argb(LILAC, 0), FULL, true);
+        // Everything here is light, added to the world, never a shade over it: no dark ground, no shadow
+        // The ground under the weight: bent air shimmering on it, its rim glowing
+        BossMesh.annulus(BossMesh.light(buffer, WARP), poseStack.last(), new Vector3f(0, .06f, 0), u, v, .01f, r, 48, 3, age * .01f, age * .02f,
+                BossMesh.glow(LILAC, .12f * shown), BossMesh.glow(VIOLET, .4f * shown), FULL, false);
+        ElementFx.groundRing(poseStack, buffer, .07f, r - .35f, r, VIOLET, .9f * shown);
+        ElementFx.groundRing(poseStack, buffer, .07f, r - .12f, r + .05f, WHITE, .5f * shown);
+        // Waves of pressure running in from the rim to the middle, over and over: the air closing in
+        for (int k = 0; k < 3; k++) {
+            float p = (age * .025f + k / 3f) % 1;
+            float rr = r * (1 - p);
+            ElementFx.groundRing(poseStack, buffer, .08f, Math.max(0, rr - .45f), rr, LILAC, .8f * Mth.sin(Mth.PI * p) * shown);
+        }
+        // The ground cracking under it, light seeping up from the cracks
+        float grow = BossMesh.ramp(age, 0, 10);
+        for (int k = 0; k < 9; k++) {
+            float a = (k + BossMesh.hash(seed + k * 13) * .6f) * Mth.TWO_PI / 9;
+            int n = 5;
+            Vector3f[] crack = new Vector3f[n];
+            for (int i = 0; i < n; i++) {
+                float t = (float) i / (n - 1);
+                float rr = r * (.12f + .8f * t * grow);
+                float jag = (BossMesh.hash(seed + k * 7 + i) - .5f) * .35f * t;
+                crack[i] = new Vector3f(Mth.cos(a + jag) * rr, .1f, Mth.sin(a + jag) * rr);
+            }
+            line(buffer, poseStack, view, crack, .05f, .75f * shown);
+        }
+        // The weight overhead: a lens of bent air, glowing, and rings dropping from it to the ground, faster and faster
+        float lensY = 4.2f - .3f * Mth.sin(age * .15f);
+        BossMesh.annulus(BossMesh.light(buffer, WARP), poseStack.last(), new Vector3f(0, lensY, 0), u, v, .01f, r, 48, 2, -age * .015f, -age * .03f,
+                BossMesh.glow(LILAC, .35f * shown), BossMesh.glow(VIOLET, 0), FULL, true);
+        ElementFx.groundRing(poseStack, buffer, lensY, r * .8f, r * .95f, VIOLET, .6f * shown);
+        for (int k = 0; k < 4; k++) {
+            float p = (age * .03f + k / 4f) % 1;
+            float y = lensY * (1 - p * p);
+            float a = Math.min(1, p * 6) * (1 - p) * shown;
+            ElementFx.groundRing(poseStack, buffer, y, r * .9f - .3f, r * .9f, LILAC, .9f * a);
+        }
         // Lines of falling air, raining straight down hard
         for (int k = 0; k < 18; k++) {
             float h1 = BossMesh.hash(seed + k), h2 = BossMesh.hash(seed + k * 3);
@@ -335,8 +364,28 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
             Vector3f top = new Vector3f(Mth.cos(a) * rr, y + 1.2f, Mth.sin(a) * rr), bottom = new Vector3f(Mth.cos(a) * rr, Math.max(.05f, y), Mth.sin(a) * rr);
             line(buffer, poseStack, view, new Vector3f[]{top, new Vector3f(top).lerp(bottom, .5f), bottom}, .06f, .9f * shown);
         }
-        ElementFx.puffs(poseStack, buffer, view, WindMesh.DUST, new Vector3f(0, .1f, 0), r, .3f, .9f, 10, age, .03f, 0xC8BCA8, .45f * shown, seed + 3, light);
-        ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 2.5f, 0), r * .5f, DEEP, .25f * shown);
+        ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, lensY, 0), r * .35f, VIOLET, .3f * shown);
+        // On each one held down: a ring pressing on them from above, over and over, and a glow on their shoulders
+        Vec3 here = e.getPosition(partialTicks);
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+        for (net.minecraft.world.entity.LivingEntity held : e.level().getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,
+                e.getBoundingBox().inflate(r + 1, 4, r + 1), com.waylays.arcanes.effect.CrushingGravityEffect::isHeavy)) {
+            if (held == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson()) {
+                continue;
+            }
+            Vec3 at = held.getPosition(partialTicks).subtract(here);
+            float h = held.getBbHeight(), w = held.getBbWidth() * .75f + .25f;
+            poseStack.pushPose();
+            poseStack.translate(at.x, at.y, at.z);
+            for (int k = 0; k < 2; k++) {
+                float p = (age * .07f + k * .5f + held.getId() * .37f) % 1;
+                float y = (h + .5f) * (1 - p * p);
+                ElementFx.groundRing(poseStack, buffer, y, w * (1 + .3f * p) - .12f, w * (1 + .3f * p), LILAC, Mth.sin(Mth.PI * p) * shown);
+            }
+            ElementFx.groundRing(poseStack, buffer, .09f, w - .2f, w + .15f, VIOLET, .7f * shown);
+            ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, h * .8f, 0), w * .6f, VIOLET, .25f * shown);
+            poseStack.popPose();
+        }
     }
 
     // ---------------------------------------------------------------- Cor Leonis
