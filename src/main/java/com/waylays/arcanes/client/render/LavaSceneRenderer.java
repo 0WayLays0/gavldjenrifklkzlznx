@@ -20,12 +20,12 @@ import org.joml.Vector3f;
 import static com.waylays.arcanes.client.render.ElementFx.FULL;
 
 /**
- * Lava Magic's spells, drawn: a gob of magma in flight, a tail of fire and smoke behind it, splashing into a pool that
- * bubbles, glows and smokes; the ground cracking and glowing, then a churning jet of lava bursting up, throwing gobs of
+ * Lava Magic's spells, drawn: a gob of magma in flight, a tail of fire and sparks behind it, splashing into a pool that
+ * bubbles and glows; the ground cracking and glowing, then a churning jet of lava bursting up, throwing gobs of
  * fire that rain down; shards of obsidian veined with fire turning round the caster, flaring when struck; a river of
  * lava flowing out between banks of crust, its head a rolling tongue of fire, plates of crust drifting on it, cooling
  * dark at its end; the ground cracking round the caster in rings and spokes, then caving into a lake of magma, jets of
- * lava bursting from it.
+ * lava bursting from it. No smoke or heat haze: their see-through sheets hid the spells.
  */
 public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
     public static final ResourceLocation LAVA = ArcanesOublies.id("textures/entity/lava/lava.png");
@@ -74,7 +74,7 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
 
     /**
      * A jet of lava from {@code base} up {@code height}, {@code r} thick at its foot: its skin churning and flowing up, a
-     * glow inside it, a swelling head, gobs of fire thrown from its top falling all round, smoke rolling off it.
+     * glow inside it, a swelling head, gobs of fire thrown from its top falling all round.
      */
     private static void jet(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f base, float height, float r, float age, float alpha,
                             int seed, int light) {
@@ -114,14 +114,11 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             Vector3f back = new Vector3f(Mth.cos(a) * reach, up * 2.4f - (height + up) * 2 * t, Mth.sin(a) * reach).mul(-.06f).add(p);
             WaterMesh.streak(streaks, poseStack.last(), view.eye(), p, back, s * 2.2f, BossMesh.glow(ORANGE, .8f * alpha), FULL);
         }
-        // Heat shimmering all up the jet
-        ElementFx.haze(poseStack, buffer, view, new Vector3f(base).add(0, -.1f, 0), r * 3.4f, height + 1.8f, 3, age, .045f, 0xFFB070, .55f * alpha);
+        // Glowing all up the jet
         for (int i = 2; i < n; i += 3) {
             ElementFx.bloom(poseStack, buffer, view, axis[i], r * 1.3f, ORANGE, .35f * alpha);
         }
         ElementFx.motes(poseStack, buffer, view, BossMesh.EMBER, base, r * 2.2f, height * 1.2f, .22f, 18, age * 3, HOT, alpha, seed + 11);
-        ElementFx.puffs(poseStack, buffer, view, BossMesh.SMOKE, top, r * 2.5f, height * .6f, r * 1.6f + .6f, 7, age, .025f, SMOKE, .45f * alpha, seed + 13,
-                light);
     }
 
     /** A pool of lava lying flat, {@code r} across: scorched ground round it, its rim of crust; bubbles swell and burst on it. */
@@ -155,11 +152,8 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             }
         }
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .25f, 0), r * 1.1f, ORANGE, .45f * alpha);
-        // Heat rising off it, the air over it wavering
-        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .1f, 0), r * 1.9f, 1.8f + r * .5f, 3, age, .025f, 0xFFB070, .6f * alpha);
+        // Embers rising off it
         ElementFx.motes(poseStack, buffer, view, BossMesh.EMBER, new Vector3f(0, .1f, 0), r, 2.2f, .18f, 10, age * 2, HOT, alpha, seed + 7);
-        ElementFx.puffs(poseStack, buffer, view, BossMesh.SMOKE, new Vector3f(0, .3f, 0), r * 1.2f, 3, r * .8f + .4f, 5, age, .018f, SMOKE, .32f * alpha,
-                seed + 9, light);
     }
 
     /** Cracks of fire running out over the ground from the middle, {@code count} of them, out to {@code reach}. */
@@ -210,7 +204,7 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
                 return;
             }
             Vector3f back = ElementFx.v(vel).normalize().negate();
-            // A tail of fire: gobs shrinking behind it, a streak, smoke rolling off
+            // A tail of fire: gobs shrinking behind it, a streak, sparks
             for (int i = 1; i <= 5; i++) {
                 Vector3f p = new Vector3f(back).mul(i * .32f).add(.05f * Mth.sin(age + i), .05f * Mth.cos(age * 1.3f + i), 0);
                 ElementFx.lumpy(BossMesh.see(buffer, LAVA), poseStack.last(), p, .3f * (1 - i / 6f), 7, 12, .25f, 2.5f, age * .1f + i, seed + i, 1,
@@ -219,12 +213,6 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             WaterMesh.streak(BossMesh.light(buffer, WaterMesh.STREAK), poseStack.last(), view.eye(), new Vector3f(), new Vector3f(back).mul(2.4f), .7f,
                     BossMesh.glow(ORANGE, .8f), FULL);
             ClockMesh.sparks(poseStack, buffer, view, new Vector3f(back).mul(.6f), .9f, 14, age, 1, seed, FULL);
-            VertexConsumer smoke = BossMesh.see(buffer, BossMesh.SMOKE);
-            for (int i = 0; i < 6; i++) {
-                float tt = (i + (age * .4f) % 1) / 6f;
-                Vector3f p = new Vector3f(back).mul(.6f + tt * 2.6f).add(0, tt * .6f, 0);
-                RitualMesh.billboard(smoke, poseStack, view, p, .5f + tt * 1.1f, i + age * .02f, -1, BossMesh.argb(SMOKE, .4f * (1 - tt)), light);
-            }
             return;
         }
         float since = e.sinceLanded(pt);
@@ -257,13 +245,12 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
         float warn = BossMesh.ramp(age, 0, LavaScene.GEYSER_WARN);
         float erupt = age - LavaScene.GEYSER_WARN;
         float heat = erupt < 0 ? warn : Math.max(0, 1 - erupt / (LavaScene.GEYSER_BURST + 15f));
-        // The warning: the ground cracking and glowing, shaking, smoke seeping out
+        // The warning: the ground cracking and glowing, shaking
         cracks(poseStack, buffer, 10, r * 1.7f * warn, .12f, heat, seed);
         ElementFx.groundRing(poseStack, buffer, .06f, 0, r * .6f * warn, HOT, .6f * heat);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .2f, 0), r * (.5f + warn), RED, .6f * heat);
         if (erupt < 0) {
             rubble(poseStack, buffer, r * 1.4f, 10, age, warn, seed, light);
-            ElementFx.puffs(poseStack, buffer, view, BossMesh.SMOKE, new Vector3f(0, .1f, 0), r * 1.2f, 2, .8f, 6, age, .04f, SMOKE, .4f * warn, seed, light);
             return;
         }
         // The vent: a cone of crust heaved up round the hole, its lip glowing
@@ -334,7 +321,6 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
         ElementFx.groundRing(poseStack, buffer, .05f, .7f, 1.25f, ORANGE, (.25f + .5f * flare) * shown);
         ElementFx.motes(poseStack, buffer, view, BossMesh.EMBER, new Vector3f(), 1.3f, 2.4f, .16f, 14, age * 2, HOT, .8f * shown, seed + 3);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 1, 0), 1.4f, RED, (.2f + .8f * flare) * shown);
-        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .2f, 0), 2.6f, 2.6f, 2, age, .03f, 0xFFB070, (.3f + .4f * flare) * shown);
         if (flare > 0) {
             ClockMesh.sparks(poseStack, buffer, view, new Vector3f(0, 1, 0), 1.8f, 20, age, flare, seed, FULL);
         }
@@ -429,20 +415,12 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             float turn = age * .01f + k;
             ElementFx.lumpy(stone, poseStack.last(), at, s * 1.2f, 4, 9, .3f, 1.6f, turn * .1f, seed + k * 17, .22f, BossMesh.argb(0xFFFFFF, 1), light);
         }
-        for (int k = 0; k < 4; k++) {
-            ElementFx.haze(poseStack, buffer, view, new Vector3f(f).mul(length * (k + .5f) / 4).add(0, .1f, 0), half * 2.4f, 2f, 2, age + k * 9, .03f,
-                    0xFFB070, .5f * (1 - cool) * gone);
-        }
         for (int k = 0; k <= 5; k++) {
             Vector3f p = new Vector3f(f).mul(length * k / 5f).add(0, .4f, 0);
             ElementFx.bloom(poseStack, buffer, view, p, 1.3f, ORANGE, .35f * (1 - cool) * gone);
         }
         ElementFx.motes(poseStack, buffer, view, BossMesh.EMBER, new Vector3f(f).mul(length * .5f), Math.max(half, length * .45f), 2, .18f, 20, age * 2, HOT,
                 (1 - cool) * gone, seed + 5);
-        for (int k = 0; k < 3; k++) {
-            ElementFx.puffs(poseStack, buffer, view, BossMesh.SMOKE, new Vector3f(f).mul(length * (k + .5f) / 3).add(0, .2f, 0), half, 2.5f, .9f, 3, age, .02f,
-                    SMOKE, (.25f + .3f * cool) * gone, seed + k * 7, light);
-        }
     }
 
     // ---------------------------------------------------------------- Caldera
@@ -461,7 +439,6 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             }
             rubble(poseStack, buffer, r * t, 22, age, t, seed, light);
             ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .2f, 0), r * .8f * t, RED, .5f * t);
-            ElementFx.puffs(poseStack, buffer, view, BossMesh.SMOKE, new Vector3f(0, .1f, 0), r * t, 2.5f, 1.2f, 10, age, .025f, SMOKE, .35f * t, seed, light);
             return;
         }
         float since = e.sinceLanded(pt);
@@ -504,13 +481,7 @@ public class LavaSceneRenderer extends EntityRenderer<LavaScene> {
             ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 1, 0), r * (1 - t * .5f), ORANGE, 1 - t);
         }
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .6f, 0), R * .9f, ORANGE, .35f * fade);
-        for (int k = 0; k < 5; k++) {
-            float a = k * Mth.TWO_PI / 5 + .4f, rr = k == 0 ? 0 : R * .55f;
-            ElementFx.haze(poseStack, buffer, view, new Vector3f(Mth.cos(a) * rr, .1f, Mth.sin(a) * rr), R * .7f, 3.2f, 2, age + k * 13, .03f, 0xFFB070,
-                    .5f * fade);
-        }
         ElementFx.motes(poseStack, buffer, view, BossMesh.EMBER, new Vector3f(), R, 4, .22f, 30, age * 2, HOT, fade, seed + 9);
-        ElementFx.puffs(poseStack, buffer, view, BossMesh.SMOKE, new Vector3f(0, .3f, 0), R, 5, 1.8f, 10, age, .012f, SMOKE, .35f * fade, seed + 7, light);
     }
 
     @Override

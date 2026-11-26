@@ -253,8 +253,6 @@ public class GaleSceneRenderer extends EntityRenderer<GaleScene> {
             Vector3f b = new Vector3f(a).sub(new Vector3f(f).mul(1.5f + 2 * h));
             line(buffer, poseStack, view, new Vector3f[]{b, new Vector3f(a).lerp(b, .5f), a}, .03f, .7f * fade);
         }
-        ElementFx.puffs(poseStack, buffer, view, WindMesh.DUST, new Vector3f(f).mul(reach + .5f).add(0, .2f, 0), half, .8f, .8f, 6, age, .08f, 0xC8BCA8,
-                .6f * fade, seed + 5, light);
     }
 
     // ---------------------------------------------------------------- Cutting Dash

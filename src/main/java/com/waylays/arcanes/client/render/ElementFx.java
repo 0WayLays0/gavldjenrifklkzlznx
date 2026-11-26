@@ -45,26 +45,6 @@ public final class ElementFx {
         ClockMesh.glow(poseStack, buffer, view, at, size * .45f, BossMesh.mix(rgb, 0xFFFFFF, .65f), .85f * alpha, FULL);
     }
 
-    /**
-     * Soft puffs of {@code texture} (cloud, mist, smoke) round {@code at}, {@code count} of them drifting out to
-     * {@code spread} and up by {@code rise} over their life ({@code rate} of it a tick), each swelling from
-     * {@code size}; see-through, lit by {@code light}.
-     */
-    public static void puffs(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, ResourceLocation texture, Vector3f at, float spread, float rise,
-                             float size, int count, float age, float rate, int rgb, float alpha, int seed, int light) {
-        if (alpha <= .01f) {
-            return;
-        }
-        VertexConsumer c = BossMesh.see(buffer, texture);
-        for (int k = 0; k < count; k++) {
-            float t = (age * rate + BossMesh.hash(seed + k * 7)) % 1;
-            float a = BossMesh.hash(seed + k * 13) * Mth.TWO_PI, out = spread * (.3f + .7f * BossMesh.hash(seed + k * 17));
-            Vector3f p = new Vector3f(Mth.cos(a) * out * t, rise * t + (BossMesh.hash(seed + k * 19) - .5f) * size, Mth.sin(a) * out * t).add(at);
-            float fade = Mth.sin(Mth.PI * t);
-            RitualMesh.billboard(c, poseStack, view, p, size * (.6f + 1.2f * t), a + age * .01f * (k % 2 == 0 ? 1 : -1), -1, BossMesh.argb(rgb, alpha * fade),
-                    light);
-        }
-    }
 
     /**
      * Motes drifting round {@code at} within {@code radius} (and {@code height} up), twinkling: {@code count} of
@@ -115,7 +95,8 @@ public final class ElementFx {
      */
     public static void wall(PoseStack poseStack, MultiBufferSource buffer, ResourceLocation texture, float radius, float y0, float y1, int bands, float age,
                             float speed, int rgb, float alpha, int light) {
-        VertexConsumer c = BossMesh.see(buffer, texture);
+        // Drawn as light: a see-through sheet hid what was behind it
+        VertexConsumer c = BossMesh.light(buffer, texture);
         int segs = 48;
         float bandH = (y1 - y0) / bands;
         for (int b = 0; b < bands; b++) {
@@ -128,8 +109,8 @@ public final class ElementFx {
                 Vector3f p00 = new Vector3f(Mth.cos(a0) * r, by0, Mth.sin(a0) * r), p10 = new Vector3f(Mth.cos(a1) * r, by0, Mth.sin(a1) * r);
                 Vector3f p01 = new Vector3f(Mth.cos(a0) * r, mid, Mth.sin(a0) * r), p11 = new Vector3f(Mth.cos(a1) * r, mid, Mth.sin(a1) * r);
                 Vector3f p02 = new Vector3f(Mth.cos(a0) * r, by1, Mth.sin(a0) * r), p12 = new Vector3f(Mth.cos(a1) * r, by1, Mth.sin(a1) * r);
-                twoSided(c, poseStack.last(), p00, p10, p11, p01, u0, 1, u1, 1, u1, .5f, u0, .5f, BossMesh.argb(rgb, 0), BossMesh.argb(rgb, alpha), light);
-                twoSided(c, poseStack.last(), p01, p11, p12, p02, u0, .5f, u1, .5f, u1, 0, u0, 0, BossMesh.argb(rgb, alpha), BossMesh.argb(rgb, 0), light);
+                twoSided(c, poseStack.last(), p00, p10, p11, p01, u0, 1, u1, 1, u1, .5f, u0, .5f, BossMesh.glow(rgb, 0), BossMesh.glow(rgb, alpha), light);
+                twoSided(c, poseStack.last(), p01, p11, p12, p02, u0, .5f, u1, .5f, u1, 0, u0, 0, BossMesh.glow(rgb, alpha), BossMesh.glow(rgb, 0), light);
             }
         }
     }
@@ -197,37 +178,6 @@ public final class ElementFx {
     /** Air so hot (or cold, or foul) that it bends the light: rippling lines, light against dark (see GaleSceneRenderer). */
     public static final ResourceLocation WARP = com.waylays.arcanes.ArcanesOublies.id("textures/entity/gale/warp.png");
 
-    /**
-     * A haze rising from {@code at}: {@code layers} sheets of bent air facing the eye, {@code width} wide and
-     * {@code height} tall, their ripples drifting up at {@code speed} (tiles a tick), tinted {@code rgb}, fading out at
-     * their top: heat over lava, cold over snow, fumes over acid.
-     */
-    public static void haze(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f at, float width, float height, int layers,
-                            float age, float speed, int rgb, float alpha) {
-        if (alpha <= .01f) {
-            return;
-        }
-        VertexConsumer c = BossMesh.see(buffer, WARP);
-        PoseStack.Pose p = poseStack.last();
-        for (int k = 0; k < layers; k++) {
-            float off = (k - (layers - 1) / 2f) * width * .35f;
-            Vector3f base = new Vector3f(at);
-            Vector3f toEye = new Vector3f(view.eye()).sub(base);
-            toEye.y = 0;
-            if (toEye.lengthSquared() < 1.0E-6f) {
-                toEye.set(0, 0, 1);
-            }
-            Vector3f side = new Vector3f(toEye).cross(0, 1, 0).normalize();
-            base.add(new Vector3f(side).mul(off));
-            Vector3f s = new Vector3f(side).mul(width * .5f);
-            float v0 = age * speed * (1 + k * .3f) + k * .37f, v1 = v0 + height / 2;
-            float u0 = k * .31f, u1 = u0 + width / 2;
-            int bottom = BossMesh.argb(rgb, alpha * (.9f - k * .15f)), top = BossMesh.argb(rgb, 0);
-            // Bottom edge, then the top, fading
-            BossMesh.quad(c, p, new Vector3f(base).sub(s), new Vector3f(base).add(s), new Vector3f(base).add(s).add(0, height, 0),
-                    new Vector3f(base).sub(s).add(0, height, 0), u0, v1, u1, v1, u1, v0, u0, v0, bottom, top, FULL, BossMesh.UP);
-        }
-    }
 
     /**
      * How far above the scene's feet the thin cover of its block stands (snow layers, a carpet...): what lies on the
@@ -247,18 +197,6 @@ public final class ElementFx {
         return top <= .5 && top > feet ? (float) (top - feet) : 0;
     }
 
-    /** A soft shadow on the ground under something, {@code radius} across, at {@code at} (its y the ground's). */
-    public static void shadow(PoseStack poseStack, MultiBufferSource buffer, Vector3f at, float radius, float alpha) {
-        if (alpha <= .01f || radius <= .01f) {
-            return;
-        }
-        // MIST fades to nothing at its edges: GLOW is black-backed and would print a dark square.
-        VertexConsumer c = BossMesh.ground(buffer, WaterMesh.MIST);
-        int col = BossMesh.argb(0x101018, Math.min(1, alpha * 1.6f));
-        Vector3f a = new Vector3f(at).add(-radius, .02f, -radius), b = new Vector3f(at).add(radius, .02f, -radius);
-        Vector3f d = new Vector3f(at).add(radius, .02f, radius), e = new Vector3f(at).add(-radius, .02f, radius);
-        flat(c, poseStack.last(), a, b, d, e, 0, 0, 1, 0, 1, 1, 0, 1, col, col, FULL);
-    }
 
     /** A flat ring of light on the ground from {@code r0} to {@code r1}, at {@code y}. */
     public static void groundRing(PoseStack poseStack, MultiBufferSource buffer, float y, float r0, float r1, int rgb, float alpha) {

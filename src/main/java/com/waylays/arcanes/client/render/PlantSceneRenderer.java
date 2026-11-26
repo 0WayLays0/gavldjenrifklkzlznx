@@ -21,7 +21,7 @@ import static com.waylays.arcanes.client.render.ElementFx.FULL;
 
 /**
  * Plant Magic's spells, drawn: a stem rising, leaves unfurling on it, its bud swelling and opening into a great flower
- * of curved petals with a golden heart, thorns flung out of it; a haze of golden pollen swirling and glittering, little
+ * of curved petals with a golden heart, thorns flung out of it; a cloud of golden pollen grains swirling and glittering, little
  * flowers opening on the ground under it; seeds flying in a fan, sprouting into puffballs that swell, glow and burst
  * into green spores; a shaft of sunlight, rays round it, leaves whirling up in it, grass and flowers springing up at its
  * foot; a flytrap rising from a bed of great leaves, its two lobes fringed with long teeth, red inside, snapping shut
@@ -247,21 +247,6 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
         if (shown <= .01f) {
             return;
         }
-        // A golden haze turning slowly, lit by its own glitter
-        VertexConsumer cloud = BossMesh.see(buffer, WaterMesh.MIST);
-        for (int k = 0; k < 20; k++) {
-            float a = k * Mth.TWO_PI / 20 + age * .012f;
-            float rr = r * (.3f + .55f * BossMesh.hash(seed + k));
-            float y = .6f + 1.6f * BossMesh.hash(seed + k * 3) + .25f * Mth.sin(age * .04f + k);
-            RitualMesh.billboard(cloud, poseStack, view, new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), 2.6f + BossMesh.hash(seed + k * 5), a, -1,
-                    BossMesh.argb(0xFFE890, .3f * shown), FULL);
-        }
-        VertexConsumer haze = BossMesh.light(buffer, WaterMesh.MIST);
-        for (int k = 0; k < 8; k++) {
-            float a = k * Mth.TWO_PI / 8 - age * .008f;
-            RitualMesh.billboard(haze, poseStack, view, new Vector3f(Mth.cos(a) * r * .5f, 1.3f, Mth.sin(a) * r * .5f), 3.5f, a, -1,
-                    BossMesh.glow(GOLD, .12f * shown), FULL);
-        }
         // Grains of pollen swirling up in a slow whirl, glittering
         VertexConsumer motes = BossMesh.light(buffer, BossMesh.MOTE);
         for (int k = 0; k < 140; k++) {
@@ -328,7 +313,6 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
                 float pr = (.12f + .45f * grow) * swell;
                 Vector3f ball = new Vector3f(spot).add(0, stalk + pr * .8f, 0);
                 ElementFx.lumpy(puff, poseStack.last(), ball, pr, 12, 18, .1f, 2.4f, age * .02f * grow, seed + i * 31, .9f, BossMesh.argb(0xF0E6C0, 1), light);
-                ElementFx.shadow(poseStack, buffer, spot, pr * 1.3f, .35f);
                 for (int k = 0; k < 7; k++) {
                     float a = BossMesh.hash(seed + i * 9 + k) * Mth.TWO_PI, b = BossMesh.hash(seed + i * 9 + k * 3) * 2.2f;
                     Vector3f at = new Vector3f(Mth.sin(b) * Mth.cos(a), Mth.cos(b), Mth.sin(b) * Mth.sin(a)).mul(pr).add(ball);
@@ -341,8 +325,6 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             float t = (age - PlantScene.SEED_BURST) / 16f;
             if (t < 1) {
                 Vector3f at = new Vector3f(spot).add(0, .6f, 0);
-                ElementFx.puffs(poseStack, buffer, view, WaterMesh.MIST, at, 2.4f * t + .2f, .6f, 1.2f + 1.2f * t, 7, t * 40, .02f, SPORE, .75f * (1 - t) * fade,
-                        seed + i * 13, FULL);
                 ElementFx.burst(poseStack, buffer, view, BossMesh.MOTE, at, 2, 1.2f, .22f, 14, t, SPORE, 1, seed + i * 7, true, FULL);
                 ElementFx.groundRing(poseStack, buffer, .06f, 2 * t, 2 * t + .35f, SPORE, (1 - t) * .8f);
                 ElementFx.bloom(poseStack, buffer, view, at, 1.2f, SPORE, .7f * (1 - t));
@@ -403,8 +385,6 @@ public class PlantSceneRenderer extends EntityRenderer<PlantScene> {
             blade(leaves, poseStack.last(), new Vector3f(dir).mul(-.2f).add(at), dir, side, new Vector3f(0, -.1f, 0), .42f, .3f, 2, col, col, light);
         }
         ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(), 1.2f, 4.5f, .16f, 30, age, GOLD, shown, seed + 3);
-        // The sunlit air shimmering warm in the shaft
-        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .05f, 0), 2.2f, 4.5f, 2, age, .02f, 0xFFF0B0, .25f * shown);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, 1, 0), 1.3f, 0xFFF0B0, .35f * shown);
         // Healing: green sparks rising round the caster
         ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(), .7f, 2.4f, .2f, 10, age * 2, GREEN, .9f * shown, seed + 9);

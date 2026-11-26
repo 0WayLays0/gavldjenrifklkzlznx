@@ -20,11 +20,11 @@ import static com.waylays.arcanes.client.render.ElementFx.FULL;
 
 /**
  * Acid Magic's spells, drawn: a jet of glowing acid sprayed ahead, a fan of fat drops streaking out of it, hissing
- * green fumes where they fall; a glowing pool of acid that slowly swirls, its bubbles swelling and bursting, froth round
- * its rim, green fumes curling up from it; a sickly green cloud flickering within, raining glowing streaks that splash
+ * splats where they fall; a glowing pool of acid that slowly swirls, its bubbles swelling and bursting, froth round
+ * its rim; a sickly green cloud in body, flickering within, raining glowing streaks that splash
  * in small rings on a puddle below; a clear bubble of acid round an enemy, glassy at its rim, froth at its foot,
  * bubbles rising inside, that bursts in a splash; a low ring-shaped wave of acid rolling out round the caster, its
- * crest glowing and foaming, the ground behind it wet and fuming.
+ * crest glowing and foaming, the ground behind it wet. No fumes, mist or haze: their see-through sheets hid the spells.
  */
 public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
     public static final ResourceLocation ACID = ArcanesOublies.id("textures/entity/acid/acid.png");
@@ -73,7 +73,7 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
         WaterMesh.streak(streaks, poseStack.last(), view.eye(), at, from, width, BossMesh.glow(core, alpha), FULL);
     }
 
-    /** A splat of acid where a drop fell, {@code size} across, hissing: its stain, a ring of froth, a wisp of fume. */
+    /** A splat of acid where a drop fell, {@code size} across, hissing: its stain, a ring of froth. */
     private static void splat(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f at, float size, float age, float alpha, int seed) {
         if (alpha <= .01f) {
             return;
@@ -84,13 +84,6 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
         BossMesh.annulus(BossMesh.ground(buffer, FROTH), poseStack.last(), new Vector3f(at).add(0, .04f, 0), u, v, size * .7f, size * 1.1f, 14, 1, seed * .3f, 0,
                 BossMesh.argb(0xFFFFFF, 0), BossMesh.argb(0xF4FFE0, .8f * alpha), FULL, false);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(at).add(0, .1f, 0), size * .6f, GREEN, .5f * alpha);
-        ElementFx.puffs(poseStack, buffer, view, WaterMesh.MIST, at, .3f, .9f, .4f, 2, age, .05f, FUME, .4f * alpha, seed, FULL);
-    }
-
-    /** Green fumes curling up from {@code at}: soft puffs, lit as by daylight (a dim light turned them a dirty grey). */
-    private static void fumes(PoseStack poseStack, MultiBufferSource buffer, WaterMesh.View view, Vector3f at, float reach, float size, int count, float age,
-                              float alpha, int seed, int light) {
-        ElementFx.puffs(poseStack, buffer, view, WaterMesh.MIST, at, reach * .4f, reach, size, count, age, .02f, FUME, .5f * alpha, seed, FULL);
     }
 
     /** A puddle of acid lying flat, {@code r} across, glowing and slowly swirling, a rim of froth; bubbles swell and burst on it. */
@@ -126,8 +119,6 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             }
         }
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .2f, 0), r * 1.1f, GREEN, .4f * alpha);
-        // The foul air over it wavering
-        ElementFx.haze(poseStack, buffer, view, new Vector3f(0, .1f, 0), r * 1.8f, 1.6f + r * .3f, 3, age, .02f, 0xC8F090, .5f * alpha);
     }
 
     // ---------------------------------------------------------------- Acid Spray
@@ -185,9 +176,6 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             if (k % 3 == 0) {
                 BossMesh.sphere(blobs, poseStack.last(), at, w * .9f, 4, 6, 0, 0, 1, BossMesh.argb(0xE8FFB0, alpha), FULL);
             }
-            if (t > 10 && k % 5 == 0) {
-                fumes(poseStack, buffer, view, at, 1, .5f, 2, age, alpha, seed + k, light);
-            }
         }
         // Where the drops land, splats of acid hissing on the ground (the spell rises from the caster's eyes: the ground is
         // taken 1.3 blocks under it, flat)
@@ -206,14 +194,6 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             at.y = ground;
             float stay = 1 - BossMesh.ramp(age, e.getLife() - 12, e.getLife());
             splat(poseStack, buffer, view, at, (.25f + .2f * BossMesh.hash(seed + k * 9)) * Math.min(1, since / 3f + .4f), age, stay, seed + k);
-        }
-        // A misty cone of fine droplets round it all
-        VertexConsumer mist = BossMesh.light(buffer, WaterMesh.MIST);
-        for (int k = 0; k < 16; k++) {
-            float t = ((age * .09f + BossMesh.hash(seed + k * 13)) % 1);
-            float ax = (BossMesh.hash(seed + k * 17) * 2 - 1) * AcidScene.SPRAY_HALF * .8f;
-            Vector3f at = new Vector3f(aim).add(new Vector3f(side).mul(ax)).normalize().mul(reach * t);
-            RitualMesh.billboard(mist, poseStack, view, at, .4f + 1.8f * t, k + age * .03f, -1, BossMesh.glow(GREEN, .35f * nozzle * (1 - t)), FULL);
         }
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(aim).mul(.3f), .7f, BRIGHT, nozzle);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(aim).mul(reach * .45f), reach * .4f, GREEN, .3f * nozzle);
@@ -238,10 +218,6 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             }
             ElementFx.groundRing(poseStack, buffer, .08f, e.getSize() * 1.4f * t, e.getSize() * 1.4f * t + .4f, BRIGHT, 1 - t);
         }
-        for (int k = 0; k < 4; k++) {
-            float a = k * Mth.TWO_PI / 4 + age * .01f;
-            fumes(poseStack, buffer, view, new Vector3f(Mth.cos(a) * r * .5f, .15f, Mth.sin(a) * r * .5f), 2.4f, .9f, 3, age, fade, seed + k * 7, light);
-        }
         ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(), r * .9f, 1.8f, .14f, 14, age, BRIGHT, fade, seed + 5);
         float bite = Math.max(0, 1 - e.sinceStruck(age - e.tickCount) / 8f);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, .4f, 0), r, BRIGHT, .5f * bite * fade);
@@ -258,16 +234,17 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
         // The cloud: sickly green-yellow puffs churning, a deeper green underneath, lit from within now and then
         int flash = Mth.floor(age / 9);
         float flicker = BossMesh.hash(seed + flash * 13) > .55f ? 1 - ((age % 9) / 9f) : 0;
-        VertexConsumer puffs = BossMesh.see(buffer, BossMesh.CLOUD);
-        for (int k = 0; k < 30; k++) {
+        // In body, not a fog: a fog hid the rain and everything behind it
+        VertexConsumer puffs = BossMesh.solid(buffer, SnowSceneRenderer.SNOW);
+        for (int k = 0; k < 22; k++) {
             float a = BossMesh.hash(seed + k) * Mth.TWO_PI + age * .004f * (k % 2 == 0 ? 1 : -1);
             float rr = r * Mth.sqrt(BossMesh.hash(seed + k * 3)) * (.6f + .4f * gather);
             float low = BossMesh.hash(seed + k * 5);
-            float y = h + (low - .3f) * 1.2f + .15f * Mth.sin(age * .05f + k);
+            float y = h + (low - .3f) * 1.1f + .15f * Mth.sin(age * .05f + k);
             int col = BossMesh.mix(0x5E8A30, 0xB8D878, low);
             col = BossMesh.mix(col, 0xE8FF90, .4f * flicker);
-            RitualMesh.billboard(puffs, poseStack, view, new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), 2 + 1.4f * BossMesh.hash(seed + k * 11),
-                    k + age * .005f, -1, BossMesh.argb(col, .8f * shown), FULL);
+            ElementFx.lumpy(puffs, poseStack.last(), new Vector3f(Mth.cos(a) * rr, y, Mth.sin(a) * rr), (.8f + .6f * BossMesh.hash(seed + k * 11)) * shown, 8,
+                    12, .22f, 2, age * .01f, seed + k * 7, .6f, BossMesh.argb(col, 1), FULL);
         }
         float fa = BossMesh.hash(seed + flash * 17) * Mth.TWO_PI, fr = r * .6f * BossMesh.hash(seed + flash * 19);
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(Mth.cos(fa) * fr, h - .2f, Mth.sin(fa) * fr), r * .8f, GREEN, (.2f + .8f * flicker) * shown);
@@ -303,7 +280,6 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             }
         }
         puddle(poseStack, buffer, view, r * .9f * gather, age, .8f * shown, 8, seed + 3, light);
-        fumes(poseStack, buffer, view, new Vector3f(0, .15f, 0), 2.2f, 1, 6, age, shown, seed, light);
     }
 
     // ---------------------------------------------------------------- Dissolve
@@ -352,8 +328,6 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
             }
             float bite = Math.max(0, 1 - ((age - 1) % 20) / 8f);
             ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, centreY, 0), r * 1.4f, GREEN, (.25f + .4f * bite) * close);
-            ElementFx.haze(poseStack, buffer, view, new Vector3f(0, height * .3f, 0), r * 3f, height + 1.4f, 2, age, .03f, 0xC8F090, .45f * close);
-            fumes(poseStack, buffer, view, new Vector3f(0, height + .2f, 0), 1.8f, .7f, 5, age, close, seed, light);
             puddle(poseStack, buffer, view, r * 1.1f * close, age, .7f * close, 4, seed, light);
             return;
         }
@@ -375,8 +349,6 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
         }
         ElementFx.bloom(poseStack, buffer, view, new Vector3f(0, centreY, 0), r * 2, BRIGHT, 1 - t);
         ElementFx.groundRing(poseStack, buffer, .08f, r * 2.6f * t, r * 2.6f * t + .6f, BRIGHT, 1 - t);
-        ElementFx.puffs(poseStack, buffer, view, WaterMesh.MIST, new Vector3f(0, centreY, 0), r * 3, 1.2f, 1.4f, 8, since * 3, .03f, FUME, .6f * (1 - t),
-                seed + 11, light);
         puddle(poseStack, buffer, view, r * 1.5f, age, 1 - t, 5, seed, light);
     }
 
@@ -456,17 +428,7 @@ public class AcidSceneRenderer extends EntityRenderer<AcidScene> {
                 ElementFx.bloom(poseStack, buffer, view, new Vector3f(Mth.cos(a) * front, h * .6f, Mth.sin(a) * front), 1.1f, GREEN, .35f * wave);
             }
         }
-        for (int k = 0; k < 6; k++) {
-            float a = k * Mth.TWO_PI / 6 + seed;
-            float rr = front * (.3f + .5f * BossMesh.hash(seed + k));
-            fumes(poseStack, buffer, view, new Vector3f(Mth.cos(a) * rr, .15f, Mth.sin(a) * rr), 2.4f, 1, 3, age, fade * Math.min(1, front / 3), seed + k * 5, light);
-        }
         ElementFx.motes(poseStack, buffer, view, BossMesh.MOTE, new Vector3f(), Math.max(1, front), 1.5f, .14f, 30, age, BRIGHT, fade, seed + 7);
-        for (int k = 0; k < 6 && front > 1; k++) {
-            float a = k * Mth.TWO_PI / 6 + .2f;
-            ElementFx.haze(poseStack, buffer, view, new Vector3f(Mth.cos(a) * front * .7f, .1f, Mth.sin(a) * front * .7f), 3f, 1.8f, 2, age + k * 7, .025f,
-                    0xC8F090, .4f * fade);
-        }
     }
 
     @Override

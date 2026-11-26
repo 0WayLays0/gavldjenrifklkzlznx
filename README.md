@@ -649,6 +649,13 @@ la glissade givrée, vapeurs sur l'acide (flaques, dissolution, marée), air cha
 Plus : bourrelets de neige le long du sillon de la boule et neige projetée sur ses côtés ; gouttes de lave qui tombent
 des éclats d'obsidienne ; lucioles, pétales qui tombent et herbe autour de la grande fleur ; bave qui coule de la dionée.
 
+**Plus de fumées (1.11.5)** : toutes les textures de fumée, brume, nuage, poussière et la brume de distorsion de la
+troisième passe sont **retirées** des sorts de Neige, Lave, Plante, Acide et de la Bourrasque : ces voiles
+semi-transparents cachaient le sort derrière eux. Le blizzard du Voile blanc est fait de neige poussée en traînées et
+de paquets de neige, sous un plafond de nuages en volume ; le nuage de la Pluie acide est un nuage en volume (plus un
+voile). Les murs tournants de Cor Leonis sont lumineux au lieu d'être semi-transparents. Plus aucune ombre portée sous
+les sorts.
+
 ### Magie de la Bourrasque (Gale)
 
 Six sorts d'air si dense qu'il **déforme la lumière** : des lignes qui ondulent, claires sur sombres, à travers lesquelles le
